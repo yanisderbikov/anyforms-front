@@ -1,0 +1,46 @@
+{
+  "name": "anyforms-front",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://yourusername.github.io/anyforms-front",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-hot-toast": "^2.4.1",
+    "axios": "^1.6.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "api": "swagger-typescript-api generate -p https://anyforms-production.up.railway.app/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums",
+    "dev-api": "swagger-typescript-api generate -p http://localhost:8090/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.0",
+    "swagger-typescript-api": "^13.0.3"
+  }
+}
+
+
