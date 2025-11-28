@@ -1,27 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { toast } from 'react-hot-toast';
-import { syncOrder } from '../../services/api';
 import styles from './OrderCard.module.css';
 
 const OrderCard = ({ order, onAddTracker }) => {
-  const [syncing, setSyncing] = useState(false);
+  const copyToClipboard = (text, message) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      toast.success(message, {
+        position: 'top-right',
+        duration: 2000,
+      });
+    }).catch(() => {
+      toast.error('Ошибка при копировании');
+    });
+  };
 
-  const handleSync = async () => {
+  const handleCopyFIO = () => {
+    copyToClipboard(order.contactName, 'ФИО скопировано');
+  };
+
+  const handleCopyPhone = () => {
+    copyToClipboard(order.contactPhone, 'Телефон скопирован');
+  };
+
+  const handleCopyCdekPickupPoint = () => {
+    copyToClipboard(order.pvzSdek, 'ПВЗ СДЭК скопирован');
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
     try {
-      setSyncing(true);
-      const result = await syncOrder(order.leadId);
-      if (result.success) {
-        toast.success(
-          `Заказ синхронизирован. Товаров: ${result.itemsCount || order.items.length}`
-        );
-      } else {
-        toast.error(result.error || 'Ошибка при синхронизации');
-      }
-    } catch (error) {
-      toast.error('Ошибка при синхронизации заказа');
-      console.error('Error syncing order:', error);
-    } finally {
-      setSyncing(false);
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch {
+      return dateString;
     }
   };
 
@@ -34,13 +50,45 @@ const OrderCard = ({ order, onAddTracker }) => {
       <div className={styles.cardBody}>
         <div className={styles.contactInfo}>
           <div className={styles.contactItem}>
-            <span className={styles.label}>Контакт:</span>
-            <span className={styles.value}>{order.contactName}</span>
+            <span className={styles.label}>ФИО:</span>
+            <span 
+              className={`${styles.value} ${styles.clickable}`}
+              onClick={handleCopyFIO}
+              title="Нажмите для копирования"
+            >
+              {order.contactName || '-'}
+            </span>
           </div>
           <div className={styles.contactItem}>
             <span className={styles.label}>Телефон:</span>
-            <span className={styles.value}>{order.contactPhone}</span>
+            <span 
+              className={`${styles.value} ${styles.clickable}`}
+              onClick={handleCopyPhone}
+              title="Нажмите для копирования"
+            >
+              {order.contactPhone || '-'}
+            </span>
           </div>
+          {order.pvzSdek && (
+            <div className={styles.contactItem}>
+              <span className={styles.label}>ПВЗ СДЭК:</span>
+              <span 
+                className={`${styles.value} ${styles.clickable}`}
+                onClick={handleCopyCdekPickupPoint}
+                title="Нажмите для копирования"
+              >
+                {order.pvzSdek}
+              </span>
+            </div>
+          )}
+          {order.purchaseDate && (
+            <div className={styles.contactItem}>
+              <span className={styles.label}>Дата оплаты:</span>
+              <span className={styles.value}>
+                {formatDate(order.purchaseDate)}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className={styles.itemsSection}>
@@ -63,19 +111,13 @@ const OrderCard = ({ order, onAddTracker }) => {
         >
           Добавить трекер
         </button>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className={styles.syncButton}
-        >
-          {syncing ? 'Синхронизация...' : 'Синхронизировать'}
-        </button>
       </div>
     </div>
   );
 };
 
 export default OrderCard;
+
 
 
 

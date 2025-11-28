@@ -61,6 +61,20 @@
   font-weight: 500;
 }
 
+.clickable {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  user-select: none;
+}
+
+.clickable:hover {
+  opacity: 0.7;
+}
+
+.clickable:active {
+  opacity: 0.5;
+}
+
 .itemsSection {
   margin-top: 1rem;
 }
@@ -132,38 +146,13 @@
   opacity: 0.6;
 }
 
-.syncButton {
-  flex: 1;
-  min-width: 120px;
-  padding: 0.75rem 1rem;
-  background: transparent;
-  color: #000;
-  border: 1px solid #000;
-  border-radius: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  text-transform: lowercase;
-}
-
-.syncButton:hover:not(:disabled) {
-  background: #000;
-  color: #fff;
-}
-
-.syncButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
 
 @media (max-width: 768px) {
   .cardFooter {
     flex-direction: column;
   }
   
-  .addTrackerButton,
-  .syncButton {
+  .addTrackerButton {
     width: 100%;
   }
 }
