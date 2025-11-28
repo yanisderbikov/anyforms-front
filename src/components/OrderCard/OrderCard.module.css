@@ -1,28 +1,31 @@
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #e5e5e5;
+  border-radius: 0;
+  border: none;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: none;
   display: flex;
   flex-direction: column;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: none;
+  box-shadow: none;
 }
 
 .cardHeader {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #e5e5e5;
   padding: 1rem 1.5rem;
-  color: white;
+  color: #000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .leadId {
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
+  text-transform: lowercase;
+  color: #000;
 }
 
 .cardBody {
@@ -48,12 +51,13 @@
 
 .label {
   font-weight: 600;
-  color: #666;
+  color: #000;
   font-size: 0.9rem;
+  text-transform: lowercase;
 }
 
 .value {
-  color: #333;
+  color: #000;
   font-weight: 500;
 }
 
@@ -64,8 +68,9 @@
 .itemsTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: #000;
   margin-bottom: 0.75rem;
+  text-transform: lowercase;
 }
 
 .itemsList {
@@ -80,24 +85,25 @@
   align-items: center;
   padding: 0.5rem;
   margin-bottom: 0.25rem;
-  background: rgba(102, 126, 234, 0.05);
-  border-radius: 6px;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .itemName {
-  color: #333;
+  color: #000;
   font-size: 0.95rem;
 }
 
 .itemQuantity {
-  color: #667eea;
+  color: #000;
   font-weight: 600;
   font-size: 0.9rem;
 }
 
 .cardFooter {
   padding: 1rem 1.5rem;
-  background: rgba(0, 0, 0, 0.02);
+  background: #e5e5e5;
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
@@ -107,46 +113,47 @@
   flex: 1;
   min-width: 120px;
   padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #000;
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: opacity 0.2s ease;
+  text-transform: lowercase;
 }
 
 .addTrackerButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+  opacity: 0.8;
 }
 
 .addTrackerButton:active {
-  transform: translateY(0);
+  opacity: 0.6;
 }
 
 .syncButton {
   flex: 1;
   min-width: 120px;
   padding: 0.75rem 1rem;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  border: 2px solid #667eea;
-  border-radius: 8px;
+  background: transparent;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+  text-transform: lowercase;
 }
 
 .syncButton:hover:not(:disabled) {
-  background: #667eea;
-  color: white;
+  background: #000;
+  color: #fff;
 }
 
 .syncButton:disabled {
-  opacity: 0.6;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 

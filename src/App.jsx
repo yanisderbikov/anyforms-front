@@ -6,7 +6,7 @@ function App() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <h1 className={styles.title}>AnyForms - Управление заказами</h1>
+        <h1 className={styles.title}>any forms</h1>
       </header>
       <main className={styles.main}>
         <OrderList />

@@ -46,11 +46,16 @@ const OrderList = () => {
 
   const filteredOrders = orders.filter((order) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesBasicInfo = 
       order.contactName.toLowerCase().includes(query) ||
       order.contactPhone.includes(query) ||
-      order.leadId.toString().includes(query)
+      order.leadId.toString().includes(query);
+    
+    const matchesProductType = order.items.some((item) =>
+      item.productName.toLowerCase().includes(query)
     );
+    
+    return matchesBasicInfo || matchesProductType;
   });
 
   if (loading) {
@@ -68,7 +73,7 @@ const OrderList = () => {
         <div className={styles.searchContainer}>
           <input
             type="text"
-            placeholder="Поиск по имени, телефону или ID сделки..."
+            placeholder="Поиск по имени, телефону, ID сделки или типу товара..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchInput}
