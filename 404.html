@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <script>
+        (function () {
+            // сохраняем полный путь
+            sessionStorage.setItem('spaRedirect', location.pathname + location.search + location.hash);
+            // идём на корень, где лежит index.html
+            location.replace('/');
+        })();
+    </script>
+</head>
+<body></body>
+</html>
+
