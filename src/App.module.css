@@ -2,6 +2,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+.appFullscreen {
+  height: 100vh;
+  overflow: hidden;
 }
 
 .header {
@@ -24,6 +31,14 @@
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+}
+
+.mainFullscreen {
+  flex: 1;
+  padding: 0;
+  width: 100%;
+  margin: 0;
+  max-width: none;
 }
 
 @media (max-width: 768px) {
