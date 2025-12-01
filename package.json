@@ -2,7 +2,7 @@
   "name": "anyforms-front",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://yourusername.github.io/anyforms-front",
+  "homepage": "https://anyforms.ru",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
