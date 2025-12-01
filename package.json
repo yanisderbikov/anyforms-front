@@ -17,7 +17,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "api": "swagger-typescript-api generate -p https://anyforms-production.up.railway.app/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums",
+    "api": "swagger-typescript-api generate -p https://anyforms.up.railway.app/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums",
     "dev-api": "swagger-typescript-api generate -p http://localhost:8090/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums"
   },
   "eslintConfig": {
