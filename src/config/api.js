@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
   // Проверяем hostname для определения окружения
   // Если мы не на localhost, значит это production
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return 'https://anyforms.up.railway.app';
+    return 'https://anyforms-production.up.railway.app';
   }
   
   // Development mode

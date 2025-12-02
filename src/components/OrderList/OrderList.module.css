@@ -2,6 +2,45 @@
   width: 100%;
 }
 
+.summaryBox {
+  background: #e5e5e5;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0;
+}
+
+.summaryTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 1rem 0;
+  text-transform: lowercase;
+}
+
+.summaryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.summaryProductName {
+  color: #000;
+  text-transform: lowercase;
+}
+
+.summaryCount {
+  color: #000;
+  font-weight: 600;
+}
+
 .controls {
   display: flex;
   gap: 1rem;

@@ -47,9 +47,9 @@ const OrderList = () => {
   const filteredOrders = orders.filter((order) => {
     const query = searchQuery.toLowerCase();
     const matchesBasicInfo = 
-      order.contactName.toLowerCase().includes(query) ||
-      order.contactPhone.includes(query) ||
-      order.leadId.toString().includes(query);
+      order.contactName?.toLowerCase().includes(query) ||
+      order.contactPhone?.includes(query) ||
+      order.leadId?.toString().includes(query);
     
     const matchesProductType = order.items.some((item) =>
       item.productName.toLowerCase().includes(query)
@@ -57,6 +57,24 @@ const OrderList = () => {
     
     return matchesBasicInfo || matchesProductType;
   });
+
+  // Подсчет количества товаров по типам
+  const getProductCounts = () => {
+    const counts = {};
+    filteredOrders.forEach((order) => {
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((item) => {
+          if (item.productName && item.quantity) {
+            const productName = item.productName;
+            counts[productName] = (counts[productName] || 0) + item.quantity;
+          }
+        });
+      }
+    });
+    return counts;
+  };
+
+  const productCounts = getProductCounts();
 
   if (loading) {
     return (
@@ -69,6 +87,20 @@ const OrderList = () => {
 
   return (
     <div className={styles.orderList}>
+      {Object.keys(productCounts).length > 0 && (
+        <div className={styles.summaryBox}>
+          <h2 className={styles.summaryTitle}>к отправке</h2>
+          <div className={styles.summaryContent}>
+            {Object.entries(productCounts).map(([productName, count]) => (
+              <div key={productName} className={styles.summaryItem}>
+                <span className={styles.summaryProductName}>{productName}</span>
+                <span className={styles.summaryCount}>{count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.controls}>
         <div className={styles.searchContainer}>
           <input
