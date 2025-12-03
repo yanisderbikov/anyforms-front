@@ -27,6 +27,13 @@ const OrderCard = ({ order, onAddTracker }) => {
     copyToClipboard(order.pvzSdek, 'ПВЗ СДЭК скопирован');
   };
 
+  const handleLeadClick = () => {
+    if (order.leadId) {
+      const url = `https://hairdoskeels38.amocrm.ru/leads/detail/${order.leadId}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
@@ -44,7 +51,21 @@ const OrderCard = ({ order, onAddTracker }) => {
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <h3 className={styles.leadId}>Сделка #{order.leadId}</h3>
+        <h3 className={styles.leadId}>
+          Сделка #{order.leadId}
+        </h3>
+        <button
+          className={styles.linkIcon}
+          onClick={handleLeadClick}
+          title="Открыть сделку в AmoCRM"
+          aria-label="Открыть сделку в AmoCRM"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
       
       <div className={styles.cardBody}>

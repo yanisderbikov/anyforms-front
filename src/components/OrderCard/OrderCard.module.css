@@ -18,6 +18,10 @@
   padding: 1rem 1.5rem;
   color: #000;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .leadId {
@@ -26,6 +30,32 @@
   margin: 0;
   text-transform: lowercase;
   color: #000;
+  flex: 1;
+}
+
+.linkIcon {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.linkIcon:hover {
+  opacity: 0.7;
+}
+
+.linkIcon:active {
+  opacity: 0.5;
+}
+
+.linkIcon svg {
+  display: block;
 }
 
 .cardBody {
