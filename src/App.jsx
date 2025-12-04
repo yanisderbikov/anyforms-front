@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
@@ -7,6 +7,7 @@ import styles from './App.module.css';
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isOrdersPage = location.pathname.startsWith('/orders');
 
   useEffect(() => {
     if (isHomePage) {
@@ -18,7 +19,7 @@ function App() {
 
   return (
     <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      {!isHomePage && (
+      {!isHomePage && !isOrdersPage && (
         <header className={styles.header}>
           <h1 className={styles.title}>any forms</h1>
         </header>
@@ -26,7 +27,10 @@ function App() {
       <main className={isHomePage ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/" element={<PDFViewer />} />
-          <Route path="/orders" element={<OrderList />} />
+          <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
+          <Route path="/orders/without-tracker" element={<OrderList />} />
+          <Route path="/orders/created" element={<OrderList />} />
+          <Route path="/orders/delivering" element={<OrderList />} />
         </Routes>
       </main>
     </div>

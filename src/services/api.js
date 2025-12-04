@@ -58,4 +58,34 @@ export const syncOrder = async (leadId) => {
   }
 };
 
+/**
+ * Get delivering orders (без трекера)
+ * @returns {Promise<Array>} Array of orders
+ */
+export const getDeliveringOrders = async () => {
+  try {
+    const response = await apiClient.api.getDeliveringOrders();
+    const data = response.data;
+    return Array.isArray(data) ? data : [data];
+  } catch (error) {
+    console.error('Error fetching delivering orders:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get created orders (к отправке / накладные)
+ * @returns {Promise<Array>} Array of orders
+ */
+export const getCreatedOrders = async () => {
+  try {
+    const response = await apiClient.api.getCreatedOrders();
+    const data = response.data;
+    return Array.isArray(data) ? data : [data];
+  } catch (error) {
+    console.error('Error fetching created orders:', error);
+    throw error;
+  }
+};
+
 

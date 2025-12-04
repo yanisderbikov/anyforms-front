@@ -110,6 +110,30 @@ const OrderCard = ({ order, onAddTracker }) => {
               </span>
             </div>
           )}
+          {order.tracker && (
+              <div className={styles.contactItem}>
+                <span className={styles.label}>Трекер:</span>
+                <span className={styles.value}>
+                {order.tracker}
+              </span>
+              </div>
+          )}
+          {order.deliveryStatus && (
+              <div className={styles.contactItem}>
+                <span className={styles.label}>Статус доставки:</span>
+                <span className={styles.value}>
+                {order.deliveryStatus}
+              </span>
+              </div>
+          )}
+          {order.comment && (
+              <div className={styles.contactItem}>
+                <span className={styles.label}>Комментарий:</span>
+                <span className={styles.value}>
+                {order.comment}
+              </span>
+              </div>
+          )}
         </div>
 
         <div className={styles.itemsSection}>
@@ -125,14 +149,16 @@ const OrderCard = ({ order, onAddTracker }) => {
         </div>
       </div>
 
-      <div className={styles.cardFooter}>
-        <button
-          onClick={onAddTracker}
-          className={styles.addTrackerButton}
-        >
-          Добавить трекер
-        </button>
-      </div>
+      {onAddTracker && (
+        <div className={styles.cardFooter}>
+          <button
+            onClick={onAddTracker}
+            className={styles.addTrackerButton}
+          >
+            Добавить трекер
+          </button>
+        </div>
+      )}
     </div>
   );
 };
