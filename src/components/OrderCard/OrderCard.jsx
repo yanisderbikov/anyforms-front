@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-hot-toast';
 import styles from './OrderCard.module.css';
 
-const OrderCard = ({ order, onAddTracker }) => {
+const OrderCard = ({ order, onAddTracker, onAddComment }) => {
   const copyToClipboard = (text, message) => {
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
@@ -149,14 +149,24 @@ const OrderCard = ({ order, onAddTracker }) => {
         </div>
       </div>
 
-      {onAddTracker && (
+      {(onAddTracker || onAddComment) && (
         <div className={styles.cardFooter}>
-          <button
-            onClick={onAddTracker}
-            className={styles.addTrackerButton}
-          >
-            Добавить трекер
-          </button>
+          {onAddTracker && (
+            <button
+              onClick={onAddTracker}
+              className={styles.addTrackerButton}
+            >
+              Добавить трекер
+            </button>
+          )}
+          {onAddComment && (
+            <button
+              onClick={onAddComment}
+              className={styles.addTrackerButton}
+            >
+              Добавить комментарий
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -164,7 +174,3 @@ const OrderCard = ({ order, onAddTracker }) => {
 };
 
 export default OrderCard;
-
-
-
-

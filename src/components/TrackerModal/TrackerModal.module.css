@@ -121,6 +121,12 @@
   cursor: not-allowed;
 }
 
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
 .inputError {
   border-color: #000;
 }
@@ -208,6 +214,3 @@
     width: 100%;
   }
 }
-
-
-

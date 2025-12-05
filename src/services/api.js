@@ -25,9 +25,9 @@ export const getOrdersWithoutTracker = async () => {
  * @param {string} tracker - Tracker number
  * @returns {Promise<Object>} API response
  */
-export const setTracker = async (leadId, tracker) => {
+export const setTracker = async (leadId, tracker, comment) => {
   try {
-    const response = await apiClient.api.setTracker({ leadId, tracker });
+    const response = await apiClient.api.setTrackerAndComment({ leadId, tracker, comment });
     return response.data;
   } catch (error) {
     console.error('Error setting tracker:', error);
@@ -87,5 +87,3 @@ export const getCreatedOrders = async () => {
     throw error;
   }
 };
-
-

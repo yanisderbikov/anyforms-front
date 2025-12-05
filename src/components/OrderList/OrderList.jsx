@@ -13,6 +13,7 @@ const OrderList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isCommentModal, setIsCommentModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -79,14 +80,16 @@ const OrderList = () => {
     }
   };
 
-  const handleOpenModal = (leadId) => {
+  const handleOpenModal = (leadId, isComment = false) => {
     setSelectedOrder(leadId);
+    setIsCommentModal(isComment);
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedOrder(null);
+    setIsCommentModal(false);
   };
 
   const handleTrackerSet = () => {
@@ -230,7 +233,8 @@ const OrderList = () => {
             <OrderCard
               key={order.leadId}
               order={order}
-              onAddTracker={activeMode === 'without-tracker' ? () => handleOpenModal(order.leadId) : null}
+              onAddTracker={activeMode === 'without-tracker' ? () => handleOpenModal(order.leadId, false) : null}
+              onAddComment={activeMode === 'created' || activeMode === 'delivering' ? () => handleOpenModal(order.leadId, true) : null}
             />
           ))}
         </div>
@@ -241,6 +245,7 @@ const OrderList = () => {
           leadId={selectedOrder}
           onClose={handleCloseModal}
           onSuccess={handleTrackerSet}
+          commentOnly={isCommentModal}
         />
       )}
     </div>
@@ -248,6 +253,3 @@ const OrderList = () => {
 };
 
 export default OrderList;
-
-
-
