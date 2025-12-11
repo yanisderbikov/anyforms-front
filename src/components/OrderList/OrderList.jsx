@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getOrdersWithoutTracker, getDeliveringOrders, getCreatedOrders } from '../../services/api';
+import { getOrdersWithoutTracker, getDeliveringOrders, getCreatedOrders, syncOrder } from '../../services/api';
 import OrderCard from '../OrderCard/OrderCard';
 import TrackerModal from '../TrackerModal/TrackerModal';
 import styles from './OrderList.module.css';
@@ -95,6 +95,30 @@ const OrderList = () => {
   const handleTrackerSet = () => {
     loadOrders();
     handleCloseModal();
+  };
+
+  const handleSync = async (leadId) => {
+    try {
+      await syncOrder(leadId);
+      toast.success('Синхронизация запущена. Список обновится через 5 секунд...', {
+        position: 'top-right',
+        duration: 3000,
+      });
+      // Обновляем список через 5 секунд
+      setTimeout(() => {
+        loadOrders();
+        toast.success('Список обновлен', {
+          position: 'top-right',
+          duration: 2000,
+        });
+      }, 5000);
+    } catch (error) {
+      toast.error('Ошибка при синхронизации сделки', {
+        position: 'top-right',
+        duration: 3000,
+      });
+      console.error('Error syncing order:', error);
+    }
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -194,7 +218,7 @@ const OrderList = () => {
 
       {Object.keys(productCounts).length > 0 && (
         <div className={styles.summaryBox}>
-          <h2 className={styles.summaryTitle}>Саммари</h2>
+          <h2 className={styles.summaryTitle}>Саммари: {getModeTitle()}</h2>
           <div className={styles.summaryContent}>
             {Object.entries(productCounts).map(([productName, count]) => (
               <div key={productName} className={styles.summaryItem}>
@@ -235,6 +259,7 @@ const OrderList = () => {
               order={order}
               onAddTracker={activeMode === 'without-tracker' ? () => handleOpenModal(order.leadId, false) : null}
               onAddComment={activeMode === 'created' || activeMode === 'delivering' ? () => handleOpenModal(order.leadId, true) : null}
+              onSync={handleSync}
             />
           ))}
         </div>
