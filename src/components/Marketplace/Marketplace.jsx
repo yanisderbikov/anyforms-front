@@ -60,7 +60,10 @@ const Marketplace = () => {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Каталог</h1>
+      <header className={styles.header}>
+        <h1 className={styles.title}>any forms</h1>
+        <p className={styles.subtitle}>Продукция под розницу</p>
+      </header>
       <ul className={styles.grid}>
         {items.map((item) => (
           <li key={item.id} className={styles.gridItem}>

@@ -12,11 +12,24 @@
   }
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
 .title {
   font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 1.5rem;
+  margin: 0 0 0.25rem;
   color: #000;
+  text-transform: lowercase;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0;
+  color: #888;
   text-transform: lowercase;
 }
 

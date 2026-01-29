@@ -14,7 +14,7 @@ const MOCK_ITEMS = [
       'https://storage.yandexcloud.net/anyforms/shop/heart/7.jpeg',
     ],
     price: 890,
-    crossedPrice: 1200,
+    crossedPrice: 1190,
     discountPercent: 26,
     tgLink: 'https://t.me/anyforms_shop/161',
   },
