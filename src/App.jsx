@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
+import Marketplace from "./components/Marketplace/Marketplace";
 
 function App() {
   const location = useLocation();
@@ -26,7 +27,8 @@ function App() {
       )}
       <main className={isHomePage ? styles.mainFullscreen : styles.main}>
         <Routes>
-          <Route path="/" element={<PDFViewer />} />
+          <Route path="/pdf" element={<PDFViewer />} />
+          <Route path="/" element={<Marketplace />} />
           <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
           <Route path="/orders/without-tracker" element={<OrderList />} />
           <Route path="/orders/created" element={<OrderList />} />

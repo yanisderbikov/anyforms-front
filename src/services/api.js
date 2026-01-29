@@ -1,4 +1,6 @@
-import { apiClient } from '../shared/api';
+import apiClient from '../config/apiClient';
+// Вызовы api.gen: apiClient.api.* (getProducts, getProductById, getOrder и т.д.).
+// Эндпоинты заказов (getOrdersWithoutTracker и др.) должны быть в OpenAPI бэка, затем: pnpm run dev-api
 
 /**
  * Get orders without tracker
