@@ -1,60 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './ProductCard.module.css';
 
-const ProductCard = ({ item }) => {
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+const ProductCard = ({ item, onSelect }) => {
   const photos = item.photos?.length ? item.photos : [];
-  const currentPhoto = photos[currentPhotoIndex];
-
-  const goToPrev = (e) => {
-    e.preventDefault();
-    setCurrentPhotoIndex((i) => (i === 0 ? photos.length - 1 : i - 1));
-  };
-
-  const goToNext = (e) => {
-    e.preventDefault();
-    setCurrentPhotoIndex((i) => (i === photos.length - 1 ? 0 : i + 1));
-  };
+  const firstPhoto = photos[0];
 
   const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
+  const handleClick = (e) => {
+    e.preventDefault();
+    onSelect?.(item);
+  };
+
   return (
-    <article className={styles.card}>
+    <article className={styles.card} onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}>
       <div className={styles.photoWrap}>
-        {currentPhoto ? (
+        {firstPhoto ? (
           <img
             className={styles.photo}
-            src={encodeURI(currentPhoto)}
+            src={encodeURI(firstPhoto)}
             alt={item.name}
           />
         ) : null}
-        {photos.length > 1 && (
-          <>
-            <button
-              type="button"
-              className={`${styles.photoNav} ${styles.photoNavPrev}`}
-              onClick={goToPrev}
-              aria-label="Предыдущее фото"
-            />
-            <button
-              type="button"
-              className={`${styles.photoNav} ${styles.photoNavNext}`}
-              onClick={goToNext}
-              aria-label="Следующее фото"
-            />
-            <div className={styles.dots}>
-              {photos.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={`${styles.dot} ${i === currentPhotoIndex ? styles.dotActive : ''}`}
-                  onClick={() => setCurrentPhotoIndex(i)}
-                  aria-label={`Фото ${i + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
         {item.discountPercent > 0 && (
           <span className={styles.discountBadge}>−{item.discountPercent}%</span>
         )}
@@ -70,16 +37,6 @@ const ProductCard = ({ item }) => {
             <span className={styles.crossedPrice}>{formatPrice(item.crossedPrice)}</span>
           )}
         </div>
-        {item.tgLink && (
-          <a
-            href={item.tgLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.tgLink}
-          >
-            Подробнее
-          </a>
-        )}
       </div>
     </article>
   );

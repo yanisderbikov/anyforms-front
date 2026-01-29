@@ -2,6 +2,14 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .wrap {
+    padding: 0 50px;
+  }
 }
 
 .title {
@@ -12,17 +20,26 @@
   text-transform: lowercase;
 }
 
+/* Телефон: ровно 2 колонки одинаковой ширины */
 .grid {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
 }
 
 .gridItem {
   min-width: 0;
+}
+
+/* Комп: колонки заполняют строку, макс. 200px, без больших дыр */
+@media (min-width: 769px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 200px));
+    gap: 1rem;
+  }
 }
 
 .message,
@@ -36,9 +53,240 @@
   color: #c00;
 }
 
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+/* Fullscreen popup */
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.popup {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.popupClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.popupClose:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.popupGallery {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 60vh;
+  background: #f5f5f5;
+  overflow: hidden;
+}
+
+.popupGalleryTrack {
+  display: flex;
+  height: 100%;
+  transition: transform 0.35s ease-out;
+}
+
+.popupGallerySlide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popupGalleryImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.popupNavPrev,
+.popupNavNext {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  background: rgba(0, 0, 0, 0.25);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease;
+  z-index: 2;
+}
+
+.popupNavPrev:hover,
+.popupNavNext:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.popupNavPrev::after,
+.popupNavNext::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: translate(-30%, -50%) rotate(45deg);
+}
+
+.popupNavPrev {
+  left: 0;
+}
+
+.popupNavPrev::after {
+  transform: translate(-70%, -50%) rotate(-135deg);
+}
+
+.popupNavNext {
+  right: 0;
+}
+
+.popupDots {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.popupDot,
+.popupDotActive {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.popupDot {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.popupDot:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.popupDotActive {
+  background: #fff;
+}
+
+.popupBody {
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.popupName {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: #000;
+  text-transform: lowercase;
+}
+
+.popupDescription {
+  font-size: 1rem;
+  color: #333;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.popupPrices {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.popupPrice {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.popupCrossedPrice {
+  font-size: 1rem;
+  color: #888;
+  text-decoration: line-through;
+}
+
+.popupActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.popupBtnDetails {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  background: #888;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: opacity 0.2s ease;
+  text-transform: lowercase;
+}
+
+.popupBtnDetails:hover {
+  opacity: 0.9;
+}
+
+.popupBtnOrder {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: opacity 0.2s ease;
+  text-transform: lowercase;
+}
+
+.popupBtnOrder:hover {
+  opacity: 0.9;
 }
