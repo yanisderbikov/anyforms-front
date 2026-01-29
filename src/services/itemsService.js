@@ -26,9 +26,7 @@ const MOCK_ITEMS = [
       'https://storage.yandexcloud.net/anyforms/shop/pillow/1.jpeg',
       'https://storage.yandexcloud.net/anyforms/shop/pillow/2.jpeg',
     ],
-    price: 1500,
-    crossedPrice: 2000,
-    discountPercent: 25,
+    price: 1190,
     tgLink: 'https://t.me/anyforms_shop/124',
   },
   {
@@ -40,10 +38,21 @@ const MOCK_ITEMS = [
       'https://storage.yandexcloud.net/anyforms/shop/xmastree/2.jpeg',
       'https://storage.yandexcloud.net/anyforms/shop/xmastree/3.jpeg',
     ],
-    price: 650,
-    crossedPrice: 900,
-    discountPercent: 28,
-    tgLink: 'https://t.me/anyforms',
+    price: 1250,
+    tgLink: 'https://t.me/anyforms_shop/116',
+  },
+  {
+    id: 'pepper',
+    name: 'Перец',
+    description: 'Перец для десертов.',
+    photos: [
+      'https://storage.yandexcloud.net/anyforms/shop/pepper/1.jpeg',
+      'https://storage.yandexcloud.net/anyforms/shop/pepper/2.jpeg',
+      'https://storage.yandexcloud.net/anyforms/shop/pepper/3.jpeg',
+      'https://storage.yandexcloud.net/anyforms/shop/pepper/4.jpeg',
+    ],
+    price: 1490,
+    tgLink: 'https://t.me/anyforms_shop/68',
   },
 ];
 

@@ -77,7 +77,7 @@ const ProductCard = ({ item }) => {
             rel="noopener noreferrer"
             className={styles.tgLink}
           >
-            Написать в Telegram
+            Подробнее
           </a>
         )}
       </div>
