@@ -134,9 +134,11 @@
 .popupNavPrev,
 .popupNavNext {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 48px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   background: rgba(0, 0, 0, 0.25);
   border: none;
   cursor: pointer;
@@ -160,19 +162,22 @@
   height: 12px;
   border-left: 2px solid #fff;
   border-bottom: 2px solid #fff;
-  transform: translate(-30%, -50%) rotate(45deg);
 }
 
 .popupNavPrev {
-  left: 0;
+  left: 5px;
 }
 
 .popupNavPrev::after {
-  transform: translate(-70%, -50%) rotate(-135deg);
+  transform: translate(calc(-50% + 2px), -50%) rotate(45deg);
 }
 
 .popupNavNext {
-  right: 0;
+  right: 5px;
+}
+
+.popupNavNext::after {
+  transform: translate(calc(-50% - 2px), -50%) rotate(-135deg);
 }
 
 .popupDots {
