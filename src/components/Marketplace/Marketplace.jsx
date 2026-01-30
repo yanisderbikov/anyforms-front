@@ -66,7 +66,7 @@ const Marketplace = () => {
       </header>
       <ul className={styles.grid}>
         {items.map((item) => (
-          <li key={item.id} className={styles.gridItem}>
+          <li key={item.name} className={styles.gridItem}>
             <ProductCard item={item} onSelect={openPopup} />
           </li>
         ))}
