@@ -1,3 +1,4 @@
+import apiClient from "../apiClient";
 
 const MOCK_ITEMS = [
   {
@@ -79,7 +80,8 @@ function mapProductToItem(product) {
  */
 export async function getItems() {
   try {
-    return MOCK_ITEMS;
+    const res = await apiClient.api.getAllProducts();
+    return res.data;
   } catch (err) {
     console.error('getItems:', err);
     return MOCK_ITEMS;

@@ -1,4 +1,4 @@
-import apiClient from '../config/apiClient';
+import apiClient from '../apiClient';
 // Вызовы api.gen: apiClient.api.* (getProducts, getProductById, getOrder и т.д.).
 // Эндпоинты заказов (getOrdersWithoutTracker и др.) должны быть в OpenAPI бэка, затем: pnpm run dev-api
 

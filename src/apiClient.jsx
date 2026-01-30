@@ -1,13 +1,33 @@
-import { Api } from './shared/api/api.gen';
-import config from './config.jsx';
+import { Api } from './shared/api/api.gen.ts';
+import config from 'src/config';
+import { jwtDecode } from 'jwt-decode';
 
-// Инициализируем cookies
-const cookies = new Cookies();
+// Храним JWT в localStorage (без куки)
 export const jwt_key = 'jwt_authentication';
+
+const getStoredToken = () => {
+    try {
+        return localStorage.getItem(jwt_key);
+    } catch {
+        return null;
+    }
+};
+
+const setStoredToken = (token) => {
+    try {
+        if (token) {
+            localStorage.setItem(jwt_key, token);
+        } else {
+            localStorage.removeItem(jwt_key);
+        }
+    } catch (e) {
+        console.warn('localStorage unavailable', e);
+    }
+};
 
 // Функция, которая будет добавлять токен в каждый запрос
 const securityWorker = (securityData) => {
-    const token = cookies.get(jwt_key);
+    const token = getStoredToken();
     if (token) {
         return {
             headers: {
@@ -18,37 +38,34 @@ const securityWorker = (securityData) => {
     return {};
 };
 
-// Инициализируем API-клиент с базовым URL и securityWorker
+// Инициализируем API-клиент с базовым URL и securityWorker (без withCredentials)
 const apiClient = new Api({
     baseURL: config.apiUrl,
     securityWorker,
-    axiosConfigDefaults: {
-        withCredentials: true, // Это важно для передачи cookie
-    },
 });
 
 apiClient.instance.interceptors.request.use(
-    (config) => {
-        config.withCredentials = true; // Передаём cookie
-        return config;
-    },
+    (config) => config,
     (error) => Promise.reject(error)
 );
 
 // Добавляем метод для установки JWT токена
 apiClient.setToken = (token) => {
-    cookies.remove(jwt_key);
-    cookies.set(jwt_key, token);
+    setStoredToken(token);
     apiClient.setSecurityData(token);
 };
 
 // Добавляем метод для получения JWT токена
-apiClient.getToken = () => {
-    return cookies.get(jwt_key);
+apiClient.getToken = () => getStoredToken();
+
+// Очистка токена (логаут)
+apiClient.clearToken = () => {
+    setStoredToken(null);
+    apiClient.setSecurityData(null);
 };
 
 apiClient.getJwtMetadata = () => {
-    const token = cookies.get(jwt_key);
+    const token = getStoredToken();
     if (!token) return null;
 
     try {
