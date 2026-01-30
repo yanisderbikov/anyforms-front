@@ -98,7 +98,7 @@ const Marketplace = () => {
                 {photos.map((src, i) => (
                   <div key={i} className={styles.popupGallerySlide}>
                     <img
-                      src={encodeURI(src)}
+                      src={src}
                       alt={`${selectedItem.name} — фото ${i + 1}`}
                       className={styles.popupGalleryImg}
                     />

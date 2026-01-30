@@ -18,7 +18,7 @@ const ProductCard = ({ item, onSelect }) => {
         {firstPhoto ? (
           <img
             className={styles.photo}
-            src={encodeURI(firstPhoto)}
+            src={firstPhoto}
             alt={item.name}
           />
         ) : null}
