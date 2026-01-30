@@ -1,5 +1,5 @@
 import { Api } from './shared/api/api.gen.ts';
-import config from 'src/config';
+import config from './config';
 import { jwtDecode } from 'jwt-decode';
 
 // Храним JWT в localStorage (без куки)
