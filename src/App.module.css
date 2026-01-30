@@ -34,6 +34,8 @@
 
 .mainFullscreen {
   flex: 1;
+  min-height: 0; /* позволяет flex-элементу сжиматься и скроллиться */
+  overflow-y: auto;
   padding: 0;
   width: 100%;
   margin: 0;

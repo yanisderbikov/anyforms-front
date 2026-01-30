@@ -47,11 +47,12 @@
   min-width: 0;
 }
 
-/* Комп: колонки заполняют строку, макс. 200px, без больших дыр */
-@media (min-width: 769px) {
+/* Планшет и комп: фиксированная ширина 200px, фиксированный gap, ряд по центру (убирает просвет при 2 колонках) */
+@media (min-width: 450px) {
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 200px));
+    grid-template-columns: repeat(auto-fill, 200px);
     gap: 1rem;
+    justify-content: center;
   }
 }
 
