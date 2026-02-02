@@ -15,13 +15,13 @@
   },
   "scripts": {
     "dev": "vite --host --no-open",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite --host",
+    "build": "vite build",
+    "postbuild": "cp CNAME dist/ && cp 404.html dist/",
+    "predeploy": "pnpm build",
+    "deploy": "gh-pages -d dist",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "pnpm build",
-    "deploy": "gh-pages -d build",
-    "postbuild": "cp CNAME build/ && cp 404.html build/",
     "api": "swagger-typescript-api generate -p https://anyforms.up.railway.app/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums",
     "dev-api": "swagger-typescript-api generate -p http://localhost:8090/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums"
   },
