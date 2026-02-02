@@ -114,16 +114,16 @@ apiClient.instance.interceptors.response.use(
                 window.location.href = data.url;
             }
 
+            // 403 на странице заказов — редирект на логин
+            if (error.response.status === 403 && window.location.pathname.startsWith('/orders')) {
+                window.location.href = '/login';
+                return;
+            }
+
             if (error.response.status === 402) {
                 console.error('402 Payment required');
                 console.log('Redirecting to payment...');
                 // window.location.href = '/payment'; // Локальная обработка
-            }
-
-            if (error.response.status === 403) {
-                apiClient.clearToken();
-                window.location.href = '/login';
-                return Promise.reject(error);
             }
         }
 
