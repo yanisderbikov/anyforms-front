@@ -16,6 +16,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite --host --no-open",
+    "prebuild": "pnpm run api",
     "build": "vite build",
     "preview": "vite preview",
     "api": "swagger-typescript-api generate -p https://anyforms-production.up.railway.app/v3/api-docs -o ./src/shared/api -n api.gen.ts --axios --union-enums",

@@ -1,4 +1,4 @@
-import { Api } from './shared/api/api.gen.ts';
+import { Api } from './shared/api/api.gen';
 import config from './config';
 import { jwtDecode } from 'jwt-decode';
 
