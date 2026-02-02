@@ -119,6 +119,12 @@ apiClient.instance.interceptors.response.use(
                 console.log('Redirecting to payment...');
                 // window.location.href = '/payment'; // Локальная обработка
             }
+
+            if (error.response.status === 403) {
+                apiClient.clearToken();
+                window.location.href = '/login';
+                return Promise.reject(error);
+            }
         }
 
         // Прокидываем ошибку дальше для локальной обработки

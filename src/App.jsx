@@ -4,11 +4,13 @@ import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
+import Login from "./components/Login/Login";
 
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isOrdersPage = location.pathname.startsWith('/orders');
+  const isLoginPage = location.pathname === '/login';
 
   useEffect(() => {
     if (isHomePage) {
@@ -20,13 +22,14 @@ function App() {
 
   return (
     <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      {!isHomePage && !isOrdersPage && (
+      {!isHomePage && !isOrdersPage && !isLoginPage && (
         <header className={styles.header}>
           <h1 className={styles.title}>any forms</h1>
         </header>
       )}
       <main className={isHomePage ? styles.mainFullscreen : styles.main}>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/" element={<Marketplace />} />
           <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
