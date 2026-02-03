@@ -24,16 +24,11 @@ function App() {
 
   return (
     <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      {!isHomePage && !isOrdersPage && !isLoginPage && !isAdminProductsPage && (
-        <header className={styles.header}>
-          <h1 className={styles.title}>any forms</h1>
-        </header>
-      )}
       <main className={isHomePage ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/pdf" element={<PDFViewer />} />
-          <Route path="/" element={<Marketplace />} />
+          <Route path="/" element={<PDFViewer />} />
+          <Route path="/shop" element={<Marketplace />} />
           <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
           <Route path="/orders/without-tracker" element={<OrderList />} />
           <Route path="/orders/created" element={<OrderList />} />
