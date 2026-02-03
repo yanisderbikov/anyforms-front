@@ -5,12 +5,14 @@ import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
 import Login from "./components/Login/Login";
+import AdminProducts from "./components/AdminProducts/AdminProducts";
 
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isOrdersPage = location.pathname.startsWith('/orders');
   const isLoginPage = location.pathname === '/login';
+  const isAdminProductsPage = location.pathname === '/admin/products';
 
   useEffect(() => {
     if (isHomePage) {
@@ -22,7 +24,7 @@ function App() {
 
   return (
     <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      {!isHomePage && !isOrdersPage && !isLoginPage && (
+      {!isHomePage && !isOrdersPage && !isLoginPage && !isAdminProductsPage && (
         <header className={styles.header}>
           <h1 className={styles.title}>any forms</h1>
         </header>
@@ -36,6 +38,7 @@ function App() {
           <Route path="/orders/without-tracker" element={<OrderList />} />
           <Route path="/orders/created" element={<OrderList />} />
           <Route path="/orders/delivering" element={<OrderList />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
         </Routes>
       </main>
     </div>
