@@ -23,13 +23,17 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
     copyToClipboard(order.contactPhone, 'Телефон скопирован');
   };
 
-  const handleCopyCdekPickupPoint = () => {
-    copyToClipboard(order.pvzSdek, 'ПВЗ СДЭК скопирован');
+  const handleCopyCdekStreet = () => {
+    copyToClipboard(order.pvzSdekStreet, 'ПВЗ СДЭК улица скопировано');
+  };
+
+  const handleCopyCdekCity = () => {
+    copyToClipboard(order.pvzSdekCity, 'ПВЗ СДЭК город скопирован');
   };
 
   const handleLeadClick = () => {
     if (order.leadId) {
-      const url = `https://hairdoskeels38.amocrm.ru/leads/detail/${order.leadId}`;
+      const url = `https://anyforms.amocrm.ru/leads/detail/${order.leadId}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
@@ -128,17 +132,29 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
               {order.contactPhone || '-'}
             </span>
           </div>
-          {order.pvzSdek && (
+          {order.pvzSdekStreet && (
             <div className={styles.contactItem}>
-              <span className={styles.label}>ПВЗ СДЭК:</span>
+              <span className={styles.label}>ПВЗ СДЭК улица:</span>
               <span 
                 className={`${styles.value} ${styles.clickable}`}
-                onClick={handleCopyCdekPickupPoint}
+                onClick={handleCopyCdekStreet}
                 title="Нажмите для копирования"
               >
-                {order.pvzSdek}
+                {order.pvzSdekStreet}
               </span>
             </div>
+          )}
+          {order.pvzSdekCity && (
+              <div className={styles.contactItem}>
+                <span className={styles.label}>ПВЗ СДЭК город:</span>
+                <span
+                    className={`${styles.value} ${styles.clickable}`}
+                    onClick={handleCopyCdekCity}
+                    title="Нажмите для копирования"
+                >
+                {order.pvzSdekCity}
+              </span>
+              </div>
           )}
           {order.purchaseDate && (
             <div className={styles.contactItem}>
