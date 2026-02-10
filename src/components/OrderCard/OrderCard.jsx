@@ -44,13 +44,15 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
+  const formatDate = (dateInput) => {
+    if (dateInput == null || dateInput === '') return '-';
     try {
-      // Ожидаем UTC в формате "year,month,day,hour,minute,second" (month 1–12)
-      const parts = String(dateString).split(',').map(Number);
-      if (parts.length >= 6 && parts.every((n) => !Number.isNaN(n))) {
-        const [year, month, day, hour, min, sec] = parts;
+      // Массив от API: [year, month, day, hour, min] или [year, month, day, hour, min, sec] (month 1–12)
+      const parts = Array.isArray(dateInput)
+        ? dateInput.map(Number)
+        : String(dateInput).split(',').map(Number);
+      if (parts.length >= 3 && parts.every((n) => !Number.isNaN(n))) {
+        const [year, month, day, hour = 0, min = 0, sec = 0] = parts;
         // Date.UTC использует месяц 0–11
         const utcMs = Date.UTC(year, month - 1, day, hour, min, sec);
         const date = new Date(utcMs);
@@ -61,7 +63,7 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
         });
       }
       // Fallback: попытка парсить как ISO или другой стандартный формат
-      const date = new Date(dateString);
+      const date = new Date(dateInput);
       if (Number.isNaN(date.getTime())) return '-';
       return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
