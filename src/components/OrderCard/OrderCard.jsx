@@ -43,14 +43,29 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
+      // Ожидаем UTC в формате "year,month,day,hour,minute,second" (month 1–12)
+      const parts = String(dateString).split(',').map(Number);
+      if (parts.length >= 6 && parts.every((n) => !Number.isNaN(n))) {
+        const [year, month, day, hour, min, sec] = parts;
+        // Date.UTC использует месяц 0–11
+        const utcMs = Date.UTC(year, month - 1, day, hour, min, sec);
+        const date = new Date(utcMs);
+        return date.toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+      }
+      // Fallback: попытка парсить как ISO или другой стандартный формат
       const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return '-';
       return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
       });
     } catch {
-      return dateString;
+      return '-';
     }
   };
 

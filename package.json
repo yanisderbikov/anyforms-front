@@ -14,7 +14,7 @@
     "vite": "^5.4.11"
   },
   "scripts": {
-    "dev": "vite --host --no-open",
+    "dev": "vite --host --no-open --mode dev",
     "start": "vite --host",
     "build": "vite build",
     "postbuild": "cp CNAME dist/ && cp 404.html dist/",
