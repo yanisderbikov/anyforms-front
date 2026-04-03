@@ -6,10 +6,12 @@ import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
+import ChefLanding from "./components/ChefLanding/ChefLanding";
 
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isChefPage = location.pathname === '/chef';
   const isOrdersPage = location.pathname.startsWith('/orders');
   const isLoginPage = location.pathname === '/login';
   const isAdminProductsPage = location.pathname === '/admin/products';
@@ -22,11 +24,14 @@ function App() {
     }
   }, [isHomePage]);
 
+  const fullscreen = isHomePage || isChefPage;
+
   return (
-    <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      <main className={isHomePage ? styles.mainFullscreen : styles.main}>
+    <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
+      <main className={fullscreen ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/chef" element={<ChefLanding />} />
           <Route path="/" element={<PDFViewer />} />
           <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/shop" element={<Marketplace />} />
