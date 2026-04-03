@@ -1,5 +1,7 @@
 .page {
-  --chef-header-h: 64px;
+  /* было 64px; +30% толщина шапки и полосы с логотипами */
+  --chef-header-h: calc(64px * 1.3);
+  --chef-muted: #888;
   width: 100%;
   min-height: 100vh;
   /* контент не уезжает под fixed-хедер */
@@ -20,9 +22,8 @@
   gap: 1rem;
   min-height: var(--chef-header-h);
   padding: 0.65rem 12px;
-  background: rgba(245, 245, 245, 0.96);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(10px);
+  background: #000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   box-sizing: border-box;
 }
 
@@ -42,7 +43,7 @@
 .logo {
   display: block;
   width: auto;
-  height: clamp(28px, 4.5vw, 40px);
+  height: clamp(28px, 4.5vw, 52px);
   max-width: min(160px, 42vw);
 }
 
@@ -51,23 +52,6 @@
   align-items: center;
   gap: clamp(0.75rem, 2vw, 1.5rem);
   min-width: 0;
-}
-
-.headerMeta {
-  display: none;
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: #888;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-@media (min-width: 640px) {
-  .headerMeta {
-    display: block;
-  }
 }
 
 .nav {
@@ -86,7 +70,7 @@
 .navLink {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #333;
+  color: rgba(255, 255, 255, 0.95);
   text-decoration: none;
   text-transform: lowercase;
   padding: 0.35rem 0.45rem;
@@ -102,8 +86,8 @@
 }
 
 .navLink:hover {
-  color: #000;
-  background: rgba(0, 0, 0, 0.05);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Секции с якорями — отступ под fixed header */
@@ -130,7 +114,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #888;
+  color: var(--chef-muted);
   margin: 0 0 1rem;
 }
 
@@ -218,9 +202,9 @@
 /* Hero — двухколоночный макет как в коммерческом предложении */
 .hero {
   position: relative;
-  min-height: calc(100vh - var(--chef-header-h));
   display: flex;
   flex-direction: column;
+  min-height: calc(82vh - var(--chef-header-h));
   background: #f5f5f5;
   box-sizing: border-box;
 }
@@ -229,18 +213,20 @@
   flex: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.75rem;
+  gap: 1.4rem;
   align-items: center;
-  padding: 1.5rem 12px 1.25rem;
+  /* сверху и снизу одинаково — до картинки и до бегущей строки */
+  padding: 1.15rem 12px 1.15rem;
   min-height: 0;
 }
 
 @media (min-width: 900px) {
   .heroBody {
     grid-template-columns: 1fr 1fr;
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    padding: 2.5rem clamp(12px, 4vw, 50px) 1.5rem;
-    align-items: stretch;
+    gap: clamp(1.25rem, 3.2vw, 2.75rem);
+    padding: 1.85rem clamp(12px, 4vw, 50px) 1.85rem;
+    /* текст и фото по центру по вертикали относительно друг друга */
+    align-items: center;
   }
 }
 
@@ -253,8 +239,7 @@
 
 @media (min-width: 900px) {
   .heroLeft {
-    min-height: min(85vh, 820px);
-    justify-content: flex-start;
+    justify-content: center;
   }
 }
 
@@ -267,7 +252,7 @@
 }
 
 .heroTitle {
-  margin: 0 0 1.25rem;
+  margin: 0 0 1rem;
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -275,28 +260,19 @@
 
 .heroTitleLine {
   display: block;
-  font-size: clamp(1.75rem, 5.2vw, 2.75rem);
+  font-size: clamp(1.65rem, 4.85vw, 2.6rem);
   color: #000;
   text-transform: uppercase;
 }
 
 .heroTitleMuted {
-  color: #888;
+  color: var(--chef-muted);
 }
 
 .heroTagline {
-  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  font-size: clamp(0.88rem, 1.65vw, 1rem);
   line-height: 1.5;
-  margin: 0 0 0.65rem;
-  color: #000;
-  text-transform: lowercase;
-  max-width: 22rem;
-}
-
-.heroBrands {
-  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
-  line-height: 1.5;
-  margin: 0 0 1.75rem;
+  margin: 0 0 0.75rem;
   color: #000;
   text-transform: lowercase;
   max-width: 22rem;
@@ -307,7 +283,7 @@
   align-self: flex-start;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 1.65rem;
+  padding: 0.78rem 1.52rem;
   background: #000;
   color: #fff;
   font-size: 0.95rem;
@@ -330,7 +306,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 280px;
+  min-height: 250px;
 }
 
 @media (min-width: 900px) {
@@ -344,35 +320,38 @@
 .heroImageFrame {
   position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: min(100%, 380px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
-  border-radius: 28px;
+  border-radius: 25px;
   overflow: hidden;
   background: #e0e0e0;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.11);
 }
 
 @media (min-width: 900px) {
   .heroImageFrame {
-    max-width: min(100%, min(85vh, 820px));
-    border-radius: 32px;
+    max-width: min(100%, min(68vh, 630px));
+    border-radius: 29px;
   }
 }
 
-.heroImage {
+.heroImageSlide {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 1.2s ease-in-out;
+  pointer-events: none;
 }
 
 .heroImageIcon {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 3;
   width: 40px;
   height: 40px;
   display: flex;
@@ -383,6 +362,144 @@
   border-radius: 10px;
   backdrop-filter: blur(6px);
   pointer-events: none;
+}
+
+/* Бегущая строка: полоса = высота хедера; подпись снизу на фоне героя */
+.heroMarqueeWrap {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.heroMarquee {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--chef-header-h);
+  min-height: var(--chef-header-h);
+  padding: 0;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--chef-muted);
+}
+
+.heroMarqueeLabel {
+  margin: 0;
+  padding: 0.5rem 12px 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000;
+  text-align: center;
+  background: #f5f5f5;
+}
+
+@media (min-width: 900px) {
+  .heroMarqueeLabel {
+    padding: 0.55rem clamp(12px, 4vw, 50px) 0.75rem;
+  }
+}
+
+.marqueeMask {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.marqueeGroup {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 100%;
+}
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  will-change: transform;
+  animation: chefMarquee 40s linear infinite;
+}
+
+.marqueeTrack:hover {
+  animation-play-state: paused;
+}
+
+@keyframes chefMarquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    /* ровно половина ширины трека = один полный набор логотипов */
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marqueeMask {
+    mask-image: none;
+  }
+
+  .heroMarquee {
+    height: auto;
+    min-height: var(--chef-header-h);
+    padding: 0.75rem 0;
+  }
+
+  .marqueeTrack {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    min-width: 0;
+    gap: 1.5rem 2rem;
+    height: auto;
+  }
+
+  .marqueeGroup {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2rem;
+    height: auto;
+  }
+
+  .marqueeGroup:last-of-type {
+    display: none;
+  }
+}
+
+.marqueeItem {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  max-height: var(--chef-header-h);
+  width: 210px;
+  padding: 0 2.17rem;
+  box-sizing: border-box;
+}
+
+.marqueeItem img {
+  display: block;
+  max-height: min(47px, calc(var(--chef-header-h) - 12px));
+  max-width: 126px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 /* Offer section */

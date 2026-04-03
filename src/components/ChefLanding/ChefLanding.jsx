@@ -1,8 +1,29 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import styles from './ChefLanding.module.css';
 
 const TG_BOT = 'https://t.me/AnyFormsCheifBot';
+
+/**
+ * Все логотипы из public/landing/logos.
+ * Добавили файл — добавьте строку (имя файла как на диске).
+ */
+const LOGO_FILES = [
+  { file: 'birch.svg', alt: 'Birch' },
+  { file: 'cristal_logo.svg', alt: 'Cristal' },
+  { file: 'selfie logo.svg', alt: 'Selfie' },
+  { file: 'Lotte_logo.svg.png', alt: 'Lotte' },
+  { file: 'JISCO_LOGO_RGB_orang.png', alt: 'JISCO' },
+  { file: 'rene.webp', alt: 'René' },
+];
+
+const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
+  src: `/landing/logos/${encodeURIComponent(file)}`,
+  alt,
+}));
+
+/** Два круга в одной группе — шире лента, на экране всегда есть логотипы */
+const MARQUEE_STRIP = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
 
 const NAV = [
   { id: 'about', label: 'о нас' },
@@ -10,8 +31,27 @@ const NAV = [
   { id: 'contacts', label: 'контакты' },
 ];
 
+/** Слайды героя: public/landing/main/ — по кругу каждые 10 с */
+const HERO_IMAGES = [
+  '/landing/main/main.jpeg',
+  '/landing/main/Cristal.jpeg',
+  '/landing/main/Kona.jpeg',
+  '/landing/main/Rene.jpeg',
+];
+
+const HERO_SLIDE_MS = 7_000;
+
 const ChefLanding = () => {
   const [idea, setIdea] = useState('');
+  const [heroSlide, setHeroSlide] = useState(0);
+
+  useEffect(() => {
+    if (HERO_IMAGES.length <= 1) return undefined;
+    const id = window.setInterval(() => {
+      setHeroSlide((i) => (i + 1) % HERO_IMAGES.length);
+    }, HERO_SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, []);
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -50,7 +90,7 @@ const ChefLanding = () => {
         >
           <img
             className={styles.logo}
-            src="/anyforms_logo_new.svg"
+            src="/anyforms_logo_new_white.svg"
             alt=""
             width={200}
             height={46}
@@ -58,7 +98,6 @@ const ChefLanding = () => {
           />
         </a>
         <div className={styles.headerRight}>
-          <p className={styles.headerMeta}>молды · визуализация · hoReCa</p>
           <nav className={styles.nav} aria-label="Разделы страницы">
             {NAV.map(({ id, label }) => (
               <a
@@ -96,9 +135,6 @@ const ChefLanding = () => {
                 мы работаем с силиконом более 5 лет. реализовали более 1000
                 заказов.
               </p>
-              <p className={styles.heroBrands}>
-                с нами работали: selfie / cristal / rené
-              </p>
 
               <a
                 className={styles.cta}
@@ -112,15 +148,27 @@ const ChefLanding = () => {
           </div>
 
           <div className={styles.heroVisual}>
-            <div className={styles.heroImageFrame}>
-              <img
-                className={styles.heroImage}
-                src="/landing/main.jpeg"
-                alt=""
-                width={960}
-                height={1280}
-                decoding="async"
-              />
+            <div
+              className={styles.heroImageFrame}
+              aria-roledescription="карусель"
+            >
+              {HERO_IMAGES.map((src, i) => (
+                <img
+                  key={src}
+                  className={styles.heroImageSlide}
+                  src={src}
+                  alt=""
+                  width={960}
+                  height={1280}
+                  decoding="async"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  aria-hidden={i !== heroSlide}
+                  style={{
+                    opacity: i === heroSlide ? 1 : 0,
+                    zIndex: i === heroSlide ? 2 : 0,
+                  }}
+                />
+              ))}
               <span className={styles.heroImageIcon} aria-hidden>
                 <svg
                   width="20"
@@ -140,6 +188,42 @@ const ChefLanding = () => {
               </span>
             </div>
           </div>
+        </div>
+
+        <div className={styles.heroMarqueeWrap}>
+          <div
+            className={styles.heroMarquee}
+            aria-label="С нами работают"
+          >
+            <div className={styles.marqueeMask}>
+              <div className={styles.marqueeTrack}>
+                <div className={styles.marqueeGroup}>
+                  {MARQUEE_STRIP.map((logo, i) => (
+                    <div
+                      key={`a-${logo.src}-${i}`}
+                      className={styles.marqueeItem}
+                    >
+                      <img
+                        src={logo.src}
+                        alt={i < PARTNER_LOGOS.length ? logo.alt : ''}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.marqueeGroup} aria-hidden>
+                  {MARQUEE_STRIP.map((logo, i) => (
+                    <div
+                      key={`b-${logo.src}-${i}`}
+                      className={styles.marqueeItem}
+                    >
+                      <img src={logo.src} alt="" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className={styles.heroMarqueeLabel}>с нами работали</p>
         </div>
       </section>
 
@@ -170,9 +254,9 @@ const ChefLanding = () => {
           </h2>
           <p className={styles.casesLead}>с нами работали</p>
           <ul className={styles.casesList}>
-            <li>Selfie</li>
-            <li>cristal</li>
-            <li>René</li>
+            {PARTNER_LOGOS.map((logo) => (
+              <li key={logo.src}>{logo.alt}</li>
+            ))}
           </ul>
         </div>
       </section>
