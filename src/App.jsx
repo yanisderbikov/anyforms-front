@@ -6,12 +6,12 @@ import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
-import ChefLanding from "./components/ChefLanding/ChefLanding";
+import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const isChefPage = location.pathname === '/chef';
+  const isChiefPage = location.pathname === '/chief';
   const isOrdersPage = location.pathname.startsWith('/orders');
   const isLoginPage = location.pathname === '/login';
   const isAdminProductsPage = location.pathname === '/admin/products';
@@ -24,14 +24,16 @@ function App() {
     }
   }, [isHomePage]);
 
-  const fullscreen = isHomePage || isChefPage;
+  const fullscreen = isHomePage || isChiefPage;
 
   return (
     <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
       <main className={fullscreen ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/chef" element={<ChefLanding />} />
+          <Route path="/chef" element={<Navigate to="/chief" replace />} />
+          <Route path="/cheif" element={<Navigate to="/chief" replace />} />
+          <Route path="/chief" element={<ChiefLanding />} />
           <Route path="/" element={<PDFViewer />} />
           <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/shop" element={<Marketplace />} />

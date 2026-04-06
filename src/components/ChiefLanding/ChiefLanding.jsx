@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
-import styles from './ChefLanding.module.css';
+import styles from './ChiefLanding.module.css';
 
-const TG_BOT = 'https://t.me/AnyFormsCheifBot';
+const TG_BOT = 'https://t.me/AnyFormsChiefBot';
 
 /**
  * Все логотипы из public/landing/logos.
@@ -22,36 +22,20 @@ const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
   alt,
 }));
 
-/** Два круга в одной группе — шире лента, на экране всегда есть логотипы */
-const MARQUEE_STRIP = [...PARTNER_LOGOS, ...PARTNER_LOGOS];
-
 const NAV = [
   { id: 'about', label: 'о нас' },
   { id: 'cases', label: 'кейсы' },
   { id: 'contacts', label: 'контакты' },
 ];
 
-/** Слайды героя: public/landing/main/ — по кругу каждые 10 с */
-const HERO_IMAGES = [
-  '/landing/main/main.jpeg',
-  '/landing/main/Cristal.jpeg',
-  '/landing/main/Kona.jpeg',
-  '/landing/main/Rene.jpeg',
-];
+const HERO_IMAGES = {
+  main: '/landing/main/main.jpeg',
+  top: '/landing/main/Cristal.jpeg',
+  bottom: '/landing/main/Kona.jpeg',
+};
 
-const HERO_SLIDE_MS = 7_000;
-
-const ChefLanding = () => {
+const ChiefLanding = () => {
   const [idea, setIdea] = useState('');
-  const [heroSlide, setHeroSlide] = useState(0);
-
-  useEffect(() => {
-    if (HERO_IMAGES.length <= 1) return undefined;
-    const id = window.setInterval(() => {
-      setHeroSlide((i) => (i + 1) % HERO_IMAGES.length);
-    }, HERO_SLIDE_MS);
-    return () => window.clearInterval(id);
-  }, []);
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -102,7 +86,7 @@ const ChefLanding = () => {
             {NAV.map(({ id, label }) => (
               <a
                 key={id}
-                className={styles.navLink}
+                className={`${styles.navLink} ${id === 'contacts' ? styles.navLinkPill : ''}`}
                 href={`#${id}`}
                 onClick={(e) => scrollToSection(e, id)}
               >
@@ -113,121 +97,89 @@ const ChefLanding = () => {
         </div>
       </header>
 
-      <section className={styles.hero} aria-label="Главный экран">
-        <div className={styles.heroBody}>
-          <div className={styles.heroLeft}>
-            <div className={styles.heroCopy}>
-              <h1 className={styles.heroTitle}>
-                <span className={styles.heroTitleLine}>Силиконовые молды</span>
-                <span
-                  className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
-                >
-                  для масла и
-                </span>
-                <span
-                  className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
-                >
-                  десертов
-                </span>
-              </h1>
-
-              <p className={styles.heroTagline}>
-                мы работаем с силиконом более 5 лет. реализовали более 1000
-                заказов.
-              </p>
-
-              <a
-                className={styles.cta}
-                href={TG_BOT}
-                target="_blank"
-                rel="noopener noreferrer"
+      <div className={styles.hero} aria-label="Главный экран">
+        <div className={styles.heroGrid}>
+          <div className={styles.heroInfoCard}>
+            <h1 className={styles.heroTitle}>
+              <span className={styles.heroTitleLine}>Силиконовые молды</span>
+              <span
+                className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
               >
-                Обсудить проект
-              </a>
-            </div>
-          </div>
-
-          <div className={styles.heroVisual}>
-            <div
-              className={styles.heroImageFrame}
-              aria-roledescription="карусель"
-            >
-              {HERO_IMAGES.map((src, i) => (
-                <img
-                  key={src}
-                  className={styles.heroImageSlide}
-                  src={src}
-                  alt=""
-                  width={960}
-                  height={1280}
-                  decoding="async"
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  aria-hidden={i !== heroSlide}
-                  style={{
-                    opacity: i === heroSlide ? 1 : 0,
-                    zIndex: i === heroSlide ? 2 : 0,
-                  }}
-                />
-              ))}
-              <span className={styles.heroImageIcon} aria-hidden>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 17L17 7M17 7H9M17 7V15"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                для масла
               </span>
-            </div>
-          </div>
-        </div>
+              <span
+                className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
+              >
+                и десертов
+              </span>
+            </h1>
 
-        <div className={styles.heroMarqueeWrap}>
-          <div
-            className={styles.heroMarquee}
-            aria-label="С нами работают"
-          >
-            <div className={styles.marqueeMask}>
-              <div className={styles.marqueeTrack}>
-                <div className={styles.marqueeGroup}>
-                  {MARQUEE_STRIP.map((logo, i) => (
-                    <div
-                      key={`a-${logo.src}-${i}`}
-                      className={styles.marqueeItem}
-                    >
-                      <img
-                        src={logo.src}
-                        alt={i < PARTNER_LOGOS.length ? logo.alt : ''}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <div className={styles.marqueeGroup} aria-hidden>
-                  {MARQUEE_STRIP.map((logo, i) => (
-                    <div
-                      key={`b-${logo.src}-${i}`}
-                      className={styles.marqueeItem}
-                    >
-                      <img src={logo.src} alt="" />
-                    </div>
-                  ))}
-                </div>
+            <p className={styles.heroTagline}>
+              мы работаем с силиконом более 5 лет. реализовали более 1000
+              заказов.
+            </p>
+
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Обсудить проект
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
+
+            <div className={styles.heroPartnersBlock}>
+              <p className={styles.heroPartnersTitle}>Нам доверяют:</p>
+              <div className={styles.heroPartners} aria-label="С нами работали">
+              {PARTNER_LOGOS.map((logo) => (
+                <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy" />
+              ))}
               </div>
             </div>
           </div>
-          <p className={styles.heroMarqueeLabel}>с нами работали</p>
-        </div>
-      </section>
 
-      <section className={styles.about} id="about" aria-labelledby="about-title">
+          <div className={styles.mediaContainer}>
+          <div className={styles.heroMainMedia}>
+            <img
+              className={styles.heroImage}
+              src={HERO_IMAGES.main}
+              alt=""
+              width={960}
+              height={1280}
+              decoding="async"
+            />
+          </div>
+
+          <div className={styles.heroSideMedia}>
+            <div className={styles.heroSideCard}>
+              <img
+                className={styles.heroImage}
+                src={HERO_IMAGES.top}
+                alt=""
+                width={640}
+                height={640}
+                decoding="async"
+              />
+            </div>
+            <div className={styles.heroSideCard}>
+              <img
+                className={styles.heroImage}
+                src={HERO_IMAGES.bottom}
+                alt=""
+                width={640}
+                height={640}
+                decoding="async"
+              />
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.about} id="about" aria-labelledby="about-title">
         <div className={styles.sectionInner}>
           <h2 className={styles.blockTitle} id="about-title">
             о нас
@@ -241,9 +193,9 @@ const ChefLanding = () => {
             пищевую безопасность и удобство в работе.
           </p>
         </div>
-      </section>
+      </div>
 
-      <section
+      <div
         className={styles.cases}
         id="cases"
         aria-labelledby="cases-title"
@@ -259,9 +211,9 @@ const ChefLanding = () => {
             ))}
           </ul>
         </div>
-      </section>
+      </div>
 
-      <section className={styles.offer} aria-label="Что предлагаем">
+      <div className={styles.offer} aria-label="Что предлагаем">
         <div className={styles.offerInner}>
           <h2 className={styles.sectionTitle}>Что предлагаем сделать</h2>
           <p className={styles.offerHighlight}>
@@ -294,9 +246,9 @@ const ChefLanding = () => {
             </li>
           </ol>
         </div>
-      </section>
+      </div>
 
-      <section
+      <div
         className={styles.contacts}
         id="contacts"
         aria-labelledby="contacts-title"
@@ -314,17 +266,17 @@ const ChefLanding = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            @AnyFormsCheifBot
+            @AnyFormsChiefBot
           </a>
 
           <div className={styles.capture}>
             <h3 className={styles.captureTitle}>Отправить свою идею</h3>
             <form className={styles.form} onSubmit={handleSubmitIdea}>
-              <label className={styles.label} htmlFor="chef-idea">
+              <label className={styles.label} htmlFor="chief-idea">
                 Ваш запрос
               </label>
               <textarea
-                id="chef-idea"
+                id="chief-idea"
                 className={styles.textarea}
                 rows={5}
                 placeholder="Опишите идею: форма, объём, референсы…"
@@ -337,9 +289,9 @@ const ChefLanding = () => {
             </form>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-export default ChefLanding;
+export default ChiefLanding;
