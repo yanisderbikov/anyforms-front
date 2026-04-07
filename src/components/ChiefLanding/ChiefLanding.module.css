@@ -1,9 +1,8 @@
 .page {
   --chief-header-h: 78px;
-  --chief-muted: #8f8f8f;
   width: 100%;
   min-height: 100vh;
-  background: #000;
+  background: var(--color-base-black);
   padding-top: var(--chief-header-h);
   box-sizing: border-box;
 }
@@ -20,7 +19,7 @@
   gap: 0.75rem;
   min-height: var(--chief-header-h);
   padding: 0.9rem 1.4rem;
-  background: #000;
+  background: var(--color-base-black);
   box-sizing: border-box;
 }
 
@@ -96,7 +95,7 @@
 
 .navLinkPill:hover {
   background: #fff;
-  color: #000;
+  color: var(--color-base-black);
 }
 
 /* Секции с якорями — отступ под fixed header */
@@ -123,7 +122,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--chief-muted);
+  color: var(--color-base-gray);
   margin: 0 0 1rem;
 }
 
@@ -136,7 +135,7 @@
   font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.45;
-  color: #000;
+  color: var(--color-base-black);
   margin: 0 0 0.85rem;
   text-transform: lowercase;
 }
@@ -173,7 +172,7 @@
 .casesList li {
   font-size: 1rem;
   font-weight: 600;
-  color: #000;
+  color: var(--color-base-black);
 }
 
 .contacts {
@@ -193,7 +192,7 @@
   display: inline-block;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #000;
+  color: var(--color-base-black);
   margin-bottom: 1.75rem;
   text-decoration: none;
   border-bottom: 1px solid #ccc;
@@ -201,7 +200,7 @@
 }
 
 .contactsTg:hover {
-  border-bottom-color: #000;
+  border-bottom-color: var(--color-base-black);
 }
 
 .contacts .capture {
@@ -211,7 +210,7 @@
 .hero {
   position: relative;
   padding: 0 1.4rem 1.4rem;
-  background: #000;
+  background: var(--color-base-black);
   box-sizing: border-box;
 }
 
@@ -304,11 +303,11 @@
 .heroTitleLine {
   display: block;
   font-size: clamp(2rem, 4vw, 4rem);
-  color: #000;
+  color: var(--color-base-black);
 }
 
 .heroTitleMuted {
-  color: var(--chief-muted);
+  color: var(--color-base-gray);
 }
 
 .heroTagline {
@@ -317,7 +316,7 @@
   margin: 0;
   /* + gap 1rem у .heroInfoCard ≈ втрое больший зазор до кнопки */
   margin-bottom: 2rem;
-  color: #000;
+  color: var(--color-base-black);
   text-transform: lowercase;
   max-width: 32rem;
 }
@@ -329,7 +328,7 @@
   justify-content: space-between;
   gap: 0.6rem;
   padding: 0.25rem 0.3rem 0.25rem 1rem;
-  background: #000;
+  background: var(--color-base-black);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -351,39 +350,46 @@
   height: 2rem;
   border-radius: 50%;
   background: #fff;
-  color: #000;
+  color: var(--color-base-black);
   font-size: 1.2rem;
   line-height: 1;
 }
 
 .heroPartners {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   align-items: center;
-  gap: 0.55rem 1rem;
+  column-gap: clamp(0.35rem, 1.2vw, 0.75rem);
 }
 
 .heroPartnersBlock {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin-top: 0.35rem;
   min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .heroPartnersTitle {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 500;
-  color: #8c8c8c;
+  color: var(--color-base-gray);
 }
 
 .heroPartners img {
   display: block;
-  height: 26px;
-  width: auto;
-  max-width: 96px;
+  width: 100%;
+  height: auto;
+  max-height: clamp(16px, 2.2vw, 26px);
+  justify-self: center;
   object-fit: contain;
+  object-position: center;
 }
 /*
  * Правая половина hero. Важно: не задавать width: 100% здесь — иначе правило ниже
@@ -556,7 +562,7 @@
   font-size: 1.35rem;
   font-weight: 700;
   margin: 0 0 0.75rem;
-  color: #000;
+  color: var(--color-base-black);
   text-transform: lowercase;
 }
 
@@ -564,7 +570,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 1rem;
-  color: #000;
+  color: var(--color-base-black);
   text-transform: lowercase;
 }
 
@@ -605,7 +611,7 @@
 .stepTitle {
   display: block;
   font-weight: 700;
-  color: #000;
+  color: var(--color-base-black);
   margin-bottom: 0.35rem;
   text-transform: lowercase;
 }
@@ -627,7 +633,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 1rem;
-  color: #000;
+  color: var(--color-base-black);
   text-transform: lowercase;
 }
 
@@ -657,13 +663,13 @@
 
 .textarea:focus {
   outline: none;
-  border-color: #000;
+  border-color: var(--color-base-black);
 }
 
 .submit {
   margin-top: 0.35rem;
   padding: 0.75rem 1.25rem;
-  background: #000;
+  background: var(--color-base-black);
   color: #fff;
   border: none;
   border-radius: 6px;

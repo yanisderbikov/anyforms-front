@@ -100,7 +100,7 @@ const ChiefLanding = () => {
         <div className={styles.heroGrid}>
           <div className={styles.heroInfoCard}>
             <h1 className={styles.heroTitle}>
-              <span className={styles.heroTitleLine}>Силиконовые молды</span>
+              <span className={styles.heroTitleLine}>Силиконовые формы</span>
               <span
                   className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
               >
