@@ -216,8 +216,9 @@
 }
 
 .heroGrid {
-  display: grid;
-  grid-template-columns: 1fr;
+  --hero-media-gap: clamp(10px, 1vw, 14px);
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
   min-width: 0;
 }
@@ -227,19 +228,36 @@
     padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
   }
 
+  /*
+   * Высоту задаёт только левая колонка (текст). Правая — absolute top/bottom,
+   * тянется по высоте обёртки и не раздувает её контентом картинок.
+   */
   .heroGrid {
-    grid-template-columns: minmax(420px, 1.2fr) minmax(0, 1fr);
-    gap: clamp(10px, 1vw, 14px);
-    align-items: stretch;
+    position: relative;
+    display: flow-root;
+    min-width: 0;
   }
 
-  .heroGrid > * {
-    min-height: 0;
+  .heroInfoCard {
+    float: left;
+    width: calc(50% - var(--hero-media-gap) / 2);
+    max-width: calc(50% - var(--hero-media-gap) / 2);
+    height: auto;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
   }
 
   .mediaContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: calc(50% - var(--hero-media-gap) / 2);
+    height: auto;
     min-height: 0;
-    height: 100%;
+    z-index: 0;
   }
 
   .heroMainMedia,
@@ -247,7 +265,6 @@
   .heroSideCard {
     min-height: 0;
     height: 100%;
-    max-height: none;
   }
 }
 
@@ -259,6 +276,9 @@
   padding: clamp(1.5rem, 2.2vw, 2.25rem) clamp(1.25rem, 2.1vw, 2rem);
   border-radius: 22px;
   background: #e9e9e9;
+  overflow: auto;
+  /* width задаётся в брейкпоинтах: на десктопе — половина, на мобиле — 100% */
+  box-sizing: border-box;
 }
 
 .heroTitle {
@@ -353,13 +373,15 @@
   filter: grayscale(1);
   opacity: 0.52;
 }
-
+/* Правая половина hero: две равные колонки; вторая — две равные строки с фото */
 .mediaContainer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
-  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--hero-media-gap, 0.75rem);
   width: 100%;
   min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 .heroMainMedia,
@@ -368,24 +390,22 @@
   border-radius: 22px;
   overflow: hidden;
   background: #1a1a1a;
-}
-
-.heroMainMedia {
-  height: auto;
-  min-height: 210px;
   min-width: 0;
+  min-height: 0;
 }
 
 .heroSideMedia {
   display: grid;
-  gap: 0.75rem;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  height: auto;
-  min-height: 210px;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--hero-media-gap, 0.75rem);
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .heroImage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -399,23 +419,44 @@
 
   .heroGrid {
     min-height: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    position: static;
   }
 
-  .heroMainMedia {
-    aspect-ratio: 0.8 / 1;
+  .heroInfoCard {
+    float: none;
+    width: 100%;
+    max-width: none;
   }
 
   .mediaContainer {
+    position: static;
+    width: 100%;
+    height: auto;
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .heroMainMedia {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    height: auto;
+    min-height: 200px;
   }
 
   .heroSideMedia {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: none;
+    height: auto;
+    min-height: 0;
   }
 
   .heroSideCard {
+    position: relative;
     aspect-ratio: 1 / 1;
+    height: auto;
   }
 }
 

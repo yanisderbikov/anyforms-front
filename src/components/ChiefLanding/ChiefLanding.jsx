@@ -103,12 +103,12 @@ const ChiefLanding = () => {
             <h1 className={styles.heroTitle}>
               <span className={styles.heroTitleLine}>Силиконовые молды</span>
               <span
-                className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
+                  className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
               >
                 для масла
               </span>
               <span
-                className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
+                  className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
               >
                 и десертов
               </span>
@@ -120,10 +120,10 @@ const ChiefLanding = () => {
             </p>
 
             <a
-              className={styles.cta}
-              href={TG_BOT}
-              target="_blank"
-              rel="noopener noreferrer"
+                className={styles.cta}
+                href={TG_BOT}
+                target="_blank"
+                rel="noopener noreferrer"
             >
               Обсудить проект
               <span className={styles.ctaArrow} aria-hidden>
@@ -134,47 +134,46 @@ const ChiefLanding = () => {
             <div className={styles.heroPartnersBlock}>
               <p className={styles.heroPartnersTitle}>Нам доверяют:</p>
               <div className={styles.heroPartners} aria-label="С нами работали">
-              {PARTNER_LOGOS.map((logo) => (
-                <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy" />
-              ))}
+                {PARTNER_LOGOS.map((logo) => (
+                    <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy"/>
+                ))}
               </div>
             </div>
           </div>
 
           <div className={styles.mediaContainer}>
-          <div className={styles.heroMainMedia}>
-            <img
-              className={styles.heroImage}
-              src={HERO_IMAGES.main}
-              alt=""
-              width={960}
-              height={1280}
-              decoding="async"
-            />
-          </div>
-
-          <div className={styles.heroSideMedia}>
-            <div className={styles.heroSideCard}>
+            <div className={styles.heroMainMedia}>
               <img
                 className={styles.heroImage}
-                src={HERO_IMAGES.top}
+                src={HERO_IMAGES.main}
                 alt=""
-                width={640}
-                height={640}
+                width={960}
+                height={1280}
                 decoding="async"
               />
             </div>
-            <div className={styles.heroSideCard}>
-              <img
-                className={styles.heroImage}
-                src={HERO_IMAGES.bottom}
-                alt=""
-                width={640}
-                height={640}
-                decoding="async"
-              />
+            <div className={styles.heroSideMedia}>
+              <div className={styles.heroSideCard}>
+                <img
+                  className={styles.heroImage}
+                  src={HERO_IMAGES.top}
+                  alt=""
+                  width={640}
+                  height={640}
+                  decoding="async"
+                />
+              </div>
+              <div className={styles.heroSideCard}>
+                <img
+                  className={styles.heroImage}
+                  src={HERO_IMAGES.bottom}
+                  alt=""
+                  width={640}
+                  height={640}
+                  decoding="async"
+                />
+              </div>
             </div>
-          </div>
           </div>
         </div>
       </div>
