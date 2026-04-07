@@ -28,11 +28,11 @@ const NAV = [
   { id: 'contacts', label: 'контакты' },
 ];
 
+/** Три фото: слева main, справа сверху hachapuri, справа снизу blue */
 const HERO_IMAGES = {
-  main: '/landing/main/main.jpeg',
-  top: '/landing/main/Cristal.jpeg',
-  bottom: '/landing/main/Kona.jpeg',
-  rene: '/landing/main/Rene.jpeg',
+  main: 'https://storage.yandexcloud.net/anyforms/landing/main.jpeg',
+  hachapuri: 'https://storage.yandexcloud.net/anyforms/landing/hachapuri.jpeg',
+  blue: 'https://storage.yandexcloud.net/anyforms/landing/blue.jpeg',
 };
 
 const ChiefLanding = () => {
@@ -144,46 +144,39 @@ const ChiefLanding = () => {
           </div>
 
           <div className={styles.mediaContainer}>
-            <div className={styles.heroMainMedia}>
-              <img
-                className={styles.heroImage}
-                src={HERO_IMAGES.main}
-                alt=""
-                width={960}
-                height={1280}
-                decoding="async"
-              />
-            </div>
             <div className={styles.heroSideMedia}>
               <div className={styles.heroSideSingle}>
                 <img
                   className={styles.heroImage}
-                  src={HERO_IMAGES.top}
+                  src={HERO_IMAGES.main}
                   alt=""
-                  width={640}
-                  height={640}
+                  width={960}
+                  height={1280}
                   decoding="async"
+                  loading="eager"
                 />
               </div>
               <div className={styles.heroSideStack}>
                 <div className={styles.heroSideCard}>
                   <img
                     className={styles.heroImage}
-                    src={HERO_IMAGES.bottom}
+                    src={HERO_IMAGES.hachapuri}
                     alt=""
-                    width={640}
-                    height={640}
+                    width={800}
+                    height={600}
                     decoding="async"
+                    loading="eager"
                   />
                 </div>
                 <div className={styles.heroSideCard}>
                   <img
                     className={styles.heroImage}
-                    src={HERO_IMAGES.rene}
+                    src={HERO_IMAGES.blue}
                     alt=""
-                    width={640}
-                    height={640}
+                    width={800}
+                    height={600}
                     decoding="async"
+                    loading="eager"
                   />
                 </div>
               </div>

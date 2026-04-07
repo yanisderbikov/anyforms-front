@@ -254,19 +254,29 @@
     right: 0;
     bottom: 0;
     left: auto;
+    display: flex;
+    flex-direction: column;
     width: calc(50% - var(--hero-media-gap) / 2);
-    height: auto;
+    height: 100%;
     min-height: 0;
     z-index: 0;
+    box-sizing: border-box;
   }
 
-  .heroMainMedia,
-  .heroSideMedia,
-  .heroSideSingle,
-  .heroSideStack,
-  .heroSideCard {
+  .heroSideMedia {
+    flex: 1 1 auto;
     min-height: 0;
     height: 100%;
+  }
+
+  .heroSideSingle,
+  .heroSideStack {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .heroSideCard {
+    min-height: 0;
   }
 }
 
@@ -377,21 +387,20 @@
   filter: grayscale(1);
   opacity: 0.52;
 }
-/* Правая половина hero: две равные колонки; вторая — две равные строки с фото */
+/* Правая половина hero: только heroSideMedia (2 колонки: 1 фото | стек из 2) */
 .mediaContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--hero-media-gap, 0.75rem);
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-width: 0;
   min-height: 0;
   box-sizing: border-box;
 }
 
-.heroMainMedia,
 .heroSideSingle,
 .heroSideCard {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   border-radius: 22px;
   overflow: hidden;
   background: #1a1a1a;
@@ -399,11 +408,12 @@
   min-height: 0;
 }
 
-/* Две равные части: слева одна фотка, справа колонка из двух */
+/* Две колонки: слева одна фотка, справа две поровну по высоте (flex, без схлопывания 1fr) */
 .heroSideMedia {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   gap: var(--hero-media-gap, 0.75rem);
   min-width: 0;
   min-height: 0;
@@ -411,19 +421,24 @@
 }
 
 .heroSideStack {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--hero-media-gap, 0.75rem);
   min-width: 0;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
 }
 
+.heroSideStack .heroSideCard {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
 .heroImage {
-  position: absolute;
-  inset: 0;
+  flex: 1 1 0;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   object-fit: cover;
   display: block;
 }
@@ -451,15 +466,6 @@
     position: static;
     width: 100%;
     height: auto;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  .heroMainMedia {
-    position: relative;
-    aspect-ratio: 4 / 5;
-    height: auto;
-    min-height: 200px;
   }
 
   .heroSideMedia {
@@ -470,22 +476,37 @@
   }
 
   .heroSideSingle {
-    position: relative;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 5;
     height: auto;
+    min-height: 220px;
+  }
+
+  .heroSideSingle .heroImage {
+    flex: none;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
   }
 
   .heroSideStack {
-    grid-template-rows: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: var(--hero-media-gap, 0.75rem);
-    height: auto;
+    height: 100%;
     min-height: 0;
+    align-self: stretch;
   }
 
-  .heroSideCard {
-    position: relative;
-    aspect-ratio: 1 / 1;
+  .heroSideStack .heroSideCard {
+    flex: 1 1 0;
+    min-height: 120px;
     height: auto;
+  }
+
+  .heroSideStack .heroImage {
+    flex: 1 1 0;
+    min-height: 0;
   }
 }
 
