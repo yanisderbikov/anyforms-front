@@ -305,6 +305,8 @@
   font-size: clamp(1rem, 1.1vw, 1.35rem);
   line-height: 1.28;
   margin: 0;
+  /* + gap 1rem у .heroInfoCard ≈ втрое больший зазор до кнопки */
+  margin-bottom: 2rem;
   color: #000;
   text-transform: lowercase;
   max-width: 32rem;
