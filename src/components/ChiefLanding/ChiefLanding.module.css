@@ -330,12 +330,20 @@
   padding: 0.25rem 0.3rem 0.25rem 1rem;
   background: var(--color-base-black);
   color: #fff;
+  border: 1px solid var(--color-base-black);
   font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
   text-transform: none;
   border-radius: 999px;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+    opacity 0.2s ease, transform 0.15s ease;
+}
+
+.cta:hover {
+  background: var(--color-base-gray);
+  color: var(--color-base-black);
+  border-color: var(--color-base-black);
 }
 
 .cta:active {
@@ -353,6 +361,12 @@
   color: var(--color-base-black);
   font-size: 1.2rem;
   line-height: 1;
+  transform: translateX(0);
+  transition: transform 0.25s ease;
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(-0.45rem);
 }
 
 .heroPartners {
