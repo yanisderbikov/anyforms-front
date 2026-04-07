@@ -387,11 +387,14 @@
   filter: grayscale(1);
   opacity: 0.52;
 }
-/* Правая половина hero: только heroSideMedia (2 колонки: 1 фото | стек из 2) */
+/*
+ * Правая половина hero. Важно: не задавать width: 100% здесь — иначе правило ниже
+ * перебивает width из @media (min-width: 900px), блок наезжает на текст, главное фото
+ * оказывается под карточкой (z-index) и «пропадает».
+ */
 .mediaContainer {
   display: flex;
   flex-direction: column;
-  width: 100%;
   min-width: 0;
   min-height: 0;
   box-sizing: border-box;
@@ -399,8 +402,6 @@
 
 .heroSideSingle,
 .heroSideCard {
-  display: flex;
-  flex-direction: column;
   border-radius: 22px;
   overflow: hidden;
   background: #1a1a1a;
@@ -408,10 +409,35 @@
   min-height: 0;
 }
 
-/* Две колонки: слева одна фотка, справа две поровну по высоте (flex, без схлопывания 1fr) */
+.heroSideCard {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Десктоп: главное фото — block + absolute img (после общих стилей, не перебивается flex’ом) */
+@media (min-width: 900px) {
+  .heroSideSingle {
+    display: block;
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .heroSideSingle .heroImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    flex: none;
+    object-fit: cover;
+  }
+}
+
+/* Две колонки: minmax(0,1fr) — иначе первая колонка может схлопнуться в 0 */
 .heroSideMedia {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
   align-items: stretch;
   gap: var(--hero-media-gap, 0.75rem);
@@ -476,15 +502,16 @@
   }
 
   .heroSideSingle {
+    display: flex;
+    flex-direction: column;
     aspect-ratio: 4 / 5;
     height: auto;
     min-height: 220px;
   }
 
   .heroSideSingle .heroImage {
-    flex: none;
+    flex: 1 1 auto;
     width: 100%;
-    height: 100%;
     min-height: 0;
     object-fit: cover;
   }
