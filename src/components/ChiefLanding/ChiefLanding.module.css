@@ -384,8 +384,6 @@
   width: auto;
   max-width: 96px;
   object-fit: contain;
-  filter: grayscale(1);
-  opacity: 0.52;
 }
 /*
  * Правая половина hero. Важно: не задавать width: 100% здесь — иначе правило ниже

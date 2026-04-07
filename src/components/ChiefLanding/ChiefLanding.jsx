@@ -9,12 +9,10 @@ const TG_BOT = 'https://t.me/AnyFormsChiefBot';
  * Добавили файл — добавьте строку (имя файла как на диске).
  */
 const LOGO_FILES = [
-  { file: 'birch.svg', alt: 'Birch' },
-  { file: 'cristal_logo.svg', alt: 'Cristal' },
-  { file: 'selfie logo.svg', alt: 'Selfie' },
-  { file: 'Lotte_logo.svg.png', alt: 'Lotte' },
-  { file: 'JISCO_LOGO_RGB_orang.png', alt: 'JISCO' },
-  { file: 'rene.webp', alt: 'René' },
+  { file: 'Birch.svg', alt: 'Birch' },
+  { file: 'Cristal.svg', alt: 'Cristal' },
+  { file: 'Selfie.svg', alt: 'Selfie' },
+  { file: 'Lotte.svg', alt: 'Lotte' },
 ];
 
 const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
