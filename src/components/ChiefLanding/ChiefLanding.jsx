@@ -32,6 +32,7 @@ const HERO_IMAGES = {
   main: '/landing/main/main.jpeg',
   top: '/landing/main/Cristal.jpeg',
   bottom: '/landing/main/Kona.jpeg',
+  rene: '/landing/main/Rene.jpeg',
 };
 
 const ChiefLanding = () => {
@@ -153,7 +154,7 @@ const ChiefLanding = () => {
               />
             </div>
             <div className={styles.heroSideMedia}>
-              <div className={styles.heroSideCard}>
+              <div className={styles.heroSideSingle}>
                 <img
                   className={styles.heroImage}
                   src={HERO_IMAGES.top}
@@ -163,15 +164,27 @@ const ChiefLanding = () => {
                   decoding="async"
                 />
               </div>
-              <div className={styles.heroSideCard}>
-                <img
-                  className={styles.heroImage}
-                  src={HERO_IMAGES.bottom}
-                  alt=""
-                  width={640}
-                  height={640}
-                  decoding="async"
-                />
+              <div className={styles.heroSideStack}>
+                <div className={styles.heroSideCard}>
+                  <img
+                    className={styles.heroImage}
+                    src={HERO_IMAGES.bottom}
+                    alt=""
+                    width={640}
+                    height={640}
+                    decoding="async"
+                  />
+                </div>
+                <div className={styles.heroSideCard}>
+                  <img
+                    className={styles.heroImage}
+                    src={HERO_IMAGES.rene}
+                    alt=""
+                    width={640}
+                    height={640}
+                    decoding="async"
+                  />
+                </div>
               </div>
             </div>
           </div>

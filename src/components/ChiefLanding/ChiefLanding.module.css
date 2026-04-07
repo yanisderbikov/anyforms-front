@@ -262,6 +262,8 @@
 
   .heroMainMedia,
   .heroSideMedia,
+  .heroSideSingle,
+  .heroSideStack,
   .heroSideCard {
     min-height: 0;
     height: 100%;
@@ -385,6 +387,7 @@
 }
 
 .heroMainMedia,
+.heroSideSingle,
 .heroSideCard {
   position: relative;
   border-radius: 22px;
@@ -394,10 +397,20 @@
   min-height: 0;
 }
 
+/* Две равные части: слева одна фотка, справа колонка из двух */
 .heroSideMedia {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr;
+  gap: var(--hero-media-gap, 0.75rem);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.heroSideStack {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
   gap: var(--hero-media-gap, 0.75rem);
   min-width: 0;
   min-height: 0;
@@ -450,6 +463,19 @@
   .heroSideMedia {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: none;
+    height: auto;
+    min-height: 0;
+  }
+
+  .heroSideSingle {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
+
+  .heroSideStack {
+    grid-template-rows: 1fr 1fr;
+    gap: var(--hero-media-gap, 0.75rem);
     height: auto;
     min-height: 0;
   }
