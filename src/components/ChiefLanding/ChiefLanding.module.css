@@ -658,13 +658,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-}
-
-.label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
+  gap: 0.45rem;
 }
 
 .textarea {
@@ -702,6 +696,12 @@
   opacity: 0.9;
 }
 
+.ctaSubmit {
+  margin-top: 0.35rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
 .marketing {
   background: #fff;
   padding: 0 1.4rem 1.4rem;
@@ -727,7 +727,7 @@
 }
 
 .marketingFormCard {
-  backdrop-filter: none;
+  border: 1px solid rgba(17, 17, 17, 0.12);
 }
 
 .marketingInfoCard {
@@ -738,11 +738,18 @@
 }
 
 .marketingFormTitle {
-  margin: 0 0 1rem;
-  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.2rem, 1.6vw, 1.45rem);
   font-weight: 800;
   color: var(--color-base-black);
   text-transform: uppercase;
+}
+
+.marketingFormLead {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: #3a3a3a;
 }
 
 .marketingEyebrow {
@@ -777,17 +784,26 @@
   color: #2b2b2b;
 }
 
+.field {
+  position: relative;
+}
+
 .input,
 .textarea {
   width: 100%;
-  padding: 0.65rem 0.75rem;
+  padding: 1.05rem 0.75rem 0.45rem;
   border: 1px solid #ccc;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-family: inherit;
   background: #fff;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, padding 0.2s ease;
   box-sizing: border-box;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 92px;
 }
 
 .input:focus,
@@ -796,21 +812,39 @@
   border-color: var(--color-base-black);
 }
 
-.fileLabel {
+.floatingLabel {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
+  color: #666;
+  background: #fff;
+  padding: 0 0.2rem;
+  pointer-events: none;
+  transition: top 0.2s ease, transform 0.2s ease, font-size 0.2s ease, color 0.2s ease;
 }
 
-.fileInput {
-  font-size: 0.95rem;
-  color: #333;
+.field .textarea + .floatingLabel {
+  top: 1rem;
+  transform: translateY(0);
 }
 
-.fileName {
+.field .input:focus + .floatingLabel,
+.field .input:not(:placeholder-shown) + .floatingLabel,
+.field .textarea:focus + .floatingLabel,
+.field .textarea:not(:placeholder-shown) + .floatingLabel {
+  top: 0.35rem;
+  transform: translateY(0);
+  font-size: 0.72rem;
+  color: #444;
+}
+
+.formDisclaimer {
   margin: 0;
-  font-size: 0.86rem;
-  color: #555;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: #808080;
 }
 
 @media (min-width: 900px) {
@@ -822,5 +856,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--hero-media-gap, clamp(10px, 1vw, 14px));
     align-items: center;
+  }
+
+  .marketingFormCard {
+    width: 70%;
+    max-width: 460px;
+    justify-self: end;
   }
 }

@@ -30,10 +30,8 @@ const HERO_IMAGES = {
 };
 
 const ChiefLanding = () => {
-  const [idea, setIdea] = useState('');
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
-  const [attachmentName, setAttachmentName] = useState('');
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -44,15 +42,11 @@ const ChiefLanding = () => {
     const values = {
       name: name.trim(),
       contact: contact.trim(),
-      idea: idea.trim(),
-      attachmentName: attachmentName.trim(),
     };
     const text = [
       'Заявка на 3D-визуализацию',
       `Имя: ${values.name || '—'}`,
       `Телефон / WhatsApp / Telegram: ${values.contact || '—'}`,
-      `Описание идеи: ${values.idea || '—'}`,
-      `Фото: ${values.attachmentName || 'файл не прикреплен'}`,
     ].join('\n');
     if (text) {
       try {
@@ -126,10 +120,18 @@ const ChiefLanding = () => {
 
             <p className={styles.heroTagline}>
               мы работаем с силиконом более 5 лет.
-              <br />
+              <br/>
               реализовали более 1000 заказов.
             </p>
 
+            <div className={styles.heroPartnersBlock}>
+              <p className={styles.heroPartnersTitle}>Нам доверяют:</p>
+              <div className={styles.heroPartners} aria-label="С нами работали">
+                {PARTNER_LOGOS.map((logo) => (
+                    <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy"/>
+                ))}
+              </div>
+            </div>
             <a
                 className={styles.cta}
                 href={TG_BOT}
@@ -141,28 +143,19 @@ const ChiefLanding = () => {
                 →
               </span>
             </a>
-
-            <div className={styles.heroPartnersBlock}>
-              <p className={styles.heroPartnersTitle}>Нам доверяют:</p>
-              <div className={styles.heroPartners} aria-label="С нами работали">
-                {PARTNER_LOGOS.map((logo) => (
-                    <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy"/>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className={styles.mediaContainer}>
             <div className={styles.heroSideMedia}>
               <div className={styles.heroSideSingle}>
                 <img
-                  className={styles.heroImage}
-                  src={HERO_IMAGES.main}
-                  alt=""
-                  width={960}
-                  height={1280}
-                  decoding="async"
-                  loading="eager"
+                    className={styles.heroImage}
+                    src={HERO_IMAGES.main}
+                    alt=""
+                    width={960}
+                    height={1280}
+                    decoding="async"
+                    loading="eager"
                 />
               </div>
               <div className={styles.heroSideStack}>
@@ -200,65 +193,6 @@ const ChiefLanding = () => {
         aria-labelledby="marketing-title"
       >
         <div className={styles.marketingGrid}>
-          <div className={styles.marketingFormCard}>
-            <h2 className={styles.marketingFormTitle}>Отправить идею</h2>
-            <form className={styles.form} onSubmit={handleSubmitIdea}>
-              <label className={styles.label} htmlFor="chief-name">
-                Имя
-              </label>
-              <input
-                id="chief-name"
-                className={styles.input}
-                type="text"
-                placeholder="Ваше имя"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <label className={styles.label} htmlFor="chief-contact">
-                Телефон / WhatsApp / Telegram
-              </label>
-              <input
-                id="chief-contact"
-                className={styles.input}
-                type="text"
-                placeholder="+7 999 000-00-00 / @username"
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-              />
-
-              <label className={styles.label} htmlFor="chief-idea">
-                Описание идеи или фото
-              </label>
-              <textarea
-                id="chief-idea"
-                className={styles.textarea}
-                rows={5}
-                placeholder="Опишите идею: форма, объем, референсы..."
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
-              />
-
-              <label className={styles.fileLabel} htmlFor="chief-photo">
-                Прикрепить фото
-              </label>
-              <input
-                id="chief-photo"
-                className={styles.fileInput}
-                type="file"
-                accept="image/*"
-                onChange={(e) => setAttachmentName(e.target.files?.[0]?.name || '')}
-              />
-              {attachmentName ? (
-                <p className={styles.fileName}>Выбран файл: {attachmentName}</p>
-              ) : null}
-
-              <button type="submit" className={styles.submit}>
-                Сделать 3D бесплатно
-              </button>
-            </form>
-          </div>
-
           <div className={styles.marketingInfoCard}>
             <h2 className={styles.marketingTitle} id="marketing-title">
               Визуализируем вашу идею в 3D
@@ -270,18 +204,53 @@ const ChiefLanding = () => {
                 Вы сразу понимаете, как это будет выглядеть и стоит ли запускать.
               </li>
             </ul>
+          </div>
 
-            <a
-              className={styles.cta}
-              href={TG_BOT}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Сделать 3D бесплатно
-              <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-            </a>
+          <div className={styles.marketingFormCard}>
+            <h2 className={styles.marketingFormTitle}>Заполните форму</h2>
+            <p className={styles.marketingFormLead}>
+              Мы свяжемся с вами, уточним идею и подготовим 3D-визуализацию
+            </p>
+            <form className={styles.form} onSubmit={handleSubmitIdea}>
+              <div className={styles.field}>
+                <input
+                  id="chief-name"
+                  className={styles.input}
+                  type="text"
+                  placeholder=" "
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <label className={styles.floatingLabel} htmlFor="chief-name">
+                  Имя
+                </label>
+              </div>
+
+              <div className={styles.field}>
+                <input
+                  id="chief-contact"
+                  className={styles.input}
+                  type="text"
+                  placeholder=" "
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                />
+                <label className={styles.floatingLabel} htmlFor="chief-contact">
+                  Телефон / WhatsApp / Telegram
+                </label>
+              </div>
+
+              <button type="submit" className={`${styles.cta} ${styles.ctaSubmit}`}>
+                Сделать 3D бесплатно
+                <span className={styles.ctaArrow} aria-hidden>
+                  →
+                </span>
+              </button>
+              <p className={styles.formDisclaimer}>
+                Нажимая на кнопку вы соглашаетесь с условиями обработки данных и
+                политикой конфиденциальности
+              </p>
+            </form>
           </div>
         </div>
       </section>
