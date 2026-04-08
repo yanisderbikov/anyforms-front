@@ -101,7 +101,8 @@
 /* Секции с якорями — отступ под fixed header */
 .about,
 .cases,
-.contacts {
+.contacts,
+.marketing {
   scroll-margin-top: calc(var(--chief-header-h) + 8px);
 }
 
@@ -524,12 +525,15 @@
     flex-direction: column;
     aspect-ratio: 4 / 5;
     height: auto;
-    min-height: 220px;
+    min-height: 0;
   }
 
   .heroSideSingle .heroImage {
+    position: static;
+    inset: auto;
     flex: 1 1 auto;
     width: 100%;
+    height: 100%;
     min-height: 0;
     object-fit: cover;
   }
@@ -545,7 +549,7 @@
 
   .heroSideStack .heroSideCard {
     flex: 1 1 0;
-    min-height: 120px;
+    min-height: 0;
     height: auto;
   }
 
@@ -696,4 +700,127 @@
 
 .submit:hover {
   opacity: 0.9;
+}
+
+.marketing {
+  background: #fff;
+  padding: 0 1.4rem 1.4rem;
+  box-sizing: border-box;
+}
+
+.marketingGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  background: #fff;
+  border-radius: 22px;
+  padding: clamp(1.25rem, 2vw, 2rem);
+  box-sizing: border-box;
+}
+
+.marketingFormCard,
+.marketingInfoCard {
+  border-radius: 16px;
+  padding: clamp(0.6rem, 1vw, 1rem);
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.marketingFormCard {
+  backdrop-filter: none;
+}
+
+.marketingInfoCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.marketingFormTitle {
+  margin: 0 0 1rem;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  font-weight: 800;
+  color: var(--color-base-black);
+  text-transform: uppercase;
+}
+
+.marketingEyebrow {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.marketingTitle {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--color-base-black);
+}
+
+.marketingList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.marketingList li {
+  font-size: clamp(0.98rem, 1.1vw, 1.12rem);
+  line-height: 1.4;
+  color: #2b2b2b;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-base-black);
+}
+
+.fileLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.fileInput {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.fileName {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #555;
+}
+
+@media (min-width: 900px) {
+  .marketing {
+    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+  }
+
+  .marketingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hero-media-gap, clamp(10px, 1vw, 14px));
+    align-items: center;
+  }
 }

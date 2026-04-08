@@ -20,11 +20,7 @@ const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
   alt,
 }));
 
-const NAV = [
-  { id: 'about', label: 'о нас' },
-  { id: 'cases', label: 'кейсы' },
-  { id: 'contacts', label: 'контакты' },
-];
+const NAV = [{ id: 'marketing', label: '3d бесплатно' }];
 
 /** Три фото: слева main, справа сверху hachapuri, справа снизу blue */
 const HERO_IMAGES = {
@@ -35,6 +31,9 @@ const HERO_IMAGES = {
 
 const ChiefLanding = () => {
   const [idea, setIdea] = useState('');
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [attachmentName, setAttachmentName] = useState('');
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -42,7 +41,19 @@ const ChiefLanding = () => {
 
   const handleSubmitIdea = async (e) => {
     e.preventDefault();
-    const text = idea.trim();
+    const values = {
+      name: name.trim(),
+      contact: contact.trim(),
+      idea: idea.trim(),
+      attachmentName: attachmentName.trim(),
+    };
+    const text = [
+      'Заявка на 3D-визуализацию',
+      `Имя: ${values.name || '—'}`,
+      `Телефон / WhatsApp / Telegram: ${values.contact || '—'}`,
+      `Описание идеи: ${values.idea || '—'}`,
+      `Фото: ${values.attachmentName || 'файл не прикреплен'}`,
+    ].join('\n');
     if (text) {
       try {
         await navigator.clipboard.writeText(text);
@@ -183,117 +194,97 @@ const ChiefLanding = () => {
         </div>
       </div>
 
-      <div className={styles.about} id="about" aria-labelledby="about-title">
-        <div className={styles.sectionInner}>
-          <h2 className={styles.blockTitle} id="about-title">
-            о нас
-          </h2>
-          <p className={styles.aboutLead}>
-            Работаем с силиконом больше пяти лет: от форм для масла и десертов
-            до сложных решений под кухню и витрину.
-          </p>
-          <p className={styles.aboutText}>
-            Реализовали свыше тысячи заказов — знаем, как совместить эстетику,
-            пищевую безопасность и удобство в работе.
-          </p>
-        </div>
-      </div>
-
-      <div
-        className={styles.cases}
-        id="cases"
-        aria-labelledby="cases-title"
+      <section
+        className={styles.marketing}
+        id="marketing"
+        aria-labelledby="marketing-title"
       >
-        <div className={styles.sectionInner}>
-          <h2 className={styles.blockTitle} id="cases-title">
-            кейсы
-          </h2>
-          <p className={styles.casesLead}>с нами работали</p>
-          <ul className={styles.casesList}>
-            {PARTNER_LOGOS.map((logo) => (
-              <li key={logo.src}>{logo.alt}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className={styles.offer} aria-label="Что предлагаем">
-        <div className={styles.offerInner}>
-          <h2 className={styles.sectionTitle}>Что предлагаем сделать</h2>
-          <p className={styles.offerHighlight}>
-            Визуализация для вашего заведения
-          </p>
-          <p className={styles.sectionLead}>
-            Расскажите о задаче — мы покажем, как может выглядеть продукт в
-            вашем формате. Вы получаете понятную картинку до производства и
-            можете согласовать детали без лишних итераций.
-          </p>
-
-          <ol className={styles.steps}>
-            <li>
-              <span className={styles.stepTitle}>Напишите нам</span>
-            </li>
-            <li>
-              <span className={styles.stepTitle}>Опишите вашу идею</span>
-              <ul className={styles.stepSublist}>
-                <li>Это может быть масло</li>
-                <li>Или любой другой десерт</li>
-              </ul>
-            </li>
-            <li>
-              <span className={styles.stepTitle}>
-                Получите 3D-визуализацию вашего проекта
-              </span>
-              <span className={styles.stepDesc}>
-                Готовим визуал под ваш бренд и подачу в заведении.
-              </span>
-            </li>
-          </ol>
-        </div>
-      </div>
-
-      <div
-        className={styles.contacts}
-        id="contacts"
-        aria-labelledby="contacts-title"
-      >
-        <div className={styles.sectionInner}>
-          <h2 className={styles.blockTitle} id="contacts-title">
-            контакты
-          </h2>
-          <p className={styles.contactsLead}>
-            Напишите в Telegram — ответим и обсудим задачу без лишней бюрократии.
-          </p>
-          <a
-            className={styles.contactsTg}
-            href={TG_BOT}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            @AnyFormsChiefBot
-          </a>
-
-          <div className={styles.capture}>
-            <h3 className={styles.captureTitle}>Отправить свою идею</h3>
+        <div className={styles.marketingGrid}>
+          <div className={styles.marketingFormCard}>
+            <h2 className={styles.marketingFormTitle}>Отправить идею</h2>
             <form className={styles.form} onSubmit={handleSubmitIdea}>
+              <label className={styles.label} htmlFor="chief-name">
+                Имя
+              </label>
+              <input
+                id="chief-name"
+                className={styles.input}
+                type="text"
+                placeholder="Ваше имя"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+
+              <label className={styles.label} htmlFor="chief-contact">
+                Телефон / WhatsApp / Telegram
+              </label>
+              <input
+                id="chief-contact"
+                className={styles.input}
+                type="text"
+                placeholder="+7 999 000-00-00 / @username"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+              />
+
               <label className={styles.label} htmlFor="chief-idea">
-                Ваш запрос
+                Описание идеи или фото
               </label>
               <textarea
                 id="chief-idea"
                 className={styles.textarea}
                 rows={5}
-                placeholder="Опишите идею: форма, объём, референсы…"
+                placeholder="Опишите идею: форма, объем, референсы..."
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
               />
+
+              <label className={styles.fileLabel} htmlFor="chief-photo">
+                Прикрепить фото
+              </label>
+              <input
+                id="chief-photo"
+                className={styles.fileInput}
+                type="file"
+                accept="image/*"
+                onChange={(e) => setAttachmentName(e.target.files?.[0]?.name || '')}
+              />
+              {attachmentName ? (
+                <p className={styles.fileName}>Выбран файл: {attachmentName}</p>
+              ) : null}
+
               <button type="submit" className={styles.submit}>
-                Отправить свою идею
+                Сделать 3D бесплатно
               </button>
             </form>
           </div>
+
+          <div className={styles.marketingInfoCard}>
+            <h2 className={styles.marketingTitle} id="marketing-title">
+              Визуализируем вашу идею в 3D
+            </h2>
+            <ul className={styles.marketingList}>
+              <li>Вы отправляете идею или референс.</li>
+              <li>Мы продумываем реализацию и делаем 3D-визуализацию формы.</li>
+              <li>
+                Вы сразу понимаете, как это будет выглядеть и стоит ли запускать.
+              </li>
+            </ul>
+
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Сделать 3D бесплатно
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
