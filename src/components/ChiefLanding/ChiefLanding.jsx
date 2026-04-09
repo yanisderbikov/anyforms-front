@@ -28,6 +28,10 @@ const HERO_IMAGES = {
   hachapuri: 'https://storage.yandexcloud.net/anyforms/landing/hachapuri.jpeg',
   blue: 'https://storage.yandexcloud.net/anyforms/landing/blue.jpeg',
 };
+const TRUST_CASE_IMAGES = {
+  mold: 'https://storage.yandexcloud.net/anyforms/landing/Cristal-mold.jpg',
+  result: 'https://storage.yandexcloud.net/anyforms/landing/cristal-result.jpeg',
+};
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
@@ -172,15 +176,6 @@ const ChiefLanding = () => {
               <br/>
               реализовали более 1000 заказов.
             </p>
-
-            <div className={styles.heroPartnersBlock}>
-              <p className={styles.heroPartnersTitle}>Нам доверяют:</p>
-              <div className={styles.heroPartners} aria-label="С нами работали">
-                {PARTNER_LOGOS.map((logo) => (
-                    <img key={logo.src} src={logo.src} alt={logo.alt} loading="lazy"/>
-                ))}
-              </div>
-            </div>
             <a
                 className={styles.cta}
                 href={TG_BOT}
@@ -318,6 +313,71 @@ const ChiefLanding = () => {
                 политикой конфиденциальности
               </p>
             </form>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.trustCase} aria-labelledby="trust-case-title">
+        <div className={styles.trustCaseInner}>
+          <div className={styles.trustCaseLayout}>
+            <div className={styles.trustCaseInfoCard}>
+              <h2 className={styles.trustCaseTitle} id="trust-case-title">
+                Нам доверяют
+              </h2>
+              <p className={styles.trustCaseLead}>
+                Производители десертов и масла выбирают нас за
+              </p>
+              <ul className={styles.trustCaseSubtitle}>
+                <li>Сроки производства: 2-3 недели (до 100 форм)</li>
+                <li>Удобные в работе молды для ежедневного использования</li>
+                <li>3 бесплатные правки 3D-модели</li>
+              </ul>
+              <div className={styles.trustCasePartners} aria-label="С нами работали">
+                {PARTNER_LOGOS.map((logo) => (
+                  <img
+                    key={logo.src}
+                    className={styles.trustCasePartnerLogo}
+                    src={logo.src}
+                    alt={logo.alt}
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.trustCaseGrid} aria-label="Фото проекта Cristal">
+            <article className={styles.trustCaseCard}>
+              <p className={styles.trustCaseLabel}>Силиконовый молд для Cristal</p>
+              <img
+                className={styles.trustCaseImage}
+                src={TRUST_CASE_IMAGES.mold}
+                alt="Силиконовый молд для десерта Cristal"
+                width={800}
+                height={1067}
+                loading="lazy"
+                decoding="async"
+              />
+              <p className={styles.trustCaseMeta}>
+                Простой и удобный проект: реализовали за 2 недели и изготовили 50 молдов.
+              </p>
+            </article>
+
+            <article className={styles.trustCaseCard}>
+              <p className={styles.trustCaseLabel}>Готовый десерт</p>
+              <img
+                className={styles.trustCaseImage}
+                src={TRUST_CASE_IMAGES.result}
+                alt="Тирамису Cristal с сезонными ягодами и темным шоколадом"
+                width={800}
+                height={533}
+                loading="lazy"
+                decoding="async"
+              />
+              <p className={styles.trustCaseCaption}>
+                Тирамису Cristal с сезонными ягодами и тёмным шоколадом.
+              </p>
+            </article>
           </div>
         </div>
       </section>
