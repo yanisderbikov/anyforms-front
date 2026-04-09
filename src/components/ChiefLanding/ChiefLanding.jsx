@@ -303,31 +303,6 @@ const ChiefLanding = () => {
 
       <section className={styles.brandScreen} aria-labelledby="brand-screen-title">
         <div className={styles.heroGrid}>
-          <div className={styles.heroInfoCard}>
-            <h2 className={styles.heroTitle} id="brand-screen-title">
-              <span className={styles.heroTitleLine}>Гости запоминают</span>
-              <span className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}>
-                ваш бренд
-              </span>
-            </h2>
-            <ul className={styles.brandScreenList}>
-              <li>Логотип на десерте или масле остаётся в памяти</li>
-              <li>Гости фотографируют и делятся в соцсетях</li>
-              <li>Ваше заведение узнают без лишних слов</li>
-            </ul>
-            <a
-              className={styles.cta}
-              href={TG_BOT}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Разработать свою идею
-              <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-            </a>
-          </div>
-
           <div className={styles.mediaContainer}>
             <div className={styles.heroSideMedia}>
               <div className={styles.heroSideSingle}>
@@ -366,6 +341,31 @@ const ChiefLanding = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className={styles.heroInfoCard}>
+            <h2 className={styles.heroTitle} id="brand-screen-title">
+              <span className={styles.heroTitleLine}>Гости запоминают</span>
+              <span className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}>
+                ваш бренд
+              </span>
+            </h2>
+            <ul className={styles.brandScreenList}>
+              <li>Логотип на десерте или масле остаётся в памяти</li>
+              <li>Гости фотографируют и делятся в соцсетях</li>
+              <li>Ваше заведение узнают без лишних слов</li>
+            </ul>
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Разработать свою идею
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
           </div>
         </div>
       </section>

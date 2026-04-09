@@ -893,6 +893,16 @@
   .brandScreen {
     padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
   }
+
+  /* В brandScreen меняем стороны: медиа слева, текст справа */
+  .brandScreen .heroInfoCard {
+    float: right;
+  }
+
+  .brandScreen .mediaContainer {
+    left: 0;
+    right: auto;
+  }
 }
 
 .marketing {
