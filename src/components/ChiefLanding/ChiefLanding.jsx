@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import styles from './ChiefLanding.module.css';
 
@@ -28,10 +28,16 @@ const HERO_IMAGES = {
   hachapuri: 'https://storage.yandexcloud.net/anyforms/landing/hachapuri.jpeg',
   blue: 'https://storage.yandexcloud.net/anyforms/landing/blue.jpeg',
 };
+const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
+const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
+const MODEL_MAX_ROTATION_DEG = 10;
+const MODEL_BASE_YAW_DEG = 120;
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
+  const marketingSectionRef = useRef(null);
+  const marketingModelRef = useRef(null);
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -62,6 +68,49 @@ const ChiefLanding = () => {
   const scrollToSection = useCallback((e, sectionId) => {
     e.preventDefault();
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    if (!customElements.get('model-viewer') && !document.getElementById(MODEL_VIEWER_SCRIPT_ID)) {
+      const script = document.createElement('script');
+      script.id = MODEL_VIEWER_SCRIPT_ID;
+      script.type = 'module';
+      script.src =
+        'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js';
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
+    const section = marketingSectionRef.current;
+    const modelViewer = marketingModelRef.current;
+    if (!section || !modelViewer) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event) => {
+      const rect = section.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      const centeredX = (x - 0.5) * 2;
+      const centeredY = (y - 0.5) * 2;
+
+      const yaw = MODEL_BASE_YAW_DEG + centeredX * MODEL_MAX_ROTATION_DEG;
+      const pitch = 75 + centeredY * (MODEL_MAX_ROTATION_DEG * 0.45);
+      modelViewer.cameraOrbit = `${yaw.toFixed(2)}deg ${pitch.toFixed(2)}deg auto`;
+    };
+
+    const handlePointerLeave = () => {
+      modelViewer.cameraOrbit = `${MODEL_BASE_YAW_DEG}deg 75deg auto`;
+    };
+
+    section.addEventListener('pointermove', handlePointerMove);
+    section.addEventListener('pointerleave', handlePointerLeave);
+
+    return () => {
+      section.removeEventListener('pointermove', handlePointerMove);
+      section.removeEventListener('pointerleave', handlePointerLeave);
+    };
   }, []);
 
   return (
@@ -191,7 +240,25 @@ const ChiefLanding = () => {
         className={styles.marketing}
         id="marketing"
         aria-labelledby="marketing-title"
+        ref={marketingSectionRef}
       >
+        <div className={styles.marketingModelLayer} aria-hidden>
+          <model-viewer
+            ref={marketingModelRef}
+            className={styles.marketingModel}
+            src={MARKETING_MODEL_SRC}
+            camera-controls
+            camera-orbit={`${MODEL_BASE_YAW_DEG}deg 75deg 120%`}
+            min-camera-orbit="auto auto 80%"
+            max-camera-orbit="auto auto 180%"
+            disable-zoom
+            field-of-view="24deg"
+            interaction-prompt="none"
+            shadow-intensity="0"
+            exposure="1"
+            alt=""
+          />
+        </div>
         <div className={styles.marketingGrid}>
           <div className={styles.marketingInfoCard}>
             <h2 className={styles.marketingTitle} id="marketing-title">
