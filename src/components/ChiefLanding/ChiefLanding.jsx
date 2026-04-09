@@ -236,92 +236,6 @@ const ChiefLanding = () => {
         </div>
       </div>
 
-      <section
-        className={styles.marketing}
-        id="marketing"
-        aria-labelledby="marketing-title"
-        ref={marketingSectionRef}
-      >
-        <div className={styles.marketingModelLayer} aria-hidden>
-          <model-viewer
-            ref={marketingModelRef}
-            className={styles.marketingModel}
-            src={MARKETING_MODEL_SRC}
-            camera-controls
-            camera-orbit={`${MODEL_BASE_YAW_DEG}deg 75deg 120%`}
-            min-camera-orbit="auto auto 80%"
-            max-camera-orbit="auto auto 180%"
-            disable-zoom
-            field-of-view="24deg"
-            interaction-prompt="none"
-            shadow-intensity="0"
-            exposure="1"
-            alt=""
-          />
-        </div>
-        <div className={styles.marketingGrid}>
-          <div className={styles.marketingInfoCard}>
-            <h2 className={styles.marketingTitle} id="marketing-title">
-              Визуализируем вашу идею в 3D
-            </h2>
-            <ul className={styles.marketingList}>
-              <li>Вы отправляете идею или референс.</li>
-              <li>Мы продумываем реализацию и делаем 3D-визуализацию формы.</li>
-              <li>
-                Вы сразу понимаете, как это будет выглядеть и стоит ли запускать.
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.marketingFormCard}>
-            <h2 className={styles.marketingFormTitle}>Заполните форму</h2>
-            <p className={styles.marketingFormLead}>
-              Мы свяжемся с вами, уточним идею и подготовим 3D-визуализацию
-            </p>
-            <form className={styles.form} onSubmit={handleSubmitIdea}>
-              <div className={styles.field}>
-                <input
-                  id="chief-name"
-                  className={styles.input}
-                  type="text"
-                  placeholder=" "
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <label className={styles.floatingLabel} htmlFor="chief-name">
-                  Имя
-                </label>
-              </div>
-
-              <div className={styles.field}>
-                <input
-                  id="chief-contact"
-                  className={styles.input}
-                  type="text"
-                  placeholder=" "
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
-                />
-                <label className={styles.floatingLabel} htmlFor="chief-contact">
-                  Телефон / WhatsApp / Telegram
-                </label>
-              </div>
-
-              <button type="submit" className={`${styles.cta} ${styles.ctaSubmit}`}>
-                Сделать 3D бесплатно
-                <span className={styles.ctaArrow} aria-hidden>
-                  →
-                </span>
-              </button>
-              <p className={styles.formDisclaimer}>
-                Нажимая на кнопку вы соглашаетесь с условиями обработки данных и
-                политикой конфиденциальности
-              </p>
-            </form>
-          </div>
-        </div>
-      </section>
-
       <section className={styles.trustCase} aria-labelledby="trust-case-title">
         <div className={styles.trustCaseInner}>
           <div className={styles.trustCaseLayout}>
@@ -452,6 +366,92 @@ const ChiefLanding = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className={styles.marketing}
+        id="marketing"
+        aria-labelledby="marketing-title"
+        ref={marketingSectionRef}
+      >
+        <div className={styles.marketingModelLayer} aria-hidden>
+          <model-viewer
+            ref={marketingModelRef}
+            className={styles.marketingModel}
+            src={MARKETING_MODEL_SRC}
+            camera-controls
+            camera-orbit={`${MODEL_BASE_YAW_DEG}deg 75deg 120%`}
+            min-camera-orbit="auto auto 80%"
+            max-camera-orbit="auto auto 180%"
+            disable-zoom
+            field-of-view="24deg"
+            interaction-prompt="none"
+            shadow-intensity="0"
+            exposure="1"
+            alt=""
+          />
+        </div>
+        <div className={styles.marketingGrid}>
+          <div className={styles.marketingInfoCard}>
+            <h2 className={styles.marketingTitle} id="marketing-title">
+              Визуализируем вашу идею в 3D
+            </h2>
+            <ul className={styles.marketingList}>
+              <li>Вы отправляете идею или референс.</li>
+              <li>Мы продумываем реализацию и делаем 3D-визуализацию формы.</li>
+              <li>
+                Вы сразу понимаете, как это будет выглядеть и стоит ли запускать.
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.marketingFormCard}>
+            <h2 className={styles.marketingFormTitle}>Заполните форму</h2>
+            <p className={styles.marketingFormLead}>
+              Мы свяжемся с вами, уточним идею и подготовим 3D-визуализацию
+            </p>
+            <form className={styles.form} onSubmit={handleSubmitIdea}>
+              <div className={styles.field}>
+                <input
+                  id="chief-name"
+                  className={styles.input}
+                  type="text"
+                  placeholder=" "
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+                <label className={styles.floatingLabel} htmlFor="chief-name">
+                  Имя
+                </label>
+              </div>
+
+              <div className={styles.field}>
+                <input
+                  id="chief-contact"
+                  className={styles.input}
+                  type="text"
+                  placeholder=" "
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                />
+                <label className={styles.floatingLabel} htmlFor="chief-contact">
+                  Телефон / WhatsApp / Telegram
+                </label>
+              </div>
+
+              <button type="submit" className={`${styles.cta} ${styles.ctaSubmit}`}>
+                Сделать 3D бесплатно
+                <span className={styles.ctaArrow} aria-hidden>
+                  →
+                </span>
+              </button>
+              <p className={styles.formDisclaimer}>
+                Нажимая на кнопку вы соглашаетесь с условиями обработки данных и
+                политикой конфиденциальности
+              </p>
+            </form>
           </div>
         </div>
       </section>
