@@ -41,12 +41,16 @@ const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
 const MODEL_BASE_YAW_DEG = 120;
+const MODEL_SCROLL_PITCH_SHIFT_DEG = 10;
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const marketingSectionRef = useRef(null);
   const marketingModelRef = useRef(null);
+  const pointerYawOffsetRef = useRef(0);
+  const pointerPitchOffsetRef = useRef(0);
+  const scrollPitchOffsetRef = useRef(0);
 
   const openTelegram = () => {
     window.open(TG_BOT, '_blank', 'noopener,noreferrer');
@@ -97,6 +101,23 @@ const ChiefLanding = () => {
       return undefined;
     }
 
+    const applyCameraOrbit = () => {
+      const yaw = MODEL_BASE_YAW_DEG + pointerYawOffsetRef.current;
+      const pitch = 75 + pointerPitchOffsetRef.current + scrollPitchOffsetRef.current;
+      modelViewer.cameraOrbit = `${yaw.toFixed(2)}deg ${pitch.toFixed(2)}deg auto`;
+    };
+
+    const updateScrollPitch = () => {
+      const rect = section.getBoundingClientRect();
+      const viewportCenterY = window.innerHeight / 2;
+      const sectionCenterY = rect.top + rect.height / 2;
+      const maxDistance = Math.max(window.innerHeight / 2 + rect.height / 2, 1);
+      const normalized = (viewportCenterY - sectionCenterY) / maxDistance;
+      const clamped = Math.max(-1, Math.min(1, normalized));
+      scrollPitchOffsetRef.current = clamped * MODEL_SCROLL_PITCH_SHIFT_DEG;
+      applyCameraOrbit();
+    };
+
     const handlePointerMove = (event) => {
       const rect = section.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width;
@@ -104,19 +125,26 @@ const ChiefLanding = () => {
       const centeredX = (x - 0.5) * 2;
       const centeredY = (y - 0.5) * 2;
 
-      const yaw = MODEL_BASE_YAW_DEG + centeredX * MODEL_MAX_ROTATION_DEG;
-      const pitch = 75 + centeredY * (MODEL_MAX_ROTATION_DEG * 0.45);
-      modelViewer.cameraOrbit = `${yaw.toFixed(2)}deg ${pitch.toFixed(2)}deg auto`;
+      pointerYawOffsetRef.current = centeredX * MODEL_MAX_ROTATION_DEG;
+      pointerPitchOffsetRef.current = centeredY * (MODEL_MAX_ROTATION_DEG * 0.45);
+      applyCameraOrbit();
     };
 
     const handlePointerLeave = () => {
-      modelViewer.cameraOrbit = `${MODEL_BASE_YAW_DEG}deg 75deg auto`;
+      pointerYawOffsetRef.current = 0;
+      pointerPitchOffsetRef.current = 0;
+      applyCameraOrbit();
     };
 
+    updateScrollPitch();
+    window.addEventListener('scroll', updateScrollPitch, { passive: true });
+    window.addEventListener('resize', updateScrollPitch);
     section.addEventListener('pointermove', handlePointerMove);
     section.addEventListener('pointerleave', handlePointerLeave);
 
     return () => {
+      window.removeEventListener('scroll', updateScrollPitch);
+      window.removeEventListener('resize', updateScrollPitch);
       section.removeEventListener('pointermove', handlePointerMove);
       section.removeEventListener('pointerleave', handlePointerLeave);
     };
