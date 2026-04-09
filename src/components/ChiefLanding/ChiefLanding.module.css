@@ -866,6 +866,35 @@
   }
 }
 
+.brandScreen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem 0.9rem;
+  min-height: var(--chief-screen-h);
+  background: var(--color-base-black);
+  box-sizing: border-box;
+}
+
+.brandScreenList {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.brandScreenList li {
+  font-size: clamp(1rem, 1.1vw, 1.35rem);
+  line-height: 1.28;
+  color: var(--color-base-black);
+}
+
+@media (min-width: 900px) {
+  .brandScreen {
+    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+  }
+}
+
 .marketing {
   background: #fff;
   display: flex;

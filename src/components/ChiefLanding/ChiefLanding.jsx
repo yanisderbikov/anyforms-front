@@ -32,6 +32,11 @@ const TRUST_CASE_IMAGES = {
   mold: 'https://storage.yandexcloud.net/anyforms/landing/Cristal-mold.jpg',
   result: 'https://storage.yandexcloud.net/anyforms/landing/cristal-result.jpeg',
 };
+const BRAND_MEMORY_IMAGES = {
+  main: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Brown-Cake.jpeg',
+  top: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Cake.jpg',
+  bottom: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Gold-Cake.jpg',
+};
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
@@ -378,6 +383,75 @@ const ChiefLanding = () => {
                 Тирамису Cristal с сезонными ягодами и тёмным шоколадом.
               </p>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.brandScreen} aria-labelledby="brand-screen-title">
+        <div className={styles.heroGrid}>
+          <div className={styles.heroInfoCard}>
+            <h2 className={styles.heroTitle} id="brand-screen-title">
+              <span className={styles.heroTitleLine}>Гости запоминают</span>
+              <span className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}>
+                ваш бренд
+              </span>
+            </h2>
+            <ul className={styles.brandScreenList}>
+              <li>Логотип на десерте или масле остаётся в памяти</li>
+              <li>Гости фотографируют и делятся в соцсетях</li>
+              <li>Ваше заведение узнают без лишних слов</li>
+            </ul>
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Разработать свою идею
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
+          </div>
+
+          <div className={styles.mediaContainer}>
+            <div className={styles.heroSideMedia}>
+              <div className={styles.heroSideSingle}>
+                <img
+                  className={styles.heroImage}
+                  src={BRAND_MEMORY_IMAGES.main}
+                  alt="Десерт с логотипом Selfie"
+                  width={768}
+                  height={1024}
+                  decoding="async"
+                  loading="lazy"
+                />
+              </div>
+              <div className={styles.heroSideStack}>
+                <div className={styles.heroSideCard}>
+                  <img
+                    className={styles.heroImage}
+                    src={BRAND_MEMORY_IMAGES.top}
+                    alt="Десерт Selfie крупным планом"
+                    width={827}
+                    height={1000}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                </div>
+                <div className={styles.heroSideCard}>
+                  <img
+                    className={styles.heroImage}
+                    src={BRAND_MEMORY_IMAGES.bottom}
+                    alt="Золотой десерт Selfie"
+                    width={437}
+                    height={367}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
