@@ -37,6 +37,7 @@ const BRAND_MEMORY_IMAGES = {
   top: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Cake.jpg',
   bottom: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Gold-Cake.jpg',
 };
+const TEAM_IMAGE = 'https://storage.yandexcloud.net/anyforms/landing/team.jpeg';
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
@@ -480,6 +481,63 @@ const ChiefLanding = () => {
                 политикой конфиденциальности
               </p>
             </form>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.teamScreen} aria-labelledby="team-screen-title">
+        <div className={styles.heroGrid}>
+          <div className={styles.heroInfoCard}>
+            <h2 className={styles.heroTitle} id="team-screen-title">
+              <span className={styles.heroTitleLine}>Команда, которая</span>
+              <span className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}>
+                доводит до результата
+              </span>
+            </h2>
+            <div className={styles.teamMembers}>
+              <div className={styles.teamMember}>
+                <p className={styles.teamMemberName}>Юра — бренд и визуал</p>
+                <p className={styles.teamMemberDesc}>
+                  Усиливает концепцию и доводит до «вау»
+                </p>
+              </div>
+              <div className={styles.teamMember}>
+                <p className={styles.teamMemberName}>Дима — производство и качество</p>
+                <p className={styles.teamMemberDesc}>
+                  Контролирует результат и не пропускает косяки
+                </p>
+              </div>
+            </div>
+            <ul className={styles.teamStats} aria-label="О команде">
+              <li>2 брата</li>
+              <li>5+ лет опыта</li>
+              <li>Тысячи заказов</li>
+            </ul>
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Разработать свою идею
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
+          </div>
+
+          <div className={styles.mediaContainer}>
+            <div className={styles.teamSingleMedia}>
+              <img
+                className={styles.heroImage}
+                src={TEAM_IMAGE}
+                alt=""
+                width={1200}
+                height={800}
+                decoding="async"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>

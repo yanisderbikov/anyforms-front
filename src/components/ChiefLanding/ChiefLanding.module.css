@@ -103,7 +103,8 @@
 .about,
 .cases,
 .contacts,
-.marketing {
+.marketing,
+.teamScreen {
   scroll-margin-top: calc(var(--chief-header-h) + 8px);
 }
 
@@ -863,6 +864,107 @@
 @media (max-width: 620px) {
   .trustCaseGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+.teamScreen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 1.4rem 1.4rem;
+  min-height: var(--chief-screen-h);
+  background: var(--color-base-black);
+  box-sizing: border-box;
+}
+
+.teamMembers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.teamMember {
+  margin: 0;
+}
+
+.teamMemberName {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1rem, 1.1vw, 1.35rem);
+  line-height: 1.28;
+  font-weight: 700;
+  color: var(--color-base-black);
+}
+
+.teamMemberDesc {
+  margin: 0;
+  font-size: clamp(1rem, 1.1vw, 1.35rem);
+  line-height: 1.28;
+  color: var(--color-base-black);
+}
+
+.teamStats {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-size: clamp(1rem, 1.1vw, 1.35rem);
+  line-height: 1.28;
+  color: var(--color-base-black);
+}
+
+.teamSingleMedia {
+  border-radius: 22px;
+  overflow: hidden;
+  background: #1a1a1a;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  .teamScreen {
+    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+  }
+
+  .teamSingleMedia {
+    display: block;
+    position: relative;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .teamSingleMedia .heroImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    flex: none;
+    object-fit: cover;
+    object-position: top center;
+  }
+}
+
+@media (max-width: 899px) {
+  .teamScreen {
+    padding: 0 0.9rem 0.9rem;
+  }
+
+  .teamSingleMedia {
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    min-height: 0;
+  }
+
+  .teamSingleMedia .heroImage {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    object-position: top center;
   }
 }
 
