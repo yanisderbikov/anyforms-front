@@ -38,6 +38,24 @@ const BRAND_MEMORY_IMAGES = {
   bottom: 'https://storage.yandexcloud.net/anyforms/landing/Selfie-Gold-Cake.jpg',
 };
 const TEAM_IMAGE = 'https://storage.yandexcloud.net/anyforms/landing/team.jpeg';
+const PROCESS_IMAGES = [
+  {
+    src: 'https://storage.yandexcloud.net/anyforms/landing/single-3d.jpeg',
+    alt: '3D-модель формы',
+  },
+  {
+    src: 'https://storage.yandexcloud.net/anyforms/landing/single-mold.jpeg',
+    alt: 'Силиконовая форма',
+  },
+  {
+    src: 'https://storage.yandexcloud.net/anyforms/landing/single-shipping.jpg',
+    alt: 'Упаковка и отгрузка',
+  },
+  {
+    src: 'https://storage.yandexcloud.net/anyforms/landing/Single-result.jpg',
+    alt: 'Готовый десерт',
+  },
+];
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
@@ -538,6 +556,60 @@ const ChiefLanding = () => {
                 loading="lazy"
               />
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className={styles.brandScreen}
+        aria-labelledby="process-transparency-title"
+      >
+        <div className={styles.heroGrid}>
+          <div className={styles.mediaContainer}>
+            <div className={styles.processPhotoGrid}>
+              {PROCESS_IMAGES.map(({ src, alt }) => (
+                <div key={src} className={styles.processPhotoCell}>
+                  <img
+                    className={styles.processPhotoImg}
+                    src={src}
+                    alt={alt}
+                    width={800}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.heroInfoCard}>
+            <h2 className={styles.heroTitle} id="process-transparency-title">
+              <span className={styles.heroTitleLine}>Информируем на каждом</span>
+              <span className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}>
+                этапе
+              </span>
+            </h2>
+            <p className={styles.processLead}>
+              Наш процесс абсолютно прозрачный. И мы проактивно сообщаем о всех этапах.
+            </p>
+            <ul className={styles.brandScreenList}>
+              <li>Сообщаем, на каком этапе находится заказ</li>
+              <li>Показываем процесс: от 3D до готовой формы</li>
+              <li>Отправляем фото с производства</li>
+              <li>Держим связь до момента получения</li>
+            </ul>
+            <a
+              className={styles.cta}
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Обсудить задачу
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
           </div>
         </div>
       </section>
