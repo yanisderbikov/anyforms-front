@@ -56,6 +56,11 @@ const PROCESS_IMAGES = [
     alt: 'Готовый десерт',
   },
 ];
+const REVIEW_IMAGES = Array.from({ length: 16 }, (_, i) => ({
+  src: `https://storage.yandexcloud.net/anyforms/landing/review/review-${i}.jpeg`,
+  alt: `Отзыв клиента ${i + 1}`,
+}));
+
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
@@ -611,6 +616,37 @@ const ChiefLanding = () => {
               </span>
             </a>
           </div>
+        </div>
+      </section>
+
+      <section
+        className={styles.reviewsSection}
+        id="reviews"
+        aria-labelledby="reviews-title"
+      >
+        <div className={styles.reviewsHeader}>
+          <h2 className={styles.reviewsTitle} id="reviews-title">
+            Отзывы
+          </h2>
+        </div>
+        <div
+          className={styles.reviewsStrip}
+          role="region"
+          aria-label="Галерея отзывов, прокрутка вправо"
+        >
+          {REVIEW_IMAGES.map(({ src, alt }) => (
+            <div key={src} className={styles.reviewsCard}>
+              <img
+                className={styles.reviewsCardImg}
+                src={src}
+                alt={alt}
+                width={720}
+                height={1280}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ))}
         </div>
       </section>
     </div>
