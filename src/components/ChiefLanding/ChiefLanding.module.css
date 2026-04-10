@@ -869,13 +869,23 @@
 }
 
 .reviewsSection {
-  --reviews-edge: clamp(0.9rem, 2.6vw, 32px);
+  /*
+   * Горизонтальный отступ как у hero / marketing / trustCase:
+   * до 899px — 0.9rem, от 900px — clamp(20px, 2.6vw, 32px)
+   */
+  --reviews-edge: 0.9rem;
   width: 100%;
   /* Поверхность как у блока «3D бесплатно» (.marketing) */
   background: #fff;
   color: var(--color-base-black);
   padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.5rem, 3vw, 2.75rem);
   box-sizing: border-box;
+}
+
+@media (min-width: 900px) {
+  .reviewsSection {
+    --reviews-edge: clamp(20px, 2.6vw, 32px);
+  }
 }
 
 .reviewsHeader {
@@ -905,7 +915,16 @@
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.15rem var(--reviews-edge) 0.35rem;
+  /*
+   * Первая и последняя карточка на одной вертикали с заголовком (max-width 1280px + --reviews-edge):
+   * на узком экране — только отступ от края; на широком — + центрирование колонки.
+   */
+  --reviews-strip-inline: max(
+    var(--reviews-edge),
+    calc((100vw - 1280px) / 2 + var(--reviews-edge))
+  );
+  padding: 0.15rem var(--reviews-strip-inline) 0.35rem;
+  scroll-padding-inline: var(--reviews-strip-inline);
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
   scrollbar-color: rgba(0, 0, 0, 0.28) rgba(0, 0, 0, 0.06);
