@@ -75,11 +75,11 @@ const CLOSING_IMAGES = {
   bottom: 'https://storage.yandexcloud.net/anyforms/landing/duck-3.jpeg',
 };
 
-const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
+const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka4.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
 const MODEL_BASE_YAW_DEG = 120;
-const MODEL_SCROLL_PITCH_SHIFT_DEG = 10;
+const MODEL_SCROLL_PITCH_SHIFT_DEG = 20;
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');

@@ -1137,8 +1137,8 @@
 
 .reviewsCard {
   flex: 0 0 auto;
-  width: clamp(calc(300px * 9 / 16), 30vw, 300px);
-  min-height: 300px;
+  width: clamp(calc(400px * 9 / 16), 30vw, 400px);
+  min-height: 400px;
   aspect-ratio: 9 / 16;
   border-radius: 22px;
   overflow: hidden;
@@ -1393,7 +1393,7 @@
   margin: 0 auto;
   background: transparent;
   border-radius: 22px;
-  padding: clamp(1.25rem, 2vw, 2rem);
+  padding: 0;
   box-sizing: border-box;
   position: relative;
   z-index: 1;
@@ -1573,9 +1573,14 @@
   }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 720px) {
   .closingPlain {
-    padding: 0 0.9rem 0.9rem;
+    padding: 0 0 0.9rem;
+  }
+
+  .closingPlainInner {
+    max-width: none;
+    width: 100%;
   }
 }
 
