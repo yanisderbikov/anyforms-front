@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import apiClient from '../../apiClient';
 import styles from './ChiefLanding.module.css';
+
+const LANDING_LEAD_NAME = 'Заявка с леднига - версия 1';
 
 const TG_BOT = 'https://t.me/AnyFormsChiefBot';
 const TG_CHANNEL = 'https://t.me/anyforms';
@@ -83,7 +86,10 @@ const MODEL_SCROLL_PITCH_SHIFT_DEG = 20;
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
+  const [phone, setPhone] = useState('');
+  const [leadSent, setLeadSent] = useState(false);
+  const [phoneInvalid, setPhoneInvalid] = useState(false);
+  const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const marketingSectionRef = useRef(null);
   const marketingModelRef = useRef(null);
@@ -91,30 +97,34 @@ const ChiefLanding = () => {
   const pointerPitchOffsetRef = useRef(0);
   const scrollPitchOffsetRef = useRef(0);
 
-  const openTelegram = () => {
-    window.open(TG_BOT, '_blank', 'noopener,noreferrer');
-  };
-
   const handleSubmitIdea = async (e) => {
     e.preventDefault();
-    const values = {
-      name: name.trim(),
-      contact: contact.trim(),
-    };
-    const text = [
-      'Заявка на 3D-визуализацию',
-      `Имя: ${values.name || '—'}`,
-      `Телефон / WhatsApp / Telegram: ${values.contact || '—'}`,
-    ].join('\n');
-    if (text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        toast.success('Текст скопирован — вставьте его в чат с ботом');
-      } catch {
-        toast.error('Не удалось скопировать — скопируйте текст вручную');
-      }
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      setPhoneInvalid(true);
+      return;
     }
-    openTelegram();
+    setPhoneInvalid(false);
+    setLeadSubmitting(true);
+    try {
+      const { data } = await apiClient.api.createLead({
+        leadName: LANDING_LEAD_NAME,
+        name: name.trim() || undefined,
+        phone: trimmedPhone,
+      });
+      if (data?.success === false) {
+        toast.error(data?.error || 'Не удалось отправить заявку');
+        return;
+      }
+      setLeadSent(true);
+    } catch (err) {
+      const fromApi = err.response?.data?.error;
+      toast.error(
+        typeof fromApi === 'string' ? fromApi : 'Не удалось отправить заявку'
+      );
+    } finally {
+      setLeadSubmitting(false);
+    }
   };
 
   const scrollToSection = useCallback((e, sectionId) => {
@@ -416,53 +426,77 @@ const ChiefLanding = () => {
               </ul>
             </div>
 
-            <div className={styles.marketingFormCard}>
-              <h2 className={styles.marketingFormTitle}>Заполните форму</h2>
-              <p className={styles.marketingFormLead}>
-                Мы свяжемся с вами, уточним идею и подготовим 3D-визуализацию
-              </p>
-              <form className={styles.form} onSubmit={handleSubmitIdea}>
-                <div className={styles.field}>
-                  <input
-                      id="chief-name"
-                      className={styles.input}
-                      type="text"
-                      placeholder=" "
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                  />
-                  <label className={styles.floatingLabel} htmlFor="chief-name">
-                    Имя
-                  </label>
-                </div>
-
-                <div className={styles.field}>
-                  <input
-                      id="chief-contact"
-                      className={styles.input}
-                      type="text"
-                      placeholder=" "
-                      value={contact}
-                      onChange={(e) => setContact(e.target.value)}
-                  />
-                  <label className={styles.floatingLabel} htmlFor="chief-contact">
-                    Телефон / WhatsApp / Telegram
-                  </label>
-                </div>
-
-                <button type="submit" className={`${styles.cta} ${styles.ctaSubmit}`}>
-                  Сделать 3D бесплатно
-                  <span className={styles.ctaArrow} aria-hidden>
-                  →
-                </span>
-                </button>
-                <p className={styles.formDisclaimer}>
-                  Нажимая на кнопку вы соглашаетесь с условиями обработки данных и{' '}
-                  <Link to="/chief/privacy" className={styles.formDisclaimerLink}>
-                    политикой конфиденциальности
-                  </Link>
+            <div
+                className={`${styles.marketingFormCard} ${
+                  leadSent ? styles.marketingFormCardSent : ''
+                }`}
+            >
+              {leadSent ? (
+                <p className={styles.marketingFormSuccessMessage} role="status">
+                  Мы с вами свяжемся в течении дня!
                 </p>
-              </form>
+              ) : (
+                <>
+                  <h2 className={styles.marketingFormTitle}>Заполните форму</h2>
+                  <p className={styles.marketingFormLead}>
+                    Мы свяжемся с вами, уточним идею и подготовим 3D-визуализацию
+                  </p>
+                  <form className={styles.form} onSubmit={handleSubmitIdea}>
+                    <div className={styles.field}>
+                      <input
+                          id="chief-name"
+                          className={styles.input}
+                          type="text"
+                          placeholder=" "
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          autoComplete="name"
+                      />
+                      <label className={styles.floatingLabel} htmlFor="chief-name">
+                        Имя
+                      </label>
+                    </div>
+
+                    <div className={styles.field}>
+                      <input
+                          id="chief-phone"
+                          className={`${styles.input} ${
+                            phoneInvalid ? styles.inputError : ''
+                          }`}
+                          type="tel"
+                          placeholder=" "
+                          value={phone}
+                          onChange={(e) => {
+                            setPhone(e.target.value);
+                            if (phoneInvalid) setPhoneInvalid(false);
+                          }}
+                          aria-invalid={phoneInvalid}
+                          autoComplete="tel"
+                      />
+                      <label className={styles.floatingLabel} htmlFor="chief-phone">
+                        Телефон
+                      </label>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className={`${styles.cta} ${styles.ctaSubmit}`}
+                        disabled={leadSubmitting}
+                    >
+                      {leadSubmitting ? 'Отправка…' : 'Сделать 3D бесплатно'}
+                      <span className={styles.ctaArrow} aria-hidden>
+                        →
+                      </span>
+                    </button>
+                    <p className={styles.formDisclaimer}>
+                      Нажимая на кнопку вы соглашаетесь с условиями обработки данных и{' '}
+                      <Link to="/chief/privacy" className={styles.formDisclaimerLink}>
+                        политикой конфиденциальности
+                      </Link>
+                    </p>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </section>

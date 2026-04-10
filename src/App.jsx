@@ -11,12 +11,11 @@ import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 
 function App() {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  const isChiefPage = location.pathname === '/chief';
-  const isChiefPrivacyPage = location.pathname === '/chief/privacy';
-  const isOrdersPage = location.pathname.startsWith('/orders');
-  const isLoginPage = location.pathname === '/login';
-  const isAdminProductsPage = location.pathname === '/admin/products';
+  const normalizedPathname =
+    location.pathname.length > 1 ? location.pathname.replace(/\/+$/, '') : location.pathname;
+  const isHomePage = normalizedPathname === '/';
+  const isChiefPrivacyPage = normalizedPathname === '/chief/privacy';
+  const isChiefPage = normalizedPathname === '/chief';
 
   useEffect(() => {
     if (isHomePage) {
@@ -30,13 +29,15 @@ function App() {
 
   const fullscreen = isHomePage || isChiefPage || isChiefPrivacyPage;
 
+  if (location.pathname !== normalizedPathname) {
+    return <Navigate to={normalizedPathname} replace />;
+  }
+
   return (
     <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
       <main className={fullscreen ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/chef" element={<Navigate to="/chief" replace />} />
-          <Route path="/cheif" element={<Navigate to="/chief" replace />} />
           <Route path="/chief" element={<ChiefLanding />} />
           <Route path="/chief/privacy" element={<ChiefPrivacy />} />
           <Route path="/" element={<PDFViewer />} />

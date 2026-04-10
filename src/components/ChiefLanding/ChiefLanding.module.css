@@ -1,8 +1,12 @@
 .page {
   --chief-header-h: 78px;
-  --chief-screen-h: 85vh;
+  --chief-edge-mobile: 14px;
+  --chief-edge-desktop: 28px;
+  --chief-section-top-mobile: 32px;
+  --chief-section-bottom-mobile: 32px;
+  --chief-section-top-desktop: 72px;
+  --chief-section-bottom-desktop: 72px;
   width: 100%;
-  min-height: 100vh;
   background: var(--color-base-black);
   padding-top: var(--chief-header-h);
   box-sizing: border-box;
@@ -25,7 +29,7 @@
   align-items: center;
   column-gap: clamp(1.25rem, 4vw, 3.5rem);
   min-height: var(--chief-header-h);
-  padding: 0.9rem 1.4rem;
+  padding: 18px var(--chief-edge-desktop);
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -41,7 +45,7 @@
 
 @media (min-width: 900px) {
   .siteHeaderInner {
-    padding: 1.15rem clamp(20px, 2.6vw, 32px);
+    padding: 18px var(--chief-edge-desktop);
   }
 }
 
@@ -49,7 +53,7 @@
   .siteHeaderInner {
     grid-template-columns: 1fr auto;
     column-gap: 0.75rem;
-    padding: 0.85rem 1rem;
+    padding: 14px var(--chief-edge-mobile);
   }
 
   .logoLink {
@@ -401,8 +405,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 1.4rem 1.4rem;
-  min-height: var(--chief-screen-h);
+  padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+    var(--chief-section-bottom-desktop);
   background: var(--color-base-black);
   box-sizing: border-box;
 }
@@ -420,7 +424,8 @@
 
 @media (min-width: 900px) {
   .hero {
-    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+      var(--chief-section-bottom-desktop);
   }
 
   /*
@@ -544,6 +549,12 @@
 
 .cta:active {
   transform: scale(0.98);
+}
+
+.cta:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .ctaArrow {
@@ -685,7 +696,8 @@
 
 @media (max-width: 899px) {
   .hero {
-    padding: 0 0.9rem 0.9rem;
+    padding: var(--chief-section-top-mobile) var(--chief-edge-mobile)
+      var(--chief-section-bottom-mobile);
   }
 
   .heroGrid {
@@ -751,6 +763,11 @@
   .heroSideStack .heroImage {
     flex: 1 1 0;
     min-height: 0;
+  }
+
+  .marketing {
+    padding: calc(var(--chief-section-top-mobile) * 3) var(--chief-edge-mobile)
+      calc(var(--chief-section-bottom-mobile) * 3);
   }
 }
 
@@ -899,8 +916,8 @@
 
 .trustCase {
   background: var(--color-base-black);
-  padding: clamp(4rem, 10vw, 6.5rem) 0.9rem 0.9rem;
-  min-height: var(--chief-screen-h);
+  padding: var(--chief-section-top-mobile) var(--chief-edge-mobile)
+    var(--chief-section-bottom-mobile);
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -1032,8 +1049,8 @@
 
 @media (min-width: 900px) {
   .trustCase {
-    padding: clamp(4rem, 10vw, 6.5rem) clamp(20px, 2.6vw, 32px)
-      clamp(20px, 2.6vw, 32px);
+    padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+      var(--chief-section-bottom-desktop);
   }
 
   .trustCaseGrid {
@@ -1062,13 +1079,12 @@
    * Горизонтальный отступ как у hero / marketing / trustCase:
    * до 899px — 0.9rem, от 900px — clamp(20px, 2.6vw, 32px)
    */
-  --reviews-edge: 0.9rem;
+  --reviews-edge: var(--chief-edge-mobile);
   width: 100%;
   /* Плашка как у hero / «Нам доверяют» (.heroInfoCard, .trustCaseInfoCard) */
   background: #e9e9e9;
   color: var(--color-base-black);
-  padding: clamp(4rem, 10vw, 6.5rem) 0 clamp(5rem, 10vw, 9rem);
-  min-height: var(--chief-screen-h);
+  padding: var(--chief-section-top-mobile) 0 var(--chief-section-bottom-mobile);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1077,7 +1093,8 @@
 
 @media (min-width: 900px) {
   .reviewsSection {
-    --reviews-edge: clamp(20px, 2.6vw, 32px);
+    --reviews-edge: var(--chief-edge-desktop);
+    padding: var(--chief-section-top-desktop) 0 var(--chief-section-bottom-desktop);
   }
 }
 
@@ -1158,8 +1175,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 1.4rem 1.4rem;
-  min-height: var(--chief-screen-h);
+  padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+    var(--chief-section-bottom-desktop);
   background: var(--color-base-black);
   box-sizing: border-box;
 }
@@ -1211,7 +1228,8 @@
 
 @media (min-width: 900px) {
   .teamScreen {
-    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+      var(--chief-section-bottom-desktop);
   }
 
   .teamSingleMedia {
@@ -1234,7 +1252,8 @@
 
 @media (max-width: 899px) {
   .teamScreen {
-    padding: 0 0.9rem 0.9rem;
+    padding: var(--chief-section-top-mobile) var(--chief-edge-mobile)
+      var(--chief-section-bottom-mobile);
   }
 
   .teamSingleMedia {
@@ -1259,8 +1278,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 0.9rem 0.9rem;
-  min-height: var(--chief-screen-h);
+  padding: var(--chief-section-top-mobile) var(--chief-edge-mobile)
+    var(--chief-section-bottom-mobile);
   background: var(--color-base-black);
   box-sizing: border-box;
 }
@@ -1291,7 +1310,8 @@
 
 @media (min-width: 900px) {
   .brandScreen {
-    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: var(--chief-section-top-desktop) var(--chief-edge-desktop)
+      var(--chief-section-bottom-desktop);
   }
 
   /* В brandScreen меняем стороны: медиа слева, текст справа */
@@ -1359,8 +1379,8 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 0 1.4rem 1.4rem;
-  min-height: var(--chief-screen-h);
+  padding: calc(var(--chief-section-top-desktop) * 3) var(--chief-edge-desktop)
+    calc(var(--chief-section-bottom-desktop) * 3);
   box-sizing: border-box;
 }
 
@@ -1409,6 +1429,21 @@
 
 .marketingFormCard {
   border: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.marketingFormCardSent {
+  background: #dff6df;
+  border-color: rgba(46, 125, 50, 0.35);
+}
+
+.marketingFormSuccessMessage {
+  margin: 0;
+  padding: clamp(1.25rem, 2vw, 1.75rem) 0.5rem;
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1b5e20;
+  text-align: center;
 }
 
 .marketingInfoCard {
@@ -1493,6 +1528,14 @@
   border-color: var(--color-base-black);
 }
 
+.inputError {
+  border-color: #c62828;
+}
+
+.inputError:focus {
+  border-color: #b71c1c;
+}
+
 .floatingLabel {
   position: absolute;
   left: 0.75rem;
@@ -1540,7 +1583,8 @@
 
 @media (min-width: 900px) {
   .marketing {
-    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: calc(var(--chief-section-top-desktop) * 3) var(--chief-edge-desktop)
+      calc(var(--chief-section-bottom-desktop) * 3);
   }
 
   .marketingGrid {
@@ -1561,21 +1605,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--chief-screen-h);
-  padding: 0 1.4rem 1.4rem;
+  padding: calc(var(--chief-section-top-desktop) * 3) var(--chief-edge-desktop)
+    calc(var(--chief-section-bottom-desktop) * 3);
   background: #fff;
   box-sizing: border-box;
 }
 
 @media (min-width: 900px) {
   .closingPlain {
-    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: calc(var(--chief-section-top-desktop) * 3) var(--chief-edge-desktop)
+      calc(var(--chief-section-bottom-desktop) * 3);
   }
 }
 
 @media (max-width: 720px) {
   .closingPlain {
-    padding: 0 0 0.9rem;
+    padding: calc(var(--chief-section-top-mobile) * 3) var(--chief-edge-mobile)
+      calc(var(--chief-section-bottom-mobile) * 3);
   }
 
   .closingPlainInner {
@@ -1605,15 +1651,21 @@
 
 /* Подвал */
 .siteFooter {
-  padding: 2.5rem 1.4rem 2rem;
+  padding: 40px var(--chief-edge-desktop) 32px;
   background: var(--color-base-black);
   box-sizing: border-box;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+@media (max-width: 899px) {
+  .siteFooter {
+    padding: 32px var(--chief-edge-mobile) 24px;
+  }
+}
+
 @media (min-width: 900px) {
   .siteFooter {
-    padding: 3rem clamp(20px, 2.6vw, 32px) 2.25rem;
+    padding: 48px var(--chief-edge-desktop) 36px;
   }
 }
 
@@ -1686,7 +1738,6 @@
 
 /* Страница политики конфиденциальности */
 .privacyPage {
-  min-height: 100vh;
   width: 100%;
   padding-top: var(--chief-header-h);
   box-sizing: border-box;
