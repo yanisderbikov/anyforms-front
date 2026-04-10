@@ -875,8 +875,8 @@
    */
   --reviews-edge: 0.9rem;
   width: 100%;
-  /* Поверхность как у блока «3D бесплатно» (.marketing) */
-  background: #fff;
+  /* Плашка как у hero / «Нам доверяют» (.heroInfoCard, .trustCaseInfoCard) */
+  background: #e9e9e9;
   color: var(--color-base-black);
   padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.5rem, 3vw, 2.75rem);
   box-sizing: border-box;
@@ -927,9 +927,6 @@
   scroll-padding-inline: var(--reviews-strip-inline);
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
-  scrollbar-color: rgba(0, 0, 0, 0.28) rgba(0, 0, 0, 0.06);
-  scrollbar-color: color-mix(in srgb, var(--color-base-black) 28%, transparent)
-    color-mix(in srgb, var(--color-base-black) 6%, transparent);
   scrollbar-width: thin;
 }
 
@@ -938,28 +935,22 @@
 }
 
 .reviewsStrip::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.06);
-  background: color-mix(in srgb, var(--color-base-black) 6%, transparent);
   border-radius: 999px;
 }
 
 .reviewsStrip::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.28);
-  background: color-mix(in srgb, var(--color-base-black) 28%, transparent);
   border-radius: 999px;
 }
 
 .reviewsCard {
   flex: 0 0 auto;
-  width: clamp(148px, 30vw, 300px);
+  width: clamp(calc(300px * 9 / 16), 30vw, 300px);
+  min-height: 300px;
   aspect-ratio: 9 / 16;
   border-radius: 22px;
   overflow: hidden;
-  /* Как подложка под фото в hero / сетке процесса (.heroSideSingle, .processPhotoCell) */
   background: #1a1a1a;
   scroll-snap-align: start;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
-  box-shadow: 0 8px 28px color-mix(in srgb, var(--color-base-black) 16%, transparent);
 }
 
 .reviewsCardImg {
