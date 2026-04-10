@@ -1072,6 +1072,17 @@
   box-sizing: border-box;
 }
 
+/* Мобилка: текст блока, затем фото (в DOM у brandScreen сначала медиа — для десктопа слева) */
+@media (max-width: 899px) {
+  .brandScreen .heroInfoCard {
+    order: 1;
+  }
+
+  .brandScreen .mediaContainer {
+    order: 2;
+  }
+}
+
 .brandScreenList {
   margin: 0;
   padding-left: 1.2rem;
