@@ -4,17 +4,19 @@ import styles from './ChiefLanding.module.css';
 
 const ChiefPrivacy = () => (
   <div className={styles.privacyPage} id="top">
-    <header className={styles.siteHeader}>
-      <Link className={styles.logoLink} to="/chief" aria-label="AnyForms — лендинг">
-        <img
-          className={styles.logo}
-          src="/anyforms_logo_new_white.svg"
-          alt=""
-          width={200}
-          height={46}
-          decoding="async"
-        />
-      </Link>
+    <header className={`${styles.siteHeader} ${styles.siteHeaderPrivacy}`}>
+      <div className={styles.siteHeaderInner}>
+        <Link className={styles.logoLink} to="/chief" aria-label="AnyForms — лендинг">
+          <img
+            className={styles.logo}
+            src="/anyforms_logo_new_white.svg"
+            alt=""
+            width={200}
+            height={46}
+            decoding="async"
+          />
+        </Link>
+      </div>
     </header>
     <main className={styles.privacyMain}>
       <h1 className={styles.privacyTitle}>Политика конфиденциальности</h1>

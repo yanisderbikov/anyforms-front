@@ -26,8 +26,10 @@ const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
 
 const NAV = [
   { id: 'marketing', label: '3d бесплатно' },
-  { id: 'contacts', label: 'Контакты' },
+  { id: 'team', label: 'о команде' },
+  { id: 'reviews', label: 'отзывы' },
 ];
+const MOBILE_NAV = [...NAV].reverse();
 
 /** Три фото: слева main, справа сверху hachapuri, справа снизу blue */
 const HERO_IMAGES = {
@@ -82,6 +84,7 @@ const MODEL_SCROLL_PITCH_SHIFT_DEG = 10;
 const ChiefLanding = () => {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const marketingSectionRef = useRef(null);
   const marketingModelRef = useRef(null);
   const pointerYawOffsetRef = useRef(0);
@@ -117,7 +120,23 @@ const ChiefLanding = () => {
   const scrollToSection = useCallback((e, sectionId) => {
     e.preventDefault();
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
   }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return undefined;
+    }
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     if (!customElements.get('model-viewer') && !document.getElementById(MODEL_VIEWER_SCRIPT_ID)) {
@@ -189,30 +208,30 @@ const ChiefLanding = () => {
   return (
       <div className={styles.page} id="top">
         <header className={styles.siteHeader}>
-          <a
-              className={styles.logoLink}
-              href="#top"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({top: 0, behavior: 'smooth'});
-              }}
-              aria-label="AnyForms — наверх"
-          >
-            <img
-                className={styles.logo}
-                src="/anyforms_logo_new_white.svg"
-                alt=""
-                width={200}
-                height={46}
-                decoding="async"
-            />
-          </a>
-          <div className={styles.headerRight}>
-            <nav className={styles.nav} aria-label="Разделы страницы">
+          <div className={styles.siteHeaderInner}>
+            <a
+                className={styles.logoLink}
+                href="#top"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({top: 0, behavior: 'smooth'});
+                }}
+                aria-label="AnyForms — наверх"
+            >
+              <img
+                  className={styles.logo}
+                  src="/anyforms_logo_new_white.svg"
+                  alt=""
+                  width={200}
+                  height={46}
+                  decoding="async"
+              />
+            </a>
+            <nav className={styles.headerNav} aria-label="Разделы страницы">
               {NAV.map(({id, label}) => (
                   <a
                       key={id}
-                      className={`${styles.navLink} ${id === 'contacts' ? styles.navLinkPill : ''}`}
+                      className={styles.navLink}
                       href={`#${id}`}
                       onClick={(e) => scrollToSection(e, id)}
                   >
@@ -220,8 +239,69 @@ const ChiefLanding = () => {
                   </a>
               ))}
             </nav>
+            <div className={styles.headerContact}>
+              <a
+                  className={styles.headerPhone}
+                  href={`tel:${PHONE_E164.replace(/\D/g, '')}`}
+              >
+                +7&nbsp;981&nbsp;040-39-53
+              </a>
+              <a
+                  className={`${styles.navLink} ${styles.navLinkPill}`}
+                  href={TG_BOT}
+                  target="_blank"
+                  rel="noopener noreferrer"
+              >
+                Связаться
+              </a>
+            </div>
+            <button
+                type="button"
+                className={styles.burgerButton}
+                aria-label={isMobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="chief-mobile-menu"
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            >
+              <span className={styles.burgerLine} />
+              <span className={styles.burgerLine} />
+              <span className={styles.burgerLine} />
+            </button>
           </div>
         </header>
+        <div
+            id="chief-mobile-menu"
+            className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+        >
+          <div className={styles.mobileMenuInner}>
+            <a
+                className={`${styles.mobileMenuLink} ${styles.mobileMenuPrimary}`}
+                href={TG_BOT}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Связаться
+            </a>
+            <a
+                className={styles.mobileMenuLink}
+                href={`tel:${PHONE_E164.replace(/\D/g, '')}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+            >
+              +7&nbsp;981&nbsp;040-39-53
+            </a>
+            {MOBILE_NAV.map(({id, label}) => (
+                <a
+                    key={id}
+                    className={styles.mobileMenuLink}
+                    href={`#${id}`}
+                    onClick={(e) => scrollToSection(e, id)}
+                >
+                  {label}
+                </a>
+            ))}
+          </div>
+        </div>
 
         <div className={styles.hero} aria-label="Главный экран">
           <div className={styles.heroGrid}>
@@ -521,7 +601,11 @@ const ChiefLanding = () => {
           </div>
         </section>
 
-        <section className={styles.teamScreen} aria-labelledby="team-screen-title">
+        <section
+            className={styles.teamScreen}
+            id="team"
+            aria-labelledby="team-screen-title"
+        >
           <div className={styles.heroGrid}>
             <div className={styles.heroInfoCard}>
               <h2 className={styles.heroTitle} id="team-screen-title">
