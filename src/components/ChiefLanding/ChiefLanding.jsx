@@ -52,7 +52,7 @@ const PROCESS_IMAGES = [
     alt: 'Упаковка и отгрузка',
   },
   {
-    src: 'https://storage.yandexcloud.net/anyforms/landing/Single-result.jpg',
+    src: 'https://storage.yandexcloud.net/anyforms/landing/single-result.jpeg',
     alt: 'Готовый десерт',
   },
 ];
@@ -60,6 +60,11 @@ const REVIEW_IMAGES = Array.from({ length: 16 }, (_, i) => ({
   src: `https://storage.yandexcloud.net/anyforms/landing/review/review-${i}.jpeg`,
   alt: `Отзыв клиента ${i + 1}`,
 }));
+const CLOSING_IMAGES = {
+  main: 'https://storage.yandexcloud.net/anyforms/landing/duck-1.jpeg',
+  top: 'https://storage.yandexcloud.net/anyforms/landing/duck-2.jpeg',
+  bottom: 'https://storage.yandexcloud.net/anyforms/landing/duck-3.jpeg',
+};
 
 const MARKETING_MODEL_SRC = encodeURI('/landing/stl/ytka.glb');
 const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
@@ -646,6 +651,109 @@ const ChiefLanding = () => {
                   />
                 </div>
             ))}
+          </div>
+        </section>
+
+        {/*<section className={styles.teamScreen} aria-labelledby="closing-title">*/}
+        {/*  <div className={styles.heroGrid}>*/}
+        {/*    <div className={styles.heroInfoCard}>*/}
+        {/*      <h2 className={styles.heroTitle} id="closing-title">*/}
+        {/*        <span className={styles.heroTitleLine}>Не откладывайте</span>*/}
+        {/*        <span*/}
+        {/*            className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}*/}
+        {/*        >*/}
+        {/*          начнём сейчас*/}
+        {/*        </span>*/}
+        {/*      </h2>*/}
+        {/*      <p className={styles.heroTagline}>*/}
+        {/*        Достаточно идеи — остальное сделаем мы.*/}
+        {/*        <br />*/}
+        {/*        Продумаем реализацию и покажем результат в 3D*/}
+        {/*      </p>*/}
+        {/*      <a*/}
+        {/*          className={styles.cta}*/}
+        {/*          href={TG_BOT}*/}
+        {/*          target="_blank"*/}
+        {/*          rel="noopener noreferrer"*/}
+        {/*      >*/}
+        {/*        Начать*/}
+        {/*        <span className={styles.ctaArrow} aria-hidden>*/}
+        {/*          →*/}
+        {/*        </span>*/}
+        {/*      </a>*/}
+        {/*    </div>*/}
+
+        {/*    <div className={styles.mediaContainer}>*/}
+        {/*      <div className={styles.heroSideMedia}>*/}
+        {/*        <div className={styles.heroSideSingle}>*/}
+        {/*          <img*/}
+        {/*              className={styles.heroImage}*/}
+        {/*              src={CLOSING_IMAGES.main}*/}
+        {/*              alt=""*/}
+        {/*              width={960}*/}
+        {/*              height={1280}*/}
+        {/*              decoding="async"*/}
+        {/*              loading="lazy"*/}
+        {/*          />*/}
+        {/*        </div>*/}
+        {/*        <div className={styles.heroSideStack}>*/}
+        {/*          <div className={styles.heroSideCard}>*/}
+        {/*            <img*/}
+        {/*                className={styles.heroImage}*/}
+        {/*                src={CLOSING_IMAGES.top}*/}
+        {/*                alt=""*/}
+        {/*                width={960}*/}
+        {/*                height={1280}*/}
+        {/*                decoding="async"*/}
+        {/*                loading="lazy"*/}
+        {/*            />*/}
+        {/*          </div>*/}
+        {/*          <div className={styles.heroSideCard}>*/}
+        {/*            <img*/}
+        {/*                className={styles.heroImage}*/}
+        {/*                src={CLOSING_IMAGES.bottom}*/}
+        {/*                alt=""*/}
+        {/*                width={960}*/}
+        {/*                height={1280}*/}
+        {/*                decoding="async"*/}
+        {/*                loading="lazy"*/}
+        {/*            />*/}
+        {/*          </div>*/}
+        {/*        </div>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</section>*/}
+
+        <section
+            className={styles.closingPlain}
+            aria-labelledby="closing-plain-title"
+        >
+          <div className={styles.closingPlainInner}>
+            <h2 className={styles.heroTitle} id="closing-plain-title">
+              <span className={styles.heroTitleLine}>Не откладывайте</span>
+              <span
+                  className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
+              >
+                начнём сейчас
+              </span>
+            </h2>
+            <p className={styles.heroTagline}>
+              Достаточно идеи — остальное сделаем мы.
+              <br />
+              Продумаем реализацию и покажем результат в 3D
+            </p>
+            <a
+                className={styles.cta}
+                href={TG_BOT}
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+              Начать
+              <span className={styles.ctaArrow} aria-hidden>
+                →
+              </span>
+            </a>
           </div>
         </section>
       </div>

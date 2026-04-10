@@ -711,7 +711,7 @@
 
 .trustCase {
   background: var(--color-base-black);
-  padding: 0.9rem 0.9rem 0.9rem;
+  padding: clamp(4rem, 10vw, 6.5rem) 0.9rem 0.9rem;
   min-height: var(--chief-screen-h);
   display: flex;
   align-items: center;
@@ -844,7 +844,8 @@
 
 @media (min-width: 900px) {
   .trustCase {
-    padding: clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+    padding: clamp(4rem, 10vw, 6.5rem) clamp(20px, 2.6vw, 32px)
+      clamp(20px, 2.6vw, 32px);
   }
 
   .trustCaseGrid {
@@ -878,7 +879,11 @@
   /* Плашка как у hero / «Нам доверяют» (.heroInfoCard, .trustCaseInfoCard) */
   background: #e9e9e9;
   color: var(--color-base-black);
-  padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.5rem, 3vw, 2.75rem);
+  padding: clamp(4rem, 10vw, 6.5rem) 0 clamp(5rem, 10vw, 9rem);
+  min-height: var(--chief-screen-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   box-sizing: border-box;
 }
 
@@ -1349,4 +1354,46 @@
     max-width: 460px;
     justify-self: end;
   }
+}
+
+/* Дубликат финального блока: белый фон, без фото, по центру, ≤ половины экрана; высота как у hero */
+.closingPlain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chief-screen-h);
+  padding: 0 1.4rem 1.4rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+@media (min-width: 900px) {
+  .closingPlain {
+    padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
+  }
+}
+
+@media (max-width: 899px) {
+  .closingPlain {
+    padding: 0 0.9rem 0.9rem;
+  }
+}
+
+.closingPlainInner {
+  width: 100%;
+  max-width: min(50vw, calc(100% - 2rem));
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.closingPlainInner .heroTagline {
+  max-width: none;
+}
+
+.closingPlainInner .cta {
+  align-self: center;
 }
