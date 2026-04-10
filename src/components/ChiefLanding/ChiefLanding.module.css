@@ -105,7 +105,8 @@
 .contacts,
 .marketing,
 .teamScreen,
-.reviewsSection {
+.reviewsSection,
+.siteFooter {
   scroll-margin-top: calc(var(--chief-header-h) + 8px);
 }
 
@@ -1338,6 +1339,16 @@
   color: #808080;
 }
 
+.formDisclaimerLink {
+  color: #555;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.formDisclaimerLink:hover {
+  color: #111;
+}
+
 @media (min-width: 900px) {
   .marketing {
     padding: 0 clamp(20px, 2.6vw, 32px) clamp(20px, 2.6vw, 32px);
@@ -1396,4 +1407,144 @@
 
 .closingPlainInner .cta {
   align-self: center;
+}
+
+/* Подвал */
+.siteFooter {
+  padding: 2.5rem 1.4rem 2rem;
+  background: var(--color-base-black);
+  box-sizing: border-box;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 900px) {
+  .siteFooter {
+    padding: 3rem clamp(20px, 2.6vw, 32px) 2.25rem;
+  }
+}
+
+.footerGrid {
+  display: grid;
+  gap: 2rem;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (min-width: 720px) {
+  .footerGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem;
+    align-items: start;
+  }
+}
+
+.footerHeading {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: uppercase;
+}
+
+.footerText {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.footerLink {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.footerLink:hover {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.55);
+}
+
+.footerLegal {
+  margin: 2rem auto 0;
+  max-width: 920px;
+  text-align: center;
+}
+
+.footerLegalLink {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footerLegalLink:hover {
+  color: #fff;
+}
+
+.footerCopyright {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Страница политики конфиденциальности */
+.privacyPage {
+  min-height: 100vh;
+  width: 100%;
+  padding-top: var(--chief-header-h);
+  box-sizing: border-box;
+  background: var(--color-base-black);
+}
+
+.privacyMain {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.4rem 3rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 900px) {
+  .privacyMain {
+    padding: 2rem clamp(20px, 2.6vw, 32px) 3.5rem;
+  }
+}
+
+.privacyTitle {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.25;
+}
+
+.privacyBody {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.privacyBody p {
+  margin: 0 0 1rem;
+}
+
+.privacyBody p:last-child {
+  margin-bottom: 0;
+}
+
+.privacyBackWrap {
+  margin: 2rem 0 0;
+}
+
+.privacyBack {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.privacyBack:hover {
+  color: #fff;
 }

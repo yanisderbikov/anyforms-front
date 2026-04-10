@@ -1,8 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import styles from './ChiefLanding.module.css';
 
 const TG_BOT = 'https://t.me/AnyFormsChiefBot';
+const TG_CHANNEL = 'https://t.me/anyforms';
+const PHONE_E164 = '+79810403953';
+const CONTACT_EMAIL = 'suvorov@anyforms.ru';
 
 /**
  * Все логотипы из public/landing/logos.
@@ -20,7 +24,10 @@ const PARTNER_LOGOS = LOGO_FILES.map(({ file, alt }) => ({
   alt,
 }));
 
-const NAV = [{ id: 'marketing', label: '3d бесплатно' }];
+const NAV = [
+  { id: 'marketing', label: '3d бесплатно' },
+  { id: 'contacts', label: 'Контакты' },
+];
 
 /** Три фото: слева main, справа сверху hachapuri, справа снизу blue */
 const HERO_IMAGES = {
@@ -370,8 +377,10 @@ const ChiefLanding = () => {
                 </span>
                 </button>
                 <p className={styles.formDisclaimer}>
-                  Нажимая на кнопку вы соглашаетесь с условиями обработки данных и
-                  политикой конфиденциальности
+                  Нажимая на кнопку вы соглашаетесь с условиями обработки данных и{' '}
+                  <Link to="/chief/privacy" className={styles.formDisclaimerLink}>
+                    политикой конфиденциальности
+                  </Link>
                 </p>
               </form>
             </div>
@@ -756,6 +765,59 @@ const ChiefLanding = () => {
             </a>
           </div>
         </section>
+
+        <footer className={styles.siteFooter} id="contacts">
+          <div className={styles.footerGrid}>
+            <div className={styles.footerBlock}>
+              <h2 className={styles.footerHeading}>О компании</h2>
+              <p className={styles.footerText}>
+                ИП Суворов Дмитрий Игоревич
+                <br />
+                ИНН 590699241510
+                <br />
+                Юридический адрес: г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404
+              </p>
+            </div>
+            <div className={styles.footerBlock}>
+              <h2 className={styles.footerHeading}>Контакты</h2>
+              <p className={styles.footerText}>
+                <a className={styles.footerLink} href={`tel:${PHONE_E164.replace(/\D/g, '')}`}>
+                  +7&nbsp;981&nbsp;040-39-53
+                </a>
+                <br />
+                <a className={styles.footerLink} href={`mailto:${CONTACT_EMAIL}`}>
+                  {CONTACT_EMAIL}
+                </a>
+                <br />
+                <a
+                  className={styles.footerLink}
+                  href={TG_CHANNEL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Telegram — канал
+                </a>
+                <br />
+                <a
+                  className={styles.footerLink}
+                  href={TG_BOT}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Связаться с менеджером
+                </a>
+              </p>
+            </div>
+          </div>
+          <p className={styles.footerLegal}>
+            <Link to="/chief/privacy" className={styles.footerLegalLink}>
+              Политика конфиденциальности
+            </Link>
+          </p>
+          <p className={styles.footerCopyright}>
+            © anyforms, 2026. Все права защищены
+          </p>
+        </footer>
       </div>
   );
 };

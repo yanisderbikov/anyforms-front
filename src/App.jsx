@@ -7,11 +7,13 @@ import Marketplace from "./components/Marketplace/Marketplace";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
+import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isChiefPage = location.pathname === '/chief';
+  const isChiefPrivacyPage = location.pathname === '/chief/privacy';
   const isOrdersPage = location.pathname.startsWith('/orders');
   const isLoginPage = location.pathname === '/login';
   const isAdminProductsPage = location.pathname === '/admin/products';
@@ -19,12 +21,14 @@ function App() {
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
+    } else if (isChiefPage || isChiefPrivacyPage) {
+      document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage]);
+  }, [isHomePage, isChiefPage, isChiefPrivacyPage]);
 
-  const fullscreen = isHomePage || isChiefPage;
+  const fullscreen = isHomePage || isChiefPage || isChiefPrivacyPage;
 
   return (
     <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
@@ -34,6 +38,7 @@ function App() {
           <Route path="/chef" element={<Navigate to="/chief" replace />} />
           <Route path="/cheif" element={<Navigate to="/chief" replace />} />
           <Route path="/chief" element={<ChiefLanding />} />
+          <Route path="/chief/privacy" element={<ChiefPrivacy />} />
           <Route path="/" element={<PDFViewer />} />
           <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/shop" element={<Marketplace />} />
