@@ -220,6 +220,12 @@ const MainLanding = () => {
 
   return (
     <div className={styles.page}>
+      {copied && (
+        <div className={styles.globalCopyToast} role="status">
+          Текст скопирован
+        </div>
+      )}
+
       <header className={styles.siteHeader}>
         <div className={styles.siteHeaderInner}>
           <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">

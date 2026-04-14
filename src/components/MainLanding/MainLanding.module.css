@@ -12,6 +12,22 @@
   padding-top: var(--header-h);
 }
 
+.globalCopyToast {
+  position: fixed;
+  top: calc(var(--header-h) + 12px);
+  right: 16px;
+  z-index: 60;
+  background: #2f9e44;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.6rem 0.95rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 8px 22px rgba(47, 158, 68, 0.35);
+  animation: globalToastSlideOut 1.8s ease forwards;
+}
+
 .siteHeader {
   position: fixed;
   top: 0;
@@ -422,6 +438,25 @@
   width: 20px;
   height: 20px;
   fill: currentColor;
+}
+
+@keyframes globalToastSlideOut {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(44px);
+  }
 }
 
 @media (min-width: 900px) {
