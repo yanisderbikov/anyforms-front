@@ -31,11 +31,16 @@ const STEP_TWO_BY_AUDIENCE = {
   Другое: ['Свободный вариант'],
 };
 
-const STEP_THREE_OPTIONS = ['1-2', '3-10', '10+'];
+const STEP_THREE_OPTIONS = ['1-2', '3-10', '10+', '30+'];
 const STEP_FOUR_OPTIONS = ['Есть фото / референс', 'Есть только идея', 'Нужно разработать с нуля'];
 
 const TOTAL_STEPS = 4;
 const HERO_VARIANTS = ['ПОД ЗАКАЗ', 'В РОЗНИЦУ', 'ДЛЯ БИЗНЕСА'];
+const QUIZ_OFFERS = [
+  { discountLabel: '10%', promoCode: 'any-10' },
+  { discountLabel: '20%', promoCode: 'any-20' },
+  { discountLabel: '5000₽', promoCode: 'any-5000' },
+];
 
 const StepCard = ({ title, options, value, onSelect }) => {
   return (
@@ -116,6 +121,10 @@ const MainLanding = () => {
   const [typedHeroText, setTypedHeroText] = useState(HERO_VARIANTS[0]);
   const [heroVariantIndex, setHeroVariantIndex] = useState(0);
   const [isDeletingHeroText, setIsDeletingHeroText] = useState(false);
+  const [selectedOffer] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * QUIZ_OFFERS.length);
+    return QUIZ_OFFERS[randomIndex];
+  });
 
   const currentStep = useMemo(() => {
     if (!answers.audience) return 1;
@@ -138,8 +147,8 @@ const MainLanding = () => {
 Количество: ${answers.quantity || '-'}
 Материалы: ${answers.materials || '-'}
 
-Промокод: any-20`;
-  }, [answers]);
+Промокод: ${selectedOffer.promoCode}`;
+  }, [answers, selectedOffer.promoCode]);
 
   const secondStepOptions = STEP_TWO_BY_AUDIENCE[answers.audience] || [];
   const reassuranceText =
@@ -271,7 +280,8 @@ const MainLanding = () => {
           <h2 className={styles.quizIntroTitle}>
             <span className={styles.quizIntroLine}>Подберем форму</span>
             <span className={`${styles.quizIntroLine} ${styles.quizIntroLineMuted}`}>
-              и закрепим за вами скидку <span className={styles.quizIntroAccent}>5000₽</span>
+              и закрепим за вами скидку{' '}
+              <span className={styles.quizIntroAccent}>{selectedOffer.discountLabel}</span>
             </span>
           </h2>
           <p className={styles.quizIntroSubtitle}>
@@ -322,7 +332,7 @@ const MainLanding = () => {
 
             {currentStep === 5 && (
               <div className={styles.resultCard}>
-                <h2 className={styles.stepTitle}>Готово! Текст заявки:</h2>
+                <h2 className={styles.stepTitle}>Готово! Скопируйте и отправьте нам это сообщение</h2>
                 <div className={styles.resultTextWrap}>
                   <button
                     type="button"
@@ -339,7 +349,7 @@ const MainLanding = () => {
                 </div>
                 <div className={styles.resultActions}>
                   <CTAButton href={managerUrl} target="_blank" rel="noopener noreferrer">
-                    Написать менеджеру
+                    Написать
                   </CTAButton>
                 </div>
               </div>
