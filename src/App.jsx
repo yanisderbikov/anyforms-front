@@ -8,6 +8,7 @@ import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
+import MainLanding from "./components/MainLanding/MainLanding";
 
 function App() {
   const location = useLocation();
@@ -40,7 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/chief" element={<ChiefLanding />} />
           <Route path="/chief/privacy" element={<ChiefPrivacy />} />
-          <Route path="/" element={<PDFViewer />} />
+          <Route path="/" element={<MainLanding />} />
           <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/shop" element={<Marketplace />} />
           <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />

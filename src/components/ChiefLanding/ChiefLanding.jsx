@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import apiClient from '../../apiClient';
+import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './ChiefLanding.module.css';
 
 const LANDING_LEAD_NAME = 'Заявка с леднига - версия 1';
@@ -335,17 +336,9 @@ const ChiefLanding = () => {
                 <br/>
                 реализовали более 1000 заказов.
               </p>
-              <a
-                  className={styles.cta}
-                  href={TG_BOT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
+              <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
                 Обсудить проект
-                <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-              </a>
+              </CTAButton>
             </div>
 
             <div className={styles.mediaContainer}>
@@ -620,17 +613,9 @@ const ChiefLanding = () => {
                 <li>Гости фотографируют и делятся в соцсетях</li>
                 <li>Ваше заведение узнают без лишних слов</li>
               </ul>
-              <a
-                  className={styles.cta}
-                  href={TG_BOT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
+              <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
                 Разработать свою идею
-                <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-              </a>
+              </CTAButton>
             </div>
           </div>
         </section>
@@ -667,17 +652,9 @@ const ChiefLanding = () => {
                 <li>5+ лет опыта</li>
                 <li>Тысячи заказов</li>
               </ul>
-              <a
-                  className={styles.cta}
-                  href={TG_BOT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
+              <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
                 Разработать свою идею
-                <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-              </a>
+              </CTAButton>
             </div>
 
             <div className={styles.mediaContainer}>
@@ -735,17 +712,9 @@ const ChiefLanding = () => {
                 <li>Отправляем фото с производства</li>
                 <li>Держим связь до момента получения</li>
               </ul>
-              <a
-                  className={styles.cta}
-                  href={TG_BOT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
+              <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
                 Обсудить задачу
-                <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-              </a>
+              </CTAButton>
             </div>
           </div>
         </section>
@@ -870,17 +839,9 @@ const ChiefLanding = () => {
               <br />
               Продумаем реализацию и покажем результат в 3D
             </p>
-            <a
-                className={styles.cta}
-                href={TG_BOT}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
+            <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
               Начать
-              <span className={styles.ctaArrow} aria-hidden>
-                →
-              </span>
-            </a>
+            </CTAButton>
           </div>
         </section>
 
