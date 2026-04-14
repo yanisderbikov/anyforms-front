@@ -6,28 +6,42 @@ import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
+import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
+import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 
 function App() {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  const isOrdersPage = location.pathname.startsWith('/orders');
-  const isLoginPage = location.pathname === '/login';
-  const isAdminProductsPage = location.pathname === '/admin/products';
+  const normalizedPathname =
+    location.pathname.length > 1 ? location.pathname.replace(/\/+$/, '') : location.pathname;
+  const isHomePage = normalizedPathname === '/';
+  const isChiefPrivacyPage = normalizedPathname === '/chief/privacy';
+  const isChiefPage = normalizedPathname === '/chief';
 
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
+    } else if (isChiefPage || isChiefPrivacyPage) {
+      document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage]);
+  }, [isHomePage, isChiefPage, isChiefPrivacyPage]);
+
+  const fullscreen = isHomePage || isChiefPage || isChiefPrivacyPage;
+
+  if (location.pathname !== normalizedPathname) {
+    return <Navigate to={normalizedPathname} replace />;
+  }
 
   return (
-    <div className={`${styles.app} ${isHomePage ? styles.appFullscreen : ''}`}>
-      <main className={isHomePage ? styles.mainFullscreen : styles.main}>
+    <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
+      <main className={fullscreen ? styles.mainFullscreen : styles.main}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/chief" element={<ChiefLanding />} />
+          <Route path="/chief/privacy" element={<ChiefPrivacy />} />
           <Route path="/" element={<PDFViewer />} />
+          <Route path="/pdf" element={<PDFViewer />} />
           <Route path="/shop" element={<Marketplace />} />
           <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
           <Route path="/orders/without-tracker" element={<OrderList />} />

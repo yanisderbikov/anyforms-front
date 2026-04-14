@@ -23,13 +23,17 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
     copyToClipboard(order.contactPhone, 'Телефон скопирован');
   };
 
-  const handleCopyCdekPickupPoint = () => {
-    copyToClipboard(order.pvzSdek, 'ПВЗ СДЭК скопирован');
+  const handleCopyCdekStreet = () => {
+    copyToClipboard(order.pvzSdekStreet, 'ПВЗ СДЭК улица скопировано');
+  };
+
+  const handleCopyCdekCity = () => {
+    copyToClipboard(order.pvzSdekCity, 'ПВЗ СДЭК город скопирован');
   };
 
   const handleLeadClick = () => {
     if (order.leadId) {
-      const url = `https://hairdoskeels38.amocrm.ru/leads/detail/${order.leadId}`;
+      const url = `https://anyforms.amocrm.ru/leads/detail/${order.leadId}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
@@ -40,17 +44,34 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
+  const formatDate = (dateInput) => {
+    if (dateInput == null || dateInput === '') return '-';
     try {
-      const date = new Date(dateString);
+      // Массив от API: [year, month, day, hour, min] или [year, month, day, hour, min, sec] (month 1–12)
+      const parts = Array.isArray(dateInput)
+        ? dateInput.map(Number)
+        : String(dateInput).split(',').map(Number);
+      if (parts.length >= 3 && parts.every((n) => !Number.isNaN(n))) {
+        const [year, month, day, hour = 0, min = 0, sec = 0] = parts;
+        // Date.UTC использует месяц 0–11
+        const utcMs = Date.UTC(year, month - 1, day, hour, min, sec);
+        const date = new Date(utcMs);
+        return date.toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+      }
+      // Fallback: попытка парсить как ISO или другой стандартный формат
+      const date = new Date(dateInput);
+      if (Number.isNaN(date.getTime())) return '-';
       return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
       });
     } catch {
-      return dateString;
+      return '-';
     }
   };
 
@@ -113,17 +134,29 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
               {order.contactPhone || '-'}
             </span>
           </div>
-          {order.pvzSdek && (
+          {order.pvzSdekStreet && (
             <div className={styles.contactItem}>
-              <span className={styles.label}>ПВЗ СДЭК:</span>
+              <span className={styles.label}>ПВЗ СДЭК улица:</span>
               <span 
                 className={`${styles.value} ${styles.clickable}`}
-                onClick={handleCopyCdekPickupPoint}
+                onClick={handleCopyCdekStreet}
                 title="Нажмите для копирования"
               >
-                {order.pvzSdek}
+                {order.pvzSdekStreet}
               </span>
             </div>
+          )}
+          {order.pvzSdekCity && (
+              <div className={styles.contactItem}>
+                <span className={styles.label}>ПВЗ СДЭК город:</span>
+                <span
+                    className={`${styles.value} ${styles.clickable}`}
+                    onClick={handleCopyCdekCity}
+                    title="Нажмите для копирования"
+                >
+                {order.pvzSdekCity}
+              </span>
+              </div>
           )}
           {order.purchaseDate && (
             <div className={styles.contactItem}>
