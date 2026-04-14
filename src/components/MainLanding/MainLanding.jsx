@@ -37,10 +37,9 @@ const STEP_FOUR_OPTIONS = ['Есть фото / референс', 'Есть т�
 const TOTAL_STEPS = 4;
 const HERO_VARIANTS = ['ПОД ЗАКАЗ', 'В РОЗНИЦУ', 'ДЛЯ БИЗНЕСА'];
 
-const StepCard = ({ stepLabel, title, options, value, onSelect }) => {
+const StepCard = ({ title, options, value, onSelect }) => {
   return (
     <div className={styles.stepCard}>
-      <p className={styles.stepLabel}>{stepLabel}</p>
       <h2 className={styles.stepTitle}>{title}</h2>
       <div className={styles.optionsGrid}>
         {options.map((option) => {
@@ -62,25 +61,45 @@ const StepCard = ({ stepLabel, title, options, value, onSelect }) => {
 };
 
 const Progress = ({ currentStep }) => {
-  const percent = Math.round((currentStep / TOTAL_STEPS) * 100);
-  const stepsLeft = TOTAL_STEPS - currentStep;
+  const isCompleted = currentStep > TOTAL_STEPS;
+  const normalizedStep = Math.min(currentStep, TOTAL_STEPS);
+  const percent = isCompleted
+    ? 100
+    : normalizedStep === 4
+      ? 85
+      : Math.round((normalizedStep / TOTAL_STEPS) * 100);
+  const stepsLeft = isCompleted ? 0 : TOTAL_STEPS - normalizedStep;
   const stepsLeftText =
-    stepsLeft <= 0
-      ? 'Финальный шаг'
-      : stepsLeft === 1
-        ? 'Остался 1 шаг'
-        : stepsLeft < 5
-          ? `Осталось ${stepsLeft} шага`
-          : `Осталось ${stepsLeft} шагов`;
+    isCompleted
+      ? 'Опрос завершен'
+      : stepsLeft <= 0
+        ? 'Финальный шаг'
+        : stepsLeft === 1
+          ? 'Остался 1 шаг'
+          : stepsLeft < 5
+            ? `Осталось ${stepsLeft} шага`
+            : `Осталось ${stepsLeft} шагов`;
+
+  const progressToneClass = isCompleted
+    ? styles.progressFillCompleted
+    : currentStep === 1
+      ? styles.progressFillStep1
+      : currentStep === 2
+        ? styles.progressFillStep2
+        : currentStep === 3
+          ? styles.progressFillStep3
+          : styles.progressFillStep4;
+
+  const stepLabel = isCompleted ? TOTAL_STEPS : normalizedStep;
 
   return (
     <div className={styles.progressWrap} aria-label="Прогресс квиза">
       <div className={styles.progressMeta}>
-        <div className={styles.progressText}>Шаг {currentStep} из {TOTAL_STEPS}</div>
+        <div className={styles.progressText}>Шаг {stepLabel} из {TOTAL_STEPS}</div>
         <div className={styles.progressHint}>{stepsLeftText}</div>
       </div>
       <div className={styles.progressTrack}>
-        <div className={styles.progressFill} style={{ width: `${percent}%` }} />
+        <div className={`${styles.progressFill} ${progressToneClass}`} style={{ width: `${percent}%` }} />
       </div>
     </div>
   );
@@ -248,14 +267,25 @@ const MainLanding = () => {
       </section>
 
       <section id="quiz" className={styles.quizSection}>
+        <div className={styles.quizIntro}>
+          <h2 className={styles.quizIntroTitle}>
+            <span className={styles.quizIntroLine}>Подберем форму</span>
+            <span className={`${styles.quizIntroLine} ${styles.quizIntroLineMuted}`}>
+              и закрепим за вами скидку <span className={styles.quizIntroAccent}>5000₽</span>
+            </span>
+          </h2>
+          <p className={styles.quizIntroSubtitle}>
+            Скидка распространяется на формы, изготовленные под заказ
+          </p>
+        </div>
+
         <div className={styles.quizContainer}>
-          {currentStep <= TOTAL_STEPS && <Progress currentStep={currentStep} />}
+          <Progress currentStep={currentStep} />
           {reassuranceText && <p className={styles.reassurance}>{reassuranceText}</p>}
 
           <div key={currentStep} className={styles.stepAnimated}>
             {currentStep === 1 && (
               <StepCard
-                stepLabel="Шаг 1"
                 title="Кто вы?"
                 options={STEP_ONE_OPTIONS}
                 value={answers.audience}
@@ -265,7 +295,6 @@ const MainLanding = () => {
 
             {currentStep === 2 && (
               <StepCard
-                stepLabel="Шаг 2"
                 title="Что хотите сделать?"
                 options={secondStepOptions}
                 value={answers.moldType}
@@ -275,7 +304,6 @@ const MainLanding = () => {
 
             {currentStep === 3 && (
               <StepCard
-                stepLabel="Шаг 3"
                 title="Сколько нужно форм?"
                 options={STEP_THREE_OPTIONS}
                 value={answers.quantity}
@@ -285,7 +313,6 @@ const MainLanding = () => {
 
             {currentStep === 4 && (
               <StepCard
-                stepLabel="Шаг 4"
                 title="Есть ли у вас материалы?"
                 options={STEP_FOUR_OPTIONS}
                 value={answers.materials}
@@ -296,11 +323,21 @@ const MainLanding = () => {
             {currentStep === 5 && (
               <div className={styles.resultCard}>
                 <h2 className={styles.stepTitle}>Готово! Текст заявки:</h2>
-                <pre className={styles.resultText}>{resultText}</pre>
-                <div className={styles.resultActions}>
-                  <button type="button" className={styles.secondaryButton} onClick={handleCopy}>
-                    {copied ? 'Скопировано' : 'Скопировать'}
+                <div className={styles.resultTextWrap}>
+                  <button
+                    type="button"
+                    className={styles.copyIconButton}
+                    onClick={handleCopy}
+                    aria-label="Скопировать текст заявки"
+                    title={copied ? 'Скопировано' : 'Скопировать'}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z" />
+                    </svg>
                   </button>
+                  <pre className={styles.resultText}>{resultText}</pre>
+                </div>
+                <div className={styles.resultActions}>
                   <CTAButton href={managerUrl} target="_blank" rel="noopener noreferrer">
                     Написать менеджеру
                   </CTAButton>
