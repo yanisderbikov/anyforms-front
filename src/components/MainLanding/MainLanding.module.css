@@ -70,15 +70,19 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  min-width: 0;
 }
 
 .heroInfoCard {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: 1rem;
   padding: clamp(1.5rem, 2.2vw, 2.25rem) clamp(1.25rem, 2.1vw, 2rem);
   border-radius: 22px;
   background: #e9e9e9;
+  overflow: auto;
+  box-sizing: border-box;
 }
 
 .heroTitle {
@@ -134,24 +138,24 @@
   color: #151515;
 }
 
-.heroMicroText {
-  margin: -1rem 0 1.3rem;
-  font-size: 0.95rem;
-  line-height: 1.35;
-  color: #4f4f4f;
-  max-width: 30rem;
-}
-
 .mediaContainer {
   display: flex;
+  flex-direction: column;
+  min-width: 0;
   min-height: 0;
+  box-sizing: border-box;
 }
 
 .heroSideMedia {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   gap: var(--hero-media-gap);
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .heroSideSingle,
@@ -159,26 +163,30 @@
   border-radius: 22px;
   overflow: hidden;
   background: #1a1a1a;
-}
-
-.heroSideSingle {
-  aspect-ratio: 4 / 5;
+  min-width: 0;
+  min-height: 0;
 }
 
 .heroSideStack {
   display: flex;
   flex-direction: column;
   gap: var(--hero-media-gap);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-.heroSideCard {
-  flex: 1;
+.heroSideStack .heroSideCard {
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 .heroImage {
+  flex: 1 1 0;
   display: block;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   object-fit: cover;
 }
 
@@ -347,22 +355,61 @@
   }
 
   .heroGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
+    position: relative;
+    display: flow-root;
+    min-width: 0;
   }
 
   .heroInfoCard {
-    width: 100%;
+    float: left;
+    width: calc(50% - var(--hero-media-gap) / 2);
+    max-width: calc(50% - var(--hero-media-gap) / 2);
+    height: auto;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
   }
 
   .mediaContainer {
-    position: static;
-    width: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - var(--hero-media-gap) / 2);
+    height: 100%;
+    min-height: 0;
+    z-index: 0;
+    box-sizing: border-box;
   }
 
   .heroSideSingle {
-    aspect-ratio: auto;
+    display: block;
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .heroSideSingle .heroImage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    flex: none;
+    object-fit: cover;
+  }
+
+  .heroSideMedia {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .heroSideStack {
+    min-height: 0;
     height: 100%;
   }
 
@@ -372,6 +419,73 @@
 
   .resultActions {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 899px) {
+  .heroGrid {
+    min-height: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    position: static;
+  }
+
+  .heroInfoCard {
+    float: none;
+    width: 100%;
+    max-width: none;
+  }
+
+  .mediaContainer {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .heroSideMedia {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    height: auto;
+    min-height: 0;
+  }
+
+  .heroSideSingle {
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 4 / 5;
+    height: auto;
+    min-height: 0;
+  }
+
+  .heroSideSingle .heroImage {
+    position: static;
+    inset: auto;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+  }
+
+  .heroSideStack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hero-media-gap, 0.75rem);
+    height: 100%;
+    min-height: 0;
+    align-self: stretch;
+  }
+
+  .heroSideStack .heroSideCard {
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+  }
+
+  .heroSideStack .heroImage {
+    flex: 1 1 0;
+    min-height: 0;
   }
 }
 

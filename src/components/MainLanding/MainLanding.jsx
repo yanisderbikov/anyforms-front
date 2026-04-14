@@ -226,7 +226,6 @@ const MainLanding = () => {
               <br />
               Сделали 100 000 молдов под заказ
             </p>
-            <p className={styles.heroMicroText}>Займет не больше 1-2 минут, без звонков и обязательств.</p>
             <CTAButton onClick={scrollToQuiz}>Подобрать молд</CTAButton>
           </div>
 
