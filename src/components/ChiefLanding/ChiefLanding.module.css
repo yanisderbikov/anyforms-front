@@ -1672,8 +1672,8 @@
   max-width: none;
 }
 
-.closingPlainInner .cta {
-  align-self: center;
+.closingPlainCta {
+  margin-inline: auto;
 }
 
 /* Подвал */

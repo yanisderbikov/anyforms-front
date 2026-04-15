@@ -876,7 +876,12 @@ const ChiefLanding = () => {
               <br />
               Продумаем реализацию и покажем результат в 3D
             </p>
-            <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
+            <CTAButton
+              href={TG_BOT}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.closingPlainCta}
+            >
               Начать
             </CTAButton>
           </div>
