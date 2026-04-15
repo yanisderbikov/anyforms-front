@@ -84,6 +84,8 @@ const MODEL_VIEWER_SCRIPT_ID = 'model-viewer-script';
 const MODEL_MAX_ROTATION_DEG = 10;
 const MODEL_BASE_YAW_DEG = 120;
 const MODEL_SCROLL_PITCH_SHIFT_DEG = 20;
+const HERO_TITLE_PREFIX = 'ДЛЯ';
+const HERO_VARIANTS = ['РЕСТОРАНОВ', 'КОНДИТЕРОВ', 'ФУД-БРЕНДОВ'];
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');
@@ -92,6 +94,9 @@ const ChiefLanding = () => {
   const [phoneInvalid, setPhoneInvalid] = useState(false);
   const [leadSubmitting, setLeadSubmitting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [typedHeroText, setTypedHeroText] = useState(HERO_VARIANTS[0]);
+  const [heroVariantIndex, setHeroVariantIndex] = useState(0);
+  const [isDeletingHeroText, setIsDeletingHeroText] = useState(false);
   const marketingSectionRef = useRef(null);
   const marketingModelRef = useRef(null);
   const pointerYawOffsetRef = useRef(0);
@@ -216,6 +221,43 @@ const ChiefLanding = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const currentTarget = HERO_VARIANTS[heroVariantIndex];
+    const isTypingFinished = typedHeroText === currentTarget;
+    const isErased = typedHeroText.length === 0;
+
+    const timeout = window.setTimeout(
+      () => {
+        if (!isDeletingHeroText && !isTypingFinished) {
+          setTypedHeroText(currentTarget.slice(0, typedHeroText.length + 1));
+          return;
+        }
+
+        if (!isDeletingHeroText && isTypingFinished) {
+          setIsDeletingHeroText(true);
+          return;
+        }
+
+        if (isDeletingHeroText && !isErased) {
+          setTypedHeroText((prev) => prev.slice(0, -1));
+          return;
+        }
+
+        if (isDeletingHeroText && isErased) {
+          setIsDeletingHeroText(false);
+          setHeroVariantIndex((prev) => (prev + 1) % HERO_VARIANTS.length);
+        }
+      },
+      !isDeletingHeroText && isTypingFinished
+        ? 3900
+        : isDeletingHeroText
+          ? 50
+          : 85
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [typedHeroText, heroVariantIndex, isDeletingHeroText]);
+
   return (
       <div className={styles.page} id="top">
         <header className={styles.siteHeader}>
@@ -319,16 +361,11 @@ const ChiefLanding = () => {
             <div className={styles.heroInfoCard}>
               <h1 className={styles.heroTitle}>
                 <span className={styles.heroTitleLine}>Силиконовые формы</span>
-                <span
-                    className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
-                >
-                для масла
-              </span>
-                <span
-                    className={`${styles.heroTitleLine} ${styles.heroTitleMuted}`}
-                >
-                и десертов
-              </span>
+                <span className={`${styles.heroTitleLine} ${styles.heroTypedLine}`}>
+                  {HERO_TITLE_PREFIX}{' '}
+                  {typedHeroText}
+                  <span className={styles.heroCaret} aria-hidden />
+                </span>
               </h1>
 
               <p className={styles.heroTagline}>
