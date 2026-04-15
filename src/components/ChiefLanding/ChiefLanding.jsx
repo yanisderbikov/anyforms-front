@@ -38,7 +38,7 @@ const MOBILE_NAV = [...NAV].reverse();
 /** Три фото: слева main, справа сверху hachapuri, справа снизу blue */
 const HERO_IMAGES = {
   main: 'https://storage.yandexcloud.net/anyforms/landing/main.jpeg',
-  hachapuri: 'https://storage.yandexcloud.net/anyforms/landing/hachapuri.jpeg',
+  hachapuri: 'https://storage.yandexcloud.net/anyforms/landing/labubu-jisco.jpeg',
   blue: 'https://storage.yandexcloud.net/anyforms/landing/blue.jpeg',
 };
 const TRUST_CASE_IMAGES = {

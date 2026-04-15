@@ -10,9 +10,9 @@ const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
 
 const HERO_IMAGES = {
-  main: 'https://storage.yandexcloud.net/anyforms/landing/main.jpeg',
-  top: 'https://storage.yandexcloud.net/anyforms/landing/hachapuri.jpeg',
-  bottom: 'https://storage.yandexcloud.net/anyforms/landing/blue.jpeg',
+  main: 'https://storage.yandexcloud.net/anyforms/shop/heart/7.jpeg',
+  top: 'https://storage.yandexcloud.net/anyforms/shop/croissant-plain/photo_2026-04-15%2020.27.44.jpeg',
+  bottom: 'https://storage.yandexcloud.net/anyforms/shop/samovar/4.jpeg',
 };
 
 const STEP_ONE_OPTIONS = [
@@ -258,7 +258,7 @@ const MainLanding = () => {
             <p className={styles.heroTagline}>
               Более 5 лет в производстве форм
               <br />
-              Сделали 100 000 молдов под заказ
+              Сделали 100 000+ молдов под заказ
             </p>
             <CTAButton onClick={scrollToQuiz}>Подобрать молд</CTAButton>
           </div>
