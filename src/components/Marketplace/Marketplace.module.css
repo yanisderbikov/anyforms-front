@@ -2,35 +2,45 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 12px;
+  padding: 84px 12px 0;
   box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
   .wrap {
-    padding: 0 50px;
+    padding: 84px 50px 0;
   }
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  width: 100vw;
+  margin: 0 0 1.5rem;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 1rem 0 1.5rem;
+  background: #000;
 }
 
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 0.25rem;
-  color: #000;
-  text-transform: lowercase;
+.headerInner {
+  display: flex;
+  justify-content: center;
 }
 
-.subtitle {
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin: 0;
-  color: #888;
-  text-transform: lowercase;
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 200px;
+  max-width: 100%;
+  height: auto;
 }
 
 /* Телефон: ровно 2 колонки одинаковой ширины */

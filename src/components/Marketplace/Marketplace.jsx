@@ -61,8 +61,18 @@ const Marketplace = () => {
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
-        <h1 className={styles.title}>any forms</h1>
-        <p className={styles.subtitle}>Продукция под розницу</p>
+        <div className={styles.headerInner}>
+          <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">
+            <img
+              className={styles.logo}
+              src="/anyforms_logo_new_white.svg"
+              alt=""
+              width={200}
+              height={46}
+              decoding="async"
+            />
+          </a>
+        </div>
       </header>
       <ul className={styles.grid}>
         {items.map((item) => (
