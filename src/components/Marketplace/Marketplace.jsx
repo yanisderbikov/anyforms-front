@@ -118,8 +118,8 @@ const Marketplace = () => {
               className={styles.logo}
               src="/anyforms_logo_new_white.svg"
               alt=""
-              width={200}
-              height={46}
+              width={180}
+              height={41}
               decoding="async"
             />
           </a>
