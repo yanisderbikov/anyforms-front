@@ -517,6 +517,7 @@
   display: flex;
   align-items: center;
   gap: 0.1em;
+  white-space: nowrap;
 }
 
 .heroCaret {

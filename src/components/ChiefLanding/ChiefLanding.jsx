@@ -85,7 +85,10 @@ const MODEL_MAX_ROTATION_DEG = 10;
 const MODEL_BASE_YAW_DEG = 120;
 const MODEL_SCROLL_PITCH_SHIFT_DEG = 20;
 const HERO_TITLE_PREFIX = 'ДЛЯ';
-const HERO_VARIANTS = ['РЕСТОРАНОВ', 'КОНДИТЕРОВ', 'ФУД-БРЕНДОВ'];
+const HERO_VARIANTS = [
+  'РЕСТОРАНОВ',
+  'КОНДИТЕРОВ',
+  'ФУД-БРЕНДОВ'];
 
 const ChiefLanding = () => {
   const [name, setName] = useState('');
@@ -371,7 +374,7 @@ const ChiefLanding = () => {
               <p className={styles.heroTagline}>
                 мы работаем с силиконом более 5 лет.
                 <br/>
-                реализовали более 1000 заказов.
+                реализовали 1000+ заказов.
               </p>
               <CTAButton href={TG_BOT} target="_blank" rel="noopener noreferrer">
                 Обсудить проект

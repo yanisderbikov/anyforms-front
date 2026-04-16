@@ -28,29 +28,25 @@ function App() {
     }
   }, [isHomePage, isChiefPage, isChiefPrivacyPage]);
 
-  const fullscreen = isHomePage || isChiefPage || isChiefPrivacyPage;
-
   if (location.pathname !== normalizedPathname) {
     return <Navigate to={normalizedPathname} replace />;
   }
 
   return (
-    <div className={`${styles.app} ${fullscreen ? styles.appFullscreen : ''}`}>
-      <main className={fullscreen ? styles.mainFullscreen : styles.main}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/chief" element={<ChiefLanding />} />
-          <Route path="/chief/privacy" element={<ChiefPrivacy />} />
-          <Route path="/" element={<MainLanding />} />
-          <Route path="/pdf" element={<PDFViewer />} />
-          <Route path="/shop" element={<Marketplace />} />
-          <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
-          <Route path="/orders/without-tracker" element={<OrderList />} />
-          <Route path="/orders/created" element={<OrderList />} />
-          <Route path="/orders/delivering" element={<OrderList />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-        </Routes>
-      </main>
+    <div className={styles.app}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/chief" element={<ChiefLanding />} />
+        <Route path="/chief/privacy" element={<ChiefPrivacy />} />
+        <Route path="/" element={<MainLanding />} />
+        <Route path="/pdf" element={<PDFViewer />} />
+        <Route path="/shop" element={<Marketplace />} />
+        <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
+        <Route path="/orders/without-tracker" element={<OrderList />} />
+        <Route path="/orders/created" element={<OrderList />} />
+        <Route path="/orders/delivering" element={<OrderList />} />
+        <Route path="/admin/products" element={<AdminProducts />} />
+      </Routes>
     </div>
   );
 }

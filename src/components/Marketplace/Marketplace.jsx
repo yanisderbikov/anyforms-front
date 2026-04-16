@@ -20,17 +20,15 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [popupPhotoIndex, setPopupPhotoIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const photos = selectedItem?.photos?.length ? selectedItem.photos : [];
 
   const openPopup = (item) => {
     setSelectedItem(item);
-    setPopupPhotoIndex(0);
   };
 
   const closePopup = () => {
     setSelectedItem(null);
-    setPopupPhotoIndex(0);
 
     // Чтобы попап не открывался заново эффектом по query-параметру `id`.
     const params = new URLSearchParams(location.search);
@@ -48,6 +46,7 @@ const Marketplace = () => {
   };
 
   const stopPropagation = (e) => e.stopPropagation();
+
   const handlePromoCopy = async () => {
     try {
       await navigator.clipboard.writeText(PROMO_CODE);
@@ -104,8 +103,6 @@ const Marketplace = () => {
       </div>
     );
   }
-
-  const photos = selectedItem?.photos?.length ? selectedItem.photos : [];
 
   return (
     <div className={styles.wrap}>
@@ -166,10 +163,7 @@ const Marketplace = () => {
             </button>
 
             <div className={styles.popupGallery}>
-              <div
-                className={styles.popupGalleryTrack}
-                style={{ transform: `translateX(-${popupPhotoIndex * 100}%)` }}
-              >
+              <div className={styles.popupGalleryTrack}>
                 {photos.map((src, i) => (
                   <div key={i} className={styles.popupGallerySlide}>
                     <img
@@ -180,42 +174,6 @@ const Marketplace = () => {
                   </div>
                 ))}
               </div>
-              {photos.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    className={styles.popupNavPrev}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupPhotoIndex((i) => (i === 0 ? photos.length - 1 : i - 1));
-                    }}
-                    aria-label="Предыдущее фото"
-                  />
-                  <button
-                    type="button"
-                    className={styles.popupNavNext}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupPhotoIndex((i) => (i === photos.length - 1 ? 0 : i + 1));
-                    }}
-                    aria-label="Следующее фото"
-                  />
-                  <div className={styles.popupDots}>
-                    {photos.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        className={i === popupPhotoIndex ? styles.popupDotActive : styles.popupDot}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPopupPhotoIndex(i);
-                        }}
-                        aria-label={`Фото ${i + 1}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
             <div className={styles.popupBody}>
