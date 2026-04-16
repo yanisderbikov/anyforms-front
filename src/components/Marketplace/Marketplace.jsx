@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
 import ProductCard from '../ProductCard/ProductCard';
+import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './Marketplace.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
+const TG_CHANNEL = 'https://t.me/anyforms';
+const PHONE_E164 = '+79810403953';
+const CONTACT_EMAIL = 'suvorov@anyforms.ru';
+const PROMO_CODE = 'any-shop-10';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
@@ -13,6 +19,7 @@ const Marketplace = () => {
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [popupPhotoIndex, setPopupPhotoIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const openPopup = (item) => {
     setSelectedItem(item);
@@ -24,6 +31,15 @@ const Marketplace = () => {
   };
 
   const stopPropagation = (e) => e.stopPropagation();
+  const handlePromoCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(PROMO_CODE);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch (e) {
+      setCopied(false);
+    }
+  };
 
   useEffect(() => {
     getItems()
@@ -60,6 +76,11 @@ const Marketplace = () => {
 
   return (
     <div className={styles.wrap}>
+      {copied && (
+        <div className={styles.globalCopyToast} role="status">
+          Скопировано
+        </div>
+      )}
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">
@@ -81,6 +102,17 @@ const Marketplace = () => {
           </li>
         ))}
       </ul>
+      <p className={styles.promoNote}>
+        По промокоду{' '}
+        <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
+          {PROMO_CODE}
+        </button>{' '}
+        скидка 10% на первый заказ. Отправьте это сообщение{' '}
+        <a href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
+          менеджеру в телеграм
+        </a>
+        .
+      </p>
 
       {selectedItem && (
         <div
@@ -175,19 +207,65 @@ const Marketplace = () => {
                     Подробнее
                   </a>
                 )}
-                <a
-                  href={TG_ORDER_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.popupBtnOrder}
-                >
+                <CTAButton href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
                   Заказать
-                </a>
+                </CTAButton>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <footer className={styles.siteFooter}>
+        <div className={styles.footerGrid}>
+          <div className={styles.footerBlock}>
+            <h2 className={styles.footerHeading}>О компании</h2>
+            <p className={styles.footerText}>
+              ИП Суворов Дмитрий Игоревич
+              <br />
+              ИНН 590699241510
+              <br />
+              Юридический адрес: г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404
+            </p>
+          </div>
+          <div className={styles.footerBlock}>
+            <h2 className={styles.footerHeading}>Контакты</h2>
+            <p className={styles.footerText}>
+              <a className={styles.footerLink} href={`tel:${PHONE_E164.replace(/\D/g, '')}`}>
+                +7&nbsp;981&nbsp;040-39-53
+              </a>
+              <br />
+              <a className={styles.footerLink} href={`mailto:${CONTACT_EMAIL}`}>
+                {CONTACT_EMAIL}
+              </a>
+              <br />
+              <a
+                className={styles.footerLink}
+                href={TG_CHANNEL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Telegram — канал
+              </a>
+              <br />
+              <a
+                className={styles.footerLink}
+                href={TG_ORDER_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Связаться с менеджером
+              </a>
+            </p>
+          </div>
+        </div>
+        <p className={styles.footerLegal}>
+          <Link to="/chief/privacy" className={styles.footerLegalLink}>
+            Политика конфиденциальности
+          </Link>
+        </p>
+        <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>
+      </footer>
     </div>
   );
 };
