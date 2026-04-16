@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
 import ProductCard from '../ProductCard/ProductCard';
 import CTAButton from '../shared/CTAButton/CTAButton';
@@ -14,6 +14,8 @@ const PROMO_CODE = 'any-shop-10';
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
 const Marketplace = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,6 +30,21 @@ const Marketplace = () => {
 
   const closePopup = () => {
     setSelectedItem(null);
+    setPopupPhotoIndex(0);
+
+    // Чтобы попап не открывался заново эффектом по query-параметру `id`.
+    const params = new URLSearchParams(location.search);
+    if (params.has('id')) {
+      params.delete('id');
+      const search = params.toString();
+      navigate(
+        {
+          pathname: location.pathname,
+          search: search ? `?${search}` : '',
+        },
+        { replace: true }
+      );
+    }
   };
 
   const stopPropagation = (e) => e.stopPropagation();
@@ -47,6 +64,22 @@ const Marketplace = () => {
       .catch((err) => setError(err?.message || 'Не удалось загрузить товары'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!items.length) return;
+
+    const idParam = new URLSearchParams(location.search).get('id');
+    if (!idParam) return;
+
+    const normalizedId = idParam.replace(/^['"]|['"]$/g, '').trim();
+    if (!normalizedId) return;
+
+    const matchingItem = items.find((item) => String(item.id) === normalizedId);
+    if (!matchingItem) return;
+    if (selectedItem?.id === matchingItem.id) return;
+
+    openPopup(matchingItem);
+  }, [items, location.search, selectedItem?.id]);
 
   if (loading) {
     return (
