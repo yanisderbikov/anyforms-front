@@ -1,29 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
 import ProductCard from '../ProductCard/ProductCard';
+import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './Marketplace.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
+const TG_CHANNEL = 'https://t.me/anyforms';
+const PHONE_E164 = '+79810403953';
+const CONTACT_EMAIL = 'suvorov@anyforms.ru';
+const PROMO_CODE = 'any-shop-10';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
 const Marketplace = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [popupPhotoIndex, setPopupPhotoIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const photos = selectedItem?.photos?.length ? selectedItem.photos : [];
 
   const openPopup = (item) => {
     setSelectedItem(item);
-    setPopupPhotoIndex(0);
   };
 
   const closePopup = () => {
     setSelectedItem(null);
+
+    // Чтобы попап не открывался заново эффектом по query-параметру `id`.
+    const params = new URLSearchParams(location.search);
+    if (params.has('id')) {
+      params.delete('id');
+      const search = params.toString();
+      navigate(
+        {
+          pathname: location.pathname,
+          search: search ? `?${search}` : '',
+        },
+        { replace: true }
+      );
+    }
   };
 
   const stopPropagation = (e) => e.stopPropagation();
+
+  const handlePromoCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(PROMO_CODE);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch (e) {
+      setCopied(false);
+    }
+  };
 
   useEffect(() => {
     getItems()
@@ -31,6 +63,22 @@ const Marketplace = () => {
       .catch((err) => setError(err?.message || 'Не удалось загрузить товары'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!items.length) return;
+
+    const idParam = new URLSearchParams(location.search).get('id');
+    if (!idParam) return;
+
+    const normalizedId = idParam.replace(/^['"]|['"]$/g, '').trim();
+    if (!normalizedId) return;
+
+    const matchingItem = items.find((item) => String(item.id) === normalizedId);
+    if (!matchingItem) return;
+    if (selectedItem?.id === matchingItem.id) return;
+
+    openPopup(matchingItem);
+  }, [items, location.search, selectedItem?.id]);
 
   if (loading) {
     return (
@@ -56,13 +104,27 @@ const Marketplace = () => {
     );
   }
 
-  const photos = selectedItem?.photos?.length ? selectedItem.photos : [];
-
   return (
     <div className={styles.wrap}>
+      <div className={styles.headerSafeArea} aria-hidden="true" />
+      {copied && (
+        <div className={styles.globalCopyToast} role="status">
+          Скопировано
+        </div>
+      )}
       <header className={styles.header}>
-        <h1 className={styles.title}>any forms</h1>
-        <p className={styles.subtitle}>Продукция под розницу</p>
+        <div className={styles.headerInner}>
+          <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">
+            <img
+              className={styles.logo}
+              src="/anyforms_logo_new_white.svg"
+              alt=""
+              width={180}
+              height={41}
+              decoding="async"
+            />
+          </a>
+        </div>
       </header>
       <ul className={styles.grid}>
         {items.map((item) => (
@@ -71,6 +133,17 @@ const Marketplace = () => {
           </li>
         ))}
       </ul>
+      <p className={styles.promoNote}>
+        По промокоду{' '}
+        <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
+          {PROMO_CODE}
+        </button>{' '}
+        скидка 10% на первый заказ. Отправьте это сообщение{' '}
+        <a href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
+          менеджеру в телеграм
+        </a>
+        .
+      </p>
 
       {selectedItem && (
         <div
@@ -91,10 +164,7 @@ const Marketplace = () => {
             </button>
 
             <div className={styles.popupGallery}>
-              <div
-                className={styles.popupGalleryTrack}
-                style={{ transform: `translateX(-${popupPhotoIndex * 100}%)` }}
-              >
+              <div className={styles.popupGalleryTrack}>
                 {photos.map((src, i) => (
                   <div key={i} className={styles.popupGallerySlide}>
                     <img
@@ -105,42 +175,6 @@ const Marketplace = () => {
                   </div>
                 ))}
               </div>
-              {photos.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    className={styles.popupNavPrev}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupPhotoIndex((i) => (i === 0 ? photos.length - 1 : i - 1));
-                    }}
-                    aria-label="Предыдущее фото"
-                  />
-                  <button
-                    type="button"
-                    className={styles.popupNavNext}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupPhotoIndex((i) => (i === photos.length - 1 ? 0 : i + 1));
-                    }}
-                    aria-label="Следующее фото"
-                  />
-                  <div className={styles.popupDots}>
-                    {photos.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        className={i === popupPhotoIndex ? styles.popupDotActive : styles.popupDot}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPopupPhotoIndex(i);
-                        }}
-                        aria-label={`Фото ${i + 1}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
             <div className={styles.popupBody}>
@@ -165,19 +199,65 @@ const Marketplace = () => {
                     Подробнее
                   </a>
                 )}
-                <a
-                  href={TG_ORDER_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.popupBtnOrder}
-                >
+                <CTAButton href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
                   Заказать
-                </a>
+                </CTAButton>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <footer className={styles.siteFooter}>
+        <div className={styles.footerGrid}>
+          <div className={styles.footerBlock}>
+            <h2 className={styles.footerHeading}>О компании</h2>
+            <p className={styles.footerText}>
+              ИП Суворов Дмитрий Игоревич
+              <br />
+              ИНН 590699241510
+              <br />
+              Юридический адрес: г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404
+            </p>
+          </div>
+          <div className={styles.footerBlock}>
+            <h2 className={styles.footerHeading}>Контакты</h2>
+            <p className={styles.footerText}>
+              <a className={styles.footerLink} href={`tel:${PHONE_E164.replace(/\D/g, '')}`}>
+                +7&nbsp;981&nbsp;040-39-53
+              </a>
+              <br />
+              <a className={styles.footerLink} href={`mailto:${CONTACT_EMAIL}`}>
+                {CONTACT_EMAIL}
+              </a>
+              <br />
+              <a
+                className={styles.footerLink}
+                href={TG_CHANNEL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Telegram — канал
+              </a>
+              <br />
+              <a
+                className={styles.footerLink}
+                href={TG_ORDER_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Связаться с менеджером
+              </a>
+            </p>
+          </div>
+        </div>
+        <p className={styles.footerLegal}>
+          <Link to="/chief/privacy" className={styles.footerLegalLink}>
+            Политика конфиденциальности
+          </Link>
+        </p>
+        <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>
+      </footer>
     </div>
   );
 };

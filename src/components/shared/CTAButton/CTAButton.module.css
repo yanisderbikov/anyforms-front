@@ -1,0 +1,54 @@
+.cta {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.25rem 0.3rem 0.25rem 1rem;
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+    opacity 0.2s ease, transform 0.15s ease;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.cta:hover {
+  background: #8a8a8a;
+  color: #111;
+  border-color: #111;
+}
+
+.cta:active {
+  transform: scale(0.98);
+}
+
+.cta:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ctaArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  font-size: 1.2rem;
+  line-height: 1;
+  transform: translateX(0);
+  transition: transform 0.25s ease;
+}
+
+.cta:hover .ctaArrow {
+  transform: translateX(-0.45rem);
+}

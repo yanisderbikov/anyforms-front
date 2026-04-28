@@ -511,6 +511,34 @@
   color: var(--color-base-gray);
 }
 
+.heroTypedLine {
+  color: var(--color-base-gray);
+  min-height: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.1em;
+  white-space: nowrap;
+}
+
+.heroCaret {
+  width: 0.08em;
+  height: 0.95em;
+  background: #5a5a5a;
+  display: inline-block;
+  animation: blinkCaret 1s steps(1, end) infinite;
+}
+
+@keyframes blinkCaret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
 .heroTagline {
   font-size: clamp(1rem, 1.1vw, 1.35rem);
   line-height: 1.28;
@@ -1645,8 +1673,8 @@
   max-width: none;
 }
 
-.closingPlainInner .cta {
-  align-self: center;
+.closingPlainCta {
+  margin-inline: auto;
 }
 
 /* Подвал */
