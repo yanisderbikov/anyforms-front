@@ -36,11 +36,34 @@ jobs:
       - name: Generate API client
         run: pnpm run api
 
+      # Vite base must match where the browser loads the app from. Custom domain
+      # (CNAME → anyforms.ru) serves the site at /, but the old formula always used
+      # /repo-name/ and broke assets (white screen). Override: repo variable VITE_BASE.
+      - name: Resolve Vite base path
+        id: vite_base
+        run: |
+          set -euo pipefail
+          OWNER="${GITHUB_REPOSITORY%%/*}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+          if [ -n "${{ vars.VITE_BASE }}" ]; then
+            echo "value=${{ vars.VITE_BASE }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -f CNAME ] && ! grep -qiE 'github\.io' CNAME 2>/dev/null; then
+            echo "value=/" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$REPO" = "${OWNER}.github.io" ]; then
+            echo "value=/" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "value=/${REPO}/" >> "$GITHUB_OUTPUT"
+
       - name: Build
         run: pnpm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_BASE: ${{ vars.VITE_BASE || (github.event.repository.name == format('{0}.github.io', github.repository_owner) && '/' || format('/{0}/', github.event.repository.name)) }}
+          VITE_BASE: ${{ steps.vite_base.outputs.value }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
