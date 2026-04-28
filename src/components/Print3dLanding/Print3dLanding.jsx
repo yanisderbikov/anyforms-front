@@ -278,67 +278,67 @@ const Print3dLanding = () => {
         </div>
       </section>
 
-      <section className={styles.darkSection} aria-labelledby="directions-title">
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHead}>
-            <h2 className={`${styles.sectionTitle} ${styles.sectionTitleLight}`} id="directions-title">
-              Печатаем детали, которые можно использовать в работе
-            </h2>
-            <p className={`${styles.sectionLead} ${styles.sectionLeadLight}`}>
-              Не только визуальные прототипы. Делаем функциональные изделия для оборудования,
-              сборки, сервиса и производственных задач.
-            </p>
-          </div>
-          <div className={styles.directionGrid}>
-            {PRINT_DIRECTIONS.map((item) => (
-              <article key={item.title} className={styles.darkCard}>
-                <h3 className={styles.darkCardTitle}>{item.title}</h3>
-                <p className={styles.darkCardText}>{item.description}</p>
-              </article>
-            ))}
-          </div>
-          <p className={styles.directionAccent}>
-            Если деталь нужна быстро, а пресс-форма не окупается — 3D-печать часто самый
-            рациональный путь.
-          </p>
-        </div>
-      </section>
+      {/*<section className={styles.darkSection} aria-labelledby="directions-title">*/}
+      {/*  <div className={styles.sectionInner}>*/}
+      {/*    <div className={styles.sectionHead}>*/}
+      {/*      <h2 className={`${styles.sectionTitle} ${styles.sectionTitleLight}`} id="directions-title">*/}
+      {/*        Печатаем детали, которые можно использовать в работе*/}
+      {/*      </h2>*/}
+      {/*      <p className={`${styles.sectionLead} ${styles.sectionLeadLight}`}>*/}
+      {/*        Не только визуальные прототипы. Делаем функциональные изделия для оборудования,*/}
+      {/*        сборки, сервиса и производственных задач.*/}
+      {/*      </p>*/}
+      {/*    </div>*/}
+      {/*    <div className={styles.directionGrid}>*/}
+      {/*      {PRINT_DIRECTIONS.map((item) => (*/}
+      {/*        <article key={item.title} className={styles.darkCard}>*/}
+      {/*          <h3 className={styles.darkCardTitle}>{item.title}</h3>*/}
+      {/*          <p className={styles.darkCardText}>{item.description}</p>*/}
+      {/*        </article>*/}
+      {/*      ))}*/}
+      {/*    </div>*/}
+      {/*    <p className={styles.directionAccent}>*/}
+      {/*      Если деталь нужна быстро, а пресс-форма не окупается — 3D-печать часто самый*/}
+      {/*      рациональный путь.*/}
+      {/*    </p>*/}
+      {/*  </div>*/}
+      {/*</section>*/}
 
-      <section className={styles.lightSection} aria-labelledby="workflow-title">
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle} id="workflow-title">
-              От задачи до готовой детали без лишней сложности
-            </h2>
-            <p className={styles.sectionLead}>
-              Можно прийти даже без готовой 3D-модели. Поможем разобраться с геометрией,
-              материалом и способом производства.
-            </p>
-          </div>
-          <ol className={styles.stepsList}>
-            {WORKFLOW_STEPS.map((step) => (
-              <li key={step.title} className={styles.stepCard}>
-                <h3 className={styles.cardTitle}>{step.title}</h3>
-                <p className={styles.cardText}>{step.description}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      {/*<section className={styles.lightSection} aria-labelledby="workflow-title">*/}
+      {/*  <div className={styles.sectionInner}>*/}
+      {/*    <div className={styles.sectionHead}>*/}
+      {/*      <h2 className={styles.sectionTitle} id="workflow-title">*/}
+      {/*        От задачи до готовой детали без лишней сложности*/}
+      {/*      </h2>*/}
+      {/*      <p className={styles.sectionLead}>*/}
+      {/*        Можно прийти даже без готовой 3D-модели. Поможем разобраться с геометрией,*/}
+      {/*        материалом и способом производства.*/}
+      {/*      </p>*/}
+      {/*    </div>*/}
+      {/*    <ol className={styles.stepsList}>*/}
+      {/*      {WORKFLOW_STEPS.map((step) => (*/}
+      {/*        <li key={step.title} className={styles.stepCard}>*/}
+      {/*          <h3 className={styles.cardTitle}>{step.title}</h3>*/}
+      {/*          <p className={styles.cardText}>{step.description}</p>*/}
+      {/*        </li>*/}
+      {/*      ))}*/}
+      {/*    </ol>*/}
+      {/*  </div>*/}
+      {/*</section>*/}
 
-      <section className={styles.ctaSection} aria-labelledby="final-cta-title">
-        <div className={styles.ctaInner}>
-          <h2 className={styles.sectionTitle} id="final-cta-title">
-            Получить расчёт стоимости и срока
-          </h2>
-          <p className={styles.sectionLead}>
-            В ответе дадим маршрут: материал, технология, срок, стоимость и что нужно для запуска.
-          </p>
-          <CTAButton href={TELEGRAM_DEFAULT} target="_blank" rel="noopener noreferrer">
-            Получить расчёт стоимости и срока
-          </CTAButton>
-        </div>
-      </section>
+      {/*<section className={styles.ctaSection} aria-labelledby="final-cta-title">*/}
+      {/*  <div className={styles.ctaInner}>*/}
+      {/*    <h2 className={styles.sectionTitle} id="final-cta-title">*/}
+      {/*      Получить расчёт стоимости и срока*/}
+      {/*    </h2>*/}
+      {/*    <p className={styles.sectionLead}>*/}
+      {/*      В ответе дадим маршрут: материал, технология, срок, стоимость и что нужно для запуска.*/}
+      {/*    </p>*/}
+      {/*    <CTAButton href={TELEGRAM_DEFAULT} target="_blank" rel="noopener noreferrer">*/}
+      {/*      Получить расчёт стоимости и срока*/}
+      {/*    </CTAButton>*/}
+      {/*  </div>*/}
+      {/*</section>*/}
 
       <footer className={styles.siteFooter}>
         <div className={styles.footerGrid}>
