@@ -106,6 +106,7 @@ const Marketplace = () => {
 
   return (
     <div className={styles.wrap}>
+      <div className={styles.headerSafeArea} aria-hidden="true" />
       {copied && (
         <div className={styles.globalCopyToast} role="status">
           Скопировано

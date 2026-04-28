@@ -2,8 +2,19 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 84px 12px 0;
+  padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 0;
   box-sizing: border-box;
+}
+
+.headerSafeArea {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 31;
+  height: env(safe-area-inset-top, 0px);
+  background: #000;
+  pointer-events: none;
 }
 
 .globalCopyToast {
@@ -24,13 +35,13 @@
 
 @media (min-width: 769px) {
   .wrap {
-    padding: 84px 50px 0;
+    padding: calc(84px + env(safe-area-inset-top, 0px)) 50px 0;
   }
 }
 
 .header {
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   left: 0;
   right: 0;
   z-index: 30;
