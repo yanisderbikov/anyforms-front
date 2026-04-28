@@ -20,10 +20,11 @@ function emitSpa404() {
     configResolved(config) {
       outDir = path.resolve(config.root, config.build.outDir);
     },
-    closeBundle() {
+    writeBundle() {
       const templatePath = path.resolve(__dirname, '404.html');
       let html = fs.readFileSync(templatePath, 'utf8');
       html = html.replace("location.replace('/')", `location.replace(${JSON.stringify(base)})`);
+      fs.mkdirSync(outDir, { recursive: true });
       fs.writeFileSync(path.join(outDir, '404.html'), html);
     },
   };
