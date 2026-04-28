@@ -49,7 +49,7 @@ jobs:
             echo "value=${{ vars.VITE_BASE }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ -f CNAME ] && ! grep -qiE 'github\.io' CNAME 2>/dev/null; then
+          if [ -f public/CNAME ] && ! grep -qiE 'github\.io' public/CNAME 2>/dev/null; then
             echo "value=/" >> "$GITHUB_OUTPUT"
             exit 0
           fi
