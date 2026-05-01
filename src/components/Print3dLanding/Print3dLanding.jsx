@@ -4,8 +4,8 @@ import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './Print3dLanding.module.css';
 
-const TELEGRAM_DEFAULT = 'https://t.me/AnyFormsBot';
-const TG_CHANNEL = 'https://t.me/anyforms';
+/** Все CTA и контакт в Telegram на странице 3D-печати */
+const TELEGRAM_PRINT_BOT = 'https://t.me/AnyFormsPrintBot';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
 
@@ -15,11 +15,6 @@ const HERO_IMAGES = {
   bottom: 'https://storage.yandexcloud.net/anyforms/3d-print/photo_2026-04-24%2018.18.36.jpeg',
 };
 
-const HEADER_LINKS = [
-  { key: 'home', label: 'главная', to: '/' },
-  { key: 'chief', label: 'кондитеры', to: '/chief' },
-  { key: 'shop', label: 'свечевары', to: '/shop' },
-];
 const HERO_PREFIX = 'ДЛЯ ';
 const HERO_VARIANTS = ['ЗАВОДОВ', 'ПРОИЗВОДСТВ'];
 const PRINT_DIRECTIONS = [
@@ -121,13 +116,13 @@ const Print3dLanding = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           },
         }}
-        navLinks={HEADER_LINKS}
+        navLinks={[]}
         navAriaLabel="Разделы сайта"
         rightItems={[
           {
             key: 'calc-desktop',
             kind: 'link',
-            href: TELEGRAM_DEFAULT,
+            href: TELEGRAM_PRINT_BOT,
             label: 'Рассчитать деталь',
             target: '_blank',
             rel: 'noopener noreferrer',
@@ -139,7 +134,7 @@ const Print3dLanding = () => {
           {
             key: 'calc-mobile',
             kind: 'link',
-            href: TELEGRAM_DEFAULT,
+            href: TELEGRAM_PRINT_BOT,
             label: 'Рассчитать деталь',
             target: '_blank',
             rel: 'noopener noreferrer',
@@ -169,7 +164,7 @@ const Print3dLanding = () => {
               <li>Более 20 3D-принтеров в собственном парке</li>
               <li>Печать из пластиков, фотополимеров и инженерных материалов</li>
             </ul>
-            <CTAButton href={TELEGRAM_DEFAULT} target="_blank" rel="noopener noreferrer">
+            <CTAButton href={TELEGRAM_PRINT_BOT} target="_blank" rel="noopener noreferrer">
               Рассчитать деталь
             </CTAButton>
           </div>
@@ -257,7 +252,7 @@ const Print3dLanding = () => {
               <li>5+ лет опыта</li>
               <li>Тысячи заказов</li>
             </ul>
-            <CTAButton href={TELEGRAM_DEFAULT} target="_blank" rel="noopener noreferrer">
+            <CTAButton href={TELEGRAM_PRINT_BOT} target="_blank" rel="noopener noreferrer">
               Разработать свою идею
             </CTAButton>
           </div>
@@ -334,7 +329,7 @@ const Print3dLanding = () => {
       {/*    <p className={styles.sectionLead}>*/}
       {/*      В ответе дадим маршрут: материал, технология, срок, стоимость и что нужно для запуска.*/}
       {/*    </p>*/}
-      {/*    <CTAButton href={TELEGRAM_DEFAULT} target="_blank" rel="noopener noreferrer">*/}
+      {/*    <CTAButton href={TELEGRAM_PRINT_BOT} target="_blank" rel="noopener noreferrer">*/}
       {/*      Получить расчёт стоимости и срока*/}
       {/*    </CTAButton>*/}
       {/*  </div>*/}
@@ -365,20 +360,11 @@ const Print3dLanding = () => {
               <br />
               <a
                 className={styles.footerLink}
-                href={TG_CHANNEL}
+                href={TELEGRAM_PRINT_BOT}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Telegram — канал
-              </a>
-              <br />
-              <a
-                className={styles.footerLink}
-                href={TELEGRAM_DEFAULT}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Связаться с менеджером
+                Написать в Telegram
               </a>
             </p>
           </div>

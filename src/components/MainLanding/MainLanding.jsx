@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CTAButton from '../shared/CTAButton/CTAButton';
+import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './MainLanding.module.css';
 
 const TELEGRAM_DEFAULT = 'https://t.me/AnyFormsBot';
@@ -40,6 +41,12 @@ const QUIZ_OFFERS = [
   { discountLabel: '10%', promoCode: 'any-10' },
   { discountLabel: '20%', promoCode: 'any-20' },
   { discountLabel: '5000₽', promoCode: 'any-5000' },
+];
+
+const HEADER_NAV_LINKS = [
+  { key: 'print', label: 'Печать', to: '/3d-print' },
+  { key: 'chief', label: 'Кондитеры', to: '/chief' },
+  { key: 'shop', label: 'Магазин молдов', to: '/shop' },
 ];
 
 const StepCard = ({ title, options, value, onSelect }) => {
@@ -226,23 +233,40 @@ const MainLanding = () => {
         </div>
       )}
 
-      <header className={styles.siteHeader}>
-        <div className={styles.siteHeaderInner}>
-          <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">
-            <img
-              className={styles.logo}
-              src="/anyforms_logo_new_white.svg"
-              alt=""
-              width={200}
-              height={46}
-              decoding="async"
-            />
-          </a>
-          <button type="button" className={styles.headerAction} onClick={scrollToQuiz}>
-            Подобрать молд
-          </button>
-        </div>
-      </header>
+      <LandingHeader
+        logo={{
+          href: '#top',
+          ariaLabel: 'AnyForms — наверх',
+          src: '/anyforms_logo_new_white.svg',
+          width: 200,
+          height: 46,
+          onClick: (event) => {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          },
+        }}
+        navLinks={HEADER_NAV_LINKS}
+        navAriaLabel="Разделы сайта"
+        rightItems={[
+          {
+            key: 'quiz',
+            kind: 'button',
+            label: 'Подобрать молд',
+            variant: 'pill',
+            onClick: scrollToQuiz,
+          },
+        ]}
+        mobileMenuId="main-landing-mobile-menu"
+        mobileTopItems={[
+          {
+            key: 'quiz-mobile',
+            kind: 'button',
+            label: 'Подобрать молд',
+            variant: 'primary',
+            onClick: scrollToQuiz,
+          },
+        ]}
+      />
 
       <div id="top" />
       <section className={styles.hero} aria-label="Главный экран">
