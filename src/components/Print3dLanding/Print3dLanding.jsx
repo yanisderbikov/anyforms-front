@@ -44,11 +44,6 @@ const CLIENT_PROBLEMS = [
 
 const PRINT_DIRECTIONS = [
   {
-    title: 'Оснастка для производства',
-    description:
-      'Держатели, фиксаторы, направляющие, шаблоны, кондукторы, элементы для сборки.',
-  },
-  {
     title: 'Корпуса и технические элементы',
     description: 'Корпуса, крышки, кожухи, крепления, адаптеры, заглушки, переходники.',
   },
@@ -60,6 +55,11 @@ const PRINT_DIRECTIONS = [
   {
     title: 'Малые и средние серии',
     description: 'Когда литьё дорого, долго или не нужно по объёму — от 1 до 500 штук.',
+  },
+  {
+    title: 'Оснастка для производства',
+    description:
+      'Держатели, фиксаторы, направляющие, шаблоны, кондукторы, элементы для сборки.',
   },
 ];
 
@@ -156,7 +156,7 @@ const FAQ_ITEMS = [
   {
     question: 'Вы доставляете по России?',
     answer:
-      'Да, отправляем транспортными компаниями по всей России. В Санкт-Петербурге — курьерская доставка.',
+      'Да, отправляем СДЭКом по всей России. В Санкт-Петербурге — курьерская доставка.',
   },
 ];
 
@@ -305,11 +305,24 @@ const Print3dLanding = () => {
               <br />
               Пришлите чертёж или образец — рассчитаем стоимость за 15 минут.
             </p>
-            <ul className={styles.heroFacts} aria-label="Факты о компании">
-              <li>Собственный парк из 20+ промышленных 3D-принтеров</li>
-              <li>5+ лет работы с производственными заказами</li>
-              <li>Пластики, фотополимеры и инженерные материалы</li>
-            </ul>
+            <div className={styles.heroTrustSignals} aria-label="Социальные доказательства">
+              <div className={styles.heroTrustItem}>
+                <span className={styles.heroTrustValue}>5+</span>
+                <span className={styles.heroTrustLabel}>лет на рынке</span>
+              </div>
+              <div className={styles.heroTrustItem}>
+                <span className={styles.heroTrustValue}>20+</span>
+                <span className={styles.heroTrustLabel}>принтеров в парке</span>
+              </div>
+              <div className={styles.heroTrustItem}>
+                <span className={styles.heroTrustValue}>1000+</span>
+                <span className={styles.heroTrustLabel}>выполненных заказов</span>
+              </div>
+              <div className={styles.heroTrustItem}>
+                <span className={styles.heroTrustValue}>3-5</span>
+                <span className={styles.heroTrustLabel}>дней — средний срок</span>
+              </div>
+            </div>
             <CTAButton onClick={scrollToCalcForm}>Получить расчёт за 15 минут</CTAButton>
           </div>
 
@@ -781,7 +794,7 @@ const Print3dLanding = () => {
               Готовы обсудить ваш проект?
             </h2>
             <p className={styles.sectionLead}>
-              Первый расчёт — бесплатно. Пришлите задачу в любом формате, и мы предложим
+              Пришлите задачу в любом формате, и мы предложим
               решение с точными сроками и стоимостью.
             </p>
             <div className={styles.finalCtaActions}>
@@ -797,16 +810,6 @@ const Print3dLanding = () => {
                 Или напишите в Telegram
               </a>
             </div>
-            <div className={styles.leadMagnet}>
-              <p className={styles.leadMagnetText}>
-                Не готовы заказывать сейчас? Скачайте каталог материалов для 3D-печати с
-                рекомендациями по выбору — бесплатно.
-              </p>
-              {/* TODO: заменить на ссылку на реальный PDF-каталог */}
-              <CTAButton onClick={scrollToCalcForm}>
-                Скачать каталог материалов
-              </CTAButton>
-            </div>
           </div>
         </div>
       </section>
@@ -814,25 +817,6 @@ const Print3dLanding = () => {
       {/* ═══════════════ FOOTER ═══════════════ */}
       <footer className={styles.siteFooter}>
         <div className={styles.footerInner}>
-          <div className={styles.trustSignals}>
-            <div className={styles.trustItem}>
-              <span className={styles.trustValue}>5+</span>
-              <span className={styles.trustLabel}>лет на рынке</span>
-            </div>
-            <div className={styles.trustItem}>
-              <span className={styles.trustValue}>20+</span>
-              <span className={styles.trustLabel}>принтеров в парке</span>
-            </div>
-            <div className={styles.trustItem}>
-              <span className={styles.trustValue}>1000+</span>
-              <span className={styles.trustLabel}>выполненных заказов</span>
-            </div>
-            <div className={styles.trustItem}>
-              <span className={styles.trustValue}>3–5</span>
-              <span className={styles.trustLabel}>дней — средний срок</span>
-            </div>
-          </div>
-
           <div className={styles.footerGrid}>
             <div className={styles.footerBlock}>
               <h2 className={styles.footerHeading}>О компании</h2>
