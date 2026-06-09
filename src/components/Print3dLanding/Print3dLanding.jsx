@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import apiClient from '../../apiClient';
 import styles from './Print3dLanding.module.css';
 
+const LANDING_LEAD_NAME = 'Заявка с лендинга 3D-печати';
 const TELEGRAM_PRINT_BOT = 'https://t.me/AnyFormsPrintBot';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
@@ -66,37 +69,36 @@ const PRINT_DIRECTIONS = [
 const CASE_STUDIES = [
   {
     id: 1,
-    title: 'Оснастка для сборочной линии',
-    client: 'Производственное предприятие, Санкт-Петербург',
-    task: 'Заменить металлическую оснастку для фиксации деталей при сборке — оригинал изготавливался 6 недель и стоил 180 000 ₽.',
+    title: 'Панель кассы самообслуживания',
+    client: 'Лицевая часть кассы с деактиватором меток',
+    task: 'Корректно перераспределить электромагнитную катушку внутри конструкции, чтобы металлический корпус не экранировал магнитное поле и метки деактивировались стабильно.',
     solution:
-      'Спроектировали и напечатали комплект из 12 фиксаторов из PA12 за 4 рабочих дня.',
-    result: 'Экономия 65% бюджета. Срок сократился с 6 недель до 4 дней.',
-    // PLACEHOLDER: замените null на URL фотографии кейса
-    image: null,
+      'Вынесли катушку дальше от металла и спроектировали комплект из корпуса и защёлкивающейся заглушки из PETG. Сборка электроники — на стороне заказчика, наша мощность до 30 комплектов в день.',
+    result:
+      '2000 ₽ за комплект при тираже 400 шт. (5,7 ₽ за грамм) — без учёта разработки, пилота и тестов.',
+    image: 'https://storage.yandexcloud.net/anyforms/3d-print/case1.jpeg',
   },
   {
     id: 2,
-    title: 'Замена снятых с производства деталей',
-    client: 'Завод пищевого оборудования',
-    task: 'Пластиковые направляющие для конвейера сняты с производства — ожидание аналога от поставщика 3 месяца.',
+    title: 'Промышленные корпуса из ABS GF',
+    client: 'КСО для «Магнита» и магазинов одежды',
+    task: 'Изготовить промышленный продукт с высокой прочностью и стабильностью размеров.',
     solution:
-      'Отсканировали образец, доработали геометрию и напечатали партию из 40 шт. из PETG.',
-    result: 'Линия запущена через 5 дней. Стоимость — в 3 раза ниже заводского аналога.',
-    // PLACEHOLDER: замените null на URL фотографии кейса
-    image: null,
+      'Напечатали на 3D-принтере из ABS GF — стеклонаполненного пластика с любопытными свойствами для промышленных задач.',
+    result:
+      'Корпуса КСО для «Магнита» и магазинов одежды — подробнее о материале рассказываем в видео.',
+    image: 'https://storage.yandexcloud.net/anyforms/3d-print/case2.jpeg',
   },
   {
     id: 3,
-    title: 'Прототипы корпусов для нового устройства',
-    client: 'R&D-отдел электротехнической компании',
-    task: 'Изготовить 5 вариантов корпуса для тестирования эргономики и компоновки до запуска серии.',
+    title: 'Корпуса КСО крупным тиражом',
+    client: '«Лента», «Магнит» и сеть магазинов одежды',
+    task: 'Изготовить корпуса для касс самообслуживания с нуля — под нужные размеры и бюджет заказчика.',
     solution:
-      'Напечатали 5 итераций за 2 недели, внося правки между версиями за 1–2 дня.',
+      'Спроектировали и печатаем корпуса КСО для трёх сетей. На фото — уже установленный корпус в магазине «Лента» в Санкт-Петербурге.',
     result:
-      'Цикл НИОКР сократился на 2 месяца. Финальный вариант утверждён с первого раза.',
-    // PLACEHOLDER: замените null на URL фотографии кейса
-    image: null,
+      'Один из крупнейших по тиражу проектов — счёт уже перевалил за несколько тысяч единиц и продолжает расти.',
+    image: 'https://storage.yandexcloud.net/anyforms/3d-print/case3.jpeg',
   },
 ];
 
@@ -189,6 +191,7 @@ const Print3dLanding = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   useEffect(() => {
     const currentTarget = HERO_VARIANTS[heroVariantIndex];
@@ -225,14 +228,40 @@ const Print3dLanding = () => {
     setFormError('');
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.phone.trim()) {
+    const trimmedName = formData.name.trim();
+    const trimmedPhone = formData.phone.trim();
+    if (!trimmedName || !trimmedPhone) {
       setFormError('Укажите имя и телефон — мы перезвоним в течение 15 минут.');
       return;
     }
-    // TODO: подключить отправку данных на бэкенд
-    setFormSubmitted(true);
+    setFormError('');
+    setFormSubmitting(true);
+    try {
+      const { data } = await apiClient.api.createLead({
+        leadName: LANDING_LEAD_NAME,
+        name: trimmedName,
+        phone: trimmedPhone,
+      });
+      if (data?.success === false) {
+        const message = data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.';
+        setFormError(message);
+        toast.error(message);
+        return;
+      }
+      setFormSubmitted(true);
+    } catch (err) {
+      const fromApi = err.response?.data?.error;
+      const message =
+        typeof fromApi === 'string'
+          ? fromApi
+          : 'Не удалось отправить заявку. Попробуйте ещё раз.';
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setFormSubmitting(false);
+    }
   };
 
   const toggleFaq = (index) => {
@@ -709,7 +738,9 @@ const Print3dLanding = () => {
                     </div>
                   </div>
                   {formError && <p className={styles.formError}>{formError}</p>}
-                  <CTAButton type="submit">Получить расчёт бесплатно</CTAButton>
+                  <CTAButton type="submit" disabled={formSubmitting}>
+                    {formSubmitting ? 'Отправляем…' : 'Получить расчёт бесплатно'}
+                  </CTAButton>
                   <p className={styles.formDisclaimer}>
                     Нажимая кнопку, вы соглашаетесь с{' '}
                     <Link to="/chief/privacy" className={styles.formDisclaimerLink}>

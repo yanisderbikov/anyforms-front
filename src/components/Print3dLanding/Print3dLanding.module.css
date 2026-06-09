@@ -511,7 +511,8 @@
 .caseImage {
   display: block;
   width: 100%;
-  height: 180px;
+  aspect-ratio: 1 / 1;
+  height: auto;
   object-fit: cover;
 }
 
@@ -520,7 +521,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 180px;
+  aspect-ratio: 1 / 1;
   background: repeating-linear-gradient(
       -45deg,
       #ededf0,
