@@ -7,13 +7,23 @@ const ProductCard = ({ item, onSelect }) => {
 
   const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
+  const isOnSale =
+    item.discountPercent > 0 ||
+    (item.crossedPrice != null && item.crossedPrice > item.price);
+
   const handleClick = (e) => {
     e.preventDefault();
     onSelect?.(item);
   };
 
   return (
-    <article className={styles.card} onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}>
+    <article
+      className={`${styles.card} ${isOnSale ? styles.cardSale : ''}`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}
+    >
       <div className={styles.photoWrap}>
         {firstPhoto ? (
           <img

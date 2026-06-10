@@ -19,6 +19,13 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
 }
 
+/* Сдержанное выделение карточек со скидкой:
+   красим только нижнюю плашку (заголовок, описание, цена). */
+.cardSale .body {
+  background: #f6ede1;
+  border-top: 1px solid rgba(176, 122, 60, 0.18);
+}
+
 .photoWrap {
   position: relative;
   width: 100%;
@@ -111,12 +118,13 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #000;
+  background: #b3541e;
   color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 8px;
   border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(120, 60, 20, 0.25);
 }
 
 .body {
