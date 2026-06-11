@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
+import { trackProductOpen } from '../../services/analytics';
 import ProductCard from '../ProductCard/ProductCard';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './Marketplace.module.css';
@@ -25,6 +26,7 @@ const Marketplace = () => {
 
   const openPopup = (item) => {
     setSelectedItem(item);
+    trackProductOpen(item);
   };
 
   const closePopup = () => {
@@ -83,7 +85,9 @@ const Marketplace = () => {
   if (loading) {
     return (
       <div className={styles.wrap}>
-        <p className={styles.message}>Загрузка товаров...</p>
+        <div className={styles.loader} role="status" aria-label="Загрузка товаров">
+          <span className={styles.spinner} />
+        </div>
       </div>
     );
   }
