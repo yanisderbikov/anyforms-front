@@ -71,6 +71,31 @@
   display: block;
 }
 
+.intro {
+  margin: 0 auto 1.25rem;
+  max-width: 760px;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #555;
+}
+
+.highlight {
+  font-weight: 700;
+  color: #111;
+}
+
+@media (min-width: 769px) {
+  .subtitle {
+    font-size: 1.15rem;
+  }
+}
+
 /* Телефон: ровно 2 колонки одинаковой ширины */
 .grid {
   list-style: none;

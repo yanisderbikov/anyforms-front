@@ -126,6 +126,14 @@ const Marketplace = () => {
           </a>
         </div>
       </header>
+      <div className={styles.intro}>
+        <h1 className={styles.subtitle}>
+          Профессиональные молды для чистого изделия{' '}
+          <strong className={styles.highlight}>без доработки</strong>. Если дефект
+          появился из-за формы —{' '}
+          <strong className={styles.highlight}>заменим молд или вернём деньги</strong>.
+        </h1>
+      </div>
       <ul className={styles.grid}>
         {items.map((item) => (
           <li key={item.name} className={styles.gridItem}>
