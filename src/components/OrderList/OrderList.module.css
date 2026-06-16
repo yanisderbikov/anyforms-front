@@ -1,109 +1,186 @@
 .orderList {
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 0;
+  box-sizing: border-box;
   position: relative;
 }
 
-.header {
-  background: #e5e5e5;
-  padding: 2rem;
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: -2rem -2rem 2rem -2rem;
+@media (min-width: 769px) {
+  .orderList {
+    padding: calc(84px + env(safe-area-inset-top, 0px)) 50px 0;
+  }
 }
 
-.title {
-  color: #000;
-  font-size: 2rem;
-  font-weight: 700;
-  text-transform: lowercase;
-  margin: 0;
+.headerSafeArea {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 31;
+  height: env(safe-area-inset-top, 0px);
+  background: #000;
+  pointer-events: none;
+}
+
+/* Fixed black header with centered logo */
+.header {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 1rem 0;
+  background: #000;
+}
+
+.headerInner {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 41px;
+  padding: 0 16px;
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.catImg {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .menuContainer {
-  position: relative;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Когда места не хватает — прячем логотип, оставляя котика и меню */
+@media (max-width: 460px) {
+  .logoLink {
+    display: none;
+  }
 }
 
 .burgerButton {
   background: transparent;
-  color: #000;
+  color: #fff;
   border: none;
-  padding: 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: 0;
+  border-radius: 999px;
+  transition: background 0.2s ease, opacity 0.2s ease;
 }
 
 .burgerButton:hover {
-  opacity: 0.7;
-}
-
-.burgerButton:active {
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .burgerButtonOpen {
-  background: #000;
-  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .dropdownMenu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.5rem);
   right: 0;
-  margin-top: 0.5rem;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
   z-index: 1000;
-  min-width: 220px;
+  min-width: 240px;
+  padding: 0.4rem;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
 }
 
 .menuItem {
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 0.95rem;
   background: #fff;
   border: none;
   text-align: left;
   cursor: pointer;
-  font-size: 1rem;
-  color: #000;
-  transition: background-color 0.2s ease;
-  border-radius: 0;
+  font-size: 0.95rem;
+  color: #111;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
   text-transform: lowercase;
 }
 
 .menuItem:hover {
-  background: #e5e5e5;
+  background: #f1f1f1;
 }
 
-.menuItemActive {
-  background: #000;
+.menuItemActive,
+.menuItemActive:hover {
+  background: #111;
   color: #fff;
 }
 
-.menuItemActive:hover {
-  background: #000;
-  opacity: 0.9;
+/* Intro / title */
+.intro {
+  margin: 0 auto 1.25rem;
+  max-width: 760px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
+.pageTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111;
+  text-transform: lowercase;
+}
+
+/* Summary box -> white rounded card */
 .summaryBox {
-  background: #e5e5e5;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 1rem 1.5rem;
-  margin-bottom: 2rem;
-  border-radius: 0;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 22px;
 }
 
 .summaryTitle {
   font-size: 1rem;
-  font-weight: 600;
-  color: #000;
+  font-weight: 700;
+  color: #111;
   margin: 0 0 1rem 0;
   text-transform: lowercase;
 }
@@ -119,22 +196,30 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.95rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .summaryProductName {
-  color: #000;
+  color: #333;
   text-transform: lowercase;
 }
 
 .summaryCount {
-  color: #000;
-  font-weight: 600;
+  color: #111;
+  font-weight: 700;
 }
 
+/* Controls */
 .controls {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -145,81 +230,90 @@
 
 .searchInput {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
   font-size: 1rem;
-  background: #e5e5e5;
-  color: #000;
-  transition: border-color 0.2s ease;
+  background: #fff;
+  color: #111;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: #000;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
 .searchInput::placeholder {
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(17, 17, 17, 0.4);
 }
 
 .refreshButton {
-  padding: 0.75rem 1.5rem;
-  background: #000;
+  padding: 0.8rem 1.5rem;
+  background: #111;
   color: #fff;
-  border: none;
-  border-radius: 0;
+  border: 1px solid #111;
+  border-radius: 999px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
   text-transform: lowercase;
 }
 
 .refreshButton:hover {
-  opacity: 0.8;
+  background: #8a8a8a;
+  color: #111;
 }
 
 .refreshButton:active {
-  opacity: 0.6;
+  transform: scale(0.98);
 }
 
 .cardsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 1.25rem;
+  padding-bottom: 3rem;
 }
 
 .emptyState {
   text-align: center;
   padding: 4rem 2rem;
-  background: #e5e5e5;
-  border-radius: 0;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  margin-bottom: 3rem;
 }
 
 .emptyText {
-  color: #000;
-  font-size: 1.2rem;
+  color: #555;
+  font-size: 1.1rem;
   font-weight: 500;
   text-transform: lowercase;
+  margin: 0;
 }
 
+/* Loader (matches marketplace spinner) */
 .loadingContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  min-height: 60vh;
   gap: 1rem;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(0, 0, 0, 0.2);
-  border-top-color: #000;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  border: 4px solid rgba(17, 17, 17, 0.12);
+  border-top-color: #111;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -228,35 +322,29 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.6s;
+  }
+}
+
 .loadingText {
-  color: #000;
-  font-size: 1.2rem;
+  color: #555;
+  font-size: 1rem;
   font-weight: 500;
   text-transform: lowercase;
 }
 
 @media (max-width: 768px) {
-  .header {
-    padding: 1rem;
-    margin: -1rem -1rem 1rem -1rem;
-  }
-  
-  .title {
-    font-size: 1.8rem;
-  }
-  
   .cardsContainer {
     grid-template-columns: 1fr;
   }
-  
+
   .controls {
     flex-direction: column;
   }
-  
+
   .searchContainer {
     min-width: 100%;
   }
 }
-
-
-

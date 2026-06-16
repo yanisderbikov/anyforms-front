@@ -89,11 +89,9 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
               title="Обновить сделку"
               aria-label="Обновить сделку"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 3V6H10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3 13V10H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M11 5C10.2098 4.20979 9.1402 3.75 8 3.75C5.92893 3.75 4.25 5.42893 4.25 7.5C4.25 9.57107 5.92893 11.25 8 11.25C10.0711 11.25 11.75 9.57107 11.75 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                <path d="M5 11C5.79021 11.7902 6.8598 12.25 8 12.25C10.0711 12.25 11.75 10.5711 11.75 8.5C11.75 6.42893 10.0711 4.75 8 4.75C5.92893 4.75 4.25 6.42893 4.25 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M21 3v5h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           )}
