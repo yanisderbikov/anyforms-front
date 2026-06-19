@@ -12,6 +12,9 @@ import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
 import FounderYuri from "./components/Founders/FounderYuri";
+import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
+import GuideCheckout from "./components/GuideLanding/GuideCheckout";
+import GuideSuccess from "./components/GuideLanding/GuideSuccess";
 
 const SITE_URL = 'https://anyforms.ru';
 
@@ -41,6 +44,22 @@ const PAGE_SEO = {
   '/founders/yuri': {
     title: 'Реквизиты — ИП Суворов Юрий Игоревич',
     description: 'Платёжные и регистрационные реквизиты ИП Суворов Юрий Игоревич.',
+  },
+  '/guide/offer': {
+    title: 'Публичная оферта — гайд Юрия Суворова',
+    description: 'Условия покупки электронного гайда «Как продавать сложный продукт через короткие видео».',
+  },
+  '/guide/privacy': {
+    title: 'Политика конфиденциальности — гайд Юрия Суворова',
+    description: 'Как обрабатываются персональные данные при покупке электронного гайда.',
+  },
+  '/guide/checkout': {
+    title: 'Оплата гайда — AnyForms',
+    description: 'Оформление и оплата электронного гайда «Как продавать сложный продукт через короткие видео».',
+  },
+  '/guide/success': {
+    title: 'Оплата прошла успешно — гайд отправлен на почту',
+    description: 'Спасибо за покупку. Гайд отправлен на вашу электронную почту.',
   },
   '/shop': {
     title: 'Маркетплейс - AnyForms',
@@ -77,7 +96,7 @@ function App() {
   const isChiefPrivacyPage = normalizedPathname === '/chief/privacy';
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
-  const isGuidePage = normalizedPathname === '/guide';
+  const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isFounderPage = normalizedPathname.startsWith('/founders/');
 
   useEffect(() => {
@@ -102,7 +121,9 @@ function App() {
       normalizedPathname === '/login' ||
       normalizedPathname.startsWith('/orders') ||
       normalizedPathname.startsWith('/admin') ||
-      normalizedPathname === '/pdf';
+      normalizedPathname === '/pdf' ||
+      normalizedPathname === '/guide/checkout' ||
+      normalizedPathname === '/guide/success';
 
     document.title = seo.title;
     upsertMetaTag('meta[name="description"]', { name: 'description', content: seo.description });
@@ -134,6 +155,10 @@ function App() {
         <Route path="/chief/privacy" element={<ChiefPrivacy />} />
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
+        <Route path="/guide/offer" element={<GuideOffer />} />
+        <Route path="/guide/privacy" element={<GuidePrivacy />} />
+        <Route path="/guide/checkout" element={<GuideCheckout />} />
+        <Route path="/guide/success" element={<GuideSuccess />} />
         <Route path="/founders/yuri" element={<FounderYuri />} />
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />

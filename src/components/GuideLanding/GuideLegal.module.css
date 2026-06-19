@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700&display=swap');
+
+.page {
+  --cream: #f5f1e8;
+  --ink: #16140e;
+  --accent: #cb6a42;
+  --header-h: 78px;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Golos Text', system-ui, sans-serif;
+
+  width: 100%;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* tint shared header to guide palette */
+.page :global(header) {
+  background: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill']:hover {
+  background: #b85a34;
+  color: #fff;
+}
+
+.page [class*='mobileMenuPrimary'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.main {
+  padding: 48px 0 80px;
+}
+
+.inner {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(28px, 5.5vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -1.4px;
+  margin: 14px 0 0;
+}
+
+.updated {
+  font-size: 13px;
+  opacity: 0.5;
+  margin: 12px 0 0;
+}
+
+.body {
+  margin-top: 32px;
+}
+
+.body p {
+  font-size: clamp(15px, 2.2vw, 17px);
+  line-height: 1.7;
+  margin: 0 0 16px;
+  opacity: 0.85;
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 3vw, 22px);
+  letter-spacing: -0.5px;
+  margin: 34px 0 14px;
+}
+
+.inlineLink {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+  transition: opacity 0.2s ease;
+}
+
+.inlineLink:hover {
+  opacity: 0.6;
+}
+
+.backWrap {
+  margin: 44px 0 0;
+}
+
+.back {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.3);
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.back:hover {
+  opacity: 0.6;
+}
+
+@media (min-width: 560px) {
+  .inner {
+    padding: 0 28px;
+  }
+}

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './GuideLanding.module.css';
 
-// Куда ведёт кнопка «Купить гайд». Замените на ссылку оплаты при необходимости.
-const BUY_URL = 'https://t.me/AnyFormsPrintBot';
+// Кнопки покупки ведут на страницу оформления и оплаты.
+const CHECKOUT_PATH = '/guide/checkout';
+// Поддержка — телеграм-бот AnyForms.
+const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 const PRICE = '990 ₽';
 const AUTHOR_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/YuriSuvrov.jpeg';
 
@@ -344,14 +346,12 @@ const GuideLanding = () => {
             </p>
             <div className={styles.buyPriceRow}>
               <span className={styles.buyPrice}>{PRICE}</span>
-              <a
+              <Link
                 className={`${styles.heroCta} ${styles.ctaInline}`}
-                href={BUY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                to={CHECKOUT_PATH}
               >
                 Купить гайд
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -382,38 +382,41 @@ const GuideLanding = () => {
                 <br />
                 <a
                   className={styles.footerLink}
-                  href={BUY_URL}
+                  href={SUPPORT_TG}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Написать в Telegram
+                  Telegram @AnyFormsBot
                 </a>
               </p>
             </div>
             <div className={styles.footerBlock}>
               <h2 className={styles.footerHeading}>Документы</h2>
               <p className={styles.footerText}>
-                <Link to="/chief/privacy" className={styles.footerLink}>
+                <Link to="/guide/privacy" className={styles.footerLink}>
                   Политика конфиденциальности
                 </Link>
                 <br />
-                <a className={styles.footerLink} href="#buy" onClick={(e) => {
-                  e.preventDefault();
-                  scrollToBuy();
-                }}>
+                <Link to="/guide/offer" className={styles.footerLink}>
                   Публичная оферта
-                </a>
+                </Link>
               </p>
             </div>
           </div>
 
           <div className={styles.footerOffer}>
             <p className={styles.footerOfferText}>
-              Настоящий сайт носит исключительно информационный характер и ни при каких
-              условиях не является публичной офертой, определяемой положениями статьи 437
-              ГК РФ. Оплачивая гайд, вы соглашаетесь с условиями оферты и подтверждаете,
-              что приобретаете цифровой информационный продукт. Цифровой товар не подлежит
-              возврату после получения доступа. Продавец — ИП Суворов Юрий Игоревич.
+              Гайд — цифровой информационный продукт. Оплачивая его, вы принимаете
+              условия{' '}
+              <Link to="/guide/offer" className={styles.footerOfferLink}>
+                публичной оферты
+              </Link>{' '}
+              и соглашаетесь с{' '}
+              <Link to="/guide/privacy" className={styles.footerOfferLink}>
+                политикой конфиденциальности
+              </Link>
+              . После предоставления доступа цифровой товар возврату не подлежит.
+              Продавец — ИП Суворов Юрий Игоревич.
             </p>
           </div>
 
