@@ -1,0 +1,812 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap');
+
+/* ═══════════════ BASE ═══════════════ */
+.page {
+  --cream: #f5f1e8;
+  --ink: #16140e;
+  --accent: #cb6a42;
+  --edge-mobile: 18px;
+  --edge-desktop: 64px;
+  --header-h: 78px;
+  --max-w: 1160px;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Golos Text', system-ui, sans-serif;
+
+  width: 100%;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sectionInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+}
+
+/* In-page anchors must clear the fixed header */
+.page section[id] {
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+/* ═══════════════ HEADER (tint shared header to guide palette) ═══════════════ */
+.page :global(header) {
+  background: var(--ink);
+}
+
+/* Accent pill CTA in the header */
+.page :global(header) a[class*='navLinkPill'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill']:hover {
+  background: #b85a34;
+  color: #fff;
+}
+
+.page [class*='mobileMenuPrimary'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.eyebrowAccent {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -1.5px;
+  margin: 14px 0 0;
+}
+
+.sectionTitleHuge {
+  font-size: clamp(34px, 8vw, 68px);
+  letter-spacing: -2.5px;
+  line-height: 0.98;
+}
+
+.sectionLead {
+  font-size: clamp(16px, 2.4vw, 19px);
+  line-height: 1.6;
+  margin: 22px 0 0;
+  opacity: 0.78;
+  max-width: 540px;
+}
+
+.sectionHead {
+  margin-bottom: 40px;
+}
+
+.markAccent {
+  background: var(--accent);
+  color: var(--ink);
+  padding: 0 0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.textAccent {
+  color: var(--accent);
+}
+
+/* ═══════════════ CTA (override shared button to guide accent) ═══════════════ */
+.guideCta.guideCta {
+  padding: 0.45rem 0.5rem 0.45rem 1.5rem;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.2px;
+}
+
+.guideCta.guideCta:hover {
+  background: #b85a34;
+  border-color: #b85a34;
+  color: #fff;
+}
+
+.guideCta.guideCta span {
+  width: 2.1rem;
+  height: 2.1rem;
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* ═══════════════ PHOTO FRAME (placeholders) ═══════════════ */
+.photoFrame {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border: 2px solid #000;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.photoFrame[data-ratio='portrait'] {
+  aspect-ratio: 3 / 4;
+}
+
+.photoFrame::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed rgba(245, 241, 232, 0.3);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.photoLabel {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(245, 241, 232, 0.55);
+}
+
+/* ═══════════════ ЭКРАН 1 · HERO ═══════════════ */
+/* Mobile-first: single vertical flow. Desktop (≥900px): two-column grid. */
+.hero {
+  padding: 30px 0 40px;
+}
+
+.heroInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+  display: flex;
+  flex-direction: column;
+}
+
+.heroEyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 22px 0 0;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 8.5vw, 64px);
+  line-height: 1;
+  letter-spacing: -1.5px;
+  margin: 12px 0 0;
+}
+
+.heroMark {
+  background: var(--accent);
+  color: var(--ink);
+  padding: 0 0.06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.heroSub {
+  font-size: clamp(16px, 2.5vw, 19px);
+  line-height: 1.5;
+  opacity: 0.72;
+  margin: 16px 0 0;
+  max-width: 34ch;
+}
+
+.heroMedia {
+  position: relative;
+  margin: 20px 0 0;
+}
+
+.heroPhoto {
+  display: block;
+  width: 100%;
+  height: 228px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.heroPhotoEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border: 2px solid #000;
+  color: rgba(245, 241, 232, 0.55);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.heroCaption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 20px;
+}
+
+.heroChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+}
+
+.heroChip {
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(22, 20, 14, 0.06);
+  padding: 7px 13px;
+  border-radius: 20px;
+}
+
+.heroBuy {
+  margin-top: 22px;
+}
+
+.heroPriceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heroPrice {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 9vw, 44px);
+  letter-spacing: -2px;
+}
+
+.heroNote {
+  font-size: 12px;
+  opacity: 0.55;
+  text-align: right;
+  max-width: 150px;
+  line-height: 1.35;
+}
+
+.heroCta {
+  margin-top: 14px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.heroCta:hover {
+  background: #bf5f38;
+  box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+}
+
+.heroCta:active {
+  transform: translateY(1px);
+}
+
+.heroProof {
+  display: flex;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(22, 20, 14, 0.14);
+}
+
+.heroStat {
+  flex: 1;
+  text-align: center;
+}
+
+.heroStatValue {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.heroStatLabel {
+  display: block;
+  font-size: 11px;
+  opacity: 0.55;
+  margin-top: 2px;
+}
+
+.heroDivider {
+  width: 1px;
+  height: 30px;
+  background: rgba(22, 20, 14, 0.14);
+}
+
+/* Grid-area hooks — only take effect inside the desktop grid below */
+.areaEyebrow,
+.areaTitle,
+.areaSub,
+.areaMedia,
+.areaChips,
+.areaBuy,
+.areaProof {
+  min-width: 0;
+}
+
+/* Desktop: switch the flow column into a two-column grid */
+@media (min-width: 900px) {
+  .hero {
+    padding: 40px 0 48px;
+  }
+
+  .heroInner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-areas:
+      'eyebrow media'
+      'title   media'
+      'sub     media'
+      'chips   media'
+      'buy     media'
+      'proof   media';
+    column-gap: 56px;
+    align-items: start;
+  }
+
+  .areaEyebrow {
+    grid-area: eyebrow;
+    margin-top: 8px;
+  }
+  .areaTitle {
+    grid-area: title;
+  }
+  .areaSub {
+    grid-area: sub;
+  }
+  .areaMedia {
+    grid-area: media;
+    align-self: stretch;
+    margin-top: 8px;
+    height: 100%;
+    min-height: 480px;
+  }
+  .areaChips {
+    grid-area: chips;
+    margin-top: 26px;
+  }
+  .areaBuy {
+    grid-area: buy;
+    margin-top: 32px;
+    max-width: 440px;
+  }
+  .areaProof {
+    grid-area: proof;
+    max-width: 520px;
+    margin-top: 36px;
+  }
+
+  .heroTitle {
+    font-size: clamp(48px, 5vw, 64px);
+    letter-spacing: -2.5px;
+    margin-top: 14px;
+  }
+  .heroSub {
+    max-width: 34ch;
+  }
+  .areaMedia .heroPhoto,
+  .areaMedia .heroPhotoEmpty {
+    height: 100%;
+    min-height: 480px;
+  }
+  .heroStat {
+    text-align: left;
+  }
+  .heroStatValue {
+    font-size: 22px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 2 · АВТОР ═══════════════ */
+.authorSection {
+  padding: 64px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.authorGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.authorMedia {
+  width: 100%;
+  max-width: 340px;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.factList {
+  list-style: none;
+  margin: 30px 0 34px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.factItem {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.12);
+  font-size: clamp(16px, 2.2vw, 18px);
+  font-weight: 500;
+}
+
+.factDot {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+/* ═══════════════ ЭКРАН 3 · DARK / ПРОСМОТРЫ ═══════════════ */
+.darkSection {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 84px 0;
+}
+
+.bigQuote {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 4.6vw, 40px);
+  line-height: 1.22;
+  letter-spacing: -1px;
+  margin: 44px 0 0;
+  max-width: 880px;
+  color: var(--accent);
+}
+
+.darkLead {
+  font-size: clamp(16px, 2.4vw, 20px);
+  line-height: 1.6;
+  margin: 34px 0 0;
+  max-width: 620px;
+  color: rgba(245, 241, 232, 0.72);
+}
+
+/* ═══════════════ ЭКРАН 4 · ДО / ПОСЛЕ ═══════════════ */
+.systemSection {
+  padding: 72px 0;
+}
+
+.compareGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.compareCard {
+  border-radius: 22px;
+  padding: 32px 28px;
+}
+
+.compareBefore {
+  background: rgba(22, 20, 14, 0.05);
+  border: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.compareAfter {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.compareLabel {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.compareAfter .compareLabel {
+  color: var(--accent);
+}
+
+.compareList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.compareItem {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: clamp(16px, 2.2vw, 18px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.iconDice,
+.iconTarget {
+  flex: none;
+  font-size: 18px;
+}
+
+/* ═══════════════ ЭКРАН 5 · ЧТО ВНУТРИ ═══════════════ */
+.insideSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.insideGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.insideList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.insideItem {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.insideNum {
+  flex: none;
+  width: 34px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--accent);
+}
+
+.insideText {
+  font-size: clamp(16px, 2.3vw, 19px);
+  font-weight: 600;
+}
+
+.bonusCard {
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 22px;
+  padding: 32px 28px;
+  position: sticky;
+  top: calc(var(--header-h) + 20px);
+}
+
+.bonusLabel {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+
+.bonusList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bonusItem {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: clamp(15px, 2.1vw, 17px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.bonusStar {
+  flex: none;
+  color: var(--accent);
+}
+
+/* ═══════════════ ЭКРАН 6 · BUY ═══════════════ */
+.buySection {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 90px 0;
+}
+
+.buyInner {
+  max-width: 760px;
+}
+
+.buyPriceRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 26px;
+  margin-top: 40px;
+}
+
+.buyPrice {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(36px, 7vw, 52px);
+  letter-spacing: -2px;
+  color: var(--accent);
+}
+
+/* ═══════════════ FOOTER ═══════════════ */
+.siteFooter {
+  background: var(--cream);
+  color: var(--ink);
+  padding: 56px 0 40px;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.footerInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.footerHeading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 0 0 14px;
+}
+
+.footerText {
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.footerLink {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.25);
+  transition: opacity 0.2s ease;
+}
+
+.footerLink:hover {
+  opacity: 0.6;
+}
+
+.footerOffer {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.footerOfferText {
+  font-size: 12.5px;
+  line-height: 1.65;
+  margin: 0;
+  opacity: 0.5;
+  max-width: 880px;
+}
+
+.footerCopyright {
+  margin: 26px 0 0;
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media (min-width: 720px) {
+  .sectionInner,
+  .heroGrid,
+  .footerInner {
+    padding-left: var(--edge-desktop);
+    padding-right: var(--edge-desktop);
+  }
+
+  .compareGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+  }
+
+  .footerGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 920px) {
+  .heroGrid {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 56px;
+  }
+
+  .heroMedia {
+    justify-self: end;
+    max-width: 320px;
+  }
+
+  .authorGrid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 56px;
+  }
+
+  .authorMedia {
+    max-width: 320px;
+  }
+
+  .insideGrid {
+    grid-template-columns: 1.4fr 0.6fr;
+    gap: 48px;
+  }
+}
