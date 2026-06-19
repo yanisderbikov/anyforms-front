@@ -114,31 +114,6 @@
   color: var(--accent);
 }
 
-/* ═══════════════ CTA (override shared button to guide accent) ═══════════════ */
-.guideCta.guideCta {
-  padding: 0.45rem 0.5rem 0.45rem 1.5rem;
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: -0.2px;
-}
-
-.guideCta.guideCta:hover {
-  background: #b85a34;
-  border-color: #b85a34;
-  color: #fff;
-}
-
-.guideCta.guideCta span {
-  width: 2.1rem;
-  height: 2.1rem;
-  background: var(--ink);
-  color: var(--cream);
-}
-
 /* ═══════════════ PHOTO FRAME (placeholders) ═══════════════ */
 .photoFrame {
   position: relative;
@@ -320,15 +295,28 @@
   border-radius: 14px;
   box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  /* anchor-safe so the same look works on <a> CTAs too */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
 }
 
 .heroCta:hover {
   background: #bf5f38;
   box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+  color: var(--ink);
 }
 
 .heroCta:active {
   transform: translateY(1px);
+}
+
+/* Same button, but capped so it doesn't stretch across wide columns/sections */
+.ctaInline {
+  width: 100%;
+  max-width: 360px;
 }
 
 .heroProof {

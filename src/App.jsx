@@ -11,6 +11,7 @@ import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
+import FounderYuri from "./components/Founders/FounderYuri";
 
 const SITE_URL = 'https://anyforms.ru';
 
@@ -36,6 +37,10 @@ const PAGE_SEO = {
     title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
     description:
       'Пошаговый гайд для мастеров, производителей и экспертов: как получать заявки из Reels, Shorts, TikTok и Клипов, а не просто собирать просмотры.',
+  },
+  '/founders/yuri': {
+    title: 'Реквизиты — ИП Суворов Юрий Игоревич',
+    description: 'Платёжные и регистрационные реквизиты ИП Суворов Юрий Игоревич.',
   },
   '/shop': {
     title: 'Маркетплейс - AnyForms',
@@ -73,18 +78,19 @@ function App() {
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide';
+  const isFounderPage = normalizedPathname.startsWith('/founders/');
 
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
-    } else if (isGuidePage) {
+    } else if (isGuidePage || isFounderPage) {
       document.body.style.background = '#f5f1e8';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage]);
+  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isFounderPage]);
 
   useEffect(() => {
     const seo = PAGE_SEO[normalizedPathname] || {
@@ -128,6 +134,7 @@ function App() {
         <Route path="/chief/privacy" element={<ChiefPrivacy />} />
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
+        <Route path="/founders/yuri" element={<FounderYuri />} />
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />
         <Route path="/shop" element={<Marketplace />} />

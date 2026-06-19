@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './GuideLanding.module.css';
 
@@ -226,9 +225,13 @@ const GuideLanding = () => {
                   </li>
                 ))}
               </ul>
-              <CTAButton className={styles.guideCta} onClick={scrollToBuy}>
+              <button
+                type="button"
+                className={`${styles.heroCta} ${styles.ctaInline}`}
+                onClick={scrollToBuy}
+              >
                 Получить доступ
-              </CTAButton>
+              </button>
             </div>
           </div>
         </div>
@@ -341,14 +344,14 @@ const GuideLanding = () => {
             </p>
             <div className={styles.buyPriceRow}>
               <span className={styles.buyPrice}>{PRICE}</span>
-              <CTAButton
-                className={styles.guideCta}
+              <a
+                className={`${styles.heroCta} ${styles.ctaInline}`}
                 href={BUY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Купить гайд
-              </CTAButton>
+              </a>
             </div>
           </div>
         </div>
@@ -364,6 +367,10 @@ const GuideLanding = () => {
                 ИП Суворов Юрий Игоревич
                 <br />
                 г. Санкт-Петербург
+                <br />
+                <Link to="/founders/yuri" className={styles.footerLink}>
+                  Реквизиты
+                </Link>
               </p>
             </div>
             <div className={styles.footerBlock}>
