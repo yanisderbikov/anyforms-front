@@ -466,6 +466,14 @@
   max-width: 340px;
 }
 
+.authorPhoto {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
 .authorInfo {
   display: flex;
   flex-direction: column;

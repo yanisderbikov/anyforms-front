@@ -7,6 +7,7 @@ import styles from './GuideLanding.module.css';
 // Куда ведёт кнопка «Купить гайд». Замените на ссылку оплаты при необходимости.
 const BUY_URL = 'https://t.me/AnyFormsPrintBot';
 const PRICE = '990 ₽';
+const AUTHOR_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/YuriSuvrov.jpeg';
 
 const AUTHOR_FACTS = [
   'Более 5 лет в контент-маркетинге',
@@ -153,9 +154,12 @@ const GuideLanding = () => {
           </p>
 
           <div className={`${styles.heroMedia} ${styles.areaMedia}`}>
-            <div className={`${styles.heroPhoto} ${styles.heroPhotoEmpty}`}>
-              Фото эксперта
-            </div>
+            <img
+              className={styles.heroPhoto}
+              src={AUTHOR_PHOTO}
+              alt="Юрий Суворов"
+              loading="eager"
+            />
             <span className={styles.heroCaption}>Юрий Суворов · AnyForms</span>
           </div>
 
@@ -196,9 +200,12 @@ const GuideLanding = () => {
         <div className={styles.sectionInner}>
           <div className={styles.authorGrid}>
             <div className={styles.authorMedia}>
-              <div className={styles.photoFrame} data-ratio="portrait">
-                <span className={styles.photoLabel}>Фото автора</span>
-              </div>
+              <img
+                className={styles.authorPhoto}
+                src={AUTHOR_PHOTO}
+                alt="Юрий Суворов"
+                loading="lazy"
+              />
             </div>
             <div className={styles.authorInfo}>
               <span className={styles.eyebrow}>Автор гайда</span>
