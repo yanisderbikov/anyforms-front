@@ -11,6 +11,7 @@ import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
+import CourseLanding from "./components/CourseLanding/CourseLanding";
 import FounderYuri from "./components/Founders/FounderYuri";
 import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
@@ -40,6 +41,11 @@ const PAGE_SEO = {
     title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
     description:
       'Пошаговый гайд для мастеров, производителей и экспертов: как получать заявки из Reels, Shorts, TikTok и Клипов, а не просто собирать просмотры.',
+  },
+  '/course': {
+    title: 'Курс по производству силиконовых форм — AnyForms',
+    description:
+      'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
   },
   '/founders/yuri': {
     title: 'Реквизиты — ИП Суворов Юрий Игоревич',
@@ -97,19 +103,20 @@ function App() {
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
+  const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
   const isFounderPage = normalizedPathname.startsWith('/founders/');
 
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
-    } else if (isGuidePage || isFounderPage) {
+    } else if (isGuidePage || isCoursePage || isFounderPage) {
       document.body.style.background = '#f5f1e8';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isFounderPage]);
+  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage]);
 
   useEffect(() => {
     const seo = PAGE_SEO[normalizedPathname] || {
@@ -155,6 +162,7 @@ function App() {
         <Route path="/chief/privacy" element={<ChiefPrivacy />} />
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
+        <Route path="/course" element={<CourseLanding />} />
         <Route path="/guide/offer" element={<GuideOffer />} />
         <Route path="/guide/privacy" element={<GuidePrivacy />} />
         <Route path="/guide/checkout" element={<GuideCheckout />} />

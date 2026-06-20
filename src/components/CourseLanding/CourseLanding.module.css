@@ -1,0 +1,1135 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap');
+
+/* ═══════════════ BASE ═══════════════ */
+.page {
+  --cream: #f5f1e8;
+  --ink: #16140e;
+  --accent: #cb6a42;
+  --edge-mobile: 18px;
+  --edge-desktop: 64px;
+  --header-h: 78px;
+  --max-w: 1160px;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Golos Text', system-ui, sans-serif;
+
+  width: 100%;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sectionInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+}
+
+/* In-page anchors must clear the fixed header */
+.page section[id] {
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+/* ═══════════════ HEADER (tint shared header to course palette) ═══════════════ */
+.page :global(header) {
+  background: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill']:hover {
+  background: #b85a34;
+  color: #fff;
+}
+
+.page [class*='mobileMenuPrimary'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/* ═══════════════ SHARED TEXT ═══════════════ */
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.eyebrowAccent {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -1.5px;
+  margin: 14px 0 0;
+}
+
+.sectionTitleHuge {
+  font-size: clamp(34px, 8vw, 68px);
+  letter-spacing: -2.5px;
+  line-height: 0.98;
+}
+
+.sectionLead {
+  font-size: clamp(16px, 2.4vw, 19px);
+  line-height: 1.6;
+  margin: 22px 0 0;
+  opacity: 0.78;
+  max-width: 620px;
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+
+.textAccent {
+  color: var(--accent);
+}
+
+/* ═══════════════ GRAY PLACEHOLDER FRAMES ═══════════════ */
+/* Серая рамка с подписью по центру — заменить на реальное фото/видео позже. */
+.ph {
+  position: relative;
+  width: 100%;
+  background: #ddd6c8;
+  border: 2px dashed rgba(22, 20, 14, 0.28);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 24px;
+  min-height: 200px;
+}
+
+.ph[data-ratio='landscape'] {
+  aspect-ratio: 16 / 10;
+}
+
+.ph[data-ratio='portrait'] {
+  aspect-ratio: 3 / 4;
+}
+
+.ph[data-ratio='square'] {
+  aspect-ratio: 1 / 1;
+}
+
+.phLabel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(22, 20, 14, 0.5);
+  line-height: 1.5;
+  max-width: 24ch;
+}
+
+.phDark {
+  background: rgba(245, 241, 232, 0.08);
+  border-color: rgba(245, 241, 232, 0.28);
+}
+
+.phDark .phLabel {
+  color: rgba(245, 241, 232, 0.6);
+}
+
+/* ═══════════════ ЭКРАН 1 · HERO ═══════════════ */
+.hero {
+  padding: 30px 0 40px;
+}
+
+.heroInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+  display: flex;
+  flex-direction: column;
+}
+
+.heroEyebrow {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 22px 0 0;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 8.5vw, 64px);
+  line-height: 1;
+  letter-spacing: -1.5px;
+  margin: 12px 0 0;
+}
+
+.heroMark {
+  background: var(--accent);
+  color: var(--ink);
+  padding: 0 0.06em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.heroSub {
+  font-size: clamp(16px, 2.5vw, 19px);
+  line-height: 1.5;
+  opacity: 0.72;
+  margin: 16px 0 0;
+  max-width: 40ch;
+}
+
+.heroMedia {
+  position: relative;
+  margin: 22px 0 0;
+}
+
+.heroChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+}
+
+.heroChip {
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(22, 20, 14, 0.06);
+  padding: 7px 13px;
+  border-radius: 20px;
+}
+
+.heroBuy {
+  margin-top: 22px;
+}
+
+.heroPriceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heroPrice {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 9vw, 44px);
+  letter-spacing: -2px;
+}
+
+.heroNote {
+  font-size: 12px;
+  opacity: 0.55;
+  text-align: right;
+  max-width: 150px;
+  line-height: 1.35;
+}
+
+.cta {
+  margin-top: 14px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
+.cta:hover {
+  background: #bf5f38;
+  box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+  color: var(--ink);
+}
+
+.cta:active {
+  transform: translateY(1px);
+}
+
+.ctaInline {
+  width: 100%;
+  max-width: 360px;
+}
+
+.ctaLight {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.heroProof {
+  display: flex;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(22, 20, 14, 0.14);
+}
+
+.heroStat {
+  flex: 1;
+  text-align: center;
+}
+
+.heroStatValue {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.heroStatLabel {
+  display: block;
+  font-size: 11px;
+  opacity: 0.55;
+  margin-top: 2px;
+}
+
+.heroDivider {
+  width: 1px;
+  height: 30px;
+  background: rgba(22, 20, 14, 0.14);
+}
+
+.areaEyebrow,
+.areaTitle,
+.areaSub,
+.areaMedia,
+.areaChips,
+.areaBuy,
+.areaProof {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    padding: 40px 0 48px;
+  }
+
+  .heroInner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-areas:
+      'eyebrow media'
+      'title   media'
+      'sub     media'
+      'chips   media'
+      'buy     media'
+      'proof   media';
+    column-gap: 56px;
+    align-items: start;
+  }
+
+  .areaEyebrow {
+    grid-area: eyebrow;
+    margin-top: 8px;
+  }
+  .areaTitle {
+    grid-area: title;
+  }
+  .areaSub {
+    grid-area: sub;
+  }
+  .areaMedia {
+    grid-area: media;
+    align-self: start;
+    margin-top: 8px;
+  }
+  .areaMedia .ph {
+    aspect-ratio: 827 / 971;
+    min-height: 0;
+  }
+  .areaChips {
+    grid-area: chips;
+    margin-top: 26px;
+  }
+  .areaBuy {
+    grid-area: buy;
+    margin-top: 32px;
+    max-width: 440px;
+  }
+  .areaProof {
+    grid-area: proof;
+    max-width: 520px;
+    margin-top: 36px;
+  }
+
+  .heroTitle {
+    font-size: clamp(48px, 5vw, 64px);
+    letter-spacing: -2.5px;
+    margin-top: 14px;
+  }
+  .heroStat {
+    text-align: left;
+  }
+  .heroStatValue {
+    font-size: 22px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 2 · РЕЗУЛЬТАТ (ГАЛЕРЕЯ) ═══════════════ */
+.resultSection {
+  padding: 64px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 720px) {
+  .galleryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* ═══════════════ DARK SECTION (боль / финал) ═══════════════ */
+.darkSection {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 84px 0;
+}
+
+.statementQuote {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(24px, 4.6vw, 40px);
+  line-height: 1.22;
+  letter-spacing: -1px;
+  margin: 44px 0 0;
+  max-width: 880px;
+  color: var(--accent);
+}
+
+.darkLead {
+  font-size: clamp(16px, 2.4vw, 20px);
+  line-height: 1.6;
+  margin: 34px 0 0;
+  max-width: 620px;
+  color: rgba(245, 241, 232, 0.72);
+}
+
+/* ═══════════════ ЭКРАН 4 · МОДУЛИ ═══════════════ */
+.modulesSection {
+  padding: 72px 0;
+}
+
+.modulesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.moduleCard {
+  background: rgba(22, 20, 14, 0.05);
+  border: 1px solid rgba(22, 20, 14, 0.12);
+  border-radius: 22px;
+  padding: 30px 28px;
+}
+
+.moduleNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+.moduleTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 3vw, 24px);
+  letter-spacing: -0.5px;
+  margin: 0 0 16px;
+}
+
+.moduleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.moduleItem {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 15.5px;
+  line-height: 1.45;
+  opacity: 0.82;
+}
+
+.moduleDot {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+@media (min-width: 760px) {
+  .modulesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 5 · ЧТО ПОЛУЧИТЕ ═══════════════ */
+.getSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.getGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.getCard {
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 22px;
+  padding: 34px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.getCardIcon {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.getCardTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(19px, 2.8vw, 23px);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.getCardText {
+  font-size: 15.5px;
+  line-height: 1.55;
+  margin: 0;
+  color: rgba(245, 241, 232, 0.72);
+}
+
+@media (min-width: 720px) {
+  .getGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 6 · АВТОР ═══════════════ */
+.authorSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.authorGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.authorMedia {
+  width: 100%;
+  max-width: 340px;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.factList {
+  list-style: none;
+  margin: 28px 0 32px;
+  padding: 0;
+}
+
+.factItem {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.12);
+  font-size: clamp(15px, 2.2vw, 18px);
+  font-weight: 500;
+}
+
+.factDot {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+@media (min-width: 920px) {
+  .authorGrid {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 56px;
+  }
+  .authorMedia {
+    max-width: 320px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 7 · ОТЗЫВЫ ═══════════════ */
+.reviewsSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.reviewsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.reviewCard {
+  background: rgba(22, 20, 14, 0.05);
+  border: 1px solid rgba(22, 20, 14, 0.12);
+  border-radius: 20px;
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.reviewText {
+  font-size: 15.5px;
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.reviewAuthor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.reviewAvatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ddd6c8;
+  border: 2px dashed rgba(22, 20, 14, 0.28);
+}
+
+.reviewName {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.reviewMeta {
+  font-size: 13px;
+  opacity: 0.55;
+}
+
+.reviewShots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+@media (min-width: 760px) {
+  .reviewsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .reviewShots {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 8 · БОНУСЫ (DARK) ═══════════════ */
+.bonusSection {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 80px 0;
+}
+
+.bonusGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.bonusItem {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(245, 241, 232, 0.14);
+  font-size: clamp(15px, 2.2vw, 18px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.bonusStar {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+@media (min-width: 760px) {
+  .bonusGrid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 48px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 9 · ЧТО ПОНАДОБИТСЯ ═══════════════ */
+.needSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.needGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 4px;
+}
+
+.needCard {
+  background: rgba(22, 20, 14, 0.05);
+  border: 1px solid rgba(22, 20, 14, 0.12);
+  border-radius: 20px;
+  padding: 28px 26px;
+}
+
+.needNum {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.needCardTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(19px, 3vw, 22px);
+  letter-spacing: -0.5px;
+  margin: 0 0 10px;
+}
+
+.needCardText {
+  font-size: 15.5px;
+  line-height: 1.55;
+  opacity: 0.75;
+  margin: 0;
+}
+
+.offerPanel {
+  margin-top: 22px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 24px;
+  padding: 36px 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.offerLabel {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.offerTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 4.4vw, 34px);
+  line-height: 1.08;
+  letter-spacing: -1px;
+  margin: 0;
+}
+
+.offerText {
+  font-size: clamp(15px, 2.3vw, 17px);
+  line-height: 1.6;
+  margin: 18px 0 0;
+  color: rgba(245, 241, 232, 0.78);
+  max-width: 56ch;
+}
+
+.offerList {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.offerItem {
+  display: flex;
+  align-items: baseline;
+  gap: 13px;
+  font-size: clamp(15px, 2.2vw, 17px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.offerCheck {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.offerHighlight {
+  margin: 26px 0 0;
+  background: var(--accent);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-weight: 700;
+  font-size: clamp(15px, 2.3vw, 17px);
+  line-height: 1.4;
+}
+
+@media (min-width: 720px) {
+  .needGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .offerPanel {
+    grid-template-columns: 1.15fr 0.85fr;
+    padding: 44px 40px;
+    column-gap: 44px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 10 · ГАРАНТИЯ ═══════════════ */
+.guaranteeSection {
+  padding: 64px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.guaranteeCard {
+  background: rgba(203, 106, 66, 0.1);
+  border: 1.5px solid rgba(203, 106, 66, 0.4);
+  border-radius: 24px;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.guaranteeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 26px;
+}
+
+.guaranteeTitle {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 4.4vw, 36px);
+  letter-spacing: -1px;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.guaranteeText {
+  font-size: clamp(16px, 2.3vw, 18px);
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.8;
+  max-width: 640px;
+}
+
+/* ═══════════════ ЭКРАН 11 · ОФФЕР / ЦЕНА ═══════════════ */
+.buySection {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 90px 0;
+}
+
+.buyInner {
+  max-width: 880px;
+}
+
+.buyIncluded {
+  list-style: none;
+  margin: 34px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.buyIncludedItem {
+  display: flex;
+  align-items: baseline;
+  gap: 13px;
+  font-size: clamp(15px, 2.2vw, 17px);
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(245, 241, 232, 0.88);
+}
+
+.buyCheck {
+  flex: none;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.buyPriceRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 40px;
+}
+
+.buyPrice {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(40px, 8vw, 56px);
+  letter-spacing: -2px;
+  color: var(--accent);
+}
+
+.buyMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: rgba(245, 241, 232, 0.6);
+}
+
+@media (min-width: 600px) {
+  .buyIncluded {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+  }
+}
+
+/* ═══════════════ ЭКРАН 12 · FAQ ═══════════════ */
+.faqSection {
+  padding: 72px 0;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.faqList {
+  margin-top: 8px;
+  border-top: 1px solid rgba(22, 20, 14, 0.14);
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(22, 20, 14, 0.14);
+}
+
+.faqQ {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(16px, 2.6vw, 20px);
+  letter-spacing: -0.3px;
+}
+
+.faqQ::-webkit-details-marker {
+  display: none;
+}
+
+.faqIcon {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--accent);
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.faqItem[open] .faqIcon {
+  transform: rotate(45deg);
+}
+
+.faqA {
+  margin: 0;
+  padding: 0 0 24px;
+  font-size: clamp(15px, 2.3vw, 17px);
+  line-height: 1.6;
+  opacity: 0.78;
+  max-width: 760px;
+}
+
+/* ═══════════════ ЭКРАН 13 · ФИНАЛ ═══════════════ */
+.finalInner {
+  max-width: 760px;
+}
+
+.finalCtaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+  margin-top: 38px;
+}
+
+/* ═══════════════ FOOTER ═══════════════ */
+.siteFooter {
+  background: var(--cream);
+  color: var(--ink);
+  padding: 56px 0 40px;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.footerInner {
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--edge-mobile);
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.footerHeading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin: 0 0 14px;
+}
+
+.footerText {
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.footerLink {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.25);
+  transition: opacity 0.2s ease;
+}
+
+.footerLink:hover {
+  opacity: 0.6;
+}
+
+.footerOffer {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(22, 20, 14, 0.12);
+}
+
+.footerOfferText {
+  font-size: 12.5px;
+  line-height: 1.65;
+  margin: 0;
+  opacity: 0.5;
+  max-width: 880px;
+}
+
+.footerCopyright {
+  margin: 26px 0 0;
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+@media (min-width: 720px) {
+  .sectionInner,
+  .heroInner,
+  .footerInner {
+    padding-left: var(--edge-desktop);
+    padding-right: var(--edge-desktop);
+  }
+
+  .footerGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
