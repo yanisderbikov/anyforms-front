@@ -715,20 +715,21 @@
   margin: 0 0 12px;
 }
 
+/* Полноширинный скроллер: живёт вне центрированного контейнера и тянется
+   на всю ширину экрана. Первый кейс выровнен по левому краю контента,
+   листается до самого правого края. */
 .casesScroller {
   display: flex;
   gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 2px 0 16px;
-  /* небольшой «вылет» к правому краю, чтобы было видно, что список листается */
-  margin-right: calc(-1 * var(--edge-mobile));
-  padding-right: var(--edge-mobile);
+  padding: 2px var(--edge-mobile) 18px;
+  scroll-padding-left: var(--edge-mobile);
 }
 
 .caseItem {
-  flex: 0 0 78%;
+  flex: 0 0 80%;
   max-width: 320px;
   scroll-snap-align: start;
 }
@@ -737,11 +738,12 @@
   min-height: 0;
 }
 
-@media (min-width: 760px) {
+@media (min-width: 720px) {
   .casesScroller {
     gap: 20px;
-    margin-right: calc(-1 * var(--edge-desktop));
-    padding-right: var(--edge-desktop);
+    padding-left: max(var(--edge-desktop), calc((100% - var(--max-w)) / 2 + var(--edge-desktop)));
+    padding-right: max(var(--edge-desktop), calc((100% - var(--max-w)) / 2 + var(--edge-desktop)));
+    scroll-padding-left: max(var(--edge-desktop), calc((100% - var(--max-w)) / 2 + var(--edge-desktop)));
   }
   .caseItem {
     flex-basis: 320px;
