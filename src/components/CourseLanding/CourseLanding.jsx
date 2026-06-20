@@ -2,17 +2,19 @@ import React from 'react';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './CourseLanding.module.css';
 
-const PRICE = '9 900 ₽';
+const PRICE = '9 990 ₽';
+const PRICE_OLD = '20 000 ₽';
+const LAUNCH = '1 июля 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 // Чипы под заголовком — короткие факты о формате курса.
-const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Доступ 12 месяцев', 'Закрытый чат'];
+const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Доступ 12 месяцев', 'Поддержка специалистов'];
 
-// Цифры-доказательства из наполнения курса.
+// Цифры-доказательства — реальное производство AnyForms.
 const HERO_STATS = [
-  { value: '4', label: 'модуля от идеи до формы' },
-  { value: '10', label: 'моделей в подарок' },
-  { value: '2000+', label: 'мастеров в чате' },
+  { value: '5 лет', label: 'делаем формы на заказ' },
+  { value: '1000+', label: 'изготовленных форм' },
+  { value: '2 млн ₽', label: 'выручка в месяц' },
 ];
 
 // Экран 2 — что вы сделаете своими руками (галерея).
@@ -73,19 +75,29 @@ const GET_CARDS = [
   },
 ];
 
-// Экран 6 — факты об авторе. ЗАМЕНИТЬ на реальные данные.
-const AUTHOR_FACTS = [
-  '[Укажите: сколько лет в производстве форм]',
-  '[Укажите: сколько форм сделали]',
-  '[Укажите: своё производство / бренд]',
-  '[Укажите: достижение или цифру выручки]',
+// Экран 6 — основатели AnyForms.
+const FOUNDERS = [
+  {
+    name: 'Юрий Суворов',
+    role: 'Автор курса · сооснователь AnyForms',
+    bio:
+      '5 лет в производстве силиконовых форм. Лично изготовил более 1 000 форм. Производство в AnyForms приносит более 2 млн ₽ в месяц.',
+  },
+  {
+    name: 'Дмитрий [фамилия]',
+    role: 'Сооснователь AnyForms',
+    bio: '[Короткое описание роли Дмитрия в производстве — заменить.]',
+  },
 ];
 
-// Экран 7 — отзывы. ЗАМЕНИТЬ на реальные.
-const REVIEWS = [
-  { name: '[Имя ученика]', meta: '[Город / профиль]', text: '[Текст отзыва ученика — что получилось после курса.]' },
-  { name: '[Имя ученика]', meta: '[Город / профиль]', text: '[Текст отзыва ученика — про результат и продажи.]' },
-  { name: '[Имя ученика]', meta: '[Город / профиль]', text: '[Текст отзыва ученика — про поддержку и чат.]' },
+// Экран 7 — кейсы реализованных молдов (свайп-галерея). Заменить на реальные фото.
+const CASES = [
+  'Молд · контейнерная свеча',
+  'Молд · декоративная свеча',
+  'Молд · гипсовое изделие',
+  'Молд · мыло ручной работы',
+  'Молд · бетонное кашпо',
+  'Молд · сувенирная продукция',
 ];
 
 // Экран 8 — бонусы.
@@ -111,33 +123,40 @@ const OFFER_ITEMS = [
   'Стоимость — от 2 000 ₽',
 ];
 
+// Экран 10 — поддержка на каждом этапе.
+const SUPPORT_ITEMS = [
+  'Помогаем на каждом этапе — от проектирования до заливки',
+  'Любой вопрос пишите в поддержку — отвечают наш главный специалист и специалисты высшей категории',
+  'Поможем довести ваше изделие до готового результата',
+];
+
 // Экран 11 — что входит в доступ.
 const INCLUDED = [
   '4 видео-модуля: от идеи до рабочей формы',
   'Доступ к материалам на 12 месяцев',
+  'Поддержка специалистов на каждом этапе',
   '10 готовых моделей для практики',
   'Закрытый чат мастеров (2000+)',
   'Поставщики, материалы и скидки на закупки',
-  'Материалы по монетизации и продвижению',
 ];
 
 // Экран 12 — FAQ.
 const FAQ = [
+  {
+    q: 'Когда откроется доступ к курсу?',
+    a: `Сейчас идёт предзаказ. Доступ ко всем материалам откроется ${LAUNCH} — по цене предзаказа, ниже будущей стоимости курса.`,
+  },
   {
     q: 'Нужен ли свой 3D-принтер?',
     a: 'Нет. Можно заказать 3D-модель и печать у нас — нужны только фото, размеры и идея. Ученикам курса на эту услугу действует большая скидка.',
   },
   {
     q: 'Подойдёт ли новичку без опыта моделирования?',
-    a: 'Да. Курс построен пошагово — от проектирования до заливки. Всё показываем на примере реального продукта, повторить можно с нуля. [Уточните формулировку под свой курс.]',
+    a: 'Да. Курс построен пошагово — от проектирования до заливки. Всё показываем на примере реального продукта, повторить можно с нуля, а на каждом этапе помогает поддержка.',
   },
   {
     q: 'Сколько денег нужно на материалы для старта?',
     a: 'Дадим ссылки на проверенных поставщиков и скидки на стартовые закупки, чтобы не переплачивать. [Укажите примерный бюджет на первую форму.]',
-  },
-  {
-    q: 'Сколько времени займёт прохождение?',
-    a: 'Это 4 коротких модуля в видео-формате — пройти можно быстро, а доступ к материалам остаётся на 12 месяцев, чтобы возвращаться к нужным шагам.',
   },
   {
     q: 'Реально ли на этом заработать?',
@@ -149,13 +168,13 @@ const scrollToId = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 };
 
-// TODO: когда появится оплата курса — заменить на переход на /course/checkout.
+// TODO: когда откроется предзаказ — заменить на переход на /course/checkout.
 const scrollToBuy = () => scrollToId('buy');
 
 const NAV_LINKS = [
   { key: 'modules', label: 'Программа', id: 'modules' },
-  { key: 'author', label: 'Автор', id: 'author' },
-  { key: 'reviews', label: 'Отзывы', id: 'reviews' },
+  { key: 'founders', label: 'О нас', id: 'founders' },
+  { key: 'cases', label: 'Кейсы', id: 'cases' },
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
@@ -196,7 +215,7 @@ const CourseLanding = () => {
             key: 'buy-desktop',
             kind: 'link',
             href: '#buy',
-            label: 'Получить доступ',
+            label: 'Оформить предзаказ',
             variant: 'pill',
             onClick: (e) => {
               e.preventDefault();
@@ -210,7 +229,7 @@ const CourseLanding = () => {
             key: 'buy-mobile',
             kind: 'link',
             href: '#buy',
-            label: 'Получить доступ',
+            label: 'Оформить предзаказ',
             variant: 'primary',
             onClick: (e) => {
               e.preventDefault();
@@ -235,7 +254,7 @@ const CourseLanding = () => {
       <section className={styles.hero} aria-label="О курсе">
         <div className={styles.heroInner}>
           <p className={`${styles.heroEyebrow} ${styles.areaEyebrow}`}>
-            Видео-курс · 4 модуля
+            Предзаказ · старт {LAUNCH}
           </p>
 
           <h1 className={`${styles.heroTitle} ${styles.areaTitle}`}>
@@ -265,12 +284,18 @@ const CourseLanding = () => {
 
           <div className={`${styles.heroBuy} ${styles.areaBuy}`}>
             <div className={styles.heroPriceRow}>
-              <span className={styles.heroPrice}>{PRICE}</span>
-              <span className={styles.heroNote}>Цена до конца недели</span>
+              <div className={styles.heroPriceCol}>
+                <span className={styles.heroPriceOld}>{PRICE_OLD}</span>
+                <span className={styles.heroPrice}>{PRICE}</span>
+              </div>
+              <span className={styles.heroNote}>Цена предзаказа</span>
             </div>
             <button type="button" className={styles.cta} onClick={scrollToBuy}>
-              Получить доступ
+              Оформить предзаказ
             </button>
+            <p className={styles.preorderNote}>
+              Это предзаказ. Доступ к материалам откроется {LAUNCH}.
+            </p>
           </div>
 
           <div className={`${styles.heroProof} ${styles.areaProof}`}>
@@ -383,75 +408,56 @@ const CourseLanding = () => {
         </div>
       </section>
 
-      {/* ═══════════════ ЭКРАН 6 · АВТОР ═══════════════ */}
-      <section id="author" className={styles.authorSection} aria-labelledby="author-title">
-        <div className={styles.sectionInner}>
-          <div className={styles.authorGrid}>
-            <div className={styles.authorMedia}>
-              <Placeholder label="Фото автора в мастерской" ratio="portrait" />
-            </div>
-            <div className={styles.authorInfo}>
-              <span className={styles.eyebrow}>Автор курса</span>
-              <h2 className={styles.sectionTitle} id="author-title">
-                [Имя автора]
-              </h2>
-              <p className={styles.sectionLead}>
-                Курс построен на личном опыте производства силиконовых форм и продаж
-                изделий.
-              </p>
-              <ul className={styles.factList}>
-                {AUTHOR_FACTS.map((fact) => (
-                  <li key={fact} className={styles.factItem}>
-                    <span className={styles.factDot} aria-hidden>
-                      →
-                    </span>
-                    <span>{fact}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                className={`${styles.cta} ${styles.ctaInline}`}
-                onClick={scrollToBuy}
-              >
-                Получить доступ
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ ЭКРАН 7 · ОТЗЫВЫ ═══════════════ */}
-      <section id="reviews" className={styles.reviewsSection} aria-labelledby="reviews-title">
+      {/* ═══════════════ ЭКРАН 6 · ОСНОВАТЕЛИ ═══════════════ */}
+      <section id="founders" className={styles.authorSection} aria-labelledby="founders-title">
         <div className={styles.sectionInner}>
           <div className={styles.sectionHead}>
-            <span className={styles.eyebrow}>Отзывы</span>
-            <h2 className={styles.sectionTitle} id="reviews-title">
-              Это уже работает у&nbsp;других
+            <span className={styles.eyebrow}>Кто ведёт курс</span>
+            <h2 className={styles.sectionTitle} id="founders-title">
+              За курсом — практики, а&nbsp;не теоретики
             </h2>
             <p className={styles.sectionLead}>
-              Результаты учеников: их формы, отливки и первые продажи.
+              Основатели AnyForms. Уже 5 лет мы производим силиконовые формы на заказ —
+              и этим же опытом делимся в курсе.
             </p>
           </div>
-          <div className={styles.reviewsGrid}>
-            {REVIEWS.map((review, idx) => (
-              <article className={styles.reviewCard} key={idx}>
-                <p className={styles.reviewText}>{review.text}</p>
-                <div className={styles.reviewAuthor}>
-                  <span className={styles.reviewAvatar} aria-hidden />
-                  <span>
-                    <span className={styles.reviewName}>{review.name}</span>
-                    <br />
-                    <span className={styles.reviewMeta}>{review.meta}</span>
-                  </span>
+          <div className={styles.foundersGrid}>
+            {FOUNDERS.map((person) => (
+              <article className={styles.founderCard} key={person.name}>
+                <div className={styles.founderMedia}>
+                  <Placeholder label={`Фото · ${person.name}`} ratio="square" />
+                </div>
+                <div>
+                  <h3 className={styles.founderName}>{person.name}</h3>
+                  <p className={styles.founderRole}>{person.role}</p>
+                  <p className={styles.founderBio}>{person.bio}</p>
                 </div>
               </article>
             ))}
           </div>
-          <div className={styles.reviewShots}>
-            <Placeholder label="Скрин · результат ученика" ratio="square" />
-            <Placeholder label="Скрин · сообщения из чата" ratio="square" />
-            <Placeholder label="Скрин · форма ученика" ratio="square" />
+        </div>
+      </section>
+
+      {/* ═══════════════ ЭКРАН 7 · КЕЙСЫ ═══════════════ */}
+      <section id="cases" className={styles.reviewsSection} aria-labelledby="cases-title">
+        <div className={styles.sectionInner}>
+          <div className={styles.sectionHead}>
+            <span className={styles.eyebrow}>Кейсы</span>
+            <h2 className={styles.sectionTitle} id="cases-title">
+              5 лет делаем молды на&nbsp;заказ
+            </h2>
+            <p className={styles.sectionLead}>
+              За курсом — реальное производство. Уже 5 лет мы изготавливаем формы для
+              клиентов. Вот часть реализованных работ.
+            </p>
+          </div>
+          <p className={styles.swipeHint}>← Листайте, чтобы посмотреть кейсы →</p>
+          <div className={styles.casesScroller}>
+            {CASES.map((label) => (
+              <div className={styles.caseItem} key={label}>
+                <Placeholder label={label} ratio="square" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -537,20 +543,30 @@ const CourseLanding = () => {
         </div>
       </section>
 
-      {/* ═══════════════ ЭКРАН 10 · ГАРАНТИЯ ═══════════════ */}
-      <section className={styles.guaranteeSection} aria-labelledby="guarantee-title">
+      {/* ═══════════════ ЭКРАН 10 · ПОДДЕРЖКА ═══════════════ */}
+      <section className={styles.guaranteeSection} aria-labelledby="support-title">
         <div className={styles.sectionInner}>
           <div className={styles.guaranteeCard}>
             <span className={styles.guaranteeBadge} aria-hidden>
-              ✓
+              💬
             </span>
-            <h2 className={styles.guaranteeTitle} id="guarantee-title">
-              Не получится — вернём деньги
+            <h2 className={styles.guaranteeTitle} id="support-title">
+              Всё под контролем — вы не&nbsp;одни
             </h2>
             <p className={styles.guaranteeText}>
-              Пройдите курс и повторите по шагам. Если форма не получилась — вернём
-              оплату. [Финальные условия гарантии согласуем перед публикацией.]
+              Вы не остаётесь один на один с задачей. На каждом этапе мы рядом и поможем
+              довести изделие до результата.
             </p>
+            <ul className={styles.supportList}>
+              {SUPPORT_ITEMS.map((item) => (
+                <li className={styles.supportItem} key={item}>
+                  <span className={styles.supportCheck} aria-hidden>
+                    →
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -559,7 +575,7 @@ const CourseLanding = () => {
       <section id="buy" className={styles.buySection} aria-labelledby="buy-title">
         <div className={styles.sectionInner}>
           <div className={styles.buyInner}>
-            <span className={styles.eyebrowAccent}>Оффер</span>
+            <span className={styles.eyebrowAccent}>Предзаказ</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               Доступ ко&nbsp;всему курсу
             </h2>
@@ -574,17 +590,21 @@ const CourseLanding = () => {
               ))}
             </ul>
             <div className={styles.buyPriceRow}>
-              <span className={styles.buyPrice}>{PRICE}</span>
+              <div className={styles.buyPriceWrap}>
+                <span className={styles.buyPriceOld}>{PRICE_OLD}</span>
+                <span className={styles.buyPrice}>{PRICE}</span>
+              </div>
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline}`}
                 onClick={scrollToBuy}
               >
-                Получить доступ
+                Оформить предзаказ
               </button>
               <span className={styles.buyMeta}>
-                <span>Цена до конца недели</span>
-                <span>Доступ к материалам — 12 месяцев</span>
+                <span>Цена предзаказа</span>
+                <span>Доступ откроется {LAUNCH}</span>
+                <span>Материалы доступны 12 месяцев</span>
               </span>
             </div>
           </div>
@@ -620,13 +640,13 @@ const CourseLanding = () => {
       <section className={styles.darkSection} aria-labelledby="final-title">
         <div className={styles.sectionInner}>
           <div className={styles.finalInner}>
-            <span className={styles.eyebrowAccent}>Старт</span>
+            <span className={styles.eyebrowAccent}>Старт {LAUNCH}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="final-title">
               Начните делать формы с&nbsp;<span className={styles.textAccent}>предсказуемым результатом</span>
             </h2>
             <p className={styles.darkLead}>
-              Доступ на 12 месяцев, закрытый чат и все бонусы. Цена {PRICE} — до конца
-              недели.
+              Цена предзаказа {PRICE} вместо {PRICE_OLD}. Доступ откроется {LAUNCH} — на
+              12 месяцев, с поддержкой специалистов на каждом этапе.
             </p>
             <div className={styles.finalCtaRow}>
               <button
@@ -634,7 +654,7 @@ const CourseLanding = () => {
                 className={`${styles.cta} ${styles.ctaInline}`}
                 onClick={scrollToBuy}
               >
-                Получить доступ
+                Оформить предзаказ
               </button>
             </div>
           </div>
@@ -676,9 +696,9 @@ const CourseLanding = () => {
 
           <div className={styles.footerOffer}>
             <p className={styles.footerOfferText}>
-              Курс — цифровой информационный продукт. Доступ к материалам
-              предоставляется на 12 месяцев. [Условия оферты и политику
-              конфиденциальности добавим перед публикацией.]
+              Курс — цифровой информационный продукт. Сейчас доступен предзаказ; доступ
+              к материалам откроется {LAUNCH} и предоставляется на 12 месяцев. [Условия
+              оферты и политику конфиденциальности добавим перед публикацией.]
             </p>
           </div>
 
