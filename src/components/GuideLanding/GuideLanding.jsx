@@ -8,6 +8,8 @@ const CHECKOUT_PATH = '/guide/checkout';
 // Поддержка — телеграм-бот AnyForms.
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 const PRICE = '990 ₽';
+const HERO_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/content.png';
+const HERO_PHOTO_MOBILE = 'https://storage.yandexcloud.net/anyforms/guide/content-mobile.png';
 const AUTHOR_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/YuriSuvrov.jpeg';
 
 const AUTHOR_FACTS = [
@@ -155,13 +157,15 @@ const GuideLanding = () => {
           </p>
 
           <div className={`${styles.heroMedia} ${styles.areaMedia}`}>
-            <img
-              className={styles.heroPhoto}
-              src={AUTHOR_PHOTO}
-              alt="Юрий Суворов"
-              loading="eager"
-            />
-            <span className={styles.heroCaption}>Юрий Суворов · AnyForms</span>
+            <picture>
+              <source media="(min-width: 900px)" srcSet={HERO_PHOTO} />
+              <img
+                className={styles.heroPhoto}
+                src={HERO_PHOTO_MOBILE}
+                alt="Контент-система для коротких видео"
+                loading="eager"
+              />
+            </picture>
           </div>
 
           <div className={`${styles.heroChips} ${styles.areaChips}`}>

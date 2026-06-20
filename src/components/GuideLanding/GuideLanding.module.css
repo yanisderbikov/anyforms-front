@@ -209,9 +209,10 @@
 .heroPhoto {
   display: block;
   width: 100%;
-  height: 228px;
+  height: auto;
+  aspect-ratio: 827 / 481;
+  object-fit: contain;
   border-radius: 18px;
-  object-fit: cover;
 }
 
 .heroPhotoEmpty {
@@ -395,10 +396,12 @@
   }
   .areaMedia {
     grid-area: media;
-    align-self: stretch;
+    align-self: start;
     margin-top: 8px;
-    height: 100%;
-    min-height: 480px;
+  }
+  .heroPhoto {
+    /* Десктопная картинка content.png — 827×971 */
+    aspect-ratio: 827 / 971;
   }
   .areaChips {
     grid-area: chips;
@@ -422,11 +425,6 @@
   }
   .heroSub {
     max-width: 34ch;
-  }
-  .areaMedia .heroPhoto,
-  .areaMedia .heroPhotoEmpty {
-    height: 100%;
-    min-height: 480px;
   }
   .heroStat {
     text-align: left;
@@ -776,7 +774,7 @@
 /* ═══════════════ RESPONSIVE ═══════════════ */
 @media (min-width: 720px) {
   .sectionInner,
-  .heroGrid,
+  .heroInner,
   .footerInner {
     padding-left: var(--edge-desktop);
     padding-right: var(--edge-desktop);
@@ -793,16 +791,6 @@
 }
 
 @media (min-width: 920px) {
-  .heroGrid {
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 56px;
-  }
-
-  .heroMedia {
-    justify-self: end;
-    max-width: 320px;
-  }
-
   .authorGrid {
     grid-template-columns: 0.8fr 1.2fr;
     gap: 56px;
