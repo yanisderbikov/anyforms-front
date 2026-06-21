@@ -7,6 +7,7 @@ const PRICE_OLD = '20 000 ₽';
 const LAUNCH = '10 июля 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
+const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/model-order.jpg';
 
 // Чипы под заголовком — короткие факты о формате курса.
 const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Материалы навсегда', '3 месяца ведения'];
@@ -82,12 +83,14 @@ const FOUNDERS = [
   {
     name: 'Юрий Суворов',
     role: 'продвижение и соцсети',
+    photo: 'https://storage.yandexcloud.net/anyforms/course/Yuri.jpeg',
     bio:
       'Отвечает за продвижение и оформление anyforms в соцсетях. Умеет объяснять сложные вещи простыми словами — поэтому ведёт курс.',
   },
   {
     name: 'Дмитрий Суворов',
     role: 'руководитель цеха',
+    photo: 'https://storage.yandexcloud.net/anyforms/course/Dmitri.jpeg',
     bio:
       'Руководит цехом и всеми заказами, отвечает за технологию и технические решения. Через его руки проходит каждая форма.',
   },
@@ -99,15 +102,42 @@ const FOUNDERS = [
   },
 ];
 
-// Экран 7 — кейсы реализованных молдов (свайп-галерея). Заменить на реальные фото.
-const CASES = [
-  'Молд · контейнерная свеча',
-  'Молд · декоративная свеча',
-  'Молд · гипсовое изделие',
-  'Молд · мыло ручной работы',
-  'Молд · бетонное кашпо',
-  'Молд · сувенирная продукция',
+// Экран 7 — кейсы реализованных молдов (свайп-галерея), фото из бакета results.
+const RESULTS_BASE = 'https://storage.yandexcloud.net/anyforms/course/results/';
+const RESULT_FILES = [
+  '1.jpeg',
+  '2.jpeg',
+  '3.jpeg',
+  '4.jpeg',
+  '5.jpeg',
+  '6.jpeg',
+  '7.jpeg',
+  '8.jpeg',
+  '9.jpeg',
+  'photo_2026-06-21 18.32.19.jpeg',
+  'photo_2026-06-21 18.32.29.jpeg',
+  'photo_2026-06-21 18.32.44.jpeg',
+  'photo_2026-06-21 18.32.48.jpeg',
+  'photo_2026-06-21 18.33.17.jpeg',
+  'photo_2026-06-21 18.33.25.jpeg',
+  'photo_2026-06-21 18.33.40.jpeg',
+  'photo_2026-06-21 18.33.49.jpeg',
+  'photo_2026-06-21 18.34.01.jpeg',
+  'photo_2026-06-21 18.34.06.jpeg',
+  'photo_2026-06-21 18.34.10.jpeg',
+  'photo_2026-06-21 18.34.19.jpeg',
+  'photo_2026-06-21 18.34.26.jpeg',
+  'photo_2026-06-21 18.34.30.jpeg',
+  'photo_2026-06-21 18.34.37.jpeg',
+  'photo_2026-06-21 18.35.00.jpeg',
+  'photo_2026-06-21 18.35.07.jpeg',
+  'photo_2026-06-21 18.35.11.jpeg',
+  'photo_2026-06-21 18.35.20.jpeg',
+  'photo_2026-06-21 18.35.26.jpeg',
+  'photo_2026-06-21 18.35.29.jpeg',
+  'photo_2026-06-21 18.35.48.jpeg',
 ];
+const CASES = RESULT_FILES.map((name) => `${RESULTS_BASE}${encodeURIComponent(name)}`);
 
 // Экран 8 — бонусы.
 const BONUSES = [
@@ -442,7 +472,16 @@ const CourseLanding = () => {
             {FOUNDERS.map((person) => (
               <article className={styles.founderCard} key={person.name}>
                 <div className={styles.founderMedia}>
-                  <Placeholder label={`Фото · ${person.name}`} ratio="square" />
+                  {person.photo ? (
+                    <img
+                      className={styles.founderImg}
+                      src={person.photo}
+                      alt={person.name}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Placeholder label={`Фото · ${person.name}`} ratio="square" />
+                  )}
                 </div>
                 <div>
                   <h3 className={styles.founderName}>{person.name}</h3>
@@ -471,9 +510,14 @@ const CourseLanding = () => {
           <p className={styles.swipeHint}>← Листайте, чтобы посмотреть кейсы →</p>
         </div>
         <div className={styles.casesScroller}>
-          {CASES.map((label) => (
-            <div className={styles.caseItem} key={label}>
-              <Placeholder label={label} ratio="square" />
+          {CASES.map((src, i) => (
+            <div className={styles.caseItem} key={src}>
+              <img
+                className={styles.caseImg}
+                src={src}
+                alt={`Реализованный молд №${i + 1}`}
+                loading="lazy"
+              />
             </div>
           ))}
         </div>
@@ -549,10 +593,11 @@ const CourseLanding = () => {
               </p>
             </div>
             <div>
-              <Placeholder
-                label="Фото · 3D-модель → печать → готовая форма"
-                ratio="landscape"
-                dark
+              <img
+                className={styles.offerImg}
+                src={OFFER_IMAGE}
+                alt="Заказ 3D-модели и печати"
+                loading="lazy"
               />
             </div>
           </div>

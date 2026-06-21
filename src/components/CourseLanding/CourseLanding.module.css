@@ -686,7 +686,14 @@
 
 .founderMedia {
   width: 100%;
-  max-width: 200px;
+}
+
+.founderImg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 16px;
 }
 
 .founderName {
@@ -755,6 +762,14 @@
 
 .caseItem .ph {
   min-height: 0;
+}
+
+.caseImg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 18px;
 }
 
 @media (min-width: 720px) {
@@ -929,6 +944,13 @@
   grid-template-columns: 1fr;
   gap: 28px;
   align-items: center;
+}
+
+.offerImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
 }
 
 .offerLabel {
