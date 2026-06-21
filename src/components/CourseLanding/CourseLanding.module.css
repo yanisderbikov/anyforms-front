@@ -209,6 +209,15 @@
   margin: 22px 0 0;
 }
 
+.heroImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
 .heroChips {
   display: flex;
   flex-wrap: wrap;
@@ -391,7 +400,8 @@
     align-self: start;
     margin-top: 8px;
   }
-  .areaMedia .ph {
+  .areaMedia .ph,
+  .areaMedia .heroImg {
     aspect-ratio: 827 / 971;
     min-height: 0;
   }
@@ -433,6 +443,15 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+}
+
+.galleryImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 18px;
 }
 
 @media (min-width: 720px) {
@@ -696,7 +715,7 @@
 
 @media (min-width: 760px) {
   .foundersGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 22px;
   }
 }

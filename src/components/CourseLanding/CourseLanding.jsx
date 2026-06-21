@@ -6,6 +6,7 @@ const PRICE = '8 700 ₽';
 const PRICE_OLD = '20 000 ₽';
 const LAUNCH = '10 июля 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
+const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
 
 // Чипы под заголовком — короткие факты о формате курса.
 const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Материалы навсегда', '3 месяца ведения'];
@@ -17,12 +18,12 @@ const HERO_STATS = [
   { value: '2 млн ₽', label: 'выручка в месяц' },
 ];
 
-// Экран 2 — что вы сделаете своими руками (галерея).
+// Экран 2 — что вы сделаете своими руками (галерея процесса).
 const RESULT_SHOTS = [
-  'Фото · оснастка в сборе и разборе',
-  'Фото · заливка силикона',
-  'Фото · готовая силиконовая форма',
-  'Фото · финальная отливка свечи',
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-1.jpeg', alt: 'Опалубка' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-2.jpeg', alt: 'Литьё силикона' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-3.jpeg', alt: 'Процесс изготовления формы' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-4.jpeg', alt: 'Готовая форма' },
 ];
 
 // Экран 4 — 4 модуля курса.
@@ -80,15 +81,21 @@ const GET_CARDS = [
 const FOUNDERS = [
   {
     name: 'Юрий Суворов',
-    role: 'сооснователь anyforms · продвижение и соцсети',
+    role: 'продвижение и соцсети',
     bio:
       'Отвечает за продвижение и оформление anyforms в соцсетях. Умеет объяснять сложные вещи простыми словами — поэтому ведёт курс.',
   },
   {
     name: 'Дмитрий Суворов',
-    role: 'сооснователь anyforms · руководитель цеха',
+    role: 'руководитель цеха',
     bio:
       'Руководит цехом и всеми заказами, отвечает за технологию и технические решения. Через его руки проходит каждая форма.',
+  },
+  {
+    name: 'Егор Кудаков',
+    role: 'инженер 3D-моделирования',
+    bio:
+      'Проектирует оснастки, мастер-модели и сложные технические решения — в том числе с вытеснениями. Отвечает за инженерную часть форм.',
   },
 ];
 
@@ -270,9 +277,11 @@ const CourseLanding = () => {
           </p>
 
           <div className={`${styles.heroMedia} ${styles.areaMedia}`}>
-            <Placeholder
-              label="Фото / видео · готовая силиконовая форма и свеча"
-              ratio="portrait"
+            <img
+              className={styles.heroImg}
+              src={HERO_IMAGE}
+              alt="Изделие, отлитое в силиконовой форме"
+              loading="eager"
             />
           </div>
 
@@ -328,8 +337,14 @@ const CourseLanding = () => {
             </p>
           </div>
           <div className={styles.galleryGrid}>
-            {RESULT_SHOTS.map((label) => (
-              <Placeholder key={label} label={label} ratio="landscape" />
+            {RESULT_SHOTS.map((shot) => (
+              <img
+                key={shot.src}
+                className={styles.galleryImg}
+                src={shot.src}
+                alt={shot.alt}
+                loading="lazy"
+              />
             ))}
           </div>
         </div>

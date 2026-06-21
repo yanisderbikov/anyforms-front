@@ -16,8 +16,31 @@ import FounderYuri from "./components/Founders/FounderYuri";
 import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
 import GuideSuccess from "./components/GuideLanding/GuideSuccess";
+import NotFound from "./components/NotFound/NotFound";
 
 const SITE_URL = 'https://anyforms.ru';
+
+const KNOWN_PATHS = new Set([
+  '/',
+  '/login',
+  '/chief',
+  '/chief/privacy',
+  '/3d-print',
+  '/guide',
+  '/course',
+  '/guide/offer',
+  '/guide/privacy',
+  '/guide/checkout',
+  '/guide/success',
+  '/founders/yuri',
+  '/pdf',
+  '/shop',
+  '/orders',
+  '/orders/without-tracker',
+  '/orders/created',
+  '/orders/delivering',
+  '/admin/products',
+]);
 
 const PAGE_SEO = {
   '/': {
@@ -105,26 +128,33 @@ function App() {
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
   const isFounderPage = normalizedPathname.startsWith('/founders/');
+  const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname);
 
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
     } else if (isGuidePage || isCoursePage || isFounderPage) {
       document.body.style.background = '#f5f1e8';
-    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage) {
+    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || isNotFoundPage) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage]);
+  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage]);
 
   useEffect(() => {
-    const seo = PAGE_SEO[normalizedPathname] || {
-      title: 'AnyForms',
-      description: 'AnyForms - сервис управления заказами.',
-    };
+    const seo = PAGE_SEO[normalizedPathname] || (isNotFoundPage
+      ? {
+          title: 'Страница не найдена — anyforms',
+          description: 'Запрашиваемая страница не найдена. Вернитесь на главную anyforms.',
+        }
+      : {
+          title: 'AnyForms',
+          description: 'AnyForms - сервис управления заказами.',
+        });
     const pageUrl = `${SITE_URL}${normalizedPathname}`;
     const isPrivatePage =
+      isNotFoundPage ||
       normalizedPathname === '/login' ||
       normalizedPathname.startsWith('/orders') ||
       normalizedPathname.startsWith('/admin') ||
@@ -148,7 +178,7 @@ function App() {
     upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: seo.description });
     upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${SITE_URL}/anyforms-logo.svg` });
     upsertCanonical(pageUrl);
-  }, [normalizedPathname]);
+  }, [normalizedPathname, isNotFoundPage]);
 
   if (location.pathname !== normalizedPathname) {
     return <Navigate to={normalizedPathname} replace />;
@@ -176,6 +206,7 @@ function App() {
         <Route path="/orders/created" element={<OrderList />} />
         <Route path="/orders/delivering" element={<OrderList />} />
         <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
