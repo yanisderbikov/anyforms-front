@@ -1,21 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import { GUIDE_OFFER, buildPrivacy } from '../shared/legal/legalDocs';
 import styles from './GuideLegal.module.css';
 
-// Шаблонные юридические тексты под цифровой гайд. Проверьте у юриста перед публикацией.
-const SELLER = 'ИП Суворов Юрий Игоревич';
-const SELLER_EMAIL = 'suvorov@anyforms.ru';
-const PRICE = '990 ₽';
-const PRODUCT = 'электронный гайд «Как продавать сложный продукт через короткие видео»';
-const UPDATED = '19 июня 2026 г.';
+// Юр-тексты под продавца-самозанятого (НПД). Источник — модуль legalDocs (см. OWNER_ACTIONS).
+const GUIDE_PRIVACY = buildPrivacy('гайд');
 
-const LegalLayout = ({ title, updated, children }) => (
+const LegalLayout = ({ doc }) => (
   <div className={styles.page} id="top">
     <LandingHeader
       logo={{
         href: '/guide',
-        ariaLabel: 'AnyForms — к гайду',
+        ariaLabel: 'anyforms — к гайду',
         src: '/anyforms-wordmark-white.svg',
         width: 152,
         height: 21,
@@ -33,9 +30,28 @@ const LegalLayout = ({ title, updated, children }) => (
     <main className={styles.main}>
       <div className={styles.inner}>
         <span className={styles.eyebrow}>Документы</span>
-        <h1 className={styles.title}>{title}</h1>
-        {updated && <p className={styles.updated}>Редакция от {updated}</p>}
-        <div className={styles.body}>{children}</div>
+        <h1 className={styles.title}>{doc.title}</h1>
+        {doc.updated && <p className={styles.updated}>Редакция от {doc.updated}</p>}
+        <div className={styles.body}>
+          <p>{doc.intro}</p>
+          {doc.sections.map((section, i) => (
+            <section key={section.heading}>
+              <h2 className={styles.h2}>
+                {i + 1}. {section.heading}
+              </h2>
+              {section.paragraphs.map((p, j) => (
+                <p key={j}>{p}</p>
+              ))}
+            </section>
+          ))}
+          <p>
+            Актуальные реквизиты продавца —{' '}
+            <Link to="/founders/yuri?from=guide" className={styles.inlineLink}>
+              на странице реквизитов
+            </Link>
+            .
+          </p>
+        </div>
         <p className={styles.backWrap}>
           <Link className={styles.back} to="/guide">
             ← К гайду
@@ -46,136 +62,6 @@ const LegalLayout = ({ title, updated, children }) => (
   </div>
 );
 
-export const GuideOffer = () => (
-  <LegalLayout title="Публичная оферта" updated={UPDATED}>
-    <p>
-      Настоящий документ является официальным публичным предложением (офертой) {SELLER}
-      &nbsp;(далее — «Продавец») заключить договор купли-продажи {PRODUCT} (далее —
-      «Гайд») на изложенных ниже условиях. Оплачивая Гайд, вы (далее — «Покупатель»)
-      принимаете условия настоящей оферты в полном объёме (акцепт) в соответствии со
-      ст. 437–438 Гражданского кодекса РФ.
-    </p>
+export const GuideOffer = () => <LegalLayout doc={GUIDE_OFFER} />;
 
-    <h2 className={styles.h2}>1. Предмет договора</h2>
-    <p>
-      1.1. Продавец передаёт Покупателю доступ к Гайду — цифровому информационному
-      продукту в электронном виде, а Покупатель оплачивает его стоимость.
-    </p>
-    <p>
-      1.2. Гайд носит информационно-образовательный характер. Продавец не гарантирует
-      достижения Покупателем конкретного финансового или иного результата, так как он
-      зависит от самостоятельных действий Покупателя.
-    </p>
-
-    <h2 className={styles.h2}>2. Стоимость и порядок оплаты</h2>
-    <p>2.1. Стоимость Гайда составляет {PRICE}.</p>
-    <p>
-      2.2. Оплата производится единовременно в полном объёме через платёжные сервисы,
-      указанные на сайте. Моментом оплаты считается поступление денежных средств.
-    </p>
-
-    <h2 className={styles.h2}>3. Передача доступа</h2>
-    <p>
-      3.1. Доступ к Гайду предоставляется автоматически после успешной оплаты — на
-      адрес электронной почты, указанный Покупателем при оформлении заказа.
-    </p>
-    <p>
-      3.2. Обязательства Продавца считаются исполненными в полном объёме с момента
-      направления Покупателю доступа к Гайду.
-    </p>
-
-    <h2 className={styles.h2}>4. Возврат средств</h2>
-    <p>
-      4.1. Гайд является цифровым товаром, надлежащее качество которого подтверждается
-      фактом предоставления доступа. В силу п. 4 ст. 26.1 Закона РФ «О защите прав
-      потребителей» и особенностей цифрового контента возврат денежных средств после
-      предоставления доступа к Гайду не производится.
-    </p>
-    <p>
-      4.2. Если доступ не был предоставлен по вине Продавца, Покупатель вправе требовать
-      возврата уплаченной суммы в полном объёме.
-    </p>
-
-    <h2 className={styles.h2}>5. Интеллектуальная собственность</h2>
-    <p>
-      5.1. Все материалы Гайда защищены авторским правом и принадлежат Продавцу.
-    </p>
-    <p>
-      5.2. Покупателю запрещается копировать, распространять, перепродавать,
-      публиковать или иным образом передавать материалы Гайда третьим лицам без
-      письменного согласия Продавца.
-    </p>
-
-    <h2 className={styles.h2}>6. Реквизиты продавца</h2>
-    <p>
-      {SELLER}. Платёжные и регистрационные реквизиты —{' '}
-      <Link to="/founders/yuri" className={styles.inlineLink}>
-        на странице реквизитов
-      </Link>
-      . По всем вопросам:{' '}
-      <a href={`mailto:${SELLER_EMAIL}`} className={styles.inlineLink}>
-        {SELLER_EMAIL}
-      </a>
-      .
-    </p>
-  </LegalLayout>
-);
-
-export const GuidePrivacy = () => (
-  <LegalLayout title="Политика конфиденциальности" updated={UPDATED}>
-    <p>
-      Настоящая Политика описывает, как {SELLER} (далее — «Оператор») обрабатывает
-      персональные данные пользователей при покупке {PRODUCT} (далее — «Гайд»).
-    </p>
-
-    <h2 className={styles.h2}>1. Какие данные мы собираем</h2>
-    <p>
-      Для оформления покупки и передачи доступа мы обрабатываем адрес электронной почты,
-      имя (если указано) и данные о платеже, поступающие от платёжного сервиса. Реквизиты
-      банковской карты Оператору не передаются и им не хранятся.
-    </p>
-
-    <h2 className={styles.h2}>2. Цели обработки</h2>
-    <p>
-      Данные используются исключительно для: обработки платежа, предоставления доступа к
-      Гайду, направления сервисных сообщений о покупке и ответа на обращения.
-    </p>
-
-    <h2 className={styles.h2}>3. Передача третьим лицам</h2>
-    <p>
-      Данные могут передаваться платёжному провайдеру (для проведения оплаты) и сервису
-      отправки электронной почты (для доставки доступа). Оператор не продаёт и не передаёт
-      данные третьим лицам в иных целях.
-    </p>
-
-    <h2 className={styles.h2}>4. Хранение и защита</h2>
-    <p>
-      Данные хранятся не дольше, чем требуется для указанных целей и соблюдения требований
-      законодательства РФ. Оператор принимает необходимые организационные и технические
-      меры для их защиты.
-    </p>
-
-    <h2 className={styles.h2}>5. Права пользователя</h2>
-    <p>
-      Вы вправе запросить сведения об обработке ваших данных, их уточнение или удаление,
-      а также отозвать согласие на обработку, направив обращение на{' '}
-      <a href={`mailto:${SELLER_EMAIL}`} className={styles.inlineLink}>
-        {SELLER_EMAIL}
-      </a>
-      .
-    </p>
-
-    <h2 className={styles.h2}>6. Контакты</h2>
-    <p>
-      {SELLER}. Реквизиты —{' '}
-      <Link to="/founders/yuri" className={styles.inlineLink}>
-        на странице реквизитов
-      </Link>
-      . Электронная почта:{' '}
-      <a href={`mailto:${SELLER_EMAIL}`} className={styles.inlineLink}>
-        {SELLER_EMAIL}
-      </a>
-      .
-    </p>
-  </LegalLayout>
-);
+export const GuidePrivacy = () => <LegalLayout doc={GUIDE_PRIVACY} />;

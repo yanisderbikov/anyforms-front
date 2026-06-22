@@ -735,9 +735,13 @@ const CourseLanding = () => {
             <div>
               <h2 className={styles.footerHeading}>О продавце</h2>
               <p className={styles.footerText}>
-                [Реквизиты продавца]
+                Суворов Юрий Игоревич
                 <br />
-                [Город]
+                Самозанятый (НПД) · г. Пермь
+                <br />
+                <a className={styles.footerLink} href="/founders/yuri?from=course">
+                  Реквизиты
+                </a>
               </p>
             </div>
             <div>
