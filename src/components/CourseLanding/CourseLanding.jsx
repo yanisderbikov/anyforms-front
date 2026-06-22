@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './CourseLanding.module.css';
 
@@ -207,7 +208,9 @@ const scrollToId = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 };
 
-// TODO: когда откроется предзаказ — заменить на переход на /course/checkout.
+const CHECKOUT_PATH = '/course/checkout';
+
+// Все CTA ведут к единственному офферу (#buy); на чекаут уходит только кнопка внутри него.
 const scrollToBuy = () => scrollToId('buy');
 
 const NAV_LINKS = [
@@ -224,6 +227,9 @@ const Placeholder = ({ label, ratio, dark }) => (
 );
 
 const CourseLanding = () => {
+  const navigate = useNavigate();
+  const goToCheckout = () => navigate(CHECKOUT_PATH);
+
   return (
     <div className={styles.page}>
       <LandingHeader
@@ -658,7 +664,7 @@ const CourseLanding = () => {
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline}`}
-                onClick={scrollToBuy}
+                onClick={goToCheckout}
               >
                 Оформить предзаказ
               </button>
@@ -750,7 +756,13 @@ const CourseLanding = () => {
             <div>
               <h2 className={styles.footerHeading}>Документы</h2>
               <p className={styles.footerText}>
-                [Оферта] · [Политика конфиденциальности]
+                <a className={styles.footerLink} href="/course/offer">
+                  Оферта
+                </a>{' '}
+                ·{' '}
+                <a className={styles.footerLink} href="/course/privacy">
+                  Политика конфиденциальности
+                </a>
               </p>
             </div>
           </div>
@@ -759,8 +771,15 @@ const CourseLanding = () => {
             <p className={styles.footerOfferText}>
               Курс — цифровой информационный продукт. Сейчас доступен предзаказ; доступ
               к материалам откроется {LAUNCH}. Материалы остаются бессрочно, ведение
-              специалистов — 3 месяца. [Условия оферты и политику конфиденциальности
-              добавим перед публикацией.]
+              специалистов — 3 месяца. Оформляя предзаказ, вы принимаете условия{' '}
+              <a className={styles.footerLink} href="/course/offer">
+                оферты
+              </a>{' '}
+              и{' '}
+              <a className={styles.footerLink} href="/course/privacy">
+                политики конфиденциальности
+              </a>
+              .
             </p>
           </div>
 

@@ -12,6 +12,9 @@ import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
 import CourseLanding from "./components/CourseLanding/CourseLanding";
+import { CourseOffer, CoursePrivacy } from "./components/CourseLanding/CourseLegal";
+import CourseCheckout from "./components/CourseLanding/CourseCheckout";
+import CourseSuccess from "./components/CourseLanding/CourseSuccess";
 import FounderYuri from "./components/Founders/FounderYuri";
 import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
@@ -28,6 +31,10 @@ const KNOWN_PATHS = new Set([
   '/3d-print',
   '/guide',
   '/course',
+  '/course/offer',
+  '/course/privacy',
+  '/course/checkout',
+  '/course/success',
   '/guide/offer',
   '/guide/privacy',
   '/guide/checkout',
@@ -69,6 +76,22 @@ const PAGE_SEO = {
     title: 'Курс по производству силиконовых форм — AnyForms',
     description:
       'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
+  },
+  '/course/offer': {
+    title: 'Публичная оферта — курс anyforms',
+    description: 'Условия предзаказа и покупки видео-курса по производству силиконовых форм.',
+  },
+  '/course/privacy': {
+    title: 'Политика конфиденциальности — курс anyforms',
+    description: 'Как обрабатываются персональные данные при покупке курса anyforms.',
+  },
+  '/course/checkout': {
+    title: 'Предзаказ курса — anyforms',
+    description: 'Оформление и оплата предзаказа видео-курса по производству силиконовых форм.',
+  },
+  '/course/success': {
+    title: 'Предзаказ оформлен — доступ к курсу пришлём на почту',
+    description: 'Спасибо за оплату. Доступ к курсу откроется в день старта и придёт на вашу почту.',
   },
   '/founders/yuri': {
     title: 'Реквизиты — ИП Суворов Юрий Игоревич',
@@ -160,7 +183,9 @@ function App() {
       normalizedPathname.startsWith('/admin') ||
       normalizedPathname === '/pdf' ||
       normalizedPathname === '/guide/checkout' ||
-      normalizedPathname === '/guide/success';
+      normalizedPathname === '/guide/success' ||
+      normalizedPathname === '/course/checkout' ||
+      normalizedPathname === '/course/success';
 
     document.title = seo.title;
     upsertMetaTag('meta[name="description"]', { name: 'description', content: seo.description });
@@ -193,6 +218,10 @@ function App() {
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
         <Route path="/course" element={<CourseLanding />} />
+        <Route path="/course/offer" element={<CourseOffer />} />
+        <Route path="/course/privacy" element={<CoursePrivacy />} />
+        <Route path="/course/checkout" element={<CourseCheckout />} />
+        <Route path="/course/success" element={<CourseSuccess />} />
         <Route path="/guide/offer" element={<GuideOffer />} />
         <Route path="/guide/privacy" element={<GuidePrivacy />} />
         <Route path="/guide/checkout" element={<GuideCheckout />} />
