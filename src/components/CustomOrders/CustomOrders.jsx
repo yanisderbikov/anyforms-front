@@ -4,13 +4,15 @@ import { getAllCustomItems } from '../../services/customProducts';
 import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import CustomItemCard from './CustomItemCard';
+import CustomItemViewModal from './CustomItemViewModal';
 import CustomItemModal from './CustomItemModal';
 import styles from './CustomOrders.module.css';
 
 const CustomOrders = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(null);
+  const [viewing, setViewing] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState('');
 
   const load = async () => {
@@ -64,15 +66,26 @@ const CustomOrders = () => {
       ) : (
         <div className={styles.cardsContainer}>
           {filtered.map((it) => (
-            <CustomItemCard key={it.id} item={it} onOpen={() => setSelected(it)} />
+            <CustomItemCard key={it.id} item={it} onOpen={() => setViewing(it)} />
           ))}
         </div>
       )}
 
-      {selected && (
+      {viewing && (
+        <CustomItemViewModal
+          item={viewing}
+          onClose={() => setViewing(null)}
+          onEdit={() => {
+            setEditing(viewing);
+            setViewing(null);
+          }}
+        />
+      )}
+
+      {editing && (
         <CustomItemModal
-          item={selected}
-          onClose={() => setSelected(null)}
+          item={editing}
+          onClose={() => setEditing(null)}
           onSaved={(updated) => setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))}
           onDeleted={(id) => setItems((prev) => prev.filter((i) => i.id !== id))}
         />

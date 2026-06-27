@@ -6,14 +6,14 @@ import styles from './CustomTabs.module.css';
 const CustomTabs = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isTracker = pathname.startsWith('/orders/custom/tracker');
+  const isCreate = pathname.startsWith('/orders/custom/create');
   return (
     <div className={styles.tabs}>
-      <button className={`${styles.tab} ${!isTracker ? styles.active : ''}`} onClick={() => navigate('/orders/custom')}>
-        заказы
+      <button className={`${styles.tab} ${!isCreate ? styles.active : ''}`} onClick={() => navigate('/orders/custom')}>
+        в работе
       </button>
-      <button className={`${styles.tab} ${isTracker ? styles.active : ''}`} onClick={() => navigate('/orders/custom/tracker')}>
-        трекер
+      <button className={`${styles.tab} ${isCreate ? styles.active : ''}`} onClick={() => navigate('/orders/custom/create')}>
+        создать
       </button>
     </div>
   );

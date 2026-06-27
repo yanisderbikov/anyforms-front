@@ -50,7 +50,7 @@ const KNOWN_PATHS = new Set([
   '/orders/created',
   '/orders/delivering',
   '/orders/custom',
-  '/orders/custom/tracker',
+  '/orders/custom/create',
   '/admin/products',
 ]);
 
@@ -239,8 +239,8 @@ function App() {
         <Route path="/orders/without-tracker" element={<OrderList />} />
         <Route path="/orders/created" element={<OrderList />} />
         <Route path="/orders/delivering" element={<OrderList />} />
-        <Route path="/orders/custom" element={<CustomOrdersList />} />
-        <Route path="/orders/custom/tracker" element={<CustomOrders />} />
+        <Route path="/orders/custom" element={<CustomOrders />} />
+        <Route path="/orders/custom/create" element={<CustomOrdersList />} />
         <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="*" element={<NotFound />} />
