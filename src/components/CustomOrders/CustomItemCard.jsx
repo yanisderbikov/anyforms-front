@@ -11,7 +11,10 @@ const CustomItemCard = ({ item, onOpen, hideStatus }) => {
       <div className={styles.preview}>
         {first ? (
           isImageFile(first) ? (
-            <img className={styles.previewImg} src={first.url} alt="" loading="lazy" decoding="async" />
+            <>
+              <img className={styles.previewBlur} src={first.url} alt="" aria-hidden="true" />
+              <img className={styles.previewImg} src={first.url} alt="" loading="lazy" decoding="async" />
+            </>
           ) : (
             <div className={styles.fileBox}>
               <span className={styles.fileExt}>{fileExt(first)}</span>
