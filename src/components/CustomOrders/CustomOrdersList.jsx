@@ -47,7 +47,7 @@ const CustomOrdersList = () => {
 
       <div className={styles.subTabs}>
         <button className={`${styles.subTab} ${filter === 'empty' ? styles.subActive : ''}`} onClick={() => setFilter('empty')}>
-          созданные (пустые)
+          не оформленные
         </button>
         <button className={`${styles.subTab} ${filter === 'all' ? styles.subActive : ''}`} onClick={() => setFilter('all')}>
           все
@@ -62,7 +62,7 @@ const CustomOrdersList = () => {
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>{filter === 'empty' ? 'нет пустых заказов' : 'под-заказов нет'}</p>
+          <p className={styles.emptyText}>{filter === 'empty' ? 'нет не оформленных заказов' : 'под-заказов нет'}</p>
         </div>
       ) : (
         <div className={styles.cards}>
@@ -73,7 +73,7 @@ const CustomOrdersList = () => {
                   {o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`)}
                 </span>
                 <span className={`${styles.badge} ${cnt(o) === 0 ? styles.badgeEmpty : ''}`}>
-                  {cnt(o) === 0 ? 'пусто' : `${cnt(o)} поз.`}
+                  {cnt(o) === 0 ? 'не оформлен' : `${cnt(o)} поз.`}
                 </span>
               </div>
               <div className={styles.cardMeta}>
