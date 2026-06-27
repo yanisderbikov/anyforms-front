@@ -20,6 +20,9 @@ import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
 import GuideSuccess from "./components/GuideLanding/GuideSuccess";
 import NotFound from "./components/NotFound/NotFound";
+import CustomOrders from "./components/CustomOrders/CustomOrders";
+import CustomOrdersList from "./components/CustomOrders/CustomOrdersList";
+import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
 
 const SITE_URL = 'https://anyforms.ru';
 
@@ -46,6 +49,8 @@ const KNOWN_PATHS = new Set([
   '/orders/without-tracker',
   '/orders/created',
   '/orders/delivering',
+  '/orders/custom',
+  '/orders/custom/tracker',
   '/admin/products',
 ]);
 
@@ -158,7 +163,7 @@ function App() {
       document.body.style.background = '#fff';
     } else if (isGuidePage || isCoursePage || isFounderPage) {
       document.body.style.background = '#f5f1e8';
-    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || isNotFoundPage) {
+    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders'))) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
@@ -234,6 +239,9 @@ function App() {
         <Route path="/orders/without-tracker" element={<OrderList />} />
         <Route path="/orders/created" element={<OrderList />} />
         <Route path="/orders/delivering" element={<OrderList />} />
+        <Route path="/orders/custom" element={<CustomOrdersList />} />
+        <Route path="/orders/custom/tracker" element={<CustomOrders />} />
+        <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
