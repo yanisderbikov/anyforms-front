@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CUSTOM_STATUS_LABELS, isImageFile, fileExt } from '../../services/customProducts';
+import { CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE, isImageFile, fileExt } from '../../services/customProducts';
 import styles from './CustomItemViewModal.module.css';
 
 // Скачивание файла: пробуем blob (форсит сохранение), при CORS — открываем в новой вкладке.
@@ -39,6 +39,20 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
 
   const current = images[idx];
 
+  const createdLabel = (() => {
+    const v = item.createdAt;
+    if (v == null) return null;
+    const ms = typeof v === 'number' ? (v < 1e12 ? v * 1000 : v) : Date.parse(v);
+    if (Number.isNaN(ms)) return null;
+    return new Date(ms).toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  })();
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
@@ -46,10 +60,6 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
 
         <div className={styles.head}>
           <h2 className={styles.title}>{item.productName || 'без названия'}</h2>
-          <div className={styles.meta}>
-            <span className={styles.qty}>кол-во: {item.quantity}</span>
-            {item.status && <span className={styles.status}>{CUSTOM_STATUS_LABELS[item.status] || item.status}</span>}
-          </div>
         </div>
 
         {images.length > 0 && (
@@ -93,6 +103,16 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
         )}
 
         {files.length === 0 && <p className={styles.emptyFiles}>файлов нет</p>}
+
+        <div className={styles.bottomInfo}>
+          {item.status && (
+            <span className={styles.status} style={CUSTOM_STATUS_STYLE[item.status]}>
+              {CUSTOM_STATUS_LABELS[item.status] || item.status}
+            </span>
+          )}
+          <span className={styles.qty}>{item.quantity} шт</span>
+          {createdLabel && <span className={styles.created}>создан: {createdLabel}</span>}
+        </div>
 
         <div className={styles.footer}>
           <button className={styles.editBtn} onClick={onEdit}>изменить</button>

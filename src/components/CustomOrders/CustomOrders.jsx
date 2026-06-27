@@ -51,7 +51,6 @@ const CustomOrders = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button className={styles.refreshBtn} onClick={load}>обновить</button>
       </div>
 
       {loading ? (

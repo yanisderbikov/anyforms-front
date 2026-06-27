@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getCustomOrders } from '../../services/customProducts';
+import { getCustomOrders, createCustomOrder } from '../../services/customProducts';
 import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import styles from './CustomOrdersList.module.css';
@@ -19,6 +19,9 @@ const CustomOrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('empty'); // 'empty' | 'all'
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({ contactName: '', contactPhone: '' });
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     try {
@@ -38,6 +41,22 @@ const CustomOrdersList = () => {
   const cnt = (o) => o.customItemsCount || 0;
   const filtered = orders.filter((o) => (filter === 'all' ? true : cnt(o) === 0));
 
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    try {
+      setSaving(true);
+      const created = await createCustomOrder({
+        contactName: form.contactName.trim() || null,
+        contactPhone: form.contactPhone.trim() || null,
+      });
+      navigate(`/orders/custom/order/${created.id}`);
+    } catch {
+      toast.error('Не удалось создать заказ');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <CustomHeader />
@@ -52,7 +71,7 @@ const CustomOrdersList = () => {
         <button className={`${styles.subTab} ${filter === 'all' ? styles.subActive : ''}`} onClick={() => setFilter('all')}>
           все
         </button>
-        <button className={styles.refresh} onClick={load}>обновить</button>
+        <button className={styles.plusBtn} onClick={() => setCreating(true)} title="Создать заказ с нуля (без CRM)">+</button>
       </div>
 
       {loading ? (
@@ -84,6 +103,35 @@ const CustomOrdersList = () => {
               <div className={styles.fillHint}>заполнить →</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {creating && (
+        <div className={styles.modalOverlay} onClick={() => !saving && setCreating(false)}>
+          <form className={styles.modal} onClick={(e) => e.stopPropagation()} onSubmit={handleCreate}>
+            <div className={styles.modalTitle}>новый заказ без CRM</div>
+            <input
+              className={styles.modalInput}
+              placeholder="имя клиента (необязательно)"
+              value={form.contactName}
+              onChange={(e) => setForm((p) => ({ ...p, contactName: e.target.value }))}
+              autoFocus
+            />
+            <input
+              className={styles.modalInput}
+              placeholder="телефон (необязательно)"
+              value={form.contactPhone}
+              onChange={(e) => setForm((p) => ({ ...p, contactPhone: e.target.value }))}
+            />
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.modalCancel} onClick={() => setCreating(false)} disabled={saving}>
+                отмена
+              </button>
+              <button type="submit" className={styles.modalCreate} disabled={saving}>
+                {saving ? 'создаю…' : 'создать'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

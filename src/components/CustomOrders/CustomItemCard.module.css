@@ -15,6 +15,15 @@
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
 }
 
+/* Подсветка по возрасту позиции (срок ~4 недели) — фоном карточки. */
+.ageWarn {
+  background: #fff3cd;
+}
+
+.ageDanger {
+  background: #ffd9d9;
+}
+
 .preview {
   position: relative;
   width: 100%;
@@ -79,28 +88,22 @@
 }
 
 .status {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #111;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.25rem 0.6rem;
+  padding: 0.35rem 0.8rem;
   border-radius: 999px;
   text-transform: lowercase;
 }
 
 .body {
-  padding: 0.85rem 1rem;
+  padding: 0.9rem 1.1rem 1.1rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #111;
   overflow: hidden;
@@ -108,9 +111,40 @@
   white-space: nowrap;
 }
 
-.qty {
-  font-size: 0.95rem;
-  font-weight: 700;
+.client {
+  font-size: 0.9rem;
   color: #555;
+  margin-top: -0.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.qty {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111;
   flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .body {
+    padding: 0.7rem 0.85rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .name {
+    font-size: 1rem;
+  }
+
+  .qty {
+    font-size: 1.2rem;
+  }
 }

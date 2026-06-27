@@ -252,9 +252,6 @@ const OrderList = () => {
             className={styles.searchInput}
           />
         </div>
-        <button onClick={loadOrders} className={styles.refreshButton}>
-          Обновить
-        </button>
       </div>
 
       {filteredOrders.length === 0 ? (

@@ -14,6 +14,8 @@ const cfg = (extra = {}) => {
 
 // ---- Заказы под-заказа (Order, isRetail=false) ----
 export const getCustomOrders = () => http.get('/api/orders/custom', cfg()).then((r) => r.data);
+export const createCustomOrder = (body) =>
+  http.post('/api/orders/custom', body || {}, cfg()).then((r) => r.data);
 export const getOrder = (id) => http.get(`/api/orders/${id}`, cfg()).then((r) => r.data);
 
 // ---- Позиции ----
@@ -45,6 +47,13 @@ export const CUSTOM_STATUS_LABELS = {
   MODELING: 'Моделирование',
   IN_PRODUCTION: 'В производстве',
   READY_TO_SHIP: 'Готов к отправке',
+};
+
+// Цвет пилюли по статусу: моделирование — зелёный, производство — жёлтый, к отправке — красный.
+export const CUSTOM_STATUS_STYLE = {
+  MODELING: { background: '#d6f5dd', color: '#1b7a33' },
+  IN_PRODUCTION: { background: '#fff3cd', color: '#8a6d00' },
+  READY_TO_SHIP: { background: '#ffd9d9', color: '#b71c1c' },
 };
 
 export const CUSTOM_STATUSES = [
