@@ -199,46 +199,33 @@ const OrderList = () => {
               decoding="async"
             />
           </span>
-          <div className={styles.menuContainer}>
-            <button
-              className={`${styles.burgerButton} ${menuOpen ? styles.burgerButtonOpen : ''}`}
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Меню"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 12H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-            {menuOpen && (
-              <div className={styles.dropdownMenu}>
-                <button
-                  className={`${styles.menuItem} ${activeMode === 'without-tracker' ? styles.menuItemActive : ''}`}
-                  onClick={() => handleModeChange('without-tracker')}
-                >
-                  1 - без трекера
-                </button>
-                <button
-                  className={`${styles.menuItem} ${activeMode === 'created' ? styles.menuItemActive : ''}`}
-                  onClick={() => handleModeChange('created')}
-                >
-                  2 - к отправке (накладные)
-                </button>
-                <button
-                  className={`${styles.menuItem} ${activeMode === 'delivering' ? styles.menuItemActive : ''}`}
-                  onClick={() => handleModeChange('delivering')}
-                >
-                  3 - доставляются
-                </button>
-              </div>
-            )}
-          </div>
+          <button className={styles.customLink} onClick={() => navigate('/orders/custom')}>
+            под заказ →
+          </button>
         </div>
       </header>
 
-      <div className={styles.intro}>
-        <h1 className={styles.pageTitle}>{getModeTitle()}</h1>
+      <div className={styles.modeTabsWrap}>
+        <div className={styles.modeTabs}>
+          <button
+            className={`${styles.modeTab} ${activeMode === 'without-tracker' ? styles.modeTabActive : ''}`}
+            onClick={() => handleModeChange('without-tracker')}
+          >
+            без трекера
+          </button>
+          <button
+            className={`${styles.modeTab} ${activeMode === 'created' ? styles.modeTabActive : ''}`}
+            onClick={() => handleModeChange('created')}
+          >
+            к отправке
+          </button>
+          <button
+            className={`${styles.modeTab} ${activeMode === 'delivering' ? styles.modeTabActive : ''}`}
+            onClick={() => handleModeChange('delivering')}
+          >
+            доставляются
+          </button>
+        </div>
       </div>
 
       {Object.keys(productCounts).length > 0 && (
@@ -265,9 +252,6 @@ const OrderList = () => {
             className={styles.searchInput}
           />
         </div>
-        <button onClick={loadOrders} className={styles.refreshButton}>
-          Обновить
-        </button>
       </div>
 
       {filteredOrders.length === 0 ? (
