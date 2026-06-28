@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { getOrder, getItemsByOrder, createItem, addItemFiles } from '../../services/customProducts';
 import CustomItemCard from './CustomItemCard';
 import CustomItemModal from './CustomItemModal';
+import AutoTextarea from './AutoTextarea';
 import styles from './CustomOrderFill.module.css';
 
 const EMPTY = { productName: '', description: '', quantity: 1 };
@@ -122,7 +123,7 @@ const CustomOrderFill = () => {
       <form className={styles.form} onSubmit={submit}>
         <div className={styles.formTitle}>новая позиция</div>
         <input className={styles.input} placeholder="название продукта" value={form.productName} onChange={(e) => setF('productName', e.target.value)} />
-        <textarea className={styles.textarea} rows={2} placeholder="описание" value={form.description} onChange={(e) => setF('description', e.target.value)} />
+        <AutoTextarea className={styles.textarea} placeholder="описание" value={form.description} onChange={(e) => setF('description', e.target.value)} />
         <input className={styles.inputNarrow} type="number" min={1} placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value)} />
 
         <span className={styles.label}>файлы (любые: фото, чертёж, zip…)</span>

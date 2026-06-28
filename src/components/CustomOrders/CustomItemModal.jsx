@@ -10,6 +10,7 @@ import {
   deleteFile,
   deleteItem,
 } from '../../services/customProducts';
+import AutoTextarea from './AutoTextarea';
 import styles from './CustomItemModal.module.css';
 
 const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
@@ -138,7 +139,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
 
         <label className={styles.field}>
           <span className={styles.label}>описание</span>
-          <textarea className={styles.textarea} rows={3} value={form.description} onChange={(e) => setF('description', e.target.value)} />
+          <AutoTextarea className={styles.textarea} minRows={3} value={form.description} onChange={(e) => setF('description', e.target.value)} />
         </label>
 
         <span className={styles.label}>файлы</span>

@@ -127,7 +127,8 @@
   font-size: 0.95rem;
   outline: none;
   font-family: inherit;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   box-sizing: border-box;
   color: #111;
 }
