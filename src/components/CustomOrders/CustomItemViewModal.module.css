@@ -44,8 +44,29 @@
   background: #e5e5e5;
 }
 
+.amoLink {
+  position: absolute;
+  top: 12px;
+  right: 56px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f1f1;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.amoLink:hover {
+  background: #e5e5e5;
+}
+
 .head {
-  padding-right: 40px;
+  padding-right: 84px;
 }
 
 .title {
