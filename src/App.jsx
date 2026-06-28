@@ -23,6 +23,7 @@ import NotFound from "./components/NotFound/NotFound";
 import CustomOrders from "./components/CustomOrders/CustomOrders";
 import CustomOrdersList from "./components/CustomOrders/CustomOrdersList";
 import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
+import CustomShipList from "./components/CustomOrders/CustomShipList";
 
 const SITE_URL = 'https://anyforms.ru';
 
@@ -51,6 +52,7 @@ const KNOWN_PATHS = new Set([
   '/orders/delivering',
   '/orders/custom',
   '/orders/custom/create',
+  '/orders/custom/ship',
   '/admin/products',
 ]);
 
@@ -241,6 +243,7 @@ function App() {
         <Route path="/orders/delivering" element={<OrderList />} />
         <Route path="/orders/custom" element={<CustomOrders />} />
         <Route path="/orders/custom/create" element={<CustomOrdersList />} />
+        <Route path="/orders/custom/ship" element={<CustomShipList />} />
         <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="*" element={<NotFound />} />

@@ -234,4 +234,9 @@
   .titleInput {
     font-size: 1.1rem;
   }
+
+  .row {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
 }

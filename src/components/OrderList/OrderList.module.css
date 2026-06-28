@@ -305,7 +305,6 @@
   border: 1px solid rgba(17, 17, 17, 0.1);
   border-radius: 999px;
   padding: 0.25rem;
-  flex-wrap: wrap;
   justify-content: center;
 }
 
@@ -319,7 +318,25 @@
   border-radius: 999px;
   cursor: pointer;
   text-transform: lowercase;
+  white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+@media (max-width: 480px) {
+  .modeTabsWrap {
+    margin-bottom: 1rem;
+  }
+
+  .modeTabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .modeTab {
+    flex: 1;
+    padding: 0.5rem 0.3rem;
+    font-size: 0.78rem;
+  }
 }
 
 .modeTab:hover {

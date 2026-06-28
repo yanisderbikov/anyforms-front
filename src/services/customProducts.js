@@ -47,14 +47,22 @@ export const CUSTOM_STATUS_LABELS = {
   MODELING: 'Моделирование',
   IN_PRODUCTION: 'В производстве',
   READY_TO_SHIP: 'Готов к отправке',
+  SENT: 'Отправлен',
 };
 
-// Цвет пилюли по статусу: моделирование — зелёный, производство — жёлтый, к отправке — красный.
+// Цвет пилюли по статусу: моделирование — зелёный, производство — жёлтый, к отправке — красный, отправлен — серый.
 export const CUSTOM_STATUS_STYLE = {
   MODELING: { background: '#d6f5dd', color: '#1b7a33' },
   IN_PRODUCTION: { background: '#fff3cd', color: '#8a6d00' },
   READY_TO_SHIP: { background: '#ffd9d9', color: '#b71c1c' },
+  SENT: { background: '#e5e5ea', color: '#555' },
 };
+
+// Группы «к отправке» (по заказу) и отгрузка.
+export const getReadyToShipGroups = () =>
+  http.get('/api/custom-product-items/ready-to-ship', cfg()).then((r) => r.data);
+export const shipOrder = (orderId, tracker) =>
+  http.post('/api/custom-product-items/ship', { orderId, tracker }, cfg()).then((r) => r.data);
 
 export const CUSTOM_STATUSES = [
   { value: 'MODELING', label: 'Моделирование' },
