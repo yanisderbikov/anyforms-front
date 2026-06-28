@@ -59,7 +59,15 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
         <button className={styles.close} onClick={onClose} aria-label="Закрыть">×</button>
 
         <div className={styles.head}>
-          <h2 className={styles.title}>{item.productName || 'без названия'}</h2>
+          <a
+            className={styles.title}
+            href={`/orders/custom/item/${item.id}`}
+            target="_blank"
+            rel="noreferrer"
+            title="Открыть в отдельной вкладке"
+          >
+            {item.productName || 'без названия'}
+          </a>
         </div>
 
         {images.length > 0 && (

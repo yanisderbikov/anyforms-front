@@ -24,6 +24,7 @@ import CustomOrders from "./components/CustomOrders/CustomOrders";
 import CustomOrdersList from "./components/CustomOrders/CustomOrdersList";
 import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
 import CustomShipList from "./components/CustomOrders/CustomShipList";
+import CustomItemPage from "./components/CustomOrders/CustomItemPage";
 
 const SITE_URL = 'https://anyforms.ru';
 
@@ -244,6 +245,7 @@ function App() {
         <Route path="/orders/custom" element={<CustomOrders />} />
         <Route path="/orders/custom/create" element={<CustomOrdersList />} />
         <Route path="/orders/custom/ship" element={<CustomShipList />} />
+        <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
         <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="*" element={<NotFound />} />

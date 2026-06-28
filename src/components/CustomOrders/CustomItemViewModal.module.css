@@ -49,10 +49,18 @@
 }
 
 .title {
+  display: inline-block;
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
   color: #111;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.title:hover {
+  opacity: 0.7;
 }
 
 .meta {

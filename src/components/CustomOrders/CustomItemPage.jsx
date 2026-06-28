@@ -1,0 +1,183 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import {
+  getCustomItem,
+  CUSTOM_STATUS_LABELS,
+  CUSTOM_STATUS_STYLE,
+  isImageFile,
+  fileExt,
+} from '../../services/customProducts';
+import CustomItemModal from './CustomItemModal';
+import apiClient from '../../apiClient';
+import styles from './CustomItemPage.module.css';
+
+const downloadFile = async (file) => {
+  try {
+    const res = await fetch(file.url);
+    if (!res.ok) throw new Error('fetch failed');
+    const blob = await res.blob();
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = file.filename || 'file';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(href);
+  } catch {
+    window.open(file.url, '_blank', 'noopener');
+  }
+};
+
+const fmtDate = (v) => {
+  if (v == null) return null;
+  const ms = typeof v === 'number' ? (v < 1e12 ? v * 1000 : v) : Date.parse(v);
+  if (Number.isNaN(ms)) return null;
+  return new Date(ms).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const CustomItemPage = () => {
+  const { itemId } = useParams();
+  const navigate = useNavigate();
+  const isAuthed = !!(apiClient.getToken && apiClient.getToken());
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setNotFound(false);
+        const data = await getCustomItem(itemId);
+        if (alive) setItem(data);
+      } catch (e) {
+        if (e?.response?.status === 404) {
+          if (alive) setNotFound(true);
+        } else {
+          toast.error('Ошибка загрузки');
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [itemId]);
+
+  const images = useMemo(() => (item?.files || []).filter(isImageFile), [item]);
+  const others = useMemo(() => (item?.files || []).filter((f) => !isImageFile(f)), [item]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') setIdx((i) => Math.min(i + 1, images.length - 1));
+      if (e.key === 'ArrowLeft') setIdx((i) => Math.max(i - 1, 0));
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [images.length]);
+
+  const back = () => navigate('/orders/custom');
+  const current = images[idx];
+  const createdLabel = item ? fmtDate(item.createdAt) : null;
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.headerSafeArea} aria-hidden="true" />
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          {isAuthed && <button className={styles.back} onClick={back}>← назад</button>}
+          <span className={styles.logoLink} onClick={() => navigate(isAuthed ? '/orders/custom' : '/')} role="button" aria-label="AnyForms">
+            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="AnyForms" width={180} height={41} decoding="async" />
+          </span>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner} />
+          <p className={styles.loadingText}>загрузка…</p>
+        </div>
+      ) : notFound || !item ? (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyText}>позиция не найдена</p>
+        </div>
+      ) : (
+        <div className={styles.content}>
+          <h1 className={styles.title}>{item.productName || 'без названия'}</h1>
+
+          {images.length > 0 && (
+            <div className={styles.viewer}>
+              {images.length > 1 && (
+                <button className={`${styles.nav} ${styles.prev}`} onClick={() => setIdx((i) => Math.max(i - 1, 0))} disabled={idx === 0}>‹</button>
+              )}
+              <img className={styles.viewerImg} src={current.url} alt={current.filename || ''} />
+              <button className={styles.download} onClick={() => downloadFile(current)} title="Скачать">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                скачать
+              </button>
+              {images.length > 1 && (
+                <button className={`${styles.nav} ${styles.next}`} onClick={() => setIdx((i) => Math.min(i + 1, images.length - 1))} disabled={idx === images.length - 1}>›</button>
+              )}
+              {images.length > 1 && <span className={styles.counter}>{idx + 1} / {images.length}</span>}
+            </div>
+          )}
+
+          {item.description && <p className={styles.description}>{item.description}</p>}
+
+          {others.length > 0 && (
+            <div className={styles.filesBlock}>
+              <span className={styles.filesLabel}>файлы</span>
+              <div className={styles.fileList}>
+                {others.map((f) => (
+                  <button key={f.id} className={styles.fileChip} onClick={() => downloadFile(f)}>
+                    <span className={styles.fileChipExt}>{fileExt(f)}</span>
+                    <span className={styles.fileChipName}>{f.filename || 'файл'}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={styles.bottomInfo}>
+            {item.status && (
+              <span className={styles.status} style={CUSTOM_STATUS_STYLE[item.status]}>
+                {CUSTOM_STATUS_LABELS[item.status] || item.status}
+              </span>
+            )}
+            <span className={styles.qty}>{item.quantity} шт</span>
+            {createdLabel && <span className={styles.created}>создан: {createdLabel}</span>}
+          </div>
+
+          {isAuthed && (
+            <button className={styles.editBtn} onClick={() => setEditing(true)}>изменить</button>
+          )}
+        </div>
+      )}
+
+      {editing && item && (
+        <CustomItemModal
+          item={item}
+          onClose={() => setEditing(false)}
+          onSaved={(updated) => setItem(updated)}
+          onDeleted={() => navigate('/orders/custom')}
+        />
+      )}
+    </div>
+  );
+};
+
+export default CustomItemPage;

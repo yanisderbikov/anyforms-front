@@ -21,6 +21,8 @@ export const getOrder = (id) => http.get(`/api/orders/${id}`, cfg()).then((r) =>
 // ---- Позиции ----
 export const getAllCustomItems = () =>
   http.get('/api/custom-product-items', cfg()).then((r) => r.data);
+export const getCustomItem = (id) =>
+  http.get(`/api/public/custom-product-items/${id}`, cfg()).then((r) => r.data);
 export const getItemsByOrder = (orderId) =>
   http.get('/api/custom-product-items', cfg({ params: { orderId } })).then((r) => r.data);
 export const createItem = (orderId, body) =>
