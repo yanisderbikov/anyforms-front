@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE, isImageFile, fileExt } from '../../services/customProducts';
 import styles from './CustomItemViewModal.module.css';
 
@@ -26,18 +26,48 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
   const images = useMemo(() => files.filter(isImageFile), [files]);
   const others = useMemo(() => files.filter((f) => !isImageFile(f)), [files]);
   const [idx, setIdx] = useState(0);
+  const count = images.length;
+
+  // Зацикленное листание: всегда в пределах [0, count-1], не упирается в края.
+  const go = useCallback(
+    (delta) => {
+      if (count === 0) return;
+      setIdx((i) => ((i + delta) % count + count) % count);
+    },
+    [count],
+  );
+
+  // Сброс при открытии другой позиции и страховка от выхода индекса за пределы.
+  useEffect(() => {
+    setIdx(0);
+  }, [item.id]);
+  useEffect(() => {
+    if (idx > count - 1) setIdx(0);
+  }, [count, idx]);
 
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') setIdx((i) => Math.min(i + 1, images.length - 1));
-      if (e.key === 'ArrowLeft') setIdx((i) => Math.max(i - 1, 0));
+      if (e.key === 'ArrowRight') go(1);
+      if (e.key === 'ArrowLeft') go(-1);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [images.length, onClose]);
+  }, [go, onClose]);
 
-  const current = images[idx];
+  // Свайп на тач-устройствах.
+  const touchX = useRef(null);
+  const onTouchStart = (e) => {
+    touchX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = (e.changedTouches[0]?.clientX ?? touchX.current) - touchX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX.current = null;
+  };
+
+  const current = images[Math.min(idx, count - 1)];
 
   const createdLabel = (() => {
     const v = item.createdAt;
@@ -87,10 +117,10 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
           </a>
         </div>
 
-        {images.length > 0 && (
-          <div className={styles.viewer}>
-            {images.length > 1 && (
-              <button className={`${styles.nav} ${styles.prev}`} onClick={() => setIdx((i) => Math.max(i - 1, 0))} disabled={idx === 0}>‹</button>
+        {current && (
+          <div className={styles.viewer} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            {count > 1 && (
+              <button className={`${styles.nav} ${styles.prev}`} onClick={() => go(-1)} aria-label="Назад">‹</button>
             )}
             <img className={styles.viewerImg} src={current.url} alt={current.filename || ''} />
             <button className={styles.download} onClick={() => downloadFile(current)} title="Скачать">
@@ -99,11 +129,11 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
               </svg>
               скачать
             </button>
-            {images.length > 1 && (
-              <button className={`${styles.nav} ${styles.next}`} onClick={() => setIdx((i) => Math.min(i + 1, images.length - 1))} disabled={idx === images.length - 1}>›</button>
+            {count > 1 && (
+              <button className={`${styles.nav} ${styles.next}`} onClick={() => go(1)} aria-label="Вперёд">›</button>
             )}
-            {images.length > 1 && (
-              <span className={styles.counter}>{idx + 1} / {images.length}</span>
+            {count > 1 && (
+              <span className={styles.counter}>{Math.min(idx, count - 1) + 1} / {count}</span>
             )}
           </div>
         )}
