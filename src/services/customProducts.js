@@ -16,6 +16,8 @@ const cfg = (extra = {}) => {
 export const getCustomOrders = () => http.get('/api/orders/custom', cfg()).then((r) => r.data);
 export const createCustomOrder = (body) =>
   http.post('/api/orders/custom', body || {}, cfg()).then((r) => r.data);
+export const searchContacts = (q) =>
+  http.get('/api/orders/contacts/search', cfg({ params: { q } })).then((r) => r.data);
 export const getOrder = (id) => http.get(`/api/orders/${id}`, cfg()).then((r) => r.data);
 
 // ---- Позиции ----

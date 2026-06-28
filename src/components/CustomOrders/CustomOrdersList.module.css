@@ -123,6 +123,54 @@
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
+.searchWrap {
+  position: relative;
+}
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.25rem;
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: #f1f1f1;
+}
+
+.sugName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.sugMeta {
+  font-size: 0.8rem;
+  color: #555;
+}
+
 .modalActions {
   display: flex;
   justify-content: flex-end;
