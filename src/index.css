@@ -25,5 +25,17 @@ code {
     monospace;
 }
 
+/*
+ * iOS Safari зумит страницу при фокусе на input/textarea/select с font-size < 16px.
+ * На мобилке принудительно держим минимум 16px у всех полей ввода, чтобы не было зума.
+ */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 
 
