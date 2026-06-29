@@ -54,7 +54,7 @@ const Login = () => {
     <div className={styles.wrap}>
       <div className={styles.card}>
         <h1 className={styles.title}>Вход</h1>
-        <p className={styles.subtitle}>any forms</p>
+        <p className={styles.subtitle}>anyforms</p>
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
             Логин
