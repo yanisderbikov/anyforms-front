@@ -120,6 +120,15 @@
   white-space: nowrap;
 }
 
+.modeler {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3a41c8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .metaRow {
   display: flex;
   align-items: center;

@@ -166,6 +166,7 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
             </span>
           )}
           <span className={styles.qty}>{item.quantity} шт</span>
+          {item.modeler && <span className={styles.modeler}>моделирует: {item.modeler}</span>}
           {createdLabel && <span className={styles.created}>создан: {createdLabel}</span>}
         </div>
 

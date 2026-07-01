@@ -9,8 +9,10 @@ import {
   addItemFiles,
   deleteFile,
   deleteItem,
+  getModelers,
 } from '../../services/customProducts';
 import AutoTextarea from './AutoTextarea';
+import ModelerSelect from './ModelerSelect';
 import styles from './CustomItemModal.module.css';
 
 const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
@@ -19,7 +21,9 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
     description: item.description || '',
     quantity: item.quantity ?? 1,
     status: item.status || 'MODELING',
+    modeler: item.modeler || '',
   });
+  const [modelers, setModelers] = useState([]);
   const [existing, setExisting] = useState(item.files || []);
   const [removedIds, setRemovedIds] = useState(() => new Set());
   const [drafts, setDrafts] = useState([]); // [{ file, url }]
@@ -33,6 +37,13 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
+
+  useEffect(() => {
+    if (hideStatus) return;
+    getModelers()
+      .then((list) => setModelers(Array.isArray(list) ? list : []))
+      .catch(() => {});
+  }, [hideStatus]);
 
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -75,6 +86,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         productName: form.productName.trim(),
         description: form.description.trim(),
         quantity: Number(form.quantity),
+        modeler: form.modeler ? form.modeler.trim() : null,
       });
       if (!hideStatus && form.status !== item.status) {
         latest = await updateItemStatus(item.id, form.status);
@@ -136,6 +148,13 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
             </label>
           )}
         </div>
+
+        {!hideStatus && (
+          <label className={styles.field}>
+            <span className={styles.label}>кто моделирует</span>
+            <ModelerSelect value={form.modeler} options={modelers} onChange={(v) => setF('modeler', v || '')} />
+          </label>
+        )}
 
         <label className={styles.field}>
           <span className={styles.label}>описание</span>

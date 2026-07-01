@@ -2,7 +2,7 @@ import React from 'react';
 import { CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE, isImageFile, fileExt } from '../../services/customProducts';
 import styles from './CustomItemCard.module.css';
 
-const CustomItemCard = ({ item, onOpen, hideStatus }) => {
+const CustomItemCard = ({ item, onOpen, hideStatus, showModeler }) => {
   const files = item.files || [];
   const first = files[0];
 
@@ -41,6 +41,11 @@ const CustomItemCard = ({ item, onOpen, hideStatus }) => {
       <div className={styles.body}>
         <span className={styles.name} title={item.productName}>{item.productName || 'без названия'}</span>
         {item.clientName && <span className={styles.client}>{item.clientName}</span>}
+        {showModeler && (
+          <span className={styles.modeler}>
+            моделит: {item.modeler || '—'}
+          </span>
+        )}
         <div className={styles.metaRow}>
           {!hideStatus && item.status && (
             <span className={styles.status} style={CUSTOM_STATUS_STYLE[item.status]}>

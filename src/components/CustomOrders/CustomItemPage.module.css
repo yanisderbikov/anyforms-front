@@ -289,6 +289,13 @@
   text-transform: lowercase;
 }
 
+.modeler {
+  font-size: 0.9rem;
+  color: #3a41c8;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
 .editBtn {
   align-self: flex-start;
   background: #111;

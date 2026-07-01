@@ -36,6 +36,10 @@ export const updateItemStatus = (id, status) =>
 export const deleteItem = (id) =>
   http.delete(`/api/custom-product-items/${id}`, cfg()).then((r) => r.data);
 
+// Уникальные значения «кто моделирует» — для select с автодобавлением (как в Notion).
+export const getModelers = () =>
+  http.get('/api/custom-product-items/modelers', cfg()).then((r) => r.data);
+
 // ---- Файлы ----
 export const addItemFiles = (itemId, files) => {
   const fd = new FormData();

@@ -6,6 +6,7 @@ import CustomTabs from './CustomTabs';
 import CustomItemCard from './CustomItemCard';
 import CustomItemViewModal from './CustomItemViewModal';
 import CustomItemModal from './CustomItemModal';
+import StatusFilter from './StatusFilter';
 import styles from './CustomOrders.module.css';
 
 const CustomOrders = () => {
@@ -14,6 +15,7 @@ const CustomOrders = () => {
   const [viewing, setViewing] = useState(null);
   const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('IN_PRODUCTION');
 
   const load = async () => {
     try {
@@ -31,6 +33,7 @@ const CustomOrders = () => {
   }, []);
 
   const filtered = items.filter((it) => {
+    if (statusFilter && it.status !== statusFilter) return false;
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return (it.productName || '').toLowerCase().includes(q) || (it.description || '').toLowerCase().includes(q);
@@ -53,6 +56,10 @@ const CustomOrders = () => {
         />
       </div>
 
+      <div className={styles.filterRow}>
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
+      </div>
+
       {loading ? (
         <div className={styles.loadingContainer}>
           <div className={styles.spinner} />
@@ -65,7 +72,12 @@ const CustomOrders = () => {
       ) : (
         <div className={styles.cardsContainer}>
           {filtered.map((it) => (
-            <CustomItemCard key={it.id} item={it} onOpen={() => setViewing(it)} />
+            <CustomItemCard
+              key={it.id}
+              item={it}
+              showModeler={statusFilter === 'MODELING'}
+              onOpen={() => setViewing(it)}
+            />
           ))}
         </div>
       )}
