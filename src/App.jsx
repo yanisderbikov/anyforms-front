@@ -72,8 +72,10 @@ const PAGE_SEO = {
     description: 'Политика обработки и защиты персональных данных сервиса AnyForms.',
   },
   '/3d-print': {
-    title: '3D-печать на заказ - AnyForms',
-    description: 'Сервис заказа 3D-печати: быстрый расчёт, производство и доставка.',
+    title: 'Корпуса для электроники на заказ — 3D-печать от 1 шт | anyforms',
+    description:
+      'Изготовим корпус для вашей электроники без пресс-формы: от образца за 3–7 рабочих дней до серии в тысячи штук. PETG, ABS GF, PA12. Расчёт за 15 минут.',
+    image: `${SITE_URL}/og-3d-print.png`,
   },
   '/guide': {
     title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
@@ -195,6 +197,8 @@ function App() {
       normalizedPathname === '/course/checkout' ||
       normalizedPathname === '/course/success';
 
+    const ogImage = seo.image || `${SITE_URL}/anyforms-logo.svg`;
+
     document.title = seo.title;
     upsertMetaTag('meta[name="description"]', { name: 'description', content: seo.description });
     upsertMetaTag('meta[name="robots"]', {
@@ -205,11 +209,11 @@ function App() {
     upsertMetaTag('meta[property="og:description"]', { property: 'og:description', content: seo.description });
     upsertMetaTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
     upsertMetaTag('meta[property="og:url"]', { property: 'og:url', content: pageUrl });
-    upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: `${SITE_URL}/anyforms-logo.svg` });
+    upsertMetaTag('meta[property="og:image"]', { property: 'og:image', content: ogImage });
     upsertMetaTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
     upsertMetaTag('meta[name="twitter:title"]', { name: 'twitter:title', content: seo.title });
     upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: seo.description });
-    upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: `${SITE_URL}/anyforms-logo.svg` });
+    upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
     upsertCanonical(pageUrl);
   }, [normalizedPathname, isNotFoundPage]);
 

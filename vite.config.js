@@ -30,9 +30,18 @@ function emitSpa404() {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   base,
-  plugins: [react(), emitSpa404()],
+  plugins: [react(), ...(isSsrBuild ? [] : [emitSpa404()])],
+  build: isSsrBuild
+    ? {
+        // package.json без "type": "module", поэтому SSR-бандл выпускается как
+        // .mjs — иначе Node в scripts/prerender.mjs прочитает его как CommonJS
+        rollupOptions: {
+          output: { entryFileNames: 'entry-server.mjs' },
+        },
+      }
+    : {},
   server: {
     port: 3000,
     open: true,
@@ -41,4 +50,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['date-fns'],
   },
-});
+}));

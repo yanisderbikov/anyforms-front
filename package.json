@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "vite --host --no-open --mode dev",
     "start": "vite --host",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node scripts/prerender.mjs",
     "predeploy": "pnpm build",
     "deploy": "gh-pages -d dist",
     "test": "react-scripts test",

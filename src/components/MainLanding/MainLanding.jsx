@@ -44,7 +44,7 @@ const QUIZ_OFFERS = [
 ];
 
 const HEADER_NAV_LINKS = [
-  { key: 'print', label: 'Печать', to: '/3d-print' },
+  { key: 'print', label: '3D-печать корпусов', to: '/3d-print' },
   { key: 'chief', label: 'Кондитеры', to: '/chief' },
   { key: 'shop', label: 'Магазин молдов', to: '/shop' },
 ];
