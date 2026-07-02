@@ -511,6 +511,9 @@ const Print3dLanding = () => {
       if (typeof window.ym === 'function') {
         window.ym(106593235, 'reachGoal', 'print3d_lead');
       }
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'generate_lead', { form: 'print3d_calc' });
+      }
     } catch (err) {
       const fromApi = err.response?.data?.error;
       const message =
