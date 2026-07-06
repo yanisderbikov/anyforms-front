@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getAllCustomItems } from '../../services/customProducts';
 import CustomHeader from './CustomHeader';
@@ -9,13 +10,50 @@ import CustomItemModal from './CustomItemModal';
 import StatusFilter from './StatusFilter';
 import styles from './CustomOrders.module.css';
 
+// Ярлыки этапов в URL (?stage=…) → статус фильтра. Поддерживаем и «человекочитаемые»
+// слаги, и сырые значения статуса, чтобы ссылку можно было открыть сразу на нужном этапе.
+const STAGE_TO_STATUS = {
+  modeling: 'MODELING',
+  moderation: 'MODELING',
+  MODELING: 'MODELING',
+  production: 'IN_PRODUCTION',
+  IN_PRODUCTION: 'IN_PRODUCTION',
+  ship: 'READY_TO_SHIP',
+  READY_TO_SHIP: 'READY_TO_SHIP',
+  all: null,
+};
+const STATUS_TO_STAGE = {
+  MODELING: 'modeling',
+  IN_PRODUCTION: 'production',
+  READY_TO_SHIP: 'ship',
+};
+
+const stageParamToStatus = (raw) => {
+  if (raw == null) return 'IN_PRODUCTION';
+  if (raw === 'all') return null;
+  return STAGE_TO_STATUS[raw] ?? 'IN_PRODUCTION';
+};
+
 const CustomOrders = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
   const [editing, setEditing] = useState(null);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('IN_PRODUCTION');
+  const statusFilter = stageParamToStatus(searchParams.get('stage'));
+
+  const setStatusFilter = (status) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (status === null) next.set('stage', 'all');
+        else next.set('stage', STATUS_TO_STAGE[status] || status);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   const load = async () => {
     try {
