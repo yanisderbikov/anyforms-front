@@ -1,0 +1,258 @@
+import React, { useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import apiClient from '../../apiClient';
+import { useCart } from '../../context/CartContext';
+import { MARKETPLACE_CHECKOUT_ENABLED } from '../../config/features';
+import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../shared/phone';
+import PvzSelect from './PvzSelect';
+import styles from './checkout.module.css';
+
+const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
+
+const MarketplaceCheckout = () => {
+  const { items, total, count } = useCart();
+  const navigate = useNavigate();
+
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [pvz, setPvz] = useState(null);
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const nameValid = fullName.trim().length >= 2;
+  const phoneValid = isPhoneValid(phone);
+  const emailValid = EMAIL_RE.test(email.trim());
+  const pvzValid = Boolean(pvz?.pvzCode);
+  const canSubmit =
+    items.length > 0 && nameValid && phoneValid && emailValid && pvzValid && acceptTerms && !submitting;
+
+  const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
+
+  const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
+  const phoneError = touched.phone && !phoneValid ? 'Введите корректный номер: +7 (999) 123-45-67.' : '';
+  const emailError = touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
+
+  // Фича-флаг: онлайн-чекаут пока выключен — с прямого захода уводим в корзину.
+  if (!MARKETPLACE_CHECKOUT_ENABLED) {
+    return <Navigate to="/shop/cart" replace />;
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className={styles.page} id="top">
+        <div className={styles.inner}>
+          <div className={styles.centered}>
+            <p className={styles.centeredText}>Корзина пуста — оформлять нечего.</p>
+            <Link className={styles.primaryLink} to="/shop">
+              <span>Перейти к товарам</span>
+              <span className={styles.ctaArrow} aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setTouched({ fullName: true, phone: true, email: true });
+    if (!nameValid) return setError('Укажите ваше ФИО.');
+    if (!phoneValid) return setError('Укажите корректный номер телефона.');
+    if (!emailValid) return setError('Укажите корректный адрес электронной почты.');
+    if (!pvzValid) return setError('Выберите пункт выдачи СДЭК.');
+    if (!acceptTerms) return setError('Подтвердите согласие с условиями.');
+
+    setError('');
+    setSubmitting(true);
+    try {
+      const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
+        items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
+        fullName: fullName.trim(),
+        phone: toE164(phone),
+        email: email.trim(),
+        pvzCode: pvz.pvzCode,
+        pvzCity: pvz.pvzCity,
+        pvzStreet: pvz.pvzStreet,
+        marketingConsent,
+        returnUrl: `${window.location.origin}/shop/success`,
+      });
+      if (data?.paymentUrl) {
+        window.location.href = data.paymentUrl;
+        return;
+      }
+      setError('Не удалось создать платёж. Попробуйте ещё раз.');
+      setSubmitting(false);
+    } catch (err) {
+      const apiMessage = err?.response?.data?.message || err?.response?.data?.error;
+      setError(
+        typeof apiMessage === 'string'
+          ? apiMessage
+          : 'Не удалось создать платёж. Попробуйте ещё раз или напишите нам в Telegram.'
+      );
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className={styles.page} id="top">
+      <div className={styles.inner}>
+        <div className={styles.topBar}>
+          <Link className={styles.back} to="/shop/cart">
+            ← В корзину
+          </Link>
+        </div>
+        <span className={styles.eyebrow}>Оформление</span>
+        <h1 className={styles.title}>Оформление заказа</h1>
+
+        <div className={styles.summary}>
+          {items.map((item) => (
+            <div key={item.id} className={styles.summaryRow}>
+              <span>
+                {item.name} × {item.quantity}
+              </span>
+              <span>{formatPrice(item.price * item.quantity)}</span>
+            </div>
+          ))}
+          <div className={styles.summaryRow}>
+            <span>Доставка СДЭК</span>
+            <span>на ПВЗ при получении</span>
+          </div>
+          <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
+            <span>К оплате сейчас ({count})</span>
+            <span>{formatPrice(total)}</span>
+          </div>
+        </div>
+
+        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <label className={`${styles.label} ${styles.labelFirst}`} htmlFor="fullName">
+            ФИО <span className={styles.req}>*</span>
+          </label>
+          <input
+            id="fullName"
+            className={`${styles.input} ${nameError ? styles.inputError : ''}`}
+            type="text"
+            autoComplete="name"
+            placeholder="Иванов Иван Иванович"
+            value={fullName}
+            onChange={(e) => {
+              setFullName(e.target.value);
+              setError('');
+            }}
+            onBlur={() => markTouched('fullName')}
+            required
+          />
+          {nameError && <p className={styles.fieldError}>{nameError}</p>}
+
+          <label className={styles.label} htmlFor="phone">
+            Телефон <span className={styles.req}>*</span>
+          </label>
+          <input
+            id="phone"
+            className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="+7 (999) 123-45-67"
+            value={phone}
+            onChange={(e) => {
+              setPhone(formatRuPhone(e.target.value));
+              setError('');
+            }}
+            onBlur={() => markTouched('phone')}
+            required
+          />
+          {phoneError && <p className={styles.fieldError}>{phoneError}</p>}
+
+          <label className={styles.label} htmlFor="email">
+            Электронная почта <span className={styles.req}>*</span>
+          </label>
+          <input
+            id="email"
+            className={`${styles.input} ${emailError ? styles.inputError : ''}`}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError('');
+            }}
+            onBlur={() => markTouched('email')}
+            required
+          />
+          {emailError ? (
+            <p className={styles.fieldError}>{emailError}</p>
+          ) : (
+            <p className={styles.hint}>На этот адрес пришлём чек и подтверждение заказа.</p>
+          )}
+
+          <label className={styles.label}>
+            Пункт выдачи СДЭК <span className={styles.req}>*</span>
+          </label>
+          <PvzSelect
+            selected={pvz}
+            onSelect={(p) => {
+              setPvz(p);
+              setError('');
+            }}
+            onClear={() => setPvz(null)}
+            invalid={!pvzValid}
+          />
+
+          <label className={styles.checkRow}>
+            <input
+              type="checkbox"
+              className={styles.checkbox}
+              checked={marketingConsent}
+              onChange={(e) => setMarketingConsent(e.target.checked)}
+            />
+            <span className={styles.checkText}>
+              Хочу получать полезные материалы и предложения на email. Можно отписаться в любой момент.
+            </span>
+          </label>
+
+          <label className={styles.checkRow}>
+            <input
+              type="checkbox"
+              className={styles.checkbox}
+              checked={acceptTerms}
+              onChange={(e) => {
+                setAcceptTerms(e.target.checked);
+                setError('');
+              }}
+              required
+            />
+            <span className={styles.checkText}>
+              Я согласен с условиями продажи и{' '}
+              <Link to="/chief/privacy" target="_blank" className={styles.inlineLink}>
+                политикой конфиденциальности
+              </Link>
+              .
+            </span>
+          </label>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          <button type="submit" className={styles.payBtn} disabled={!canSubmit}>
+            <span>{submitting ? 'Переходим к оплате…' : `Оплатить ${formatPrice(total)}`}</span>
+            <span className={styles.ctaArrow} aria-hidden="true">→</span>
+          </button>
+
+          <p className={styles.support}>
+            Возникли вопросы? Напишите нам в Telegram{' '}
+            <a className={styles.inlineLink} href="https://t.me/AnyFormsBot" target="_blank" rel="noopener noreferrer">
+              @AnyFormsBot
+            </a>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default MarketplaceCheckout;

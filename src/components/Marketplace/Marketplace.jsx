@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { getItems } from '../../services/itemsService';
 import { trackProductOpen } from '../../services/analytics';
+import { useCart, isPurchasable } from '../../context/CartContext';
 import ProductCard from '../ProductCard/ProductCard';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './Marketplace.module.css';
@@ -17,6 +19,7 @@ const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 const Marketplace = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { add, count } = useCart();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,6 +51,11 @@ const Marketplace = () => {
   };
 
   const stopPropagation = (e) => e.stopPropagation();
+
+  const handleAddToCart = (item) => {
+    add(item);
+    toast.success('Добавлено в корзину');
+  };
 
   const handlePromoCopy = async () => {
     try {
@@ -128,6 +136,28 @@ const Marketplace = () => {
               decoding="async"
             />
           </a>
+          <Link
+            className={styles.cartLink}
+            to="/shop/cart"
+            aria-label={`Корзина${count ? `, товаров: ${count}` : ''}`}
+          >
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#fff"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            {count > 0 && <span className={styles.cartBadge}>{count}</span>}
+          </Link>
         </div>
       </header>
       <div className={styles.intro}>
@@ -201,6 +231,29 @@ const Marketplace = () => {
                 )}
               </div>
               <div className={styles.popupActions}>
+                {isPurchasable(selectedItem) ? (
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(selectedItem)}
+                    style={{
+                      flex: 1,
+                      padding: '14px 20px',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: '#fff',
+                      background: '#000',
+                      border: '1px solid #000',
+                      borderRadius: 999,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    В корзину
+                  </button>
+                ) : (
+                  <CTAButton href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
+                    Заказать
+                  </CTAButton>
+                )}
                 {selectedItem.tgLink && (
                   <a
                     href={selectedItem.tgLink}
@@ -211,9 +264,6 @@ const Marketplace = () => {
                     Подробнее
                   </a>
                 )}
-                <CTAButton href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
-                  Заказать
-                </CTAButton>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import App from './App';
+import { CartProvider } from './context/CartContext';
 import './index.css';
 
 // Обработка редиректа с 404.html для SPA роутинга на GitHub Pages
@@ -19,8 +20,10 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter basename={routerBasename}>
-      <App />
-      <Toaster position="top-right" />
+      <CartProvider>
+        <App />
+        <Toaster position="top-right" />
+      </CartProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -4,6 +4,9 @@ import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
+import MarketplaceCart from "./components/Marketplace/MarketplaceCart";
+import MarketplaceCheckout from "./components/Marketplace/MarketplaceCheckout";
+import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
@@ -166,7 +169,9 @@ function App() {
   useEffect(() => {
     if (isHomePage) {
       document.body.style.background = '#fff';
-    } else if (isGuidePage || isCoursePage || isFounderPage) {
+    } else if (isGuidePage) {
+      document.body.style.background = '#f1f0ec';
+    } else if (isCoursePage || isFounderPage) {
       document.body.style.background = '#f5f1e8';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders'))) {
       document.body.style.background = '#000';
@@ -242,6 +247,9 @@ function App() {
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />
         <Route path="/shop" element={<Marketplace />} />
+        <Route path="/shop/cart" element={<MarketplaceCart />} />
+        <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
+        <Route path="/shop/success" element={<MarketplaceSuccess />} />
         <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
         <Route path="/orders/without-tracker" element={<OrderList />} />
         <Route path="/orders/created" element={<OrderList />} />
