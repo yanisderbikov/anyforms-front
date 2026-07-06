@@ -351,7 +351,7 @@ const GuideLanding = () => {
             <div className={styles.buyPriceRow}>
               <span className={styles.buyPrice}>{PRICE}</span>
               <Link
-                className={`${styles.heroCta} ${styles.ctaInline}`}
+                className={`${styles.heroCta} ${styles.heroCtaAlt} ${styles.ctaInline}`}
                 to={CHECKOUT_PATH}
               >
                 Купить гайд

@@ -1,12 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&display=swap');
 
 .page {
-  --cream: #f5f1e8;
-  --ink: #16140e;
-  --accent: #cb6a42;
+  --cream: #f1f0ec;
+  --ink: #3e4c5d;
+  --slate: #3a4859;
+  --accent: #f2ed6f;
+  --lavender: #cbc5f0;
   --header-h: 78px;
 
-  --font-display: 'Unbounded', sans-serif;
+  --font-display: 'Oswald', 'Golos Text', sans-serif;
   --font-body: 'Golos Text', system-ui, sans-serif;
 
   width: 100%;
@@ -20,22 +22,22 @@
 
 /* tint shared header to guide palette */
 .page :global(header) {
-  background: var(--ink);
+  background: var(--slate);
 }
 
 .page :global(header) a[class*='navLinkPill'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--slate);
 }
 
 .page :global(header) a[class*='navLinkPill']:hover {
-  background: #b85a34;
-  color: #fff;
+  background: #e6e05a;
+  color: var(--slate);
 }
 
 .page [class*='mobileMenuPrimary'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--slate);
 }
 
 .main {
@@ -51,27 +53,33 @@
 
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 12px;
-  letter-spacing: 3px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  opacity: 0.5;
+  background: var(--accent);
+  color: var(--slate);
+  padding: 7px 14px;
+  border-radius: 9px;
+  transform: rotate(-1.5deg);
+  box-shadow: 0 5px 14px rgba(58, 72, 89, 0.14);
 }
 
 .title {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(28px, 5.5vw, 40px);
-  line-height: 1.05;
-  letter-spacing: -1.4px;
+  font-weight: 700;
+  font-size: clamp(30px, 6vw, 44px);
+  line-height: 1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   margin: 14px 0 0;
 }
 
 /* ── order summary ── */
 .summary {
   margin: 28px 0 0;
-  background: var(--ink);
+  background: var(--slate);
   color: var(--cream);
   border-radius: 18px;
   padding: 24px;
@@ -143,8 +151,8 @@
 }
 
 .input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(203, 106, 66, 0.16);
+  border-color: var(--slate);
+  box-shadow: 0 0 0 3px rgba(62, 76, 93, 0.16);
 }
 
 .inputError {
@@ -182,7 +190,7 @@
   width: 20px;
   height: 20px;
   margin-top: 1px;
-  accent-color: var(--accent);
+  accent-color: var(--slate);
   cursor: pointer;
 }
 
@@ -195,7 +203,7 @@
 .inlineLink {
   color: var(--ink);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
   transition: opacity 0.2s ease;
 }
 
@@ -215,21 +223,23 @@
   width: 100%;
   border: none;
   cursor: pointer;
-  background: var(--accent);
-  color: var(--ink);
+  background: var(--slate);
+  color: var(--cream);
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 18px;
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
+  box-shadow: 0 10px 24px rgba(58, 72, 89, 0.28);
   transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease,
     opacity 0.12s ease;
 }
 
 .payBtn:hover:not(:disabled) {
-  background: #bf5f38;
-  box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+  background: #313e4d;
+  box-shadow: 0 12px 28px rgba(58, 72, 89, 0.36);
 }
 
 .payBtn:active:not(:disabled) {
@@ -279,7 +289,7 @@
   height: 76px;
   margin: 0 auto 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--slate);
   color: #fff;
   display: flex;
   align-items: center;

@@ -1,12 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&display=swap');
 
 .page {
-  --cream: #f5f1e8;
-  --ink: #16140e;
-  --accent: #cb6a42;
+  --cream: #f1f0ec;
+  --ink: #3e4c5d;
+  --slate: #3a4859;
+  --accent: #f2ed6f;
   --header-h: 78px;
 
-  --font-display: 'Unbounded', sans-serif;
+  --font-display: 'Oswald', 'Golos Text', sans-serif;
   --font-body: 'Golos Text', system-ui, sans-serif;
 
   width: 100%;
@@ -20,22 +21,22 @@
 
 /* tint shared header to guide palette */
 .page :global(header) {
-  background: var(--ink);
+  background: var(--slate);
 }
 
 .page :global(header) a[class*='navLinkPill'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--slate);
 }
 
 .page :global(header) a[class*='navLinkPill']:hover {
-  background: #b85a34;
-  color: #fff;
+  background: #e6e05a;
+  color: var(--slate);
 }
 
 .page [class*='mobileMenuPrimary'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--slate);
 }
 
 .main {
@@ -51,21 +52,27 @@
 
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 12px;
-  letter-spacing: 3px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  opacity: 0.5;
+  background: var(--accent);
+  color: var(--slate);
+  padding: 7px 14px;
+  border-radius: 9px;
+  transform: rotate(-1.5deg);
+  box-shadow: 0 5px 14px rgba(58, 72, 89, 0.14);
 }
 
 .title {
   font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(28px, 5.5vw, 44px);
-  line-height: 1.05;
-  letter-spacing: -1.4px;
-  margin: 14px 0 0;
+  font-weight: 700;
+  font-size: clamp(30px, 6vw, 46px);
+  line-height: 1;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin: 16px 0 0;
 }
 
 .updated {
@@ -87,16 +94,17 @@
 
 .h2 {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(18px, 3vw, 22px);
-  letter-spacing: -0.5px;
+  font-weight: 600;
+  font-size: clamp(19px, 3.2vw, 24px);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
   margin: 34px 0 14px;
 }
 
 .inlineLink {
   color: var(--ink);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
   transition: opacity 0.2s ease;
 }
 
