@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Golos+Text:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700;900&display=swap');
 
 .page {
   --cream: #f1f0ec;
@@ -7,8 +7,8 @@
   --accent: #f2ed6f;
   --header-h: 78px;
 
-  --font-display: 'Oswald', 'Golos Text', sans-serif;
-  --font-body: 'Golos Text', system-ui, sans-serif;
+  --font-display: 'Oswald', 'Roboto', sans-serif;
+  --font-body: 'Roboto', system-ui, sans-serif;
 
   width: 100%;
   min-height: 100vh;
@@ -67,7 +67,7 @@
 
 .title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 500;
   font-size: clamp(30px, 6vw, 46px);
   line-height: 1;
   letter-spacing: 0.5px;

@@ -114,7 +114,7 @@ const GuideCheckout = () => {
       <LandingHeader
         logo={{
           href: '/guide',
-          ariaLabel: 'AnyForms — к гайду',
+          ariaLabel: 'anyforms — к гайду',
           src: '/anyforms-wordmark-white.svg',
           width: 152,
           height: 21,

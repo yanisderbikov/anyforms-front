@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Golos+Text:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto:wght@400;500;700;900&display=swap');
 
 /* ═══════════════ BASE ═══════════════ */
 .page {
@@ -20,8 +20,8 @@
   --shadow-card: 0 14px 40px rgba(62, 76, 93, 0.09);
   --shadow-chip: 0 5px 14px rgba(58, 72, 89, 0.14);
 
-  --font-display: 'Oswald', 'Golos Text', sans-serif;
-  --font-body: 'Golos Text', system-ui, sans-serif;
+  --font-display: 'Oswald', 'Roboto', sans-serif;
+  --font-body: 'Roboto', system-ui, sans-serif;
 
   width: 100%;
   min-height: 100vh;
@@ -68,6 +68,9 @@
 .eyebrow,
 .eyebrowAccent {
   display: inline-block;
+  /* в flex-колонках не растягиваться на всю ширину */
+  align-self: flex-start;
+  width: fit-content;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 12px;
@@ -93,7 +96,7 @@
 /* ═══════════════ TITLES ═══════════════ */
 .sectionTitle {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 500;
   font-size: clamp(30px, 6.2vw, 52px);
   line-height: 1.28;
   letter-spacing: 0.5px;
@@ -185,7 +188,7 @@
 
 .heroTitle {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 500;
   font-size: clamp(34px, 8vw, 62px);
   line-height: 1.32;
   letter-spacing: 0.5px;
@@ -379,12 +382,6 @@
   font-size: 11px;
   color: var(--ink-soft);
   margin-top: 3px;
-}
-
-.heroDivider {
-  width: 1px;
-  height: 32px;
-  background: rgba(62, 76, 93, 0.16);
 }
 
 /* Grid-area hooks */
@@ -717,6 +714,132 @@
 .bonusStar {
   flex: none;
   color: var(--yellow);
+}
+
+/* ═══════════════ FAQ ═══════════════ */
+.faqSection {
+  padding: 68px 0;
+  border-top: 1px solid rgba(62, 76, 93, 0.1);
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 820px;
+}
+
+.faqItem {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(16px, 2.2vw, 18px);
+  color: var(--ink);
+}
+
+.faqIcon {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--slate);
+  transition: background 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* +/− drawn as CSS bars for perfect symmetry */
+.faqIcon::before,
+.faqIcon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.faqIcon::before {
+  width: 12px;
+  height: 2.5px;
+  transform: translate(-50%, -50%);
+}
+
+.faqIcon::after {
+  width: 2.5px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+}
+
+.faqItemOpen .faqIcon {
+  background: var(--slate);
+  color: #ffffff;
+  transform: rotate(180deg);
+}
+
+/* open → vertical bar folds into the horizontal one: plus melts into minus */
+.faqItemOpen .faqIcon::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+  opacity: 0;
+}
+
+/* Smooth expand/collapse via grid-template-rows 0fr→1fr */
+.faqAnswerWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faqAnswerWrapOpen {
+  grid-template-rows: 1fr;
+}
+
+.faqAnswerClip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.faqAnswer {
+  margin: 0;
+  padding: 0 24px 22px;
+  font-size: clamp(15px, 2.1vw, 17px);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.35s ease 0.08s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.08s;
+}
+
+.faqAnswerWrapOpen .faqAnswer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqAnswerWrap,
+  .faqAnswer,
+  .faqIcon,
+  .faqIcon::before,
+  .faqIcon::after {
+    transition: none;
+  }
 }
 
 /* ═══════════════ ЭКРАН 6 · ФИНАЛЬНЫЙ CTA ═══════════════ */

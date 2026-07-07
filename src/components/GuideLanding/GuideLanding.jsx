@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import styles from './GuideLanding.module.css';
 
 // Кнопки покупки ведут на страницу оформления и оплаты.
 const CHECKOUT_PATH = '/guide/checkout';
-// Поддержка — телеграм-бот AnyForms.
+// Поддержка — телеграм-бот anyforms.
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 const PRICE = '990 ₽';
 const HERO_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/content.png';
@@ -13,10 +13,10 @@ const HERO_PHOTO_MOBILE = 'https://storage.yandexcloud.net/anyforms/guide/conten
 const AUTHOR_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/YuriSuvrov.jpeg';
 
 const AUTHOR_FACTS = [
-  'Более 5 лет в контент-маркетинге',
+  'Более 3 лет в контент-маркетинге',
   'Более 40 000 подписчиков в Instagram',
   'Более 260 опубликованных роликов и постов',
-  'Контент — основной источник заявок для AnyForms',
+  'Контент — основной источник заявок для anyforms',
   'Более 1 000 000 ₽ выручки в месяц приходит через контент',
 ];
 
@@ -53,6 +53,29 @@ const BONUS_ITEMS = [
   'Минимальная воронка продаж',
 ];
 
+const FAQ_ITEMS = [
+  {
+    q: 'Сколько страниц в гайде?',
+    a: '30 страниц — без воды. Только пошаговая система, примеры и готовые шаблоны, которые можно применить сразу.',
+  },
+  {
+    q: 'Сколько времени уйдёт на изучение?',
+    a: 'Гайд читается за один вечер — примерно 1–1,5 часа. А систему из него можно внедрить в тот же день.',
+  },
+  {
+    q: 'В каком формате я получу гайд?',
+    a: 'Это PDF-файл. Ссылка на скачивание придёт на вашу почту сразу после оплаты.',
+  },
+  {
+    q: 'Нужен ли опыт в контенте или блоге?',
+    a: 'Нет. Начинаем с нуля: как выбрать тему, понять аудиторию, писать сценарии и получать заявки. Подойдёт даже без опыта съёмок.',
+  },
+  {
+    q: 'Подойдёт ли гайд для моего продукта?',
+    a: 'Да. Система работает для любого товара или услуги — она для мастеров, производителей и экспертов в любой нише.',
+  },
+];
+
 const scrollToId = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 };
@@ -63,23 +86,28 @@ const NAV_LINKS = [
   { key: 'author', label: 'Автор', id: 'author' },
   { key: 'system', label: 'Система', id: 'system' },
   { key: 'inside', label: 'Что внутри', id: 'inside' },
+  { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
 const HERO_CHIPS = ['9 шагов', 'Готовые сценарии', 'Шаблоны CTA', 'Мини-воронка'];
 
 const HERO_STATS = [
   { value: '40К+', label: 'подписчиков' },
-  { value: '5 лет', label: 'в контенте' },
+  { value: '3 года', label: 'в контенте' },
   { value: '260+', label: 'роликов и постов' },
 ];
 
 const GuideLanding = () => {
+  const [openFaq, setOpenFaq] = useState(0);
+
+  const toggleFaq = (index) => setOpenFaq((prev) => (prev === index ? null : index));
+
   return (
     <div className={styles.page}>
       <LandingHeader
         logo={{
           href: '#top',
-          ariaLabel: 'AnyForms — гайд по контенту',
+          ariaLabel: 'anyforms — гайд по контенту',
           src: '/anyforms-wordmark-white.svg',
           width: 152,
           height: 21,
@@ -187,14 +215,11 @@ const GuideLanding = () => {
           </div>
 
           <div className={`${styles.heroProof} ${styles.areaProof}`}>
-            {HERO_STATS.map((stat, i) => (
-              <React.Fragment key={stat.label}>
-                {i > 0 && <span className={styles.heroDivider} aria-hidden />}
-                <div className={styles.heroStat}>
-                  <span className={styles.heroStatValue}>{stat.value}</span>
-                  <span className={styles.heroStatLabel}>{stat.label}</span>
-                </div>
-              </React.Fragment>
+            {HERO_STATS.map((stat) => (
+              <div className={styles.heroStat} key={stat.label}>
+                <span className={styles.heroStatValue}>{stat.value}</span>
+                <span className={styles.heroStatLabel}>{stat.label}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -332,6 +357,46 @@ const GuideLanding = () => {
                 ))}
               </ul>
             </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ FAQ ═══════════════ */}
+      <section id="faq" className={styles.faqSection} aria-labelledby="faq-title">
+        <div className={styles.sectionInner}>
+          <div className={styles.sectionHead}>
+            <span className={styles.eyebrow}>Вопросы</span>
+            <h2 className={styles.sectionTitle} id="faq-title">
+              Частые вопросы
+            </h2>
+          </div>
+          <div className={styles.faqList}>
+            {FAQ_ITEMS.map((item, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={item.q}
+                  className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''}`}
+                >
+                  <button
+                    type="button"
+                    className={styles.faqQuestion}
+                    onClick={() => toggleFaq(idx)}
+                    aria-expanded={isOpen}
+                  >
+                    <span>{item.q}</span>
+                    <span className={styles.faqIcon} aria-hidden />
+                  </button>
+                  <div
+                    className={`${styles.faqAnswerWrap} ${isOpen ? styles.faqAnswerWrapOpen : ''}`}
+                  >
+                    <div className={styles.faqAnswerClip}>
+                      <p className={styles.faqAnswer}>{item.a}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
