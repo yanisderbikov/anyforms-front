@@ -12,6 +12,8 @@ const initialForm = {
   discountPercent: '',
   tgLink: '',
   orderNumber: '',
+  amoProductId: '',
+  amoProductName: '',
 };
 
 const AdminProducts = () => {
@@ -22,6 +24,8 @@ const AdminProducts = () => {
   const [message, setMessage] = useState('');
   const [form, setForm] = useState(initialForm);
   const [expandedId, setExpandedId] = useState(null);
+  const [amoProducts, setAmoProducts] = useState([]);
+  const [amoError, setAmoError] = useState('');
   const formRef = React.useRef(null);
 
   const loadProducts = async () => {
@@ -36,8 +40,23 @@ const AdminProducts = () => {
     }
   };
 
+  const loadAmoProducts = async () => {
+    try {
+      // /api/amo/products под ADMIN — токен добавляем сами (securityWorker работает
+      // только для сгенерированных вызовов apiClient.api.*).
+      const token = apiClient.getToken ? apiClient.getToken() : null;
+      const res = await apiClient.instance.get('/api/amo/products', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      setAmoProducts(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      setAmoError(err?.response?.data?.error || err?.message || 'Не удалось загрузить товары АМО');
+    }
+  };
+
   useEffect(() => {
     loadProducts();
+    loadAmoProducts();
   }, []);
 
   const handleChange = (e) => {
@@ -45,19 +64,36 @@ const AdminProducts = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // При выборе товара АМО запоминаем и id, и имя (имя уходит в позиции заказа).
+  const handleAmoProductChange = (e) => {
+    const id = e.target.value;
+    const picked = amoProducts.find((p) => String(p.id) === String(id));
+    setForm((prev) => ({
+      ...prev,
+      amoProductId: id,
+      amoProductName: picked?.name ?? '',
+    }));
+  };
+
   const buildPayload = () => {
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
-      folder: form.folder.trim(),
       price: form.price.trim(),
       tgLink: form.tgLink.trim(),
     };
+    // Папку шлём только если заполнена: при обновлении пустое поле не меняет текущую папку.
+    if (form.folder?.trim()) payload.folder = form.folder.trim();
     if (form.id?.trim()) payload.id = form.id.trim();
     if (form.crossedPrice?.trim()) payload.crossedPrice = form.crossedPrice.trim();
     if (form.discountPercent?.trim()) payload.discountPercent = form.discountPercent.trim();
     const orderNum = parseInt(form.orderNumber, 10);
     if (!Number.isNaN(orderNum)) payload.orderNumber = orderNum;
+    const amoId = parseInt(String(form.amoProductId).trim(), 10);
+    if (!Number.isNaN(amoId)) {
+      payload.amoProductId = amoId;
+      if (form.amoProductName?.trim()) payload.amoProductName = form.amoProductName.trim();
+    }
     return payload;
   };
 
@@ -90,6 +126,8 @@ const AdminProducts = () => {
       discountPercent: p.discountPercent ?? '',
       tgLink: p.tgLink ?? '',
       orderNumber: p.orderNumber ?? '',
+      amoProductId: p.amoProductId ?? '',
+      amoProductName: p.amoProductName ?? '',
     });
     setMessage('');
     setError('');
@@ -211,6 +249,30 @@ const AdminProducts = () => {
               className={styles.input}
               placeholder="0"
             />
+          </label>
+          <label className={styles.label}>
+            Товар в АМО
+            <select
+              name="amoProductId"
+              value={form.amoProductId}
+              onChange={handleAmoProductChange}
+              className={styles.input}
+            >
+              <option value="">— не привязан —</option>
+              {/* Если у товара сохранён ID, которого нет в загруженном списке — показываем как есть. */}
+              {form.amoProductId &&
+                !amoProducts.some((p) => String(p.id) === String(form.amoProductId)) && (
+                  <option value={form.amoProductId}>
+                    {form.amoProductName || `ID ${form.amoProductId}`}
+                  </option>
+                )}
+              {amoProducts.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name || `ID ${p.id}`}
+                </option>
+              ))}
+            </select>
+            {amoError && <span className={styles.error}>{amoError}</span>}
           </label>
         </div>
         {error && <p className={styles.error}>{error}</p>}
