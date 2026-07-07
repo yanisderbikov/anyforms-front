@@ -126,7 +126,7 @@ const Marketplace = () => {
       )}
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <a className={styles.logoLink} href="#top" aria-label="AnyForms — наверх">
+          <a className={styles.logoLink} href="#top" aria-label="anyforms — наверх">
             <img
               className={styles.logo}
               src="/anyforms_logo_new_white.svg"

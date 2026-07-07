@@ -13,8 +13,8 @@ const CustomHeader = () => {
           <button className={styles.retail} onClick={() => navigate('/orders/without-tracker')}>
             ← розница
           </button>
-          <span className={styles.logoLink} onClick={() => navigate('/orders/custom')} role="button" aria-label="AnyForms">
-            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="AnyForms" width={180} height={41} decoding="async" />
+          <span className={styles.logoLink} onClick={() => navigate('/orders/custom')} role="button" aria-label="anyforms">
+            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="anyforms" width={180} height={41} decoding="async" />
           </span>
         </div>
       </header>

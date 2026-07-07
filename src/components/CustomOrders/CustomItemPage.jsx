@@ -99,8 +99,8 @@ const CustomItemPage = () => {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           {isAuthed && <button className={styles.back} onClick={back}>← назад</button>}
-          <span className={styles.logoLink} onClick={() => navigate(isAuthed ? '/orders/custom' : '/')} role="button" aria-label="AnyForms">
-            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="AnyForms" width={180} height={41} decoding="async" />
+          <span className={styles.logoLink} onClick={() => navigate(isAuthed ? '/orders/custom' : '/')} role="button" aria-label="anyforms">
+            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="anyforms" width={180} height={41} decoding="async" />
           </span>
           {isAuthed && item?.leadId && (
             <a

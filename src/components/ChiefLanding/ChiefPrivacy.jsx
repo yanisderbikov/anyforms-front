@@ -6,7 +6,7 @@ const ChiefPrivacy = () => (
   <div className={styles.privacyPage} id="top">
     <header className={`${styles.siteHeader} ${styles.siteHeaderPrivacy}`}>
       <div className={styles.siteHeaderInner}>
-        <Link className={styles.logoLink} to="/chief" aria-label="AnyForms — лендинг">
+        <Link className={styles.logoLink} to="/chief" aria-label="anyforms — лендинг">
           <img
             className={styles.logo}
             src="/anyforms_logo_new_white.svg"

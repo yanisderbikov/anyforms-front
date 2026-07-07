@@ -6,7 +6,7 @@ const PDFViewer = () => {
     <div className={styles.pdfContainer}>
       <iframe
         src="/anyforms.pdf"
-        title="AnyForms PDF"
+        title="anyforms PDF"
         className={styles.pdfFrame}
       />
     </div>

@@ -236,7 +236,7 @@ const MainLanding = () => {
       <LandingHeader
         logo={{
           href: '#top',
-          ariaLabel: 'AnyForms — наверх',
+          ariaLabel: 'anyforms — наверх',
           src: '/anyforms_logo_new_white.svg',
           width: 200,
           height: 46,

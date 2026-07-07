@@ -189,7 +189,7 @@ const OrderList = () => {
             loading="lazy"
             decoding="async"
           />
-          <span className={styles.logoLink} aria-label="AnyForms">
+          <span className={styles.logoLink} aria-label="anyforms">
             <img
               className={styles.logo}
               src="/anyforms_logo_new_white.svg"

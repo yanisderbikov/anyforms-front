@@ -13,7 +13,7 @@ const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/model-order
 // Чипы под заголовком — короткие факты о формате курса.
 const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Материалы навсегда', '3 месяца ведения'];
 
-// Цифры-доказательства — реальное производство AnyForms.
+// Цифры-доказательства — реальное производство anyforms.
 const HERO_STATS = [
   { value: '5 лет', label: 'делаем формы на заказ' },
   { value: '100 тыс+', label: 'изготовленных форм' },
@@ -79,7 +79,7 @@ const GET_CARDS = [
   },
 ];
 
-// Экран 6 — основатели AnyForms.
+// Экран 6 — основатели anyforms.
 const FOUNDERS = [
   {
     name: 'Юрий Суворов',
