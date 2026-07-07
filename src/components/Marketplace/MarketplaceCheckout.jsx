@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart } from '../../context/CartContext';
 import { MARKETPLACE_CHECKOUT_ENABLED } from '../../config/features';
-import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../shared/phone';
+import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../utils/phone';
 import PvzSelect from './PvzSelect';
 import styles from './checkout.module.css';
 
