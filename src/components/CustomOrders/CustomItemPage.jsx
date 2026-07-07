@@ -9,6 +9,7 @@ import {
   fileExt,
 } from '../../services/customProducts';
 import CustomItemModal from './CustomItemModal';
+import LinkText from './LinkText';
 import apiClient from '../../apiClient';
 import styles from './CustomItemPage.module.css';
 
@@ -152,7 +153,7 @@ const CustomItemPage = () => {
             </div>
           )}
 
-          {item.description && <p className={styles.description}>{item.description}</p>}
+          {item.description && <LinkText className={styles.description} text={item.description} />}
 
           {others.length > 0 && (
             <div className={styles.filesBlock}>

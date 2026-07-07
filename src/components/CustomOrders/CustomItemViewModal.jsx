@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE, isImageFile, fileExt } from '../../services/customProducts';
+import LinkText from './LinkText';
 import styles from './CustomItemViewModal.module.css';
 
 // Скачивание файла: пробуем blob (форсит сохранение), при CORS — открываем в новой вкладке.
@@ -138,7 +139,7 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
           </div>
         )}
 
-        {item.description && <p className={styles.description}>{item.description}</p>}
+        {item.description && <LinkText className={styles.description} text={item.description} domainOnly />}
 
         {others.length > 0 && (
           <div className={styles.filesBlock}>
