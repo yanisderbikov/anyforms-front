@@ -73,29 +73,47 @@ const CourseCheckout = () => {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [promoInput, setPromoInput] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState(null);
+  // Промокод проверяем сразу для обоих тарифов: {self: data, personal: data}.
+  const [appliedPromos, setAppliedPromos] = useState({});
   const [promoError, setPromoError] = useState('');
   const [promoChecking, setPromoChecking] = useState(false);
 
-  const checkPromo = async (rawCode, planKey = plan) => {
+  const appliedPromo = appliedPromos[plan] || null;
+
+  const checkPromo = async (rawCode) => {
     const code = rawCode.trim().toUpperCase();
     if (!code) return;
     setPromoChecking(true);
     setPromoError('');
     try {
-      const { data } = await apiClient.instance.get('/api/payment/promo-check', {
-        params: { code, productCode: COURSE_PLANS[planKey].code },
-      });
-      if (data?.valid) {
-        setAppliedPromo(data);
-        setPromoInput(data.code);
+      const entries = await Promise.all(
+        Object.entries(COURSE_PLANS).map(async ([key, p]) => {
+          try {
+            const { data } = await apiClient.instance.get('/api/payment/promo-check', {
+              params: { code, productCode: p.code },
+            });
+            return [key, data];
+          } catch {
+            return [key, undefined];
+          }
+        })
+      );
+      const valid = Object.fromEntries(
+        entries.filter(([, data]) => data?.valid)
+      );
+      if (Object.keys(valid).length > 0) {
+        setAppliedPromos(valid);
+        setPromoInput((valid[plan] || Object.values(valid)[0]).code);
       } else {
-        setAppliedPromo(null);
-        setPromoError(data?.message || 'Промокод не подошёл.');
+        setAppliedPromos({});
+        const allFailed = entries.every(([, data]) => data === undefined);
+        const activeData = entries.find(([key]) => key === plan)?.[1];
+        setPromoError(
+          allFailed
+            ? 'Не удалось проверить промокод. Попробуйте ещё раз.'
+            : activeData?.message || 'Промокод не подошёл.'
+        );
       }
-    } catch {
-      setAppliedPromo(null);
-      setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
     } finally {
       setPromoChecking(false);
     }
@@ -111,13 +129,10 @@ const CourseCheckout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Цена со скидкой зависит от тарифа — при его смене перепроверяем применённый код.
+  // Скидки для обоих тарифов уже загружены — при смене тарифа перепроверять не нужно.
   const selectPlan = (planKey) => {
     if (planKey === plan) return;
     setPlan(planKey);
-    if (appliedPromo) {
-      checkPromo(appliedPromo.code, planKey);
-    }
   };
 
   const activePlan = COURSE_PLANS[plan];
@@ -218,20 +233,34 @@ const CourseCheckout = () => {
           <h1 className={styles.title}>Предзаказ курса</h1>
 
           <div className={styles.planPicker} role="radiogroup" aria-label="Тариф курса">
-            {Object.entries(COURSE_PLANS).map(([key, p]) => (
-              <button
-                type="button"
-                key={key}
-                role="radio"
-                aria-checked={plan === key}
-                className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''}`}
-                onClick={() => selectPlan(key)}
-              >
-                <span className={styles.planName}>{p.label}</span>
-                <span className={styles.planPrice}>{p.price}</span>
-                <span className={styles.planNote}>{p.note}</span>
-              </button>
-            ))}
+            {Object.entries(COURSE_PLANS).map(([key, p]) => {
+              const planPromo = appliedPromos[key];
+              return (
+                <button
+                  type="button"
+                  key={key}
+                  role="radio"
+                  aria-checked={plan === key}
+                  className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''}`}
+                  onClick={() => selectPlan(key)}
+                >
+                  <span className={styles.planName}>{p.label}</span>
+                  {planPromo ? (
+                    <span className={styles.planPriceRow}>
+                      <span className={styles.planPriceOld}>
+                        {formatKopecks(planPromo.priceKopecks)}
+                      </span>
+                      <span className={styles.planPrice}>
+                        {formatKopecks(planPromo.discountedPriceKopecks)}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className={styles.planPrice}>{p.price}</span>
+                  )}
+                  <span className={styles.planNote}>{p.note}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className={styles.summary}>
@@ -331,7 +360,7 @@ const CourseCheckout = () => {
                 value={promoInput}
                 onChange={(e) => {
                   setPromoInput(e.target.value);
-                  setAppliedPromo(null);
+                  setAppliedPromos({});
                   setPromoError('');
                 }}
                 aria-invalid={Boolean(promoError)}
