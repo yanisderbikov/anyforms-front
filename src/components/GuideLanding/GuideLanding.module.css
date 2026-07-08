@@ -256,39 +256,29 @@
   border-radius: 20px;
 }
 
-.heroChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin: 20px 0 0;
-}
-
-.heroChip {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--slate);
-  background: #ffffff;
-  border: 1px solid rgba(62, 76, 93, 0.12);
-  padding: 8px 14px;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(62, 76, 93, 0.05);
-}
-
 .heroBuy {
   margin-top: 24px;
 }
 
+/* цена ближе к кнопке */
+.heroBuy .heroCta {
+  margin-top: 0;
+}
+
 .heroPriceRow {
   display: flex;
-  align-items: baseline;
+  /* по нижнему краю, чтобы подпись не свисала ниже цифр к кнопке */
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 10px;
 }
 
 .heroPrice {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(38px, 9vw, 46px);
+  line-height: 1;
   letter-spacing: 0.5px;
   color: var(--ink);
 }
@@ -389,7 +379,6 @@
 .areaTitle,
 .areaSub,
 .areaMedia,
-.areaChips,
 .areaBuy,
 .areaProof {
   min-width: 0;
@@ -407,7 +396,6 @@
       'eyebrow media'
       'title   media'
       'sub     media'
-      'chips   media'
       'buy     media'
       'proof   media';
     column-gap: 56px;
@@ -431,10 +419,6 @@
   }
   .heroPhoto {
     aspect-ratio: 827 / 971;
-  }
-  .areaChips {
-    grid-area: chips;
-    margin-top: 26px;
   }
   .areaBuy {
     grid-area: buy;
@@ -863,14 +847,15 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 36px;
+  gap: 12px 20px;
+  margin-top: 24px;
 }
 
 .buyPrice {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(40px, 8vw, 56px);
+  line-height: 1;
   letter-spacing: 0.5px;
   color: var(--yellow);
 }
