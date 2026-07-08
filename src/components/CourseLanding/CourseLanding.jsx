@@ -1,17 +1,58 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import apiClient from '../../apiClient';
+import {
+  getPromoFromSearch,
+  buildPassThroughQuery,
+  formatPromoDeadline,
+} from '../../shared/promoTracking';
+import { COURSE_PLANS } from './CourseCheckout';
 import styles from './CourseLanding.module.css';
 
-const PRICE = '8 700 ₽';
-const PRICE_OLD = '20 000 ₽';
-const LAUNCH = '10 июля 2026';
+const LAUNCH = '1 сентября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
+// Промокод гайда — по нему в попапе показывается заголовок-благодарность.
+const GUIDE_PROMO_CODE = 'ГАЙД';
+// Флаг «попап уже показывали» — чтобы не всплывал заново при возврате с чекаута.
+const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen';
+
+const formatKopecks = (kopecks) =>
+  `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
+
+// Экран 11 — два тарифа участия.
+const TARIFFS = [
+  {
+    key: 'self',
+    name: COURSE_PLANS.self.label,
+    desc: 'Изучаете курс в записи в своём темпе.',
+    features: [
+      '4 видео-модуля: от идеи до рабочей формы',
+      'Доступ к материалам — навсегда',
+      '10 готовых моделей для практики',
+      'Закрытый чат мастеров (2000+)',
+      'Поставщики, материалы и скидки на закупки',
+    ],
+    featured: false,
+  },
+  {
+    key: 'personal',
+    name: COURSE_PLANS.personal.label,
+    desc: 'Месяц работы вместе с командой anyforms.',
+    features: [
+      'Всё из тарифа «Самостоятельное изучение»',
+      'Ведение в течение месяца',
+      'Разбор ошибок и обратная связь',
+      'Доводим до топового результата',
+    ],
+    featured: true,
+  },
+];
 const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
 const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/model-order.jpg';
 
 // Чипы под заголовком — короткие факты о формате курса.
-const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Материалы навсегда', '3 месяца ведения'];
+const HERO_CHIPS = ['4 модуля', 'Видео-формат', 'Материалы навсегда', 'Два формата участия'];
 
 // Цифры-доказательства — реальное производство anyforms.
 const HERO_STATS = [
@@ -170,21 +211,11 @@ const SUPPORT_ITEMS = [
   'Поможем довести ваше изделие до готового результата',
 ];
 
-// Экран 11 — что входит в доступ.
-const INCLUDED = [
-  '4 видео-модуля: от идеи до рабочей формы',
-  'Доступ к материалам — навсегда',
-  '3 месяца ведения и поддержки специалистов',
-  '10 готовых моделей для практики',
-  'Закрытый чат мастеров (2000+)',
-  'Поставщики, материалы и скидки на закупки',
-];
-
 // Экран 12 — FAQ.
 const FAQ = [
   {
     q: 'Когда откроется доступ к курсу?',
-    a: `Сейчас идёт предзаказ. Доступ ко всем материалам откроется ${LAUNCH} — по цене предзаказа, ниже будущей стоимости курса.`,
+    a: `Сейчас идёт предзаказ. Доступ ко всем материалам откроется ${LAUNCH}.`,
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
@@ -228,7 +259,64 @@ const Placeholder = ({ label, ratio, dark }) => (
 
 const CourseLanding = () => {
   const navigate = useNavigate();
-  const goToCheckout = () => navigate(CHECKOUT_PATH);
+  const location = useLocation();
+  const promoFromUrl = getPromoFromSearch(location.search);
+
+  // На чекаут уходим с plan и сквозными promo/utm из текущего URL.
+  const goToCheckout = (planKey) =>
+    navigate(`${CHECKOUT_PATH}${buildPassThroughQuery(location.search, { plan: planKey })}`);
+
+  // Промокод из ссылки (?promo=...): проверяем на бэке по обоим тарифам и,
+  // если валиден, зачёркиваем цены и показываем скидочные.
+  const [promoByPlan, setPromoByPlan] = useState(null);
+  const [promoPopupOpen, setPromoPopupOpen] = useState(false);
+  useEffect(() => {
+    if (!promoFromUrl) {
+      setPromoByPlan(null);
+      return undefined;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const entries = await Promise.all(
+          Object.entries(COURSE_PLANS).map(async ([key, p]) => {
+            const { data } = await apiClient.instance.get('/api/payment/promo-check', {
+              params: { code: promoFromUrl, productCode: p.code },
+            });
+            return [key, data];
+          })
+        );
+        if (!cancelled && entries.every(([, d]) => d?.valid)) {
+          setPromoByPlan(Object.fromEntries(entries));
+          let seen = false;
+          try {
+            seen = sessionStorage.getItem(PROMO_POPUP_SEEN_KEY) === '1';
+          } catch {
+            /* приватный режим — показываем всегда */
+          }
+          if (!seen) setPromoPopupOpen(true);
+        }
+      } catch {
+        // промокод на лендинге — только украшение цены, ошибку молча пропускаем
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [promoFromUrl]);
+
+  const closePromoPopup = () => {
+    setPromoPopupOpen(false);
+    try {
+      sessionStorage.setItem(PROMO_POPUP_SEEN_KEY, '1');
+    } catch {
+      /* ок, просто покажется снова */
+    }
+  };
+
+  const heroSelfPromo = promoByPlan?.self;
+  const isGuidePromo = heroSelfPromo?.code === GUIDE_PROMO_CODE;
+  const promoDeadline = formatPromoDeadline(heroSelfPromo?.validUntil);
 
   return (
     <div className={styles.page}>
@@ -294,6 +382,42 @@ const CourseLanding = () => {
         }))}
       />
 
+      {promoPopupOpen && heroSelfPromo && (
+        <div
+          className={styles.promoModalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="promo-popup-title"
+          onClick={closePromoPopup}
+        >
+          <div className={styles.promoModal} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.promoModalClose}
+              onClick={closePromoPopup}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+            <h2 className={styles.promoModalTitle} id="promo-popup-title">
+              {isGuidePromo ? 'Спасибо, что прошли гайд!' : 'Промокод применён'}
+            </h2>
+            <p className={styles.promoModalText}>
+              По промокоду {heroSelfPromo.code} вам доступна скидка{' '}
+              {heroSelfPromo.discountPercent}% — она уже применилась к ценам курса.
+              {promoDeadline && <> Скидка действует до {promoDeadline}.</>}
+            </p>
+            <button
+              type="button"
+              className={`${styles.cta} ${styles.promoModalCta}`}
+              onClick={closePromoPopup}
+            >
+              Понятно
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ═══════════════ ЭКРАН 1 · HERO ═══════════════ */}
       <div id="top" />
       <section className={styles.hero} aria-label="О курсе">
@@ -332,14 +456,31 @@ const CourseLanding = () => {
           <div className={`${styles.heroBuy} ${styles.areaBuy}`}>
             <div className={styles.heroPriceRow}>
               <div className={styles.heroPriceCol}>
-                <span className={styles.heroPriceOld}>{PRICE_OLD}</span>
-                <span className={styles.heroPrice}>{PRICE}</span>
+                {heroSelfPromo && (
+                  <span className={styles.heroPriceOld}>
+                    от {formatKopecks(heroSelfPromo.priceKopecks)}
+                  </span>
+                )}
+                <span className={styles.heroPrice}>
+                  от{' '}
+                  {heroSelfPromo
+                    ? formatKopecks(heroSelfPromo.discountedPriceKopecks)
+                    : COURSE_PLANS.self.price}
+                </span>
               </div>
               <span className={styles.heroNote}>Цена предзаказа</span>
             </div>
             <button type="button" className={styles.cta} onClick={scrollToBuy}>
               Оформить предзаказ
             </button>
+            {heroSelfPromo && (
+              <p className={styles.promoStripLight}>
+                Промокод {heroSelfPromo.code} применён — скидка {heroSelfPromo.discountPercent}%
+                {formatPromoDeadline(heroSelfPromo.validUntil)
+                  ? `. Ваша скидка действует до ${formatPromoDeadline(heroSelfPromo.validUntil)}.`
+                  : '.'}
+              </p>
+            )}
             <p className={styles.preorderNote}>
               Это предзаказ. Доступ к материалам откроется {LAUNCH}.
             </p>
@@ -644,36 +785,65 @@ const CourseLanding = () => {
           <div className={styles.buyInner}>
             <span className={styles.eyebrowAccent}>Предзаказ</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
-              Доступ ко&nbsp;всему курсу
+              Два формата участия
             </h2>
-            <ul className={styles.buyIncluded}>
-              {INCLUDED.map((item) => (
-                <li className={styles.buyIncludedItem} key={item}>
-                  <span className={styles.buyCheck} aria-hidden>
-                    ✓
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <div className={styles.buyPriceRow}>
-              <div className={styles.buyPriceWrap}>
-                <span className={styles.buyPriceOld}>{PRICE_OLD}</span>
-                <span className={styles.buyPrice}>{PRICE}</span>
-              </div>
-              <button
-                type="button"
-                className={`${styles.cta} ${styles.ctaInline}`}
-                onClick={goToCheckout}
-              >
-                Оформить предзаказ
-              </button>
-              <span className={styles.buyMeta}>
-                <span>Цена предзаказа</span>
-                <span>Доступ откроется {LAUNCH}</span>
-                <span>Материалы — навсегда, ведение — 3 месяца</span>
-              </span>
+            <div className={styles.tariffGrid}>
+              {TARIFFS.map((tariff) => {
+                const promo = promoByPlan?.[tariff.key];
+                return (
+                  <article
+                    key={tariff.key}
+                    className={`${styles.tariffCard} ${tariff.featured ? styles.tariffCardFeatured : ''}`}
+                  >
+                    <h3 className={styles.tariffName}>{tariff.name}</h3>
+                    <p className={styles.tariffDesc}>{tariff.desc}</p>
+                    <ul className={styles.tariffList}>
+                      {tariff.features.map((item) => (
+                        <li className={styles.buyIncludedItem} key={item}>
+                          <span className={styles.buyCheck} aria-hidden>
+                            ✓
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className={styles.tariffPriceWrap}>
+                      {promo && (
+                        <span className={styles.tariffPriceOld}>
+                          {formatKopecks(promo.priceKopecks)}
+                        </span>
+                      )}
+                      <span className={styles.tariffPrice}>
+                        {promo
+                          ? formatKopecks(promo.discountedPriceKopecks)
+                          : COURSE_PLANS[tariff.key].price}
+                      </span>
+                    </div>
+                    {promo && (
+                      <p className={styles.tariffPromoNote}>
+                        Промокод {promo.code}: скидка {promo.discountPercent}%
+                        {formatPromoDeadline(promo.validUntil)
+                          ? `, действует до ${formatPromoDeadline(promo.validUntil)}`
+                          : ''}
+                        . Применится на оплате.
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      className={`${styles.cta} ${styles.tariffCta}`}
+                      onClick={() => goToCheckout(tariff.key)}
+                    >
+                      Оформить предзаказ
+                    </button>
+                  </article>
+                );
+              })}
             </div>
+            <span className={styles.buyMeta}>
+              <span>Цена предзаказа</span>
+              <span>Доступ откроется {LAUNCH}</span>
+              <span>Материалы — навсегда</span>
+            </span>
           </div>
         </div>
       </section>
@@ -712,8 +882,9 @@ const CourseLanding = () => {
               Начните делать формы с&nbsp;<span className={styles.textAccent}>предсказуемым результатом</span>
             </h2>
             <p className={styles.darkLead}>
-              Цена предзаказа {PRICE} вместо {PRICE_OLD}. Доступ откроется {LAUNCH}.
-              Материалы остаются навсегда, ведение специалистов — 3 месяца.
+              Самостоятельное изучение — {COURSE_PLANS.self.price}, личное ведение —{' '}
+              {COURSE_PLANS.personal.price}. Доступ откроется {LAUNCH}. Материалы остаются
+              навсегда.
             </p>
             <div className={styles.finalCtaRow}>
               <button

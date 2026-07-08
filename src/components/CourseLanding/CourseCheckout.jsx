@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
-import styles from '../GuideLanding/GuideCheckout.module.css';
+import {
+  getPromoFromSearch,
+  buildPassThroughQuery,
+  formatPromoDeadline,
+} from '../../shared/promoTracking';
+import styles from './CourseCheckout.module.css';
 
-const PRODUCT_CODE = 'COURSE';
-const PRICE = '8 700 ₽';
-const LAUNCH = '10 июля 2026';
+// Тарифы курса; code — продукт из payment_product на бэке.
+export const COURSE_PLANS = {
+  self: {
+    code: 'COURSE',
+    label: 'Самостоятельное изучение',
+    price: '14 900 ₽',
+    note: 'Записи курса и все материалы — навсегда',
+  },
+  personal: {
+    code: 'COURSE_PERSONAL',
+    label: 'Личное ведение',
+    price: '69 000 ₽',
+    note: 'Записи + ведение в течение месяца: разбор ошибок и обратная связь',
+  },
+};
+
+const formatKopecks = (kopecks) =>
+  `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
+const LAUNCH = '1 сентября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 // Простой, но строгий формат email.
@@ -36,6 +57,13 @@ const formatRuPhone = (value) => {
 const isPhoneValid = (value) => normalizePhoneDigits(value).length === 11;
 
 const CourseCheckout = () => {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  // Обратные ссылки на лендинг сохраняют promo/utm из текущего URL.
+  const backToCourse = `/course${buildPassThroughQuery(location.search)}`;
+  const [plan, setPlan] = useState(
+    searchParams.get('plan') === 'personal' ? 'personal' : 'self'
+  );
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -44,6 +72,58 @@ const CourseCheckout = () => {
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [promoError, setPromoError] = useState('');
+  const [promoChecking, setPromoChecking] = useState(false);
+
+  const checkPromo = async (rawCode, planKey = plan) => {
+    const code = rawCode.trim().toUpperCase();
+    if (!code) return;
+    setPromoChecking(true);
+    setPromoError('');
+    try {
+      const { data } = await apiClient.instance.get('/api/payment/promo-check', {
+        params: { code, productCode: COURSE_PLANS[planKey].code },
+      });
+      if (data?.valid) {
+        setAppliedPromo(data);
+        setPromoInput(data.code);
+      } else {
+        setAppliedPromo(null);
+        setPromoError(data?.message || 'Промокод не подошёл.');
+      }
+    } catch {
+      setAppliedPromo(null);
+      setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
+    } finally {
+      setPromoChecking(false);
+    }
+  };
+
+  // Промокод из URL (?promo=...) подставляем и применяем автоматически.
+  useEffect(() => {
+    const fromUrl = getPromoFromSearch(location.search);
+    if (fromUrl) {
+      setPromoInput(fromUrl);
+      checkPromo(fromUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Цена со скидкой зависит от тарифа — при его смене перепроверяем применённый код.
+  const selectPlan = (planKey) => {
+    if (planKey === plan) return;
+    setPlan(planKey);
+    if (appliedPromo) {
+      checkPromo(appliedPromo.code, planKey);
+    }
+  };
+
+  const activePlan = COURSE_PLANS[plan];
+  const displayPrice = appliedPromo
+    ? formatKopecks(appliedPromo.discountedPriceKopecks)
+    : activePlan.price;
 
   const nameValid = fullName.trim().length >= 2;
   const phoneValid = isPhoneValid(phone);
@@ -86,12 +166,13 @@ const CourseCheckout = () => {
     setSubmitting(true);
     try {
       const { data } = await apiClient.instance.post('/api/payment/purchase', {
-        productCode: PRODUCT_CODE,
+        productCode: activePlan.code,
         fullName: fullName.trim(),
         phone: `+${normalizePhoneDigits(phone)}`,
         email: email.trim(),
         marketingConsent,
         returnUrl: `${window.location.origin}/course/success`,
+        promoCode: appliedPromo ? appliedPromo.code : null,
       });
       if (data?.paymentUrl) {
         window.location.href = data.paymentUrl;
@@ -114,7 +195,7 @@ const CourseCheckout = () => {
     <div className={styles.page} id="top">
       <LandingHeader
         logo={{
-          href: '/course',
+          href: backToCourse,
           ariaLabel: 'anyforms — к курсу',
           src: '/anyforms-wordmark-white.svg',
           width: 152,
@@ -123,11 +204,11 @@ const CourseCheckout = () => {
         navLinks={[]}
         navAriaLabel="Разделы"
         rightItems={[
-          { key: 'course', kind: 'link', to: '/course', label: 'К курсу', variant: 'pill' },
+          { key: 'course', kind: 'link', to: backToCourse, label: 'К курсу', variant: 'pill' },
         ]}
         mobileMenuId="checkout-mobile-menu"
         mobileTopItems={[
-          { key: 'course-m', kind: 'link', to: '/course', label: 'К курсу', variant: 'primary' },
+          { key: 'course-m', kind: 'link', to: backToCourse, label: 'К курсу', variant: 'primary' },
         ]}
       />
 
@@ -136,12 +217,36 @@ const CourseCheckout = () => {
           <span className={styles.eyebrow}>Оформление</span>
           <h1 className={styles.title}>Предзаказ курса</h1>
 
+          <div className={styles.planPicker} role="radiogroup" aria-label="Тариф курса">
+            {Object.entries(COURSE_PLANS).map(([key, p]) => (
+              <button
+                type="button"
+                key={key}
+                role="radio"
+                aria-checked={plan === key}
+                className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''}`}
+                onClick={() => selectPlan(key)}
+              >
+                <span className={styles.planName}>{p.label}</span>
+                <span className={styles.planPrice}>{p.price}</span>
+                <span className={styles.planNote}>{p.note}</span>
+              </button>
+            ))}
+          </div>
+
           <div className={styles.summary}>
             <div className={styles.summaryRow}>
               <span className={styles.summaryName}>
-                Курс по производству силиконовых форм
+                Курс по производству силиконовых форм · {activePlan.label}
               </span>
-              <span className={styles.summaryPrice}>{PRICE}</span>
+              <span className={styles.summaryPriceCol}>
+                {appliedPromo && (
+                  <span className={styles.summaryPriceOld}>
+                    {formatKopecks(appliedPromo.priceKopecks)}
+                  </span>
+                )}
+                <span className={styles.summaryPrice}>{displayPrice}</span>
+              </span>
             </div>
             <p className={styles.summaryNote}>
               Это предзаказ. Доступ к курсу откроется {LAUNCH} — ссылку пришлём на
@@ -213,6 +318,43 @@ const CourseCheckout = () => {
               <p className={styles.hint}>На этот адрес мы пришлём доступ к курсу.</p>
             )}
 
+            <label className={`${styles.label} ${styles.labelGap}`} htmlFor="promo">
+              Промокод
+            </label>
+            <div className={styles.promoRow}>
+              <input
+                id="promo"
+                className={`${styles.input} ${promoError ? styles.inputError : ''}`}
+                type="text"
+                autoComplete="off"
+                placeholder="Введите промокод, если есть"
+                value={promoInput}
+                onChange={(e) => {
+                  setPromoInput(e.target.value);
+                  setAppliedPromo(null);
+                  setPromoError('');
+                }}
+                aria-invalid={Boolean(promoError)}
+              />
+              <button
+                type="button"
+                className={styles.promoApplyBtn}
+                onClick={() => checkPromo(promoInput)}
+                disabled={promoChecking || !promoInput.trim() || Boolean(appliedPromo)}
+              >
+                {promoChecking ? 'Проверяем…' : appliedPromo ? 'Применён' : 'Применить'}
+              </button>
+            </div>
+            {promoError && <p className={styles.fieldError}>{promoError}</p>}
+            {appliedPromo && (
+              <p className={styles.promoOk}>
+                Промокод {appliedPromo.code} применён: скидка {appliedPromo.discountPercent}%
+                {formatPromoDeadline(appliedPromo.validUntil)
+                  ? `. Ваша скидка действует до ${formatPromoDeadline(appliedPromo.validUntil)}.`
+                  : '.'}
+              </p>
+            )}
+
             <label className={styles.checkRow}>
               <input
                 type="checkbox"
@@ -253,7 +395,7 @@ const CourseCheckout = () => {
             {error && <p className={styles.error}>{error}</p>}
 
             <button type="submit" className={styles.payBtn} disabled={!canSubmit}>
-              {submitting ? 'Переходим к оплате…' : `Оплатить ${PRICE}`}
+              {submitting ? 'Переходим к оплате…' : `Оплатить ${displayPrice}`}
             </button>
 
             <p className={styles.support}>
@@ -270,7 +412,7 @@ const CourseCheckout = () => {
           </form>
 
           <p className={styles.backWrap}>
-            <Link className={styles.back} to="/course">
+            <Link className={styles.back} to={backToCourse}>
               ← Назад к курсу
             </Link>
           </p>

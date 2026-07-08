@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
-import styles from '../GuideLanding/GuideCheckout.module.css';
+import styles from './CourseCheckout.module.css';
 
-const LAUNCH = '10 июля 2026';
+const LAUNCH = '1 сентября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 const CourseSuccess = () => {

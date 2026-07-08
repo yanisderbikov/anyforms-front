@@ -1,0 +1,436 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap');
+
+/* Чекаут и страница успеха курса — палитра и типографика лендинга курса. */
+.page {
+  --cream: #f5f1e8;
+  --ink: #16140e;
+  --accent: #cb6a42;
+  --header-h: 78px;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Golos Text', system-ui, sans-serif;
+
+  width: 100%;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* tint shared header to course palette */
+.page :global(header) {
+  background: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.page :global(header) a[class*='navLinkPill']:hover {
+  background: #b85a34;
+  color: #fff;
+}
+
+.page [class*='mobileMenuPrimary'] {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.main {
+  padding: 48px 0 80px;
+}
+
+.inner {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(28px, 6vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin: 14px 0 0;
+}
+
+/* ── plan picker ── */
+.planPicker {
+  margin: 28px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .planPicker {
+    grid-template-columns: 1fr;
+  }
+}
+
+.planCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+  padding: 18px;
+  border: 1.5px solid rgba(22, 20, 14, 0.18);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.planCard:hover {
+  border-color: var(--accent);
+}
+
+.planCardActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(203, 106, 66, 0.2);
+}
+
+.planName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.planPrice {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+}
+
+.planNote {
+  font-size: 12.5px;
+  line-height: 1.45;
+  opacity: 0.6;
+}
+
+/* ── order summary ── */
+.summary {
+  margin: 20px 0 0;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 18px;
+  padding: 24px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.summaryName {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.summaryPrice {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -1px;
+  color: var(--accent);
+}
+
+/* Зачёркнутая цена (при промокоде) — строго над скидочной */
+.summaryPriceCol {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.summaryPriceOld {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.5px;
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.summaryNote {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.6;
+}
+
+/* ── form ── */
+.form {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+.labelGap {
+  margin-top: 18px;
+}
+
+.req {
+  color: #b3261e;
+}
+
+.input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid rgba(22, 20, 14, 0.18);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(203, 106, 66, 0.18);
+}
+
+.inputError {
+  border-color: #b3261e;
+}
+
+.inputError:focus {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.16);
+}
+
+.fieldError {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b3261e;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 13px;
+  opacity: 0.55;
+}
+
+/* ── promo ── */
+.promoRow {
+  display: flex;
+  gap: 10px;
+}
+
+.promoRow .input {
+  flex: 1;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.promoApplyBtn {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 20px;
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.promoApplyBtn:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.promoApplyBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.promoOk {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d7a3d;
+}
+
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.checkbox {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkText {
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.inlineLink {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent);
+  transition: opacity 0.2s ease;
+}
+
+.inlineLink:hover {
+  opacity: 0.6;
+}
+
+.error {
+  margin: 18px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b3261e;
+}
+
+.payBtn {
+  margin-top: 24px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.payBtn:hover:not(:disabled) {
+  background: #b85a34;
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+}
+
+.payBtn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.payBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.support {
+  margin: 22px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.75;
+}
+
+.backWrap {
+  margin: 36px 0 0;
+}
+
+.back {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(22, 20, 14, 0.3);
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.back:hover {
+  opacity: 0.6;
+}
+
+/* ── success ── */
+.successInner {
+  text-align: center;
+  padding-top: 24px;
+}
+
+.successMark {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-weight: 800;
+  box-shadow: 0 10px 28px rgba(203, 106, 66, 0.35);
+}
+
+.successLead {
+  font-size: clamp(15px, 2.4vw, 18px);
+  line-height: 1.6;
+  margin: 18px auto 0;
+  opacity: 0.82;
+  max-width: 440px;
+}
+
+.successInner .support {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 440px;
+}
+
+.successInner .backWrap {
+  margin-top: 32px;
+}
+
+@media (min-width: 560px) {
+  .inner {
+    padding: 0 28px;
+  }
+}
