@@ -6,6 +6,7 @@ import {
   getPromoFromSearch,
   buildPassThroughQuery,
   formatPromoDeadline,
+  normalizePromoCode,
 } from '../../shared/promoTracking';
 import styles from './CourseCheckout.module.css';
 
@@ -81,7 +82,7 @@ const CourseCheckout = () => {
   const appliedPromo = appliedPromos[plan] || null;
 
   const checkPromo = async (rawCode) => {
-    const code = rawCode.trim().toUpperCase();
+    const code = normalizePromoCode(rawCode);
     if (!code) return;
     setPromoChecking(true);
     setPromoError('');
