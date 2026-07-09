@@ -15,7 +15,7 @@ const CustomTabs = () => {
         в работе
       </button>
       <button className={`${styles.tab} ${isCreate ? styles.active : ''}`} onClick={() => navigate('/orders/custom/create')}>
-        создать
+        клиенты
       </button>
       <button className={`${styles.tab} ${isShip ? styles.active : ''}`} onClick={() => navigate('/orders/custom/ship')}>
         к отправке
