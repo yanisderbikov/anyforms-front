@@ -71,6 +71,7 @@
   gap: 4px;
   width: 100%;
   aspect-ratio: 2 / 1;
+  cursor: pointer;
   background: #fff;
 }
 
@@ -85,6 +86,7 @@
   justify-content: center;
   width: 100%;
   aspect-ratio: 2 / 1;
+  cursor: pointer;
   background: #f6f6f6;
   color: #999;
   font-size: 0.9rem;
@@ -403,6 +405,31 @@
   color: #111;
 }
 
+.modalTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.crmLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: #555;
+  background: rgba(17, 17, 17, 0.06);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.crmLink:hover {
+  background: rgba(17, 17, 17, 0.12);
+  color: #111;
+}
+
 .trackerInput {
   border: 1px solid rgba(17, 17, 17, 0.12);
   border-radius: 14px;
@@ -427,7 +454,9 @@
 
 .cancel {
   background: none;
-  border: none;
+  border: 1px solid #c9c9c9;
+  border-radius: 999px;
+  padding: 0.7rem 1.6rem;
   color: #555;
   font-size: 0.95rem;
   cursor: pointer;
@@ -436,6 +465,7 @@
 
 .cancel:hover {
   color: #111;
+  border-color: #8a8a8a;
 }
 
 .save {

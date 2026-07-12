@@ -173,7 +173,7 @@ const CustomShipList = () => {
             return (
               <div key={o.id} className={styles.group}>
                 {n > 0 ? (
-                  <div className={`${styles.collage} ${collageCls}`}>
+                  <div className={`${styles.collage} ${collageCls}`} onClick={() => openShip(g)}>
                     {images.slice(0, 4).map((img, i) => (
                       <div key={i} className={styles.collageCell}>
                         <img src={img.url} alt="" loading="lazy" />
@@ -182,7 +182,7 @@ const CustomShipList = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className={styles.noPhoto}>нет фотографии</div>
+                  <div className={styles.noPhoto} onClick={() => openShip(g)}>нет фотографии</div>
                 )}
 
                 <div className={styles.groupBody}>
@@ -224,7 +224,40 @@ const CustomShipList = () => {
       {shipping && (
         <div className={styles.overlay} onClick={closeShip}>
           <form className={styles.modal} onClick={(e) => e.stopPropagation()} onSubmit={handleShip}>
-            <div className={styles.modalTitle}>{title(shipping.order)}</div>
+            <div className={styles.modalTitleRow}>
+              <div className={styles.modalTitle}>{title(shipping.order)}</div>
+              {shipping.order.leadId && (
+                <a
+                  className={styles.crmLink}
+                  href={`https://anyforms.amocrm.ru/leads/detail/${shipping.order.leadId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Открыть сделку в AmoCRM"
+                  aria-label="Открыть сделку в AmoCRM"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+              )}
+            </div>
+            {mode === 'delivery' && (
+              <div className={styles.contactInfo}>
+                <Field label="ФИО" value={shipping.order.contactName} onCopy={() => copyText(shipping.order.contactName, 'ФИО скопировано')} />
+                <Field label="Телефон" value={shipping.order.contactPhone} onCopy={() => copyText(shipping.order.contactPhone, 'Телефон скопирован')} />
+                {shipping.order.pvzSdekStreet && (
+                  <Field label="ПВЗ СДЭК улица" value={shipping.order.pvzSdekStreet} onCopy={() => copyText(shipping.order.pvzSdekStreet, 'ПВЗ улица скопировано')} />
+                )}
+                {shipping.order.pvzSdekCity && (
+                  <Field label="ПВЗ СДЭК город" value={shipping.order.pvzSdekCity} onCopy={() => copyText(shipping.order.pvzSdekCity, 'ПВЗ город скопировано')} />
+                )}
+                {shipping.order.purchaseDate && <Field label="Дата оплаты" value={formatDate(shipping.order.purchaseDate)} />}
+                {shipping.order.deliveryStatus && <Field label="Статус доставки" value={shipping.order.deliveryStatus} />}
+                {shipping.order.comment && <Field label="Комментарий" value={shipping.order.comment} comment />}
+              </div>
+            )}
             <div className={styles.modalPosList}>
               {shipping.items.map((it) => (
                 <div key={it.id} className={styles.posRow}>
