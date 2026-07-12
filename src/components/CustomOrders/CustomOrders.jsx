@@ -20,12 +20,18 @@ const STAGE_TO_STATUS = {
   IN_PRODUCTION: 'IN_PRODUCTION',
   ship: 'READY_TO_SHIP',
   READY_TO_SHIP: 'READY_TO_SHIP',
+  delivering: 'DELIVERING',
+  DELIVERING: 'DELIVERING',
+  completed: 'COMPLETED',
+  COMPLETED: 'COMPLETED',
   all: null,
 };
 const STATUS_TO_STAGE = {
   MODELING: 'modeling',
   IN_PRODUCTION: 'production',
   READY_TO_SHIP: 'ship',
+  DELIVERING: 'delivering',
+  COMPLETED: 'completed',
 };
 
 const stageParamToStatus = (raw) => {
@@ -55,10 +61,10 @@ const CustomOrders = () => {
     );
   };
 
-  const load = async () => {
+  const load = async (completed) => {
     try {
       setLoading(true);
-      setItems(await getAllCustomItems());
+      setItems(await getAllCustomItems(completed ? 'COMPLETED' : undefined));
     } catch (e) {
       toast.error('Ошибка при загрузке под-заказов');
     } finally {
@@ -66,9 +72,11 @@ const CustomOrders = () => {
     }
   };
 
+  const showCompleted = statusFilter === 'COMPLETED';
+
   useEffect(() => {
-    load();
-  }, []);
+    load(showCompleted);
+  }, [showCompleted]);
 
   const filtered = items.filter((it) => {
     if (statusFilter && it.status !== statusFilter) return false;

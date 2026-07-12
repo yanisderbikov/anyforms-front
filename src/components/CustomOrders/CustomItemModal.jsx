@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import {
-  CUSTOM_STATUSES,
+  CUSTOM_EDIT_STATUSES,
+  CUSTOM_STATUS_LABELS,
   isImageFile,
   fileExt,
   updateItem,
@@ -141,7 +142,12 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
             <label className={styles.field}>
               <span className={styles.label}>статус</span>
               <select className={styles.select} value={form.status} onChange={(e) => setF('status', e.target.value)}>
-                {CUSTOM_STATUSES.map((s) => (
+                {!CUSTOM_EDIT_STATUSES.some((s) => s.value === form.status) && (
+                  <option value={form.status} disabled>
+                    {CUSTOM_STATUS_LABELS[form.status] || form.status}
+                  </option>
+                )}
+                {CUSTOM_EDIT_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>

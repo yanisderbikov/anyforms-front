@@ -17,6 +17,33 @@
   justify-content: center;
 }
 
+.subTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.subTab {
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #fff;
+  color: #111;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: lowercase;
+}
+
+.subActive,
+.subActive:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
 .groups {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
@@ -50,6 +77,18 @@
 .collageCell {
   position: relative;
   overflow: hidden;
+}
+
+.noPhoto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: #f6f6f6;
+  color: #999;
+  font-size: 0.9rem;
+  text-transform: lowercase;
 }
 
 .collageCell img {
@@ -189,6 +228,47 @@
 .shipBtn:hover {
   background: #8a8a8a;
   color: #111;
+}
+
+.completeBtn {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.25);
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: lowercase;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.completeBtn:hover {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.completeModalBtn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  color: #b71c1c;
+  border: 1px solid rgba(183, 28, 28, 0.35);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: lowercase;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.completeModalBtn:hover {
+  background: #b71c1c;
+  color: #fff;
+  border-color: #b71c1c;
 }
 
 .contactInfo {

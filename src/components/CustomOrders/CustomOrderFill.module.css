@@ -151,6 +151,24 @@
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
+.statusSelect {
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  padding: 0.7rem 0.95rem;
+  font-size: 0.95rem;
+  outline: none;
+  width: 220px;
+  box-sizing: border-box;
+  color: #111;
+  background: #fff;
+  cursor: pointer;
+}
+
+.statusSelect:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
 .label {
   font-size: 0.8rem;
   color: #555;

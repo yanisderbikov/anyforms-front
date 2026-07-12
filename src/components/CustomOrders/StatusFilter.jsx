@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CUSTOM_STATUSES, CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE } from '../../services/customProducts';
+import { CUSTOM_FILTER_STATUSES, CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE } from '../../services/customProducts';
 import styles from './StatusFilter.module.css';
 
 // Плашка-фильтр по статусу под поиском. value=null → показываем все.
@@ -46,7 +46,7 @@ const StatusFilter = ({ value, onChange }) => {
 
       {open && (
         <div className={styles.popover}>
-          {CUSTOM_STATUSES.map((s) => (
+          {CUSTOM_FILTER_STATUSES.map((s) => (
             <button
               type="button"
               key={s.value}

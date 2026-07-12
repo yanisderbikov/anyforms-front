@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import {
   getReadyToShipGroups,
+  getInDeliveryGroups,
   shipOrder,
+  completeOrder,
   isImageFile,
   CUSTOM_STATUS_STYLE,
   CUSTOM_STATUS_LABELS,
@@ -53,30 +55,31 @@ const Field = ({ label, value, onCopy, comment }) => (
 );
 
 const CustomShipList = () => {
+  const [mode, setMode] = useState('ship');
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shipping, setShipping] = useState(null);
   const [tracker, setTracker] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = async (m) => {
     try {
       setLoading(true);
-      setGroups(await getReadyToShipGroups());
+      setGroups(m === 'ship' ? await getReadyToShipGroups() : await getInDeliveryGroups());
     } catch {
-      toast.error('Не удалось загрузить заказы к отправке');
+      toast.error('Не удалось загрузить заказы');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    load(mode);
+  }, [mode]);
 
   const openShip = (g) => {
     setShipping(g);
-    setTracker('');
+    setTracker(mode === 'delivery' ? g.order.tracker || '' : '');
   };
   const closeShip = () => {
     if (!saving) {
@@ -94,12 +97,21 @@ const CustomShipList = () => {
     try {
       setSaving(true);
       await shipOrder(shipping.order.id, tracker.trim());
-      setGroups((prev) => prev.filter((g) => g.order.id !== shipping.order.id));
+      if (mode === 'ship') {
+        setGroups((prev) => prev.filter((g) => g.order.id !== shipping.order.id));
+        toast.success('Заказ отправлен');
+      } else {
+        setGroups((prev) =>
+          prev.map((g) =>
+            g.order.id === shipping.order.id ? { ...g, order: { ...g.order, tracker: tracker.trim() } } : g
+          )
+        );
+        toast.success('Трекер обновлён');
+      }
       setShipping(null);
       setTracker('');
-      toast.success('Заказ отправлен');
     } catch {
-      toast.error('Не удалось отправить заказ');
+      toast.error(mode === 'ship' ? 'Не удалось отправить заказ' : 'Не удалось обновить трекер');
     } finally {
       setSaving(false);
     }
@@ -107,11 +119,37 @@ const CustomShipList = () => {
 
   const title = (o = {}) => o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`);
 
+  const handleComplete = async () => {
+    const g = shipping;
+    if (!window.confirm(`Завершить заказ «${title(g.order)}»? Он пропадёт из списка.`)) return;
+    try {
+      setSaving(true);
+      await completeOrder(g.order.id);
+      setGroups((prev) => prev.filter((x) => x.order.id !== g.order.id));
+      setShipping(null);
+      setTracker('');
+      toast.success('Заказ завершён');
+    } catch {
+      toast.error('Не удалось завершить заказ');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <CustomHeader />
       <div className={styles.tabsWrap}>
         <CustomTabs />
+      </div>
+
+      <div className={styles.subTabs}>
+        <button className={`${styles.subTab} ${mode === 'ship' ? styles.subActive : ''}`} onClick={() => setMode('ship')}>
+          к отправке
+        </button>
+        <button className={`${styles.subTab} ${mode === 'delivery' ? styles.subActive : ''}`} onClick={() => setMode('delivery')}>
+          доставляются
+        </button>
       </div>
 
       {loading ? (
@@ -121,7 +159,9 @@ const CustomShipList = () => {
         </div>
       ) : groups.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>нет заказов к отправке</p>
+          <p className={styles.emptyText}>
+            {mode === 'ship' ? 'нет заказов к отправке' : 'нет заказов в доставке'}
+          </p>
         </div>
       ) : (
         <div className={styles.groups}>
@@ -132,7 +172,7 @@ const CustomShipList = () => {
             const collageCls = n >= 4 ? styles.c4 : n === 3 ? styles.c3 : n === 2 ? styles.c2 : styles.c1;
             return (
               <div key={o.id} className={styles.group}>
-                {n > 0 && (
+                {n > 0 ? (
                   <div className={`${styles.collage} ${collageCls}`}>
                     {images.slice(0, 4).map((img, i) => (
                       <div key={i} className={styles.collageCell}>
@@ -141,6 +181,8 @@ const CustomShipList = () => {
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <div className={styles.noPhoto}>нет фотографии</div>
                 )}
 
                 <div className={styles.groupBody}>
@@ -154,12 +196,24 @@ const CustomShipList = () => {
                       <Field label="ПВЗ СДЭК город" value={o.pvzSdekCity} onCopy={() => copyText(o.pvzSdekCity, 'ПВЗ город скопировано')} />
                     )}
                     {o.purchaseDate && <Field label="Дата оплаты" value={formatDate(o.purchaseDate)} />}
+                    {mode === 'delivery' && (
+                      <Field label="Трекер" value={o.tracker} onCopy={() => copyText(o.tracker, 'Трекер скопирован')} />
+                    )}
+                    {mode === 'delivery' && o.deliveryStatus && (
+                      <Field label="Статус доставки" value={o.deliveryStatus} />
+                    )}
                     {o.comment && <Field label="Комментарий" value={o.comment} comment />}
                   </div>
 
-                  <button className={styles.shipBtn} onClick={() => openShip(g)}>
-                    добавить трекер
-                  </button>
+                  {mode === 'ship' ? (
+                    <button className={styles.shipBtn} onClick={() => openShip(g)}>
+                      добавить трекер
+                    </button>
+                  ) : (
+                    <button className={styles.completeBtn} onClick={() => openShip(g)}>
+                      изменить
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -193,12 +247,17 @@ const CustomShipList = () => {
               onChange={(e) => setTracker(e.target.value)}
               autoFocus
             />
+            {mode === 'delivery' && (
+              <button type="button" className={styles.completeModalBtn} onClick={handleComplete} disabled={saving}>
+                завершить заказ
+              </button>
+            )}
             <div className={styles.modalActions}>
               <button type="button" className={styles.cancel} onClick={closeShip} disabled={saving}>
                 отмена
               </button>
               <button type="submit" className={styles.save} disabled={saving}>
-                {saving ? 'сохраняю…' : 'отправить'}
+                {saving ? 'сохраняю…' : mode === 'ship' ? 'отправить' : 'сохранить'}
               </button>
             </div>
           </form>

@@ -18,7 +18,7 @@ const CustomTabs = () => {
         клиенты
       </button>
       <button className={`${styles.tab} ${isShip ? styles.active : ''}`} onClick={() => navigate('/orders/custom/ship')}>
-        к отправке
+        доставка
       </button>
     </div>
   );

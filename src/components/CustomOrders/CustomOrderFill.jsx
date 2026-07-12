@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getOrder, getItemsByOrder, createItem, addItemFiles } from '../../services/customProducts';
+import { getOrder, getItemsByOrder, createItem, addItemFiles, CUSTOM_STATUSES } from '../../services/customProducts';
 import CustomItemCard from './CustomItemCard';
 import CustomItemModal from './CustomItemModal';
 import AutoTextarea from './AutoTextarea';
 import styles from './CustomOrderFill.module.css';
 
-const EMPTY = { productName: '', description: '', quantity: 1 };
+const EMPTY = { productName: '', description: '', quantity: 1, status: 'MODELING' };
 
 const CustomOrderFill = () => {
   const { orderId } = useParams();
@@ -66,6 +66,7 @@ const CustomOrderFill = () => {
         productName: form.productName.trim(),
         description: form.description.trim(),
         quantity: Number(form.quantity),
+        status: form.status,
       });
       let result = created;
       const files = drafts.map((d) => d.file);
@@ -126,6 +127,15 @@ const CustomOrderFill = () => {
         <AutoTextarea className={styles.textarea} placeholder="описание" value={form.description} onChange={(e) => setF('description', e.target.value)} />
         <input className={styles.inputNarrow} type="number" min={1} placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value)} />
 
+        <span className={styles.label}>статус</span>
+        <select className={styles.statusSelect} value={form.status} onChange={(e) => setF('status', e.target.value)}>
+          {CUSTOM_STATUSES.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label.toLowerCase()}
+            </option>
+          ))}
+        </select>
+
         <span className={styles.label}>файлы (любые: фото, чертёж, zip…)</span>
         <div className={styles.drafts}>
           {drafts.map((d, i) => (
@@ -151,7 +161,7 @@ const CustomOrderFill = () => {
       {items.length > 0 && (
         <div className={styles.itemsGrid}>
           {items.map((it) => (
-            <CustomItemCard key={it.id} item={it} hideStatus onOpen={() => setSelected(it)} />
+            <CustomItemCard key={it.id} item={it} onOpen={() => setSelected(it)} />
           ))}
         </div>
       )}
@@ -159,7 +169,6 @@ const CustomOrderFill = () => {
       {selected && (
         <CustomItemModal
           item={selected}
-          hideStatus
           onClose={() => setSelected(null)}
           onSaved={(updated) => setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))}
           onDeleted={(id) => setItems((prev) => prev.filter((i) => i.id !== id))}

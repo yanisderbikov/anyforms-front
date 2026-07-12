@@ -21,8 +21,8 @@ export const searchContacts = (q) =>
 export const getOrder = (id) => http.get(`/api/orders/${id}`, cfg()).then((r) => r.data);
 
 // ---- Позиции ----
-export const getAllCustomItems = () =>
-  http.get('/api/custom-product-items', cfg()).then((r) => r.data);
+export const getAllCustomItems = (status) =>
+  http.get('/api/custom-product-items', cfg(status ? { params: { status } } : {})).then((r) => r.data);
 export const getCustomItem = (id) =>
   http.get(`/api/public/custom-product-items/${id}`, cfg()).then((r) => r.data);
 export const getItemsByOrder = (orderId) =>
@@ -55,27 +55,48 @@ export const CUSTOM_STATUS_LABELS = {
   MODELING: 'Моделирование',
   IN_PRODUCTION: 'В производстве',
   READY_TO_SHIP: 'Готов к отправке',
-  SENT: 'Отправлен',
+  DELIVERING: 'Доставляется',
+  COMPLETED: 'Завершен',
 };
 
-// Цвет пилюли по статусу: моделирование — зелёный, производство — жёлтый, к отправке — красный, отправлен — серый.
+// Цвет пилюли по статусу: моделирование — зелёный, производство — жёлтый, к отправке — красный,
+// доставляется — синий, завершен — серый. Рамка в тон, чтобы пилюля не сливалась с фоном.
 export const CUSTOM_STATUS_STYLE = {
-  MODELING: { background: '#d6f5dd', color: '#1b7a33' },
-  IN_PRODUCTION: { background: '#fff3cd', color: '#8a6d00' },
-  READY_TO_SHIP: { background: '#ffd9d9', color: '#b71c1c' },
-  SENT: { background: '#e5e5ea', color: '#555' },
+  MODELING: { background: '#d6f5dd', color: '#1b7a33', border: '1px solid rgba(27, 122, 51, 0.35)' },
+  IN_PRODUCTION: { background: '#fff3cd', color: '#8a6d00', border: '1px solid rgba(138, 109, 0, 0.35)' },
+  READY_TO_SHIP: { background: '#ffd9d9', color: '#b71c1c', border: '1px solid rgba(183, 28, 28, 0.35)' },
+  DELIVERING: { background: '#d9e8ff', color: '#1a56b0', border: '1px solid rgba(26, 86, 176, 0.35)' },
+  COMPLETED: { background: '#e5e5ea', color: '#555', border: '1px solid rgba(85, 85, 85, 0.4)' },
 };
 
-// Группы «к отправке» (по заказу) и отгрузка.
+// Группы «к отправке» и «доставляются» (по заказу) и отгрузка.
 export const getReadyToShipGroups = () =>
   http.get('/api/custom-product-items/ready-to-ship', cfg()).then((r) => r.data);
+export const getInDeliveryGroups = () =>
+  http.get('/api/custom-product-items/in-delivery', cfg()).then((r) => r.data);
 export const shipOrder = (orderId, tracker) =>
   http.post('/api/custom-product-items/ship', { orderId, tracker }, cfg()).then((r) => r.data);
+export const completeOrder = (orderId) =>
+  http.post(`/api/custom-product-items/complete/${orderId}`, null, cfg()).then((r) => r.data);
 
 export const CUSTOM_STATUSES = [
   { value: 'MODELING', label: 'Моделирование' },
   { value: 'IN_PRODUCTION', label: 'В производстве' },
   { value: 'READY_TO_SHIP', label: 'Готов к отправке' },
+];
+
+// Статусы для фильтра «в работе»: рабочие + доставка. Завершённые подгружаются с бэка отдельно.
+export const CUSTOM_FILTER_STATUSES = [
+  ...CUSTOM_STATUSES,
+  { value: 'DELIVERING', label: 'Доставляется' },
+  { value: 'COMPLETED', label: 'Завершен' },
+];
+
+// Статусы, доступные при редактировании позиции: рабочие + завершение.
+// В «Доставляется» руками не переводим — только через трекер.
+export const CUSTOM_EDIT_STATUSES = [
+  ...CUSTOM_STATUSES,
+  { value: 'COMPLETED', label: 'Завершен' },
 ];
 
 const IMAGE_RE = /\.(png|jpe?g|gif|webp|bmp|svg|heic|heif|avif)(\?|$)/i;
