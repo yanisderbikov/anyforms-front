@@ -414,3 +414,17 @@
     padding: 1rem 1.1rem;
   }
 }
+
+/* Пилюля-переключатель способа получения: по умолчанию серая (сдэк), жёлтые цвета самовывоза приходят инлайном. */
+.deliveryToggle {
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.25);
+  background: #fff;
+  color: #555;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  cursor: pointer;
+  white-space: nowrap;
+}

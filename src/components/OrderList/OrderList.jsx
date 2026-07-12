@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getOrdersWithoutTracker, getDeliveringOrders, getCreatedOrders, syncOrder } from '../../services/api';
+import { getOrdersWithoutTracker, getDeliveringOrders, getCreatedOrders, readyForPickup } from '../../services/api';
+import { isPickup } from '../../services/customProducts';
 import OrderCard from '../OrderCard/OrderCard';
 import TrackerModal from '../TrackerModal/TrackerModal';
 import styles from './OrderList.module.css';
@@ -97,27 +98,16 @@ const OrderList = () => {
     handleCloseModal();
   };
 
-  const handleSync = async (leadId) => {
+  const handlePickupReady = async (order) => {
+    if (!window.confirm('Точно ли заказ готов? Клиенту будет отправлено уведомление, что его можно забрать.')) {
+      return;
+    }
     try {
-      await syncOrder(leadId);
-      toast.success('Синхронизация запущена. Список обновится через 5 секунд...', {
-        position: 'top-right',
-        duration: 3000,
-      });
-      // Обновляем список через 5 секунд
-      setTimeout(() => {
-        loadOrders();
-        toast.success('Список обновлен', {
-          position: 'top-right',
-          duration: 2000,
-        });
-      }, 5000);
+      await readyForPickup(order.leadId);
+      toast.success('Заказ готов к выдаче, клиент получит уведомление');
+      loadOrders();
     } catch (error) {
-      toast.error('Ошибка при синхронизации сделки', {
-        position: 'top-right',
-        duration: 3000,
-      });
-      console.error('Error syncing order:', error);
+      toast.error(error.message || 'Не удалось отметить самовывоз');
     }
   };
 
@@ -262,9 +252,9 @@ const OrderList = () => {
             <OrderCard
               key={order.leadId}
               order={order}
-              onAddTracker={activeMode === 'without-tracker' ? () => handleOpenModal(order.leadId, false) : null}
+              onAddTracker={activeMode === 'without-tracker' && !isPickup(order) ? () => handleOpenModal(order.leadId, false) : null}
+              onPickupReady={activeMode === 'without-tracker' && isPickup(order) ? () => handlePickupReady(order) : null}
               onAddComment={activeMode === 'created' || activeMode === 'delivering' ? () => handleOpenModal(order.leadId, true) : null}
-              onSync={handleSync}
             />
           ))}
         </div>

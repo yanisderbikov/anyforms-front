@@ -546,3 +546,14 @@
     font-size: 1.05rem;
   }
 }
+
+/* Жёлтая пометка «самовывоз» — цвета приходят инлайном (PICKUP_BADGE_STYLE). */
+.pickupBadge {
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  white-space: nowrap;
+}

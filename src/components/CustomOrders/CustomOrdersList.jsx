@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getCustomOrders, createCustomOrder, searchContacts } from '../../services/customProducts';
+import { getCustomOrders, createCustomOrder, searchContacts, isPickup, PICKUP_BADGE_STYLE } from '../../services/customProducts';
 import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import styles from './CustomOrdersList.module.css';
 
-const EMPTY_FORM = { contactName: '', contactPhone: '', pvzSdekCity: '', pvzSdekStreet: '' };
+const EMPTY_FORM = { contactName: '', contactPhone: '', pvzSdekCity: '', pvzSdekStreet: '', pickup: false };
 
 const fmtDate = (s) => {
   try {
@@ -75,12 +75,13 @@ const CustomOrdersList = () => {
   };
 
   const pickSuggestion = (s) => {
-    setForm({
+    setForm((p) => ({
+      ...p,
       contactName: s.contactName || '',
       contactPhone: s.contactPhone || '',
       pvzSdekCity: s.pvzSdekCity || '',
       pvzSdekStreet: s.pvzSdekStreet || '',
-    });
+    }));
     setQuery('');
     setSuggestions([]);
   };
@@ -94,6 +95,7 @@ const CustomOrdersList = () => {
         contactPhone: form.contactPhone.trim() || null,
         pvzSdekCity: form.pvzSdekCity.trim() || null,
         pvzSdekStreet: form.pvzSdekStreet.trim() || null,
+        deliveryMethod: form.pickup ? 'PICKUP' : 'CDEK',
       });
       navigate(`/orders/custom/order/${created.id}`);
     } catch {
@@ -137,8 +139,13 @@ const CustomOrdersList = () => {
                 <span className={styles.cardTitle}>
                   {o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`)}
                 </span>
-                <span className={`${styles.badge} ${cnt(o) === 0 ? styles.badgeEmpty : ''}`}>
-                  {cnt(o) === 0 ? 'не оформлен' : `${cnt(o)} поз.`}
+                <span className={styles.headBadges}>
+                  {isPickup(o) && (
+                    <span className={styles.badge} style={PICKUP_BADGE_STYLE}>самовывоз</span>
+                  )}
+                  <span className={`${styles.badge} ${cnt(o) === 0 ? styles.badgeEmpty : ''}`}>
+                    {cnt(o) === 0 ? 'не оформлен' : `${cnt(o)} поз.`}
+                  </span>
                 </span>
               </div>
               <div className={styles.cardMeta}>
@@ -183,6 +190,11 @@ const CustomOrdersList = () => {
             <input className={styles.modalInput} placeholder="телефон" value={form.contactPhone} onChange={(e) => setF('contactPhone', e.target.value)} />
             <input className={styles.modalInput} placeholder="город" value={form.pvzSdekCity} onChange={(e) => setF('pvzSdekCity', e.target.value)} />
             <input className={styles.modalInput} placeholder="улица / адрес" value={form.pvzSdekStreet} onChange={(e) => setF('pvzSdekStreet', e.target.value)} />
+
+            <label className={styles.pickupCheck}>
+              <input type="checkbox" checked={form.pickup} onChange={(e) => setF('pickup', e.target.checked)} />
+              <span>самовывоз (клиент заберёт лично, без СДЭК)</span>
+            </label>
 
             <div className={styles.modalActions}>
               <button type="button" className={styles.modalCancel} onClick={closeCreate} disabled={saving}>

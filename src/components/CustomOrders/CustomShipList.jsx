@@ -6,6 +6,8 @@ import {
   shipOrder,
   completeOrder,
   isImageFile,
+  isPickup,
+  PICKUP_BADGE_STYLE,
   CUSTOM_STATUS_STYLE,
   CUSTOM_STATUS_LABELS,
 } from '../../services/customProducts';
@@ -90,16 +92,22 @@ const CustomShipList = () => {
 
   const handleShip = async (e) => {
     e.preventDefault();
-    if (!tracker.trim()) {
+    const pickup = isPickup(shipping.order);
+    if (pickup && mode === 'ship') {
+      if (!window.confirm('Точно ли заказ готов? Клиенту будет отправлено уведомление, что его можно забрать.')) {
+        return;
+      }
+    }
+    if (!pickup && !tracker.trim()) {
       toast.error('Введите трекер');
       return;
     }
     try {
       setSaving(true);
-      await shipOrder(shipping.order.id, tracker.trim());
+      await shipOrder(shipping.order.id, pickup ? null : tracker.trim());
       if (mode === 'ship') {
         setGroups((prev) => prev.filter((g) => g.order.id !== shipping.order.id));
-        toast.success('Заказ отправлен');
+        toast.success(pickup ? 'Заказ готов к выдаче' : 'Заказ отправлен');
       } else {
         setGroups((prev) =>
           prev.map((g) =>
@@ -186,6 +194,11 @@ const CustomShipList = () => {
                 )}
 
                 <div className={styles.groupBody}>
+                  {isPickup(o) && (
+                    <span className={styles.pickupBadge} style={PICKUP_BADGE_STYLE}>
+                      самовывоз
+                    </span>
+                  )}
                   <div className={styles.contactInfo}>
                     <Field label="ФИО" value={o.contactName} onCopy={() => copyText(o.contactName, 'ФИО скопировано')} />
                     <Field label="Телефон" value={o.contactPhone} onCopy={() => copyText(o.contactPhone, 'Телефон скопирован')} />
@@ -196,7 +209,7 @@ const CustomShipList = () => {
                       <Field label="ПВЗ СДЭК город" value={o.pvzSdekCity} onCopy={() => copyText(o.pvzSdekCity, 'ПВЗ город скопировано')} />
                     )}
                     {o.purchaseDate && <Field label="Дата оплаты" value={formatDate(o.purchaseDate)} />}
-                    {mode === 'delivery' && (
+                    {mode === 'delivery' && !isPickup(o) && (
                       <Field label="Трекер" value={o.tracker} onCopy={() => copyText(o.tracker, 'Трекер скопирован')} />
                     )}
                     {mode === 'delivery' && o.deliveryStatus && (
@@ -207,7 +220,7 @@ const CustomShipList = () => {
 
                   {mode === 'ship' ? (
                     <button className={styles.shipBtn} onClick={() => openShip(g)}>
-                      добавить трекер
+                      {isPickup(o) ? 'готов к выдаче' : 'добавить трекер'}
                     </button>
                   ) : (
                     <button className={styles.completeBtn} onClick={() => openShip(g)}>
@@ -226,6 +239,11 @@ const CustomShipList = () => {
           <form className={styles.modal} onClick={(e) => e.stopPropagation()} onSubmit={handleShip}>
             <div className={styles.modalTitleRow}>
               <div className={styles.modalTitle}>{title(shipping.order)}</div>
+              {isPickup(shipping.order) && (
+                <span className={styles.pickupBadge} style={PICKUP_BADGE_STYLE}>
+                  самовывоз
+                </span>
+              )}
               {shipping.order.leadId && (
                 <a
                   className={styles.crmLink}
@@ -273,13 +291,15 @@ const CustomShipList = () => {
                 </div>
               ))}
             </div>
-            <input
-              className={styles.trackerInput}
-              placeholder="номер трекера"
-              value={tracker}
-              onChange={(e) => setTracker(e.target.value)}
-              autoFocus
-            />
+            {!isPickup(shipping.order) && (
+              <input
+                className={styles.trackerInput}
+                placeholder="номер трекера"
+                value={tracker}
+                onChange={(e) => setTracker(e.target.value)}
+                autoFocus
+              />
+            )}
             {mode === 'delivery' && (
               <button type="button" className={styles.completeModalBtn} onClick={handleComplete} disabled={saving}>
                 завершить заказ
@@ -289,9 +309,17 @@ const CustomShipList = () => {
               <button type="button" className={styles.cancel} onClick={closeShip} disabled={saving}>
                 отмена
               </button>
-              <button type="submit" className={styles.save} disabled={saving}>
-                {saving ? 'сохраняю…' : mode === 'ship' ? 'отправить' : 'сохранить'}
-              </button>
+              {!(mode === 'delivery' && isPickup(shipping.order)) && (
+                <button type="submit" className={styles.save} disabled={saving}>
+                  {saving
+                    ? 'сохраняю…'
+                    : mode === 'delivery'
+                      ? 'сохранить'
+                      : isPickup(shipping.order)
+                        ? 'заказ готов'
+                        : 'отправить'}
+                </button>
+              )}
             </div>
           </form>
         </div>

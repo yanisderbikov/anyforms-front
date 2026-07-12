@@ -1,8 +1,9 @@
 import React from 'react';
 import { toast } from 'react-hot-toast';
+import { isPickup, PICKUP_BADGE_STYLE } from '../../services/customProducts';
 import styles from './OrderCard.module.css';
 
-const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
+const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady }) => {
   const copyToClipboard = (text, message) => {
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
@@ -35,12 +36,6 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
     if (order.leadId) {
       const url = `https://anyforms.amocrm.ru/leads/detail/${order.leadId}`;
       window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  const handleSync = () => {
-    if (onSync && order.leadId) {
-      onSync(order.leadId);
     }
   };
 
@@ -81,20 +76,12 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
         <h3 className={styles.leadId}>
           Сделка #{order.leadId}
         </h3>
+        {isPickup(order) && (
+          <span className={styles.pickupBadge} style={PICKUP_BADGE_STYLE}>
+            самовывоз
+          </span>
+        )}
         <div className={styles.headerButtons}>
-          {onSync && (
-            <button
-              className={styles.refreshIcon}
-              onClick={handleSync}
-              title="Обновить сделку"
-              aria-label="Обновить сделку"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M21 3v5h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          )}
           {order.leadId && (
             <button
               className={styles.linkIcon}
@@ -205,8 +192,17 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onSync }) => {
         </div>
       </div>
 
-      {(onAddTracker || onAddComment) && (
+      {(onAddTracker || onAddComment || onPickupReady) && (
         <div className={styles.cardFooter}>
+          {onPickupReady && (
+            <button
+              onClick={onPickupReady}
+              className={styles.addTrackerButton}
+              style={PICKUP_BADGE_STYLE}
+            >
+              Можно забрать
+            </button>
+          )}
           {onAddTracker && (
             <button
               onClick={onAddTracker}

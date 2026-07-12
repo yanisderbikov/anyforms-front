@@ -19,6 +19,17 @@ export const createCustomOrder = (body) =>
 export const searchContacts = (q) =>
   http.get('/api/orders/contacts/search', cfg({ params: { q } })).then((r) => r.data);
 export const getOrder = (id) => http.get(`/api/orders/${id}`, cfg()).then((r) => r.data);
+export const updateOrderDeliveryMethod = (id, deliveryMethod) =>
+  http.patch(`/api/orders/${id}/delivery-method`, { deliveryMethod }, cfg()).then((r) => r.data);
+
+export const isPickup = (order) => order?.deliveryMethod === 'PICKUP';
+
+// Жёлтая пилюля «самовывоз» — в тон IN_PRODUCTION.
+export const PICKUP_BADGE_STYLE = {
+  background: '#fff3cd',
+  color: '#8a6d00',
+  border: '1px solid rgba(138, 109, 0, 0.35)',
+};
 
 // ---- Позиции ----
 export const getAllCustomItems = (status) =>
@@ -75,7 +86,7 @@ export const getReadyToShipGroups = () =>
 export const getInDeliveryGroups = () =>
   http.get('/api/custom-product-items/in-delivery', cfg()).then((r) => r.data);
 export const shipOrder = (orderId, tracker) =>
-  http.post('/api/custom-product-items/ship', { orderId, tracker }, cfg()).then((r) => r.data);
+  http.post('/api/custom-product-items/ship', { orderId, tracker: tracker || null }, cfg()).then((r) => r.data);
 export const completeOrder = (orderId) =>
   http.post(`/api/custom-product-items/complete/${orderId}`, null, cfg()).then((r) => r.data);
 

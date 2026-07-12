@@ -42,6 +42,30 @@ export const setTracker = async (leadId, tracker, comment) => {
 };
 
 /**
+ * Retail pickup: mark order as ready for pickup (runs pickup bot in AmoCRM)
+ * @param {number} leadId - Lead ID
+ * @param {string} comment - Optional comment
+ * @returns {Promise<Object>} API response
+ */
+export const readyForPickup = async (leadId, comment = '') => {
+  try {
+    const token = apiClient.getToken ? apiClient.getToken() : null;
+    const response = await apiClient.instance.post(
+      '/api/orders/pickup-ready',
+      { leadId, comment },
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error marking order ready for pickup:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Ошибка при отметке самовывоза');
+    }
+    throw error;
+  }
+};
+
+/**
  * Sync order from AmoCRM
  * @param {number} leadId - Lead ID
  * @returns {Promise<Object>} API response

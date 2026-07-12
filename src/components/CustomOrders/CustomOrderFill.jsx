@@ -1,7 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { getOrder, getItemsByOrder, createItem, addItemFiles, CUSTOM_STATUSES } from '../../services/customProducts';
+import {
+  getOrder,
+  getItemsByOrder,
+  createItem,
+  addItemFiles,
+  updateOrderDeliveryMethod,
+  isPickup,
+  PICKUP_BADGE_STYLE,
+  CUSTOM_STATUSES,
+} from '../../services/customProducts';
 import CustomItemCard from './CustomItemCard';
 import CustomItemModal from './CustomItemModal';
 import AutoTextarea from './AutoTextarea';
@@ -37,6 +46,16 @@ const CustomOrderFill = () => {
   }, [orderId]);
 
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+
+  const toggleDeliveryMethod = async () => {
+    const next = isPickup(order) ? 'CDEK' : 'PICKUP';
+    try {
+      setOrder(await updateOrderDeliveryMethod(orderId, next));
+      toast.success(next === 'PICKUP' ? 'Заказ помечен как самовывоз' : 'Заказ помечен как доставка СДЭК');
+    } catch {
+      toast.error('Не удалось сменить способ получения');
+    }
+  };
   const clearDrafts = () =>
     setDrafts((prev) => {
       prev.forEach((d) => URL.revokeObjectURL(d.url));
@@ -118,6 +137,15 @@ const CustomOrderFill = () => {
           {order?.contactPhone && <span>{order.contactPhone}</span>}
           {order?.leadId && <span>amo #{order.leadId}</span>}
           <span>позиций: {items.length}</span>
+          <button
+            type="button"
+            className={styles.deliveryToggle}
+            style={isPickup(order) ? PICKUP_BADGE_STYLE : undefined}
+            onClick={toggleDeliveryMethod}
+            title="Нажмите, чтобы сменить способ получения"
+          >
+            {isPickup(order) ? 'самовывоз' : 'доставка сдэк'}
+          </button>
         </div>
       </div>
 

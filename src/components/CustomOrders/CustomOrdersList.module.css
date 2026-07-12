@@ -342,3 +342,26 @@
     grid-template-columns: 1fr;
   }
 }
+
+.headBadges {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.pickupCheck {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pickupCheck input {
+  width: 16px;
+  height: 16px;
+  accent-color: #111;
+  cursor: pointer;
+}
