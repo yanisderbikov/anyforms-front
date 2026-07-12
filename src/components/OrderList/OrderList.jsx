@@ -153,15 +153,6 @@ const OrderList = () => {
 
   const productCounts = getProductCounts();
 
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-        <p className={styles.loadingText}>Загрузка заказов...</p>
-      </div>
-    );
-  }
-
   const getModeTitle = () => {
     switch (activeMode) {
       case 'without-tracker':
@@ -228,7 +219,7 @@ const OrderList = () => {
         </div>
       </div>
 
-      {Object.keys(productCounts).length > 0 && (
+      {!loading && Object.keys(productCounts).length > 0 && (
         <div className={styles.summaryBox}>
           <h2 className={styles.summaryTitle}>Саммари: {getModeTitle()}</h2>
           <div className={styles.summaryContent}>
@@ -254,7 +245,12 @@ const OrderList = () => {
         </div>
       </div>
 
-      {filteredOrders.length === 0 ? (
+      {loading ? (
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}></div>
+          <p className={styles.loadingText}>Загрузка заказов...</p>
+        </div>
+      ) : filteredOrders.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyText}>
             {searchQuery ? 'Заказы не найдены' : `Нет заказов: ${getModeTitle()}`}
