@@ -105,6 +105,26 @@
 }
 .removeBtn:hover { color: var(--color-base-black); }
 
+/* Мобилка: строка корзины в две линии — фото на обе, сверху название и крестик,
+   снизу степпер количества и сумма */
+@media (max-width: 560px) {
+  .cartRow {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    grid-template-areas:
+      'photo info remove'
+      'photo qty  price';
+    column-gap: 12px;
+    row-gap: 10px;
+  }
+  .cartPhoto { grid-area: photo; align-self: start; }
+  .cartInfo { grid-area: info; }
+  .cartName { overflow-wrap: anywhere; }
+  .qty { grid-area: qty; }
+  .rowPrice { grid-area: price; min-width: 0; align-self: center; }
+  .removeBtn { grid-area: remove; justify-self: end; align-self: start; }
+}
+
 /* Сводка / итог */
 .summary {
   background: #fafafa;
@@ -116,6 +136,33 @@
 .summaryRow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 0.95rem; color: #333; padding: 6px 0; }
 .summaryTotal { font-size: 1.1rem; font-weight: 700; color: var(--color-base-black); border-top: 1px solid #e2e2e2; margin-top: 6px; padding-top: 14px; }
 .summaryNote { font-size: 0.8rem; color: #8c8c8c; margin: 8px 0 0; }
+
+/* Информативные позиции заказа: фото + название + описание + счёт */
+.orderItems { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.orderItem { display: flex; align-items: flex-start; gap: 12px; }
+.orderThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+.orderItemInfo { flex: 1; min-width: 0; }
+.orderItemName { font-size: 0.95rem; font-weight: 600; color: var(--color-base-black); margin: 0; }
+.orderItemDesc {
+  font-size: 0.82rem;
+  color: #8c8c8c;
+  line-height: 1.4;
+  margin: 3px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.orderItemMeta { font-size: 0.82rem; color: #8c8c8c; margin: 4px 0 0; }
+.orderItemPrice { font-size: 0.95rem; font-weight: 700; white-space: nowrap; color: var(--color-base-black); }
+.summaryDivider { border: none; border-top: 1px solid #ececec; margin: 4px 0 8px; }
 
 /* Форма */
 .form { display: flex; flex-direction: column; }

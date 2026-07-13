@@ -50,6 +50,7 @@ export const CartProvider = ({ children }) => {
         {
           id,
           name: product.name ?? '',
+          description: product.description ?? '',
           price: parsePrice(product.price),
           photo: product.photos?.[0] ?? null,
           quantity,

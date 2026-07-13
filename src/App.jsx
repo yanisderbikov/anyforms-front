@@ -4,6 +4,7 @@ import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
+import MarketplaceProduct from "./components/Marketplace/MarketplaceProduct";
 import MarketplaceCart from "./components/Marketplace/MarketplaceCart";
 import MarketplaceCheckout from "./components/Marketplace/MarketplaceCheckout";
 import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
@@ -164,7 +165,8 @@ function App() {
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
   const isFounderPage = normalizedPathname.startsWith('/founders/');
-  const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname);
+  const isShopProductPage = /^\/shop\/product\/[^/]+$/.test(normalizedPathname);
+  const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage;
 
   useEffect(() => {
     if (isHomePage) {
@@ -247,6 +249,7 @@ function App() {
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />
         <Route path="/shop" element={<Marketplace />} />
+        <Route path="/shop/product/:id" element={<MarketplaceProduct />} />
         <Route path="/shop/cart" element={<MarketplaceCart />} />
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />

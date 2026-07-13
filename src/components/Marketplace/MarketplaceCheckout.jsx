@@ -109,14 +109,26 @@ const MarketplaceCheckout = () => {
         <h1 className={styles.title}>Оформление заказа</h1>
 
         <div className={styles.summary}>
-          {items.map((item) => (
-            <div key={item.id} className={styles.summaryRow}>
-              <span>
-                {item.name} × {item.quantity}
-              </span>
-              <span>{formatPrice(item.price * item.quantity)}</span>
-            </div>
-          ))}
+          <div className={styles.orderItems}>
+            {items.map((item) => (
+              <div key={item.id} className={styles.orderItem}>
+                {item.photo ? (
+                  <img className={styles.orderThumb} src={item.photo} alt={item.name} />
+                ) : (
+                  <div className={styles.orderThumb} />
+                )}
+                <div className={styles.orderItemInfo}>
+                  <p className={styles.orderItemName}>{item.name}</p>
+                  {item.description && <p className={styles.orderItemDesc}>{item.description}</p>}
+                  <p className={styles.orderItemMeta}>
+                    {formatPrice(item.price)} × {item.quantity}
+                  </p>
+                </div>
+                <span className={styles.orderItemPrice}>{formatPrice(item.price * item.quantity)}</span>
+              </div>
+            ))}
+          </div>
+          <hr className={styles.summaryDivider} />
           <div className={styles.summaryRow}>
             <span>Доставка СДЭК</span>
             <span>на ПВЗ при получении</span>

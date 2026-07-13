@@ -78,6 +78,27 @@
 .cartLink:hover { background: rgba(255, 255, 255, 0.12); }
 .cartLink svg { display: block; }
 
+/* Фильтр избранного в шапке: тот же стиль, что у корзины, левее неё */
+.likesToggle {
+  position: absolute;
+  right: 64px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.likesToggle:hover { background: rgba(255, 255, 255, 0.12); }
+.likesToggle svg { display: block; }
+.likesToggleActive { background: rgba(255, 255, 255, 0.12); }
+
 .cartBadge {
   position: absolute;
   top: 4px;

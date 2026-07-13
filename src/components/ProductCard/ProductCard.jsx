@@ -1,4 +1,5 @@
 import React from 'react';
+import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './ProductCard.module.css';
 
 const ProductCard = ({ item, onSelect }) => {
@@ -25,6 +26,7 @@ const ProductCard = ({ item, onSelect }) => {
       onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}
     >
       <div className={styles.photoWrap}>
+        <LikeButton productId={item.id} overlay />
         {firstPhoto ? (
           <img
             className={styles.photo}

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { getItems } from '../../services/itemsService';
 import { trackProductOpen } from '../../services/analytics';
-import { useCart, isPurchasable } from '../../context/CartContext';
+import { useCart } from '../../context/CartContext';
+import { useLikes } from '../../hooks/useLikes';
 import ProductCard from '../ProductCard/ProductCard';
-import CTAButton from '../shared/CTAButton/CTAButton';
 import styles from './Marketplace.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
@@ -14,47 +13,22 @@ const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
 const PROMO_CODE = 'any-shop-10';
 
-const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
-
 const Marketplace = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { add, count } = useCart();
+  const { count } = useCart();
+  const { isLiked, count: likesCount } = useLikes();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
   const [copied, setCopied] = useState(false);
-  const photos = selectedItem?.photos?.length ? selectedItem.photos : [];
+  const [showLiked, setShowLiked] = useState(false);
 
-  const openPopup = (item) => {
-    setSelectedItem(item);
+  const visibleItems = showLiked ? items.filter((item) => isLiked(item.id)) : items;
+
+  const openProduct = (item) => {
     trackProductOpen(item);
-  };
-
-  const closePopup = () => {
-    setSelectedItem(null);
-
-    // Чтобы попап не открывался заново эффектом по query-параметру `id`.
-    const params = new URLSearchParams(location.search);
-    if (params.has('id')) {
-      params.delete('id');
-      const search = params.toString();
-      navigate(
-        {
-          pathname: location.pathname,
-          search: search ? `?${search}` : '',
-        },
-        { replace: true }
-      );
-    }
-  };
-
-  const stopPropagation = (e) => e.stopPropagation();
-
-  const handleAddToCart = (item) => {
-    add(item);
-    toast.success('Добавлено в корзину');
+    navigate(`/shop/product/${item.id}`);
   };
 
   const handlePromoCopy = async () => {
@@ -74,6 +48,7 @@ const Marketplace = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // Совместимость со старыми ссылками вида /shop?id=<uuid>: уводим на страницу товара.
   useEffect(() => {
     if (!items.length) return;
 
@@ -85,10 +60,9 @@ const Marketplace = () => {
 
     const matchingItem = items.find((item) => String(item.id) === normalizedId);
     if (!matchingItem) return;
-    if (selectedItem?.id === matchingItem.id) return;
 
-    openPopup(matchingItem);
-  }, [items, location.search, selectedItem?.id]);
+    navigate(`/shop/product/${matchingItem.id}`, { replace: true });
+  }, [items, location.search, navigate]);
 
   if (loading) {
     return (
@@ -136,6 +110,28 @@ const Marketplace = () => {
               decoding="async"
             />
           </a>
+          <button
+            type="button"
+            className={`${styles.likesToggle} ${showLiked ? styles.likesToggleActive : ''}`}
+            onClick={() => setShowLiked((prev) => !prev)}
+            aria-label={showLiked ? 'Показать все товары' : 'Показать избранное'}
+            aria-pressed={showLiked}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill={showLiked ? '#f0808f' : 'none'}
+              stroke={showLiked ? '#f0808f' : '#fff'}
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
+            </svg>
+            {likesCount > 0 && <span className={styles.cartBadge}>{likesCount}</span>}
+          </button>
           <Link
             className={styles.cartLink}
             to="/shop/cart"
@@ -168,13 +164,19 @@ const Marketplace = () => {
           <strong className={styles.highlight}>заменим молд или вернём деньги</strong>.
         </h1>
       </div>
-      <ul className={styles.grid}>
-        {items.map((item) => (
-          <li key={item.name} className={styles.gridItem}>
-            <ProductCard item={item} onSelect={openPopup} />
-          </li>
-        ))}
-      </ul>
+      {showLiked && visibleItems.length === 0 ? (
+        <p className={styles.message}>
+          Пока ничего не выбрано — нажмите на сердечко у товара, чтобы сохранить его здесь.
+        </p>
+      ) : (
+        <ul className={styles.grid}>
+          {visibleItems.map((item) => (
+            <li key={item.name} className={styles.gridItem}>
+              <ProductCard item={item} onSelect={openProduct} />
+            </li>
+          ))}
+        </ul>
+      )}
       <p className={styles.promoNote}>
         По промокоду{' '}
         <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
@@ -186,89 +188,6 @@ const Marketplace = () => {
         </a>
         .
       </p>
-
-      {selectedItem && (
-        <div
-          className={styles.popupOverlay}
-          onClick={closePopup}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Карточка товара"
-        >
-          <div className={styles.popup} onClick={stopPropagation}>
-            <button
-              type="button"
-              className={styles.popupClose}
-              onClick={closePopup}
-              aria-label="Закрыть"
-            >
-              ×
-            </button>
-
-            <div className={styles.popupGallery}>
-              <div className={styles.popupGalleryTrack}>
-                {photos.map((src, i) => (
-                  <div key={i} className={styles.popupGallerySlide}>
-                    <img
-                      src={src}
-                      alt={`${selectedItem.name} — фото ${i + 1}`}
-                      className={styles.popupGalleryImg}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.popupBody}>
-              <h2 className={styles.popupName}>{selectedItem.name}</h2>
-              {selectedItem.description && (
-                <div className={styles.popupDescription}>{selectedItem.description}</div>
-              )}
-              <div className={styles.popupPrices}>
-                <span className={styles.popupPrice}>{formatPrice(selectedItem.price)}</span>
-                {selectedItem.crossedPrice != null && selectedItem.crossedPrice > selectedItem.price && (
-                  <span className={styles.popupCrossedPrice}>{formatPrice(selectedItem.crossedPrice)}</span>
-                )}
-              </div>
-              <div className={styles.popupActions}>
-                {isPurchasable(selectedItem) ? (
-                  <button
-                    type="button"
-                    onClick={() => handleAddToCart(selectedItem)}
-                    style={{
-                      flex: 1,
-                      padding: '14px 20px',
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: '#fff',
-                      background: '#000',
-                      border: '1px solid #000',
-                      borderRadius: 999,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    В корзину
-                  </button>
-                ) : (
-                  <CTAButton href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
-                    Заказать
-                  </CTAButton>
-                )}
-                {selectedItem.tgLink && (
-                  <a
-                    href={selectedItem.tgLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.popupBtnDetails}
-                  >
-                    Подробнее
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <footer className={styles.siteFooter}>
         <div className={styles.footerGrid}>
