@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart } from '../../context/CartContext';
-import { MARKETPLACE_CHECKOUT_ENABLED } from '../../config/features';
+import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../utils/phone';
 import PvzSelect from './PvzSelect';
 import styles from './checkout.module.css';
@@ -12,6 +12,7 @@ const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 const MarketplaceCheckout = () => {
   const { items, total, count } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -36,8 +37,8 @@ const MarketplaceCheckout = () => {
   const phoneError = touched.phone && !phoneValid ? 'Введите корректный номер: +7 (999) 123-45-67.' : '';
   const emailError = touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
 
-  // Фича-флаг: онлайн-чекаут пока выключен — с прямого захода уводим в корзину.
-  if (!MARKETPLACE_CHECKOUT_ENABLED) {
+  // Фича-флаг: без ?tbpayment=true в URL чекаут недоступен — уводим в корзину.
+  if (!isMarketplaceCheckoutEnabled(location.search)) {
     return <Navigate to="/shop/cart" replace />;
   }
 
@@ -101,7 +102,7 @@ const MarketplaceCheckout = () => {
     <div className={styles.page} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
-          <Link className={styles.back} to="/shop/cart">
+          <Link className={styles.back} to={`/shop/cart${location.search}`}>
             ← В корзину
           </Link>
         </div>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { MARKETPLACE_CHECKOUT_ENABLED, MARKETPLACE_ORDER_TG_LINK } from '../../config/features';
+import { isMarketplaceCheckoutEnabled, MARKETPLACE_ORDER_TG_LINK } from '../../config/features';
 import styles from './checkout.module.css';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
@@ -9,6 +9,8 @@ const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 const MarketplaceCart = () => {
   const { items, setQty, remove, total, count } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+  const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
 
   return (
     <div className={styles.page} id="top">
@@ -90,8 +92,12 @@ const MarketplaceCart = () => {
               </div>
             </div>
 
-            {MARKETPLACE_CHECKOUT_ENABLED ? (
-              <button type="button" className={styles.payBtn} onClick={() => navigate('/shop/checkout')}>
+            {checkoutEnabled ? (
+              <button
+                type="button"
+                className={styles.payBtn}
+                onClick={() => navigate(`/shop/checkout${location.search}`)}
+              >
                 <span>Оформить заказ</span>
                 <span className={styles.ctaArrow} aria-hidden="true">→</span>
               </button>
