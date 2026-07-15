@@ -40,11 +40,14 @@ export function useLikes() {
     [raw]
   );
 
+  // Возвращает новое состояние: true — лайк поставлен, false — снят.
   const toggleLike = useCallback((productId) => {
-    if (productId == null) return;
+    if (productId == null) return null;
     const id = String(productId);
     const current = JSON.parse(readRaw());
-    writeRaw(current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+    const liked = !current.includes(id);
+    writeRaw(liked ? [...current, id] : current.filter((x) => x !== id));
+    return liked;
   }, []);
 
   return { ids, isLiked, toggleLike, count: ids.length };

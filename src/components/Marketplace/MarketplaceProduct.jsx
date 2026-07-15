@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
-import { trackProductOpen } from '../../services/analytics';
+import { trackViewItem, trackAddToCart } from '../../services/analytics';
 import { useCart, isPurchasable } from '../../context/CartContext';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './MarketplaceProduct.module.css';
@@ -42,8 +42,13 @@ const MarketplaceProduct = () => {
     [items, id]
   );
 
+  // view_item — один раз на открытие конкретного товара (ref гасит повтор
+  // эффекта от StrictMode; переход на другой товар меняет id и шлёт заново).
+  const viewedIdRef = useRef(null);
   useEffect(() => {
-    if (product) trackProductOpen(product);
+    if (!product || viewedIdRef.current === String(product.id)) return;
+    viewedIdRef.current = String(product.id);
+    trackViewItem(product);
   }, [product]);
 
   useEffect(() => {
@@ -140,7 +145,7 @@ const MarketplaceProduct = () => {
               </div>
             )}
             <div className={styles.main}>
-              <LikeButton productId={product.id} overlay />
+              <LikeButton productId={product.id} product={product} placement="product_page" overlay />
               {product.discountPercent > 0 && (
                 <span className={styles.discountBadge}>−{product.discountPercent}%</span>
               )}
@@ -185,7 +190,10 @@ const MarketplaceProduct = () => {
                 <button
                   type="button"
                   className={`${styles.addBtn} ${inCart > 0 ? styles.addBtnAdded : ''}`}
-                  onClick={() => add(product)}
+                  onClick={() => {
+                    add(product);
+                    trackAddToCart(product, { quantity: 1, placement: 'product_page' });
+                  }}
                 >
                   {inCart > 0 ? `В корзине ${inCart} шт · добавить ещё` : 'В корзину'}
                 </button>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
-import { trackProductOpen } from '../../services/analytics';
+import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
 import { useLikes } from '../../hooks/useLikes';
 import ProductCard from '../ProductCard/ProductCard';
@@ -24,10 +24,24 @@ const Marketplace = () => {
   const [copied, setCopied] = useState(false);
   const [showLiked, setShowLiked] = useState(false);
 
-  const visibleItems = showLiked ? items.filter((item) => isLiked(item.id)) : items;
+  const visibleItems = useMemo(
+    () => (showLiked ? items.filter((item) => isLiked(item.id)) : items),
+    [items, showLiked, isLiked]
+  );
 
-  const openProduct = (item) => {
-    trackProductOpen(item);
+  // view_item_list — один раз на фактически показанный набор товаров.
+  // Ключ по содержимому защищает от повторов при ре-рендерах и StrictMode.
+  const lastListKeyRef = useRef(null);
+  useEffect(() => {
+    if (loading || !visibleItems.length) return;
+    const key = `${showLiked ? 'liked' : 'all'}:${visibleItems.map((i) => i.id).join(',')}`;
+    if (key === lastListKeyRef.current) return;
+    lastListKeyRef.current = key;
+    trackViewItemList(visibleItems, 'catalog');
+  }, [visibleItems, showLiked, loading]);
+
+  const openProduct = (item, index) => {
+    trackSelectItem(item, index ?? undefined, 'catalog');
     navigate(`/shop/product/${item.id}`);
   };
 
@@ -170,9 +184,9 @@ const Marketplace = () => {
         </p>
       ) : (
         <ul className={styles.grid}>
-          {visibleItems.map((item) => (
+          {visibleItems.map((item, index) => (
             <li key={item.name} className={styles.gridItem}>
-              <ProductCard item={item} onSelect={openProduct} />
+              <ProductCard item={item} index={index} onSelect={openProduct} />
             </li>
           ))}
         </ul>

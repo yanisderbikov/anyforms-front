@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled, MARKETPLACE_ORDER_TG_LINK } from '../../config/features';
+import {
+  trackViewCart,
+  trackAddToCart,
+  trackRemoveFromCart,
+  trackChangeCartQuantity,
+  trackBeginCheckout,
+} from '../../services/analytics';
 import styles from './checkout.module.css';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
@@ -11,6 +18,47 @@ const MarketplaceCart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
+
+  // view_cart — один раз на открытие страницы корзины (в том числе пустой);
+  // ref гасит повторный запуск эффекта в StrictMode.
+  const viewTrackedRef = useRef(false);
+  useEffect(() => {
+    if (viewTrackedRef.current) return;
+    viewTrackedRef.current = true;
+    trackViewCart(items);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const changeQty = (item, delta) => {
+    const newQty = Math.max(0, item.quantity + delta);
+    if (newQty === item.quantity) return;
+    setQty(item.id, newQty);
+    if (delta > 0) {
+      trackAddToCart(item, { quantity: delta, placement: 'cart' });
+    } else {
+      trackRemoveFromCart(item, {
+        quantity: item.quantity - newQty,
+        placement: 'cart',
+        removalType: 'quantity_decrease',
+      });
+    }
+    trackChangeCartQuantity(item.id, item.quantity, newQty);
+  };
+
+  const removeItem = (item) => {
+    remove(item.id);
+    trackRemoveFromCart(item, {
+      quantity: item.quantity,
+      placement: 'cart',
+      removalType: 'full_remove',
+    });
+    trackChangeCartQuantity(item.id, item.quantity, 0);
+  };
+
+  const goToCheckout = () => {
+    trackBeginCheckout(items);
+    navigate(`/shop/checkout${location.search}`);
+  };
 
   return (
     <div className={styles.page} id="top">
@@ -49,7 +97,7 @@ const MarketplaceCart = () => {
                     <button
                       type="button"
                       className={styles.qtyBtn}
-                      onClick={() => setQty(item.id, item.quantity - 1)}
+                      onClick={() => changeQty(item, -1)}
                       aria-label="Уменьшить количество"
                     >
                       −
@@ -58,7 +106,7 @@ const MarketplaceCart = () => {
                     <button
                       type="button"
                       className={styles.qtyBtn}
-                      onClick={() => setQty(item.id, item.quantity + 1)}
+                      onClick={() => changeQty(item, 1)}
                       aria-label="Увеличить количество"
                     >
                       +
@@ -68,7 +116,7 @@ const MarketplaceCart = () => {
                   <button
                     type="button"
                     className={styles.removeBtn}
-                    onClick={() => remove(item.id)}
+                    onClick={() => removeItem(item)}
                     aria-label="Удалить из корзины"
                   >
                     ×
@@ -96,7 +144,7 @@ const MarketplaceCart = () => {
               <button
                 type="button"
                 className={styles.payBtn}
-                onClick={() => navigate(`/shop/checkout${location.search}`)}
+                onClick={goToCheckout}
               >
                 <span>Оформить заказ</span>
                 <span className={styles.ctaArrow} aria-hidden="true">→</span>

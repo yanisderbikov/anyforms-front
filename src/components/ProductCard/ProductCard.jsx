@@ -2,7 +2,7 @@ import React from 'react';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './ProductCard.module.css';
 
-const ProductCard = ({ item, onSelect }) => {
+const ProductCard = ({ item, index = null, onSelect }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
 
@@ -14,7 +14,7 @@ const ProductCard = ({ item, onSelect }) => {
 
   const handleClick = (e) => {
     e.preventDefault();
-    onSelect?.(item);
+    onSelect?.(item, index);
   };
 
   return (
@@ -26,7 +26,7 @@ const ProductCard = ({ item, onSelect }) => {
       onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}
     >
       <div className={styles.photoWrap}>
-        <LikeButton productId={item.id} overlay />
+        <LikeButton productId={item.id} product={item} placement="catalog" index={index} overlay />
         {firstPhoto ? (
           <img
             className={styles.photo}

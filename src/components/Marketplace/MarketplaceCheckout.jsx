@@ -4,8 +4,16 @@ import apiClient from '../../apiClient';
 import { useCart } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../utils/phone';
+import {
+  trackAddPaymentInfo,
+  trackPaymentFailed,
+  saveCheckoutSnapshot,
+} from '../../services/analytics';
 import PvzSelect from './PvzSelect';
 import styles from './checkout.module.css';
+
+// Единственный способ оплаты — онлайн через платёжную страницу Т-Банка.
+const PAYMENT_TYPE = 'online';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
@@ -82,12 +90,18 @@ const MarketplaceCheckout = () => {
         returnUrl: `${window.location.origin}/shop/success`,
       });
       if (data?.paymentUrl) {
+        // Платёж создан: фиксируем выбор оплаты и сохраняем состав корзины,
+        // чтобы после возврата с платёжной страницы отправить purchase.
+        trackAddPaymentInfo(items, PAYMENT_TYPE);
+        saveCheckoutSnapshot(items);
         window.location.href = data.paymentUrl;
         return;
       }
+      trackPaymentFailed(PAYMENT_TYPE, 'no_payment_url');
       setError('Не удалось создать платёж. Попробуйте ещё раз.');
       setSubmitting(false);
     } catch (err) {
+      trackPaymentFailed(PAYMENT_TYPE, err?.response?.status ?? 'network_error');
       const apiMessage = err?.response?.data?.message || err?.response?.data?.error;
       setError(
         typeof apiMessage === 'string'

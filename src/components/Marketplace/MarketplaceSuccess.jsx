@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import {
+  trackPurchase,
+  readCheckoutSnapshot,
+  clearCheckoutSnapshot,
+} from '../../services/analytics';
 import styles from './checkout.module.css';
 
 const MarketplaceSuccess = () => {
@@ -8,10 +13,23 @@ const MarketplaceSuccess = () => {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order');
 
-  // Оплата прошла — очищаем корзину.
+  // Оплата прошла: отправляем purchase (состав заказа — из снапшота,
+  // сохранённого перед редиректом на оплату) и очищаем корзину.
+  // trackPurchase сам защищён от повторной отправки по transaction_id,
+  // так что обновление страницы успеха покупку не задвоит.
   useEffect(() => {
+    const snapshot = readCheckoutSnapshot();
+    const transactionId = orderNumber || snapshot?.fallbackId;
+    if (snapshot && transactionId) {
+      const sent = trackPurchase({
+        id: transactionId,
+        value: snapshot.value,
+        items: snapshot.items,
+      });
+      if (sent) clearCheckoutSnapshot();
+    }
     clear();
-  }, [clear]);
+  }, [clear, orderNumber]);
 
   return (
     <div className={styles.page} id="top">

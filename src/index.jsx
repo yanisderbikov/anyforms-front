@@ -4,7 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import App from './App';
 import { CartProvider } from './context/CartContext';
+import { initAnalytics } from './services/analytics';
 import './index.css';
+
+// Подключаем GTM (только при заданном VITE_GTM_ID).
+initAnalytics();
 
 // Обработка редиректа с 404.html для SPA роутинга на GitHub Pages
 if (sessionStorage.getItem('spaRedirect')) {

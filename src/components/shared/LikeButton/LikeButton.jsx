@@ -1,15 +1,25 @@
 import React from 'react';
 import { useLikes } from '../../../hooks/useLikes';
+import { trackAddToWishlist, trackRemoveFromWishlist } from '../../../services/analytics';
 import styles from './LikeButton.module.css';
 
-const LikeButton = ({ productId, overlay = false, className = '' }) => {
+// product, placement ('catalog' | 'product_page') и index (позиция в каталоге)
+// нужны только для аналитики; без них кнопка работает как раньше.
+const LikeButton = ({ productId, product = null, placement = null, index = null, overlay = false, className = '' }) => {
   const { isLiked, toggleLike } = useLikes();
   const liked = isLiked(productId);
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleLike(productId);
+    const nowLiked = toggleLike(productId);
+    if (nowLiked === null) return;
+    const analyticsProduct = product ?? { id: productId };
+    if (nowLiked) {
+      trackAddToWishlist(analyticsProduct, { placement, index: index ?? undefined });
+    } else {
+      trackRemoveFromWishlist(analyticsProduct, { placement, index: index ?? undefined });
+    }
   };
 
   return (
