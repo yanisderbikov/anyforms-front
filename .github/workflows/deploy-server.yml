@@ -34,24 +34,12 @@ jobs:
             type=raw,value=latest
             type=sha,format=short
 
-      # Vite-переменные вшиваются в бандл при сборке; если repository variable
-      # VITE_GTM_ID не задана (Settings → Secrets and variables → Actions →
-      # Variables), образ соберётся без GTM — предупреждаем об этом явно.
-      - name: Check analytics config
-        run: |
-          if [ -z "${{ vars.VITE_GTM_ID }}" ]; then
-            echo "::warning::Repository variable VITE_GTM_ID не задана — прод соберётся БЕЗ GTM-аналитики"
-          else
-            echo "VITE_GTM_ID=${{ vars.VITE_GTM_ID }}"
-          fi
-
       - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           build-args: |
             VITE_API_URL=${{ vars.VITE_API_URL || 'https://anyforms.ru' }}
-            VITE_GTM_ID=${{ vars.VITE_GTM_ID || '' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

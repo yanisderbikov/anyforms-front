@@ -4,59 +4,40 @@
 [`src/services/analytics.js`](../src/services/analytics.js). Чтобы события попали в GA4,
 нужно один раз настроить Google Tag Manager и GA4 по этой инструкции.
 
-## 1. Переменная окружения и разделение тест/прод
+## 1. Подключение GTM и разделение тест/прод
 
-GTM подключается только при заданной переменной сборки Vite `VITE_GTM_ID=GTM-XXXXXXX`.
-Тестовая и боевая аналитика полностью разведены — используются **два разных
-GTM-контейнера и две GA4 property**:
+Боевой контейнер **`GTM-MBTTRF2N` захардкожен** в
+[`src/services/analytics.js`](../src/services/analytics.js) (константа `PROD_GTM_ID`) —
+никакой настройки env в CI или на сервере не требуется:
 
-| Окружение | Env-файл | Контейнер GTM | GA4 property |
-| --- | --- | --- | --- |
-| Локальная отладка (`pnpm dev` / `pnpm start`) | `.env.dev` / `.env.development` | тестовый | тестовая (`anyforms — test`) |
-| Прод (`pnpm build`) | `.env.production` | боевой | боевая (`anyforms`) |
+| Окружение | Контейнер GTM |
+| --- | --- |
+| Прод-сборка (`pnpm build`, Docker/CI) | `GTM-MBTTRF2N` автоматически |
+| Локальная разработка (`pnpm dev` / `pnpm start`) | выключен; включается тестовый через `VITE_GTM_ID` в `.env.dev` / `.env.development` |
 
-Как это работает:
+Детали:
 
-- Все `.env*`-файлы локальные (в `.gitignore`); образец — [.env.example](../.env.example).
-  Раскомментируйте `VITE_GTM_ID` в нужном файле и подставьте ID соответствующего контейнера.
-- Без переменной GTM не грузится вовсе — приложение работает как обычно.
+- В dev-сборке GTM по умолчанию не грузится, чтобы локальные клики не попадали
+  в боевую статистику. Для отладки создайте **тестовый** контейнер (+ тестовую
+  GA4 property), впишите его ID в `VITE_GTM_ID` — см. [.env.example](../.env.example).
+  `VITE_GTM_ID` имеет приоритет и в prod-сборке (на случай стейджинга).
 - Счётчики из `index.html` (gtag `G-9CVRCKCES2`, Яндекс.Метрика, Top.Mail.Ru)
-  инициализируются **только на домене anyforms.ru** (проверка hostname), так что
-  localhost их не засоряет.
+  инициализируются **только на домене anyforms.ru** (проверка hostname).
 - Каждое событие несёт параметр `environment` (`development` / `production`,
-  переопределяется через `VITE_ANALYTICS_ENV`) — дополнительная страховка: если
-  события всё же попадут в одну property, их можно разделить фильтром.
+  переопределяется через `VITE_ANALYTICS_ENV`) — страховка: если события всё же
+  попадут в одну property, их можно разделить фильтром.
 - В dev-режиме каждое событие печатается в консоль: `console.debug("[analytics]", event, payload)`.
+- Смена боевого GTM ID = правка константы + деплой. После сборки нового образа
+  на GitHub **сервер должен подтянуть его сам**: `docker compose pull && docker compose up -d`
+  (или `docker pull ghcr.io/yanisderbikov/anyforms-front:latest` + перезапуск) —
+  workflow только публикует образ в ghcr.io.
 
-Для тестового окружения повторите шаги 2–5 с тестовой property и тестовым
-контейнером (достаточно Google Tag + универсального Event Tag, без публикации
-можно жить в режиме Preview). Данные в тестовой property можно периодически
-не жалеть — она только для отладки.
+Проверка, что GTM доехал до прода:
 
-### Прод: сборка на GitHub Actions
-
-Переменные Vite — **build-time**: они вшиваются в JS-бандл при `pnpm build`
-внутри Docker-образа. На прод-сервере настраивать ничего не нужно — он просто
-запускает готовый образ из ghcr.io.
-
-Боевой GTM ID задаётся один раз в репозитории GitHub:
-
-1. GitHub → репозиторий → **Settings → Secrets and variables → Actions → вкладка Variables**.
-2. **New repository variable**: имя `VITE_GTM_ID`, значение `GTM-XXXXXXX` (боевой контейнер).
-3. Запушить в `main` (или запустить workflow вручную) — [deploy-server.yml](../.github/workflows/deploy-server.yml)
-   передаст переменную в Docker build-arg, Dockerfile прокинет её в `pnpm build`.
-
-Переменная не задана → билд собирается без GTM (аналитика копится в dataLayer,
-но никуда не уходит). GTM ID не секрет (он виден в исходнике страницы любого
-сайта), поэтому хранится как variable, а не secret.
-
-Локальные `.env*`-файлы в CI не участвуют (они в `.gitignore` и `.dockerignore`):
-`.env.production` нужен только для локального `pnpm build`, если он вам зачем-то
-понадобится.
-
-Смена GTM ID = пересборка образа (переменная вшита в бандл). Если когда-нибудь
-захочется менять ID без пересборки — это делается через подстановку плейсхолдера
-в entrypoint nginx-образа, но пока такой необходимости нет.
+```bash
+BUNDLE=$(curl -s https://anyforms.ru/ | grep -o 'assets/index-[^"]*\.js' | head -1)
+curl -s "https://anyforms.ru/$BUNDLE" | grep -c GTM-MBTTRF2N   # должно быть 1
+```
 
 ## 2. Создание GA4 property
 

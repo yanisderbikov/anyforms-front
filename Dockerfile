@@ -11,9 +11,6 @@ COPY . .
 
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
-# Боевой GTM-контейнер; вшивается в бандл при сборке. Пустое значение = GTM выключен.
-ARG VITE_GTM_ID
-ENV VITE_GTM_ID=$VITE_GTM_ID
 RUN pnpm run api && pnpm run build
 
 FROM nginx:alpine

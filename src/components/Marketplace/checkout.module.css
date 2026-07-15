@@ -295,3 +295,39 @@
   color: #fff;
   font-size: 32px;
 }
+.failIcon {
+  width: 64px; height: 64px; margin: 0 auto 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: #c62828;
+  color: #fff;
+  font-size: 32px;
+}
+
+/* Чек заказа на странице результата оплаты */
+.receipt {
+  max-width: 440px;
+  margin: 0 auto 28px;
+  padding: 16px 18px;
+  background: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  text-align: left;
+}
+.receiptTitle {
+  font-size: 0.8rem; font-weight: 700; color: #8c8c8c;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 0 0 8px;
+}
+.receiptRow {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; font-size: 0.95rem; color: #333; padding: 5px 0;
+}
+.receiptName { margin: 0; }
+.receiptQty { color: #8c8c8c; white-space: nowrap; }
+.receiptPrice { white-space: nowrap; font-weight: 600; color: var(--color-base-black); }
+.receiptTotal {
+  font-size: 1.05rem; font-weight: 700; color: var(--color-base-black);
+  border-top: 1px solid #e2e2e2; margin-top: 6px; padding-top: 12px;
+}
+.receiptDelivery { font-size: 0.88rem; color: #555; margin: 12px 0 0; line-height: 1.5; }

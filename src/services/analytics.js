@@ -8,7 +8,13 @@
 // события просто копятся в dataLayer и приложение работает как раньше.
 
 const YM_COUNTER_ID = 106593235;
-const GTM_ID = import.meta.env.VITE_GTM_ID;
+
+// Боевой контейнер GTM захардкожен: ID публичный, настраивать env на CI не нужно.
+// В dev-сборке GTM по умолчанию выключен, чтобы локальные клики не летели в
+// боевую статистику; для отладки укажите тестовый контейнер в VITE_GTM_ID
+// (.env.dev / .env.development).
+const PROD_GTM_ID = 'GTM-MBTTRF2N';
+const GTM_ID = import.meta.env.VITE_GTM_ID || (import.meta.env.PROD ? PROD_GTM_ID : '');
 const CURRENCY = 'RUB';
 
 // Метка окружения уходит с каждым событием: даже если тестовый и боевой
