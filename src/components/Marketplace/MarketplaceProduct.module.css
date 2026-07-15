@@ -86,7 +86,9 @@
 }
 
 /* Галерея как в drops: превью-колонка растягивается по высоте главного фото,
-   фото показывается целиком (без обрезки), на мобилке превью уходят вниз в ряд */
+   на мобилке превью уходят вниз в ряд. Главное фото — в фиксированной рамке 3:4
+   (AspectPhoto): вытянутые фото кропаются, широкие — во всю ширину на блюр-фоне,
+   поэтому кнопки и информация под галереей не прыгают при листании. */
 .gallery {
   display: flex;
   align-items: stretch;
@@ -163,8 +165,7 @@
   overflow: hidden;
   background: #f5f5f5;
 }
-.mainImg { width: 100%; display: block; }
-.mainPlaceholder { width: 100%; aspect-ratio: 1; background: #f0f0f0; }
+.mainPlaceholder { width: 100%; aspect-ratio: 3 / 4; background: #f0f0f0; }
 
 .discountBadge {
   position: absolute;

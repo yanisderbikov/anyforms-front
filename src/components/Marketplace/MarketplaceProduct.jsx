@@ -4,6 +4,7 @@ import { getItems } from '../../services/itemsService';
 import { trackViewItem, trackAddToCart } from '../../services/analytics';
 import { useCart, isPurchasable } from '../../context/CartContext';
 import LikeButton from '../shared/LikeButton/LikeButton';
+import AspectPhoto from '../shared/AspectPhoto/AspectPhoto';
 import styles from './MarketplaceProduct.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
@@ -150,7 +151,7 @@ const MarketplaceProduct = () => {
                 <span className={styles.discountBadge}>−{product.discountPercent}%</span>
               )}
               {image ? (
-                <img className={styles.mainImg} src={image} alt={product.name} />
+                <AspectPhoto src={image} alt={product.name} />
               ) : (
                 <div className={styles.mainPlaceholder} />
               )}
