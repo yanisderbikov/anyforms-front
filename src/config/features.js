@@ -1,12 +1,8 @@
 // Фича-флаги фронтенда.
 
-// Онлайн-оплата корзины маркетплейса. Включается параметром ?tbpayment=true в URL,
-// выключается через ?tbpayment=false или полной перезагрузкой страницы без параметра.
-// Пока флаг активен, TbPaymentKeeper в App.jsx удерживает параметр в URL при
-// навигации по /shop/*, чтобы он не терялся на переходах между страницами.
 export const TB_PAYMENT_PARAM = 'tbpayment';
 
-let tbPaymentActive = false;
+let tbPaymentActive = true;
 
 export const syncTbPaymentFlag = (search) => {
   try {
