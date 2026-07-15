@@ -1,16 +1,25 @@
 // Фича-флаги фронтенда.
 
-// Онлайн-оплата корзины маркетплейса включена только пока в текущем URL есть
-// ?tbpayment=true. Без параметра кнопка ведёт на заказ через Telegram-бота.
+// Онлайн-оплата корзины маркетплейса. Включается параметром ?tbpayment=true в URL,
+// выключается через ?tbpayment=false или полной перезагрузкой страницы без параметра.
+// Пока флаг активен, TbPaymentKeeper в App.jsx удерживает параметр в URL при
+// навигации по /shop/*, чтобы он не терялся на переходах между страницами.
 export const TB_PAYMENT_PARAM = 'tbpayment';
 
-export const isMarketplaceCheckoutEnabled = (search) => {
+let tbPaymentActive = false;
+
+export const syncTbPaymentFlag = (search) => {
   try {
-    return new URLSearchParams(search).get(TB_PAYMENT_PARAM) === 'true';
+    const value = new URLSearchParams(search).get(TB_PAYMENT_PARAM);
+    if (value === 'true') tbPaymentActive = true;
+    if (value === 'false') tbPaymentActive = false;
   } catch {
-    return false;
+    // некорректный search игнорируем, состояние не меняем
   }
+  return tbPaymentActive;
 };
+
+export const isMarketplaceCheckoutEnabled = (search) => syncTbPaymentFlag(search);
 
 // Куда ведём заказ, пока чекаут выключен.
 export const MARKETPLACE_ORDER_TG_LINK = 'https://t.me/AnyFormsBot';

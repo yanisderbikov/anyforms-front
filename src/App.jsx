@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { TB_PAYMENT_PARAM, syncTbPaymentFlag } from './config/features';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
@@ -154,6 +155,30 @@ const upsertCanonical = (href) => {
   link.setAttribute('href', href);
 };
 
+// Удерживает ?tbpayment=true в URL при навигации по /shop/*, пока флаг активен
+// (см. config/features.js). Без этого параметр терялся на переходах каталог → товар → корзина.
+function TbPaymentKeeper() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const active = syncTbPaymentFlag(location.search);
+
+  useEffect(() => {
+    if (!active || !location.pathname.startsWith('/shop')) {
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    if (params.get(TB_PAYMENT_PARAM) !== 'true') {
+      params.set(TB_PAYMENT_PARAM, 'true');
+      navigate(
+        { pathname: location.pathname, search: `?${params.toString()}`, hash: location.hash },
+        { replace: true }
+      );
+    }
+  }, [active, location, navigate]);
+
+  return null;
+}
+
 function App() {
   const location = useLocation();
   const normalizedPathname =
@@ -225,11 +250,17 @@ function App() {
   }, [normalizedPathname, isNotFoundPage]);
 
   if (location.pathname !== normalizedPathname) {
-    return <Navigate to={normalizedPathname} replace />;
+    return (
+      <Navigate
+        to={{ pathname: normalizedPathname, search: location.search, hash: location.hash }}
+        replace
+      />
+    );
   }
 
   return (
     <div className={styles.app}>
+      <TbPaymentKeeper />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/chief" element={<ChiefLanding />} />
