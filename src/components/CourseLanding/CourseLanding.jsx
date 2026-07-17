@@ -33,6 +33,7 @@ const ArrowIcon = () => (
   </svg>
 );
 
+
 const VideoIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <rect x="3" y="5.5" width="18" height="13" rx="3.5" stroke="currentColor" strokeWidth="1.8" />
