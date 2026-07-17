@@ -5,7 +5,7 @@ import apiClient from '../../apiClient';
 import styles from './GuideCheckout.module.css';
 
 const PRODUCT_CODE = 'GUIDE';
-const PRICE = '990 ₽';
+const PRICE = '1490 ₽';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 // Простой, но строгий формат email.

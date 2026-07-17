@@ -7,7 +7,7 @@ import styles from './GuideLanding.module.css';
 const CHECKOUT_PATH = '/guide/checkout';
 // Поддержка — телеграм-бот anyforms.
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
-const PRICE = '990 ₽';
+const PRICE = '1490 ₽';
 const HERO_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/content.png';
 const HERO_PHOTO_MOBILE = 'https://storage.yandexcloud.net/anyforms/guide/content-mobile.png';
 const AUTHOR_PHOTO = 'https://storage.yandexcloud.net/anyforms/guide/YuriSuvrov.jpeg';
