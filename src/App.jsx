@@ -238,7 +238,6 @@ function App() {
     upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
     upsertCanonical(pageUrl);
   }, [normalizedPathname, isNotFoundPage]);
-
   if (location.pathname !== normalizedPathname) {
     return (
       <Navigate
