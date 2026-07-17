@@ -97,6 +97,10 @@
 
 .uploadRow {
   margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
 }
 
 .hintText {
@@ -272,6 +276,11 @@
   gap: 0.5rem;
 }
 
+.photoWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .photoThumb {
   display: block;
   width: 64px;
@@ -280,6 +289,30 @@
   overflow: hidden;
   border: 1px solid #ddd;
   flex-shrink: 0;
+}
+
+.photoDelete {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #b3261e;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.photoDelete:hover {
+  background: #8c1d17;
 }
 
 .photoThumb img {

@@ -152,6 +152,50 @@ const AdminProducts = () => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
+  const handleDeletePhoto = async (id, src) => {
+    let fileName = null;
+    try {
+      fileName = decodeURIComponent(new URL(src).pathname.split('/').pop());
+    } catch {
+      /* некорректный URL — кнопку просто игнорируем */
+    }
+    if (!fileName) return;
+    if (!window.confirm('Удалить это фото?')) return;
+    setError('');
+    setMessage('');
+    try {
+      await apiClient.instance.delete(`/api/product/${id}/photos`, {
+        params: { file: fileName },
+        headers: authHeaders(),
+      });
+      setMessage('Фото удалено');
+      await loadProducts();
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || 'Не удалось удалить фото');
+    }
+  };
+
+  // Превью фото с крестиком удаления — используется и в форме, и в раскрытом товаре.
+  const renderPhotos = (productId, photos) => (
+    <div className={styles.photosList}>
+      {photos.map((src, j) => (
+        <div key={j} className={styles.photoWrap}>
+          <a href={src} target="_blank" rel="noopener noreferrer" className={styles.photoThumb}>
+            <img src={src} alt="" />
+          </a>
+          <button
+            type="button"
+            className={styles.photoDelete}
+            title="Удалить фото"
+            onClick={() => handleDeletePhoto(productId, src)}
+          >
+            ×
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+
   const handleUpload = async (id, fileList) => {
     const files = Array.from(fileList || []);
     if (!files.length) return;
@@ -329,6 +373,10 @@ const AdminProducts = () => {
         </div>
         {form.id?.trim() ? (
           <div className={styles.uploadRow}>
+            {(() => {
+              const formProduct = products.find((p) => p.id === form.id.trim());
+              return formProduct?.photos?.length > 0 ? renderPhotos(formProduct.id, formProduct.photos) : null;
+            })()}
             <label className={styles.uploadBtn}>
               {uploadingId === form.id ? 'Загрузка…' : '+ Загрузить фото'}
               <input
@@ -427,19 +475,7 @@ const AdminProducts = () => {
                       {p.photos?.length > 0 && (
                         <div className={styles.itemPhotos}>
                           <span className={styles.itemLabel}>Фото:</span>
-                          <div className={styles.photosList}>
-                            {p.photos.map((src, j) => (
-                              <a
-                                key={j}
-                                href={src}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={styles.photoThumb}
-                              >
-                                <img src={src} alt="" />
-                              </a>
-                            ))}
-                          </div>
+                          {renderPhotos(p.id, p.photos)}
                         </div>
                       )}
                       {p.id && (
