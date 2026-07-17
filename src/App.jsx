@@ -16,6 +16,7 @@ import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
 import CourseLanding from "./components/CourseLanding/CourseLanding";
+import CourseLandingWhite from "./components/CourseLanding/CourseLandingWhite";
 import { CourseOffer, CoursePrivacy } from "./components/CourseLanding/CourseLegal";
 import CourseCheckout from "./components/CourseLanding/CourseCheckout";
 import CourseSuccess from "./components/CourseLanding/CourseSuccess";
@@ -40,6 +41,7 @@ const KNOWN_PATHS = new Set([
   '/3d-print',
   '/guide',
   '/course',
+  '/course-white',
   '/course/offer',
   '/course/privacy',
   '/course/checkout',
@@ -87,6 +89,11 @@ const PAGE_SEO = {
       'Пошаговый гайд для мастеров, производителей и экспертов: как получать заявки из Reels, Shorts, TikTok и Клипов, а не просто собирать просмотры.',
   },
   '/course': {
+    title: 'Курс по производству силиконовых форм — anyforms',
+    description:
+      'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
+  },
+  '/course-white': {
     title: 'Курс по производству силиконовых форм — anyforms',
     description:
       'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
@@ -164,23 +171,30 @@ function App() {
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
+  const isCourseWhitePage = normalizedPathname === '/course-white';
   const isFounderPage = normalizedPathname.startsWith('/founders/');
   const isShopProductPage = /^\/shop\/product\/[^/]+$/.test(normalizedPathname);
   const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage;
 
   useEffect(() => {
-    if (isHomePage) {
+    if (isHomePage || isCourseWhitePage) {
       document.body.style.background = '#fff';
     } else if (isGuidePage) {
       document.body.style.background = '#f1f0ec';
-    } else if (isCoursePage || isFounderPage) {
+    } else if (normalizedPathname === '/course') {
+      document.body.style.background = '#151515';
+    } else if (normalizedPathname === '/course/checkout' || normalizedPathname === '/course/success') {
+      document.body.style.background = '#fff';
+    } else if (isCoursePage) {
+      document.body.style.background = '#f1f0ec';
+    } else if (isFounderPage) {
       document.body.style.background = '#f5f1e8';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders'))) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage]);
+  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isCourseWhitePage, isFounderPage, isNotFoundPage]);
 
   useEffect(() => {
     const seo = PAGE_SEO[normalizedPathname] || (isNotFoundPage
@@ -202,7 +216,8 @@ function App() {
       normalizedPathname === '/guide/checkout' ||
       normalizedPathname === '/guide/success' ||
       normalizedPathname === '/course/checkout' ||
-      normalizedPathname === '/course/success';
+      normalizedPathname === '/course/success' ||
+      normalizedPathname === '/course-white';
 
     const ogImage = seo.image || `${SITE_URL}/anyforms-logo.svg`;
 
@@ -242,6 +257,7 @@ function App() {
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
         <Route path="/course" element={<CourseLanding />} />
+        <Route path="/course-white" element={<CourseLandingWhite />} />
         <Route path="/course/offer" element={<CourseOffer />} />
         <Route path="/course/privacy" element={<CoursePrivacy />} />
         <Route path="/course/checkout" element={<CourseCheckout />} />

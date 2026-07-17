@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,600&display=swap');
 
-/* ═══════════════ BASE ═══════════════ */
+/* ═══════════════ BASE (белая версия лендинга курса) ═══════════════ */
 .page {
-  --bg: #151515;
-  --panel: #222222;
+  --bg: #ffffff;
+  --panel: #f2f3f5;
+  --ink: #151515;
   --accent: #6c86bd;
   --accent-hover: #5b76ae;
   --white: #ffffff;
@@ -18,7 +19,7 @@
   min-height: 100vh;
   padding-top: var(--header-h);
   background: var(--bg);
-  color: var(--white);
+  color: var(--ink);
   font-family: var(--font);
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
@@ -36,10 +37,25 @@
   scroll-margin-top: calc(var(--header-h) + 12px);
 }
 
-/* ═══════════════ HEADER (tint shared header to course palette) ═══════════════ */
+/* ═══════════════ HEADER (светлая шапка поверх общего компонента) ═══════════════ */
 .page :global(header) {
   background: var(--bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.08);
+}
+
+.page :global(header) img[class*='logo'] {
+  filter: invert(1);
+}
+
+.page :global(header) a[class*='navLink'],
+.page :global(header) button[class*='navLink'] {
+  color: rgba(21, 21, 21, 0.85);
+}
+
+.page :global(header) a[class*='navLink']:hover,
+.page :global(header) button[class*='navLink']:hover {
+  color: var(--ink);
+  background: rgba(21, 21, 21, 0.06);
 }
 
 .page :global(header) a[class*='navLinkPill'] {
@@ -56,6 +72,31 @@
 .page :global(header) a[class*='navLinkPill']:hover {
   background: var(--accent-hover);
   color: var(--white);
+}
+
+.page :global(header) button[class*='burgerButton'] {
+  border-color: rgba(21, 21, 21, 0.2);
+  background: rgba(21, 21, 21, 0.04);
+  color: var(--ink);
+}
+
+.page :global(header) span[class*='burgerLine'] {
+  background: rgba(21, 21, 21, 0.95);
+}
+
+.page [class*='mobileMenuInner'] {
+  background: rgba(255, 255, 255, 0.98);
+  border-top-color: rgba(21, 21, 21, 0.08);
+  border-bottom-color: rgba(21, 21, 21, 0.08);
+}
+
+.page [class*='mobileMenuLink'] {
+  color: rgba(21, 21, 21, 0.9);
+}
+
+.page [class*='mobileMenuLink']:hover {
+  color: var(--ink);
+  background: rgba(21, 21, 21, 0.06);
 }
 
 .page [class*='mobileMenuPrimary'] {
@@ -83,7 +124,7 @@
   font-size: 12px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(21, 21, 21, 0.5);
 }
 
 .eyebrowAccent {
@@ -101,8 +142,8 @@
   font-size: 12px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--white);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--ink);
+  border: 1px solid rgba(21, 21, 21, 0.35);
   border-radius: 999px;
   padding: 9px 18px;
 }
@@ -124,7 +165,7 @@
   font-size: clamp(16px, 2.4vw, 19px);
   line-height: 1.35;
   margin: 22px 0 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
   max-width: 620px;
 }
 
@@ -144,7 +185,7 @@
   position: relative;
   width: 100%;
   background: var(--panel);
-  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border: 2px dashed rgba(21, 21, 21, 0.25);
   border-radius: 18px;
   display: flex;
   align-items: center;
@@ -171,18 +212,18 @@
   font-size: 13px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(21, 21, 21, 0.5);
   line-height: 1.35;
   max-width: 24ch;
 }
 
 .phDark {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(21, 21, 21, 0.06);
+  border-color: rgba(21, 21, 21, 0.25);
 }
 
 .phDark .phLabel {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
 }
 
 /* ═══════════════ CTA ═══════════════ */
@@ -268,12 +309,12 @@
 .heroSub {
   font-size: clamp(16px, 2.5vw, 18px);
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
   margin: 22px 0 0;
   max-width: 44ch;
 }
 
-/* Плашка фактов + белая карточка цены */
+/* Плашка фактов + тёмная карточка цены */
 .heroCards {
   display: grid;
   grid-template-columns: 1fr;
@@ -300,7 +341,7 @@
   font-size: 15px;
   font-weight: 500;
   line-height: 1.35;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .heroFeature:last-child {
@@ -312,13 +353,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--white);
+  color: var(--ink);
   opacity: 0.9;
 }
 
 .heroPriceCard {
-  background: var(--white);
-  color: var(--bg);
+  background: var(--ink);
+  color: var(--white);
   border-radius: 22px;
   padding: 26px 22px 22px;
   display: flex;
@@ -340,7 +381,7 @@
   font-size: clamp(32px, 7.5vw, 38px);
   letter-spacing: -1.2px;
   line-height: 0.9;
-  color: var(--bg);
+  color: var(--white);
   white-space: nowrap;
 }
 
@@ -349,7 +390,7 @@
   font-size: clamp(18px, 4vw, 24px);
   letter-spacing: -0.5px;
   text-decoration: line-through;
-  color: rgba(21, 21, 21, 0.4);
+  color: rgba(255, 255, 255, 0.45);
   margin-top: 8px;
 }
 
@@ -364,7 +405,7 @@
   margin: 14px 0 0;
   font-size: 13px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
 }
 
 .heroMedia {
@@ -401,7 +442,7 @@
   align-items: center;
   margin-top: 26px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(21, 21, 21, 0.1);
 }
 
 .heroStat {
@@ -419,7 +460,7 @@
 .heroStatLabel {
   display: block;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
   margin-top: 3px;
   line-height: 1.35;
 }
@@ -427,7 +468,7 @@
 .heroDivider {
   width: 1px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(21, 21, 21, 0.12);
 }
 
 @media (min-width: 900px) {
@@ -476,7 +517,7 @@
 /* ═══════════════ ЭКРАН 2 · РЕЗУЛЬТАТ (ГАЛЕРЕЯ) ═══════════════ */
 .resultSection {
   padding: 64px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .galleryGrid {
@@ -501,10 +542,10 @@
   }
 }
 
-/* ═══════════════ DARK PANEL SECTION (боль / финал) ═══════════════ */
+/* ═══════════════ PANEL SECTION (боль / финал) ═══════════════ */
 .darkSection {
   background: var(--panel);
-  color: var(--white);
+  color: var(--ink);
   padding: 84px 0;
 }
 
@@ -524,7 +565,7 @@
   line-height: 1.35;
   margin: 34px 0 0;
   max-width: 620px;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
 }
 
 /* ═══════════════ ЭКРАН 4 · МОДУЛИ ═══════════════ */
@@ -598,12 +639,12 @@
   gap: 12px;
   font-size: 15px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(21, 21, 21, 0.82);
 }
 
 .moduleDot {
   flex: none;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
   font-weight: 600;
 }
 
@@ -625,7 +666,7 @@
 /* ═══════════════ ЭКРАН 5 · ЧТО ПОЛУЧИТЕ ═══════════════ */
 .getSection {
   padding: 72px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .getGrid {
@@ -636,7 +677,7 @@
 
 .getCard {
   background: var(--panel);
-  color: var(--white);
+  color: var(--ink);
   border-radius: 22px;
   padding: 34px 30px;
   display: flex;
@@ -662,7 +703,7 @@
   font-size: 15.5px;
   line-height: 1.35;
   margin: 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
 }
 
 @media (min-width: 720px) {
@@ -675,7 +716,7 @@
 /* ═══════════════ ЭКРАН 6 · ОСНОВАТЕЛИ ═══════════════ */
 .authorSection {
   padding: 72px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .foundersGrid {
@@ -725,7 +766,7 @@
 .founderBio {
   font-size: 15px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
   margin: 14px 0 0;
 }
 
@@ -739,14 +780,14 @@
 /* ═══════════════ ЭКРАН 7 · КЕЙСЫ (свайп-галерея) ═══════════════ */
 .reviewsSection {
   padding: 72px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .swipeHint {
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.5px;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(21, 21, 21, 0.58);
   margin: 0 0 12px;
 }
 
@@ -793,7 +834,7 @@
 /* ═══════════════ ЭКРАН 8 · БОНУСЫ ═══════════════ */
 .bonusSection {
   background: var(--panel);
-  color: var(--white);
+  color: var(--ink);
   padding: 80px 0;
 }
 
@@ -809,7 +850,7 @@
   align-items: baseline;
   gap: 14px;
   padding: 18px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.12);
   font-size: clamp(15px, 2.2vw, 18px);
   font-weight: 500;
   line-height: 1.35;
@@ -831,7 +872,7 @@
 /* ═══════════════ ЭКРАН 9 · ЧТО ПОНАДОБИТСЯ ═══════════════ */
 .needSection {
   padding: 72px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .needGrid {
@@ -866,14 +907,14 @@
 .needCardText {
   font-size: 15px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(21, 21, 21, 0.72);
   margin: 0;
 }
 
 .offerPanel {
   margin-top: 22px;
   background: var(--panel);
-  color: var(--white);
+  color: var(--ink);
   border-radius: 24px;
   padding: 36px 28px;
   display: grid;
@@ -911,7 +952,7 @@
   font-size: clamp(15px, 2.3vw, 17px);
   line-height: 1.35;
   margin: 18px 0 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(21, 21, 21, 0.75);
   max-width: 56ch;
 }
 
@@ -965,7 +1006,7 @@
 /* ═══════════════ ЭКРАН 10 · ПОДДЕРЖКА ═══════════════ */
 .guaranteeSection {
   padding: 64px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .guaranteeCard {
@@ -1003,7 +1044,7 @@
   font-size: clamp(16px, 2.3vw, 18px);
   line-height: 1.35;
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(21, 21, 21, 0.8);
   max-width: 640px;
 }
 
@@ -1036,7 +1077,7 @@
 /* ═══════════════ ЭКРАН 11 · ОФФЕР / ЦЕНА ═══════════════ */
 .buySection {
   padding: 90px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .buyInner {
@@ -1049,7 +1090,7 @@
   gap: 13px;
   font-size: clamp(15px, 2.2vw, 16.5px);
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(21, 21, 21, 0.9);
 }
 
 .buyCheck {
@@ -1065,7 +1106,7 @@
   margin-top: 26px;
   font-size: 13px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
 }
 
 /* ── попап «промокод применён» ── */
@@ -1073,7 +1114,7 @@
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.66);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1084,11 +1125,11 @@
   position: relative;
   width: 100%;
   max-width: 480px;
-  background: var(--panel);
-  color: var(--white);
+  background: var(--bg);
+  color: var(--ink);
   border-radius: 24px;
   padding: 34px 30px 30px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
 }
 
 .promoModalClose {
@@ -1097,7 +1138,7 @@
   right: 16px;
   border: none;
   background: transparent;
-  color: var(--white);
+  color: var(--ink);
   font-size: 28px;
   line-height: 1;
   cursor: pointer;
@@ -1122,7 +1163,7 @@
   margin: 14px 0 0;
   font-size: 15px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(21, 21, 21, 0.78);
 }
 
 .promoModalCta {
@@ -1135,8 +1176,8 @@
   padding: 10px 14px;
   border: 1px solid rgba(108, 134, 189, 0.5);
   border-radius: 12px;
-  background: rgba(108, 134, 189, 0.14);
-  color: #aebfe3;
+  background: rgba(108, 134, 189, 0.12);
+  color: #4a6394;
   font-weight: 500;
   font-size: 13px;
   line-height: 1.35;
@@ -1189,7 +1230,7 @@
   margin: 10px 0 0;
   font-size: 14.5px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(21, 21, 21, 0.65);
 }
 
 .tariffList {
@@ -1208,7 +1249,7 @@
   gap: 4px;
   margin-top: auto;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(21, 21, 21, 0.1);
 }
 
 .tariffCard .tariffList {
@@ -1220,7 +1261,7 @@
   font-size: clamp(17px, 3vw, 22px);
   letter-spacing: -0.5px;
   text-decoration: line-through;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(21, 21, 21, 0.4);
 }
 
 .tariffPrice {
@@ -1228,14 +1269,14 @@
   font-size: clamp(32px, 6vw, 44px);
   letter-spacing: -1.2px;
   line-height: 0.9;
-  color: var(--white);
+  color: var(--ink);
 }
 
 .tariffPromoNote {
   margin: 12px 0 0;
   font-size: 13px;
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(21, 21, 21, 0.55);
 }
 
 .tariffCta {
@@ -1246,16 +1287,16 @@
 /* ═══════════════ ЭКРАН 12 · FAQ ═══════════════ */
 .faqSection {
   padding: 72px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .faqList {
   margin-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(21, 21, 21, 0.12);
 }
 
 .faqItem {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.12);
 }
 
 .faqQ {
@@ -1294,7 +1335,7 @@
   padding: 0 0 24px;
   font-size: clamp(15px, 2.3vw, 17px);
   line-height: 1.35;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(21, 21, 21, 0.75);
   max-width: 760px;
 }
 
@@ -1314,9 +1355,9 @@
 /* ═══════════════ FOOTER ═══════════════ */
 .siteFooter {
   background: var(--bg);
-  color: var(--white);
+  color: var(--ink);
   padding: 56px 0 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .footerInner {
@@ -1337,7 +1378,7 @@
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(21, 21, 21, 0.5);
   margin: 0 0 14px;
 }
 
@@ -1345,13 +1386,13 @@
   font-size: 15px;
   line-height: 1.55;
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(21, 21, 21, 0.82);
 }
 
 .footerLink {
-  color: var(--white);
+  color: var(--ink);
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.3);
   transition: opacity 0.2s ease;
 }
 
@@ -1362,21 +1403,21 @@
 .footerOffer {
   margin-top: 40px;
   padding-top: 28px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
 }
 
 .footerOfferText {
   font-size: 12.5px;
   line-height: 1.55;
   margin: 0;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(21, 21, 21, 0.5);
   max-width: 880px;
 }
 
 .footerCopyright {
   margin: 26px 0 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(21, 21, 21, 0.5);
 }
 
 @media (min-width: 720px) {

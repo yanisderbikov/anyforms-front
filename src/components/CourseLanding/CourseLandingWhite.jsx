@@ -8,14 +8,14 @@ import {
   formatPromoDeadline,
 } from '../../shared/promoTracking';
 import { COURSE_PLANS } from './CourseCheckout';
-import styles from './CourseLanding.module.css';
+import styles from './CourseLandingWhite.module.css';
 
 const LAUNCH = '1 сентября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 // Промокод гайда — по нему в попапе показывается заголовок-благодарность.
 const GUIDE_PROMO_CODE = 'ГАЙД';
 // Флаг «попап уже показывали» — чтобы не всплывал заново при возврате с чекаута.
-const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen';
+const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen_white';
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
@@ -320,7 +320,7 @@ const Placeholder = ({ label, ratio, dark }) => (
   </div>
 );
 
-const CourseLanding = () => {
+const CourseLandingWhite = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const promoFromUrl = getPromoFromSearch(location.search);
@@ -1044,4 +1044,4 @@ const CourseLanding = () => {
   );
 };
 
-export default CourseLanding;
+export default CourseLandingWhite;

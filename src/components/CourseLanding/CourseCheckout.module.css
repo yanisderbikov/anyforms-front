@@ -1,42 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Golos+Text:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,600&display=swap');
 
-/* Чекаут и страница успеха курса — палитра и типографика лендинга курса. */
+/* Чекаут и страница успеха курса — светлая тема, общая для обеих версий лендинга. */
 .page {
-  --cream: #f5f1e8;
-  --ink: #16140e;
-  --accent: #cb6a42;
+  --bg: #ffffff;
+  --panel: #f2f3f5;
+  --ink: #151515;
+  --accent: #6c86bd;
+  --accent-hover: #5b76ae;
+  --white: #ffffff;
   --header-h: 78px;
 
-  --font-display: 'Unbounded', sans-serif;
-  --font-body: 'Golos Text', system-ui, sans-serif;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
 
   width: 100%;
   min-height: 100vh;
   padding-top: var(--header-h);
-  background: var(--cream);
+  background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-body);
+  font-family: var(--font);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 
-/* tint shared header to course palette */
+/* ── светлая шапка поверх общего компонента ── */
 .page :global(header) {
-  background: var(--ink);
+  background: var(--bg);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.08);
+}
+
+.page :global(header) img[class*='logo'] {
+  filter: invert(1);
+}
+
+.page :global(header) a[class*='navLink'],
+.page :global(header) button[class*='navLink'] {
+  color: rgba(21, 21, 21, 0.85);
+}
+
+.page :global(header) a[class*='navLink']:hover,
+.page :global(header) button[class*='navLink']:hover {
+  color: var(--ink);
+  background: rgba(21, 21, 21, 0.06);
 }
 
 .page :global(header) a[class*='navLinkPill'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--white);
+  font-weight: 600;
 }
 
 .page :global(header) a[class*='navLinkPill']:hover {
-  background: #b85a34;
-  color: #fff;
+  background: var(--accent-hover);
+  color: var(--white);
+}
+
+.page :global(header) button[class*='burgerButton'] {
+  border-color: rgba(21, 21, 21, 0.2);
+  background: rgba(21, 21, 21, 0.04);
+  color: var(--ink);
+}
+
+.page :global(header) span[class*='burgerLine'] {
+  background: rgba(21, 21, 21, 0.95);
+}
+
+.page [class*='mobileMenuInner'] {
+  background: rgba(255, 255, 255, 0.98);
+  border-top-color: rgba(21, 21, 21, 0.08);
+  border-bottom-color: rgba(21, 21, 21, 0.08);
+}
+
+.page [class*='mobileMenuLink'] {
+  color: rgba(21, 21, 21, 0.9);
+}
+
+.page [class*='mobileMenuLink']:hover {
+  color: var(--ink);
+  background: rgba(21, 21, 21, 0.06);
 }
 
 .page [class*='mobileMenuPrimary'] {
   background: var(--accent);
-  color: var(--ink);
+  color: var(--white);
+}
+
+.page [class*='mobileMenuPrimary']:hover {
+  background: var(--accent-hover);
+  color: var(--white);
 }
 
 .main {
@@ -52,20 +102,18 @@
 
 .eyebrow {
   display: inline-block;
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 600;
   font-size: 12px;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--accent);
 }
 
 .title {
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 600;
   font-size: clamp(28px, 6vw, 40px);
-  line-height: 1.08;
-  letter-spacing: -1.5px;
+  line-height: 0.9;
+  letter-spacing: -1px;
   margin: 14px 0 0;
 }
 
@@ -90,12 +138,12 @@
   gap: 6px;
   text-align: left;
   padding: 18px;
-  border: 1.5px solid rgba(22, 20, 14, 0.18);
-  border-radius: 14px;
-  background: #fff;
+  border: 1.5px solid rgba(21, 21, 21, 0.12);
+  border-radius: 16px;
+  background: var(--panel);
   color: var(--ink);
   cursor: pointer;
-  font-family: var(--font-body);
+  font-family: var(--font);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -105,27 +153,26 @@
 
 .planCardActive {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(203, 106, 66, 0.2);
+  box-shadow: 0 0 0 3px rgba(108, 134, 189, 0.25);
 }
 
 .planName {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .planPrice {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 21px;
   letter-spacing: -0.5px;
   color: var(--accent);
 }
 
 .planNote {
   font-size: 12.5px;
-  line-height: 1.45;
-  opacity: 0.6;
+  line-height: 1.35;
+  color: rgba(21, 21, 21, 0.6);
 }
 
 /* Цена со скидкой на карточке тарифа: зачёркнутая старая сверху, новая под ней */
@@ -137,11 +184,10 @@
 }
 
 .planPriceOld {
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
-  letter-spacing: -0.5px;
-  opacity: 0.5;
+  letter-spacing: -0.3px;
+  color: rgba(21, 21, 21, 0.45);
   text-decoration: line-through;
 }
 
@@ -149,7 +195,7 @@
 .summary {
   margin: 20px 0 0;
   background: var(--ink);
-  color: var(--cream);
+  color: var(--white);
   border-radius: 18px;
   padding: 24px;
 }
@@ -163,17 +209,16 @@
 
 .summaryName {
   font-size: 15px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .summaryPrice {
   flex: none;
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 600;
   font-size: 24px;
-  letter-spacing: -1px;
-  color: var(--accent);
+  letter-spacing: -0.7px;
+  color: var(--white);
 }
 
 /* Зачёркнутая цена (при промокоде) — строго над скидочной */
@@ -186,19 +231,18 @@
 }
 
 .summaryPriceOld {
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 17px;
-  letter-spacing: -0.5px;
-  opacity: 0.55;
+  letter-spacing: -0.3px;
+  color: rgba(255, 255, 255, 0.45);
   text-decoration: line-through;
 }
 
 .summaryNote {
   margin: 14px 0 0;
   font-size: 13px;
-  line-height: 1.5;
-  opacity: 0.6;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ── form ── */
@@ -209,8 +253,7 @@
 }
 
 .label {
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.3px;
   margin-bottom: 8px;
@@ -226,20 +269,24 @@
 
 .input {
   width: 100%;
-  font-family: var(--font-body);
+  font-family: var(--font);
   font-size: 16px;
   padding: 14px 16px;
-  border: 1.5px solid rgba(22, 20, 14, 0.18);
+  border: 1.5px solid rgba(21, 21, 21, 0.18);
   border-radius: 12px;
-  background: #fff;
+  background: var(--bg);
   color: var(--ink);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+.input::placeholder {
+  color: rgba(21, 21, 21, 0.35);
+}
+
 .input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(203, 106, 66, 0.18);
+  box-shadow: 0 0 0 3px rgba(108, 134, 189, 0.2);
 }
 
 .inputError {
@@ -254,14 +301,16 @@
 .fieldError {
   margin: 8px 0 0;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1.35;
   color: #b3261e;
 }
 
 .hint {
   margin: 8px 0 0;
   font-size: 13px;
-  opacity: 0.55;
+  line-height: 1.35;
+  color: rgba(21, 21, 21, 0.55);
 }
 
 /* ── promo ── */
@@ -278,8 +327,8 @@
 
 .promoApplyBtn {
   flex: none;
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-family: var(--font);
+  font-weight: 600;
   font-size: 13px;
   padding: 0 20px;
   border: 1.5px solid var(--ink);
@@ -292,7 +341,7 @@
 
 .promoApplyBtn:hover:not(:disabled) {
   background: var(--ink);
-  color: var(--cream);
+  color: var(--white);
 }
 
 .promoApplyBtn:disabled {
@@ -303,7 +352,8 @@
 .promoOk {
   margin: 8px 0 0;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1.35;
   color: #1d7a3d;
 }
 
@@ -326,8 +376,8 @@
 
 .checkText {
   font-size: 14px;
-  line-height: 1.5;
-  opacity: 0.85;
+  line-height: 1.35;
+  color: rgba(21, 21, 21, 0.85);
 }
 
 .inlineLink {
@@ -344,7 +394,8 @@
 .error {
   margin: 18px 0 0;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1.35;
   color: #b3261e;
 }
 
@@ -354,21 +405,18 @@
   border: none;
   cursor: pointer;
   background: var(--accent);
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-weight: 800;
+  color: var(--white);
+  font-family: var(--font);
+  font-weight: 600;
   font-size: 17px;
   padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 8px 22px rgba(203, 106, 66, 0.32);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease,
-    opacity 0.12s ease;
+  border-radius: 16px;
+  transition: background 0.15s ease, transform 0.12s ease, opacity 0.12s ease;
 }
 
 .payBtn:hover:not(:disabled) {
-  background: #b85a34;
-  color: #fff;
-  box-shadow: 0 10px 26px rgba(203, 106, 66, 0.4);
+  background: var(--accent-hover);
+  color: var(--white);
 }
 
 .payBtn:active:not(:disabled) {
@@ -378,14 +426,13 @@
 .payBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 .support {
   margin: 22px 0 0;
   font-size: 14px;
-  line-height: 1.6;
-  opacity: 0.75;
+  line-height: 1.35;
+  color: rgba(21, 21, 21, 0.7);
 }
 
 .backWrap {
@@ -393,12 +440,11 @@
 }
 
 .back {
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 13px;
   color: var(--ink);
   text-decoration: none;
-  border-bottom: 1px solid rgba(22, 20, 14, 0.3);
+  border-bottom: 1px solid rgba(21, 21, 21, 0.3);
   padding-bottom: 2px;
   transition: opacity 0.2s ease;
 }
@@ -419,20 +465,19 @@
   margin: 0 auto 8px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 38px;
-  font-weight: 800;
-  box-shadow: 0 10px 28px rgba(203, 106, 66, 0.35);
+  font-weight: 600;
 }
 
 .successLead {
   font-size: clamp(15px, 2.4vw, 18px);
-  line-height: 1.6;
+  line-height: 1.35;
   margin: 18px auto 0;
-  opacity: 0.82;
+  color: rgba(21, 21, 21, 0.82);
   max-width: 440px;
 }
 
