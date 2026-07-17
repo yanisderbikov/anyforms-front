@@ -190,6 +190,40 @@
 .fieldError { color: #c62828; font-size: 0.8rem; margin: 6px 0 0; }
 .hint { color: #8c8c8c; font-size: 0.8rem; margin: 6px 0 0; }
 
+/* Промокод */
+.promoRow { display: flex; gap: 10px; }
+.promoRow .input { flex: 1; min-width: 0; text-transform: uppercase; }
+.promoApplyBtn {
+  flex: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.86rem;
+  padding: 0 18px;
+  border: 1px solid var(--color-base-black);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-base-black);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.promoApplyBtn:hover:not(:disabled) { background: var(--color-base-black); color: #fff; }
+.promoApplyBtn:disabled { opacity: 0.45; cursor: default; }
+.promoOk { color: #1d7a3d; font-size: 0.8rem; font-weight: 500; margin: 6px 0 0; }
+
+/* Метка предзаказа у позиции корзины */
+.preorderTag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: #4a6fa5;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.oldTotal { color: #8c8c8c; text-decoration: line-through; font-weight: 500; font-size: 0.95rem; margin-right: 8px; }
+
 .checkRow { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; cursor: pointer; }
 .checkbox { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--color-base-black); }
 .checkText { font-size: 0.86rem; line-height: 1.5; color: #444; }

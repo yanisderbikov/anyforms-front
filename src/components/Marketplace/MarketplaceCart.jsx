@@ -90,7 +90,10 @@ const MarketplaceCart = () => {
                     <div className={styles.cartPhoto} />
                   )}
                   <div className={styles.cartInfo}>
-                    <p className={styles.cartName}>{item.name}</p>
+                    <p className={styles.cartName}>
+                      {item.name}
+                      {item.preorder && <span className={styles.preorderTag}>Предзаказ</span>}
+                    </p>
                     <div className={styles.cartUnit}>{formatPrice(item.price)} / шт</div>
                   </div>
                   <div className={styles.qty}>

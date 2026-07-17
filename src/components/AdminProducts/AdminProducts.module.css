@@ -58,6 +58,70 @@
   border-color: #000;
 }
 
+.checkLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.checkLabel input {
+  width: 16px;
+  height: 16px;
+  accent-color: #000;
+}
+
+.badgeOff,
+.badgePreorder {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 999px;
+  color: #fff;
+  vertical-align: middle;
+}
+
+.badgeOff {
+  background: #b3261e;
+}
+
+.badgePreorder {
+  background: #4a6fa5;
+}
+
+.uploadRow {
+  margin-top: 0.75rem;
+}
+
+.hintText {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #8c8c8c;
+}
+
+.uploadBtn {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  border: 1px dashed #999;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.uploadBtn:hover {
+  border-color: #000;
+  color: #000;
+}
+
 .error {
   margin: 0 0 0.5rem;
   font-size: 0.9rem;

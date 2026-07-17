@@ -14,6 +14,8 @@ const initialForm = {
   orderNumber: '',
   amoProductId: '',
   amoProductName: '',
+  active: true,
+  preorder: false,
 };
 
 const AdminProducts = () => {
@@ -26,11 +28,18 @@ const AdminProducts = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [amoProducts, setAmoProducts] = useState([]);
   const [amoError, setAmoError] = useState('');
+  const [uploadingId, setUploadingId] = useState(null);
   const formRef = React.useRef(null);
+
+  const authHeaders = () => {
+    const token = apiClient.getToken ? apiClient.getToken() : null;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
   const loadProducts = async () => {
     try {
-      const res = await apiClient.api.getAllProducts();
+      // /api/product/all — админский список: включает и выключенные товары.
+      const res = await apiClient.instance.get('/api/product/all', { headers: authHeaders() });
       const data = Array.isArray(res.data) ? res.data : [];
       setProducts(data);
     } catch (err) {
@@ -60,8 +69,8 @@ const AdminProducts = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   // При выборе товара АМО запоминаем и id, и имя (имя уходит в позиции заказа).
@@ -81,6 +90,8 @@ const AdminProducts = () => {
       description: form.description.trim(),
       price: form.price.trim(),
       tgLink: form.tgLink.trim(),
+      active: Boolean(form.active),
+      preorder: Boolean(form.preorder),
     };
     // Папку шлём только если заполнена: при обновлении пустое поле не меняет текущую папку.
     if (form.folder?.trim()) payload.folder = form.folder.trim();
@@ -128,6 +139,8 @@ const AdminProducts = () => {
       orderNumber: p.orderNumber ?? '',
       amoProductId: p.amoProductId ?? '',
       amoProductName: p.amoProductName ?? '',
+      active: p.active !== false,
+      preorder: Boolean(p.preorder),
     });
     setMessage('');
     setError('');
@@ -137,6 +150,27 @@ const AdminProducts = () => {
 
   const toggleExpand = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
+  };
+
+  const handleUpload = async (id, fileList) => {
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    setUploadingId(id);
+    setError('');
+    setMessage('');
+    try {
+      const formData = new FormData();
+      files.forEach((f) => formData.append('files', f));
+      await apiClient.instance.post(`/api/product/${id}/photos`, formData, {
+        headers: authHeaders(),
+      });
+      setMessage(`Загружено фото: ${files.length}`);
+      await loadProducts();
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || 'Не удалось загрузить фото');
+    } finally {
+      setUploadingId(null);
+    }
   };
 
   if (loading) {
@@ -185,7 +219,7 @@ const AdminProducts = () => {
             />
           </label>
           <label className={styles.label}>
-            Папка (S3, под shop/) *
+            Папка (S3, под shop/) — можно не заполнять, создастся сама при загрузке фото
             <input
               type="text"
               name="folder"
@@ -229,7 +263,7 @@ const AdminProducts = () => {
             />
           </label>
           <label className={styles.label}>
-            Ссылка TG *
+            Ссылка TG
             <input
               type="text"
               name="tgLink"
@@ -274,7 +308,47 @@ const AdminProducts = () => {
             </select>
             {amoError && <span className={styles.error}>{amoError}</span>}
           </label>
+          <label className={styles.checkLabel}>
+            <input
+              type="checkbox"
+              name="active"
+              checked={form.active}
+              onChange={handleChange}
+            />
+            Товар активен (доступен к продаже)
+          </label>
+          <label className={styles.checkLabel}>
+            <input
+              type="checkbox"
+              name="preorder"
+              checked={form.preorder}
+              onChange={handleChange}
+            />
+            Предзаказ (плашка и пояснение на витрине)
+          </label>
         </div>
+        {form.id?.trim() ? (
+          <div className={styles.uploadRow}>
+            <label className={styles.uploadBtn}>
+              {uploadingId === form.id ? 'Загрузка…' : '+ Загрузить фото'}
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                hidden
+                disabled={uploadingId === form.id}
+                onChange={(e) => {
+                  handleUpload(form.id.trim(), e.target.files);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+          </div>
+        ) : (
+          <p className={styles.hintText}>
+            Фото можно загрузить после сохранения товара — кнопка появится здесь и в «Подробнее» у товара в списке.
+          </p>
+        )}
         {error && <p className={styles.error}>{error}</p>}
         {message && <p className={styles.success}>{message}</p>}
         <button type="submit" className={styles.submit} disabled={saving}>
@@ -293,7 +367,11 @@ const AdminProducts = () => {
               return (
                 <li key={p.id ?? `item-${i}`} className={styles.item}>
                   <div className={styles.itemMain}>
-                    <span className={styles.itemName}>{p.name ?? '—'}</span>
+                    <span className={styles.itemName}>
+                      {p.name ?? '—'}
+                      {p.active === false && <span className={styles.badgeOff}>Выключен</span>}
+                      {p.preorder && <span className={styles.badgePreorder}>Предзаказ</span>}
+                    </span>
                     <span className={styles.itemPrice}>{p.price ?? '—'} ₽</span>
                   </div>
                   <div className={styles.itemActions}>
@@ -362,6 +440,24 @@ const AdminProducts = () => {
                               </a>
                             ))}
                           </div>
+                        </div>
+                      )}
+                      {p.id && (
+                        <div className={styles.uploadRow}>
+                          <label className={styles.uploadBtn}>
+                            {uploadingId === p.id ? 'Загрузка…' : '+ Загрузить фото'}
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              hidden
+                              disabled={uploadingId === p.id}
+                              onChange={(e) => {
+                                handleUpload(p.id, e.target.files);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
                         </div>
                       )}
                     </div>

@@ -150,6 +150,7 @@ const MarketplaceProduct = () => {
               {product.discountPercent > 0 && (
                 <span className={styles.discountBadge}>−{product.discountPercent}%</span>
               )}
+              {product.preorder && <span className={styles.preorderBadge}>Предзаказ</span>}
               {image ? (
                 <AspectPhoto src={image} alt={product.name} />
               ) : (
@@ -185,6 +186,20 @@ const MarketplaceProduct = () => {
               <span className={styles.price}>{formatPrice(product.price)}</span>
               {onSale && <span className={styles.crossedPrice}>{formatPrice(product.crossedPrice)}</span>}
             </div>
+
+            {product.preorder && (
+              <div className={styles.preorderNote}>
+                <p className={styles.preorderNoteTitle}>Это предзаказ</p>
+                <p className={styles.preorderNoteText}>
+                  Форма ещё в производстве, поэтому сразу после оплаты вы её не получите — отправим,
+                  как только она будет готова. Если есть вопросы — напишите нам в Telegram{' '}
+                  <a href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
+                    @AnyFormsBot
+                  </a>
+                  .
+                </p>
+              </div>
+            )}
 
             {isPurchasable(product) ? (
               <>

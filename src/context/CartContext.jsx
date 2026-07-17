@@ -53,6 +53,7 @@ export const CartProvider = ({ children }) => {
           description: product.description ?? '',
           price: parsePrice(product.price),
           photo: product.photos?.[0] ?? null,
+          preorder: Boolean(product.preorder),
           quantity,
         },
       ];

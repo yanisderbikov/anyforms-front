@@ -127,6 +127,19 @@
   box-shadow: 0 2px 8px rgba(120, 60, 20, 0.25);
 }
 
+.preorderBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: #4a6fa5;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(30, 50, 80, 0.25);
+}
+
 .body {
   padding: 0.95rem 1rem 1rem;
   flex: 1;

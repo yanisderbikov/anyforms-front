@@ -8,6 +8,7 @@ import {
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
+import { clearCheckoutFormPromo } from './checkoutFormStorage';
 import styles from './checkout.module.css';
 
 const PAYMENT_TYPE = 'online';
@@ -46,6 +47,8 @@ const MarketplaceSuccess = () => {
       });
       if (sent) clearCheckoutSnapshot();
     }
+    // Контакты и ПВЗ пригодятся для следующего заказа, а промокод — одноразовый.
+    clearCheckoutFormPromo();
     clear();
   }, [clear, orderNumber, isFail]);
 

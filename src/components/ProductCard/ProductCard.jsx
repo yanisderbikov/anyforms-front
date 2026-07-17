@@ -37,6 +37,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
         {item.discountPercent > 0 && (
           <span className={styles.discountBadge}>−{item.discountPercent}%</span>
         )}
+        {item.preorder && <span className={styles.preorderBadge}>Предзаказ</span>}
       </div>
       <div className={styles.body}>
         <h2 className={styles.name}>{item.name}</h2>

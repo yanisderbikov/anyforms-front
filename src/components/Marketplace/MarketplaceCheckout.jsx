@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../utils/phone';
+import { normalizePromoCode } from '../../shared/promoTracking';
 import {
   trackAddPaymentInfo,
   trackPaymentFailed,
   saveCheckoutSnapshot,
 } from '../../services/analytics';
 import PvzSelect from './PvzSelect';
+import { readCheckoutForm, saveCheckoutForm } from './checkoutFormStorage';
 import styles from './checkout.module.css';
 
 // Единственный способ оплаты — онлайн через платёжную страницу Т-Банка.
@@ -22,15 +24,36 @@ const MarketplaceCheckout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [pvz, setPvz] = useState(null);
-  const [marketingConsent, setMarketingConsent] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  // Черновик формы: возвращение с других страниц (и после оплаты) не заставляет
+  // вводить всё заново.
+  const savedForm = useMemo(() => readCheckoutForm() || {}, []);
+
+  const [fullName, setFullName] = useState(savedForm.fullName || '');
+  const [phone, setPhone] = useState(savedForm.phone || '');
+  const [email, setEmail] = useState(savedForm.email || '');
+  const [pvz, setPvz] = useState(savedForm.pvz || null);
+  const [marketingConsent, setMarketingConsent] = useState(Boolean(savedForm.marketingConsent));
+  const [acceptTerms, setAcceptTerms] = useState(Boolean(savedForm.acceptTerms));
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [promoInput, setPromoInput] = useState(savedForm.promoInput || '');
+  const [appliedPromo, setAppliedPromo] = useState(savedForm.appliedPromo || null);
+  const [promoError, setPromoError] = useState('');
+  const [promoChecking, setPromoChecking] = useState(false);
+
+  useEffect(() => {
+    saveCheckoutForm({
+      fullName,
+      phone,
+      email,
+      pvz,
+      marketingConsent,
+      acceptTerms,
+      promoInput,
+      appliedPromo,
+    });
+  }, [fullName, phone, email, pvz, marketingConsent, acceptTerms, promoInput, appliedPromo]);
 
   const nameValid = fullName.trim().length >= 2;
   const phoneValid = isPhoneValid(phone);
@@ -40,6 +63,50 @@ const MarketplaceCheckout = () => {
     items.length > 0 && nameValid && phoneValid && emailValid && pvzValid && acceptTerms && !submitting;
 
   const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
+
+  // Скидка считается как на сервере: с каждой единицы товара, с округлением до копейки.
+  const discountedTotal = appliedPromo
+    ? items.reduce(
+        (sum, i) =>
+          sum +
+          (Math.round((i.price * 100 * (100 - appliedPromo.discountPercent)) / 100) / 100) * i.quantity,
+        0
+      )
+    : total;
+
+  // Промокод закреплён за контактами: сменили почту или телефон — проверяем заново.
+  const resetPromo = () => {
+    setAppliedPromo(null);
+    setPromoError('');
+  };
+
+  const checkPromo = async () => {
+    const code = normalizePromoCode(promoInput);
+    if (!code) return;
+    if (!EMAIL_RE.test(email.trim()) || !isPhoneValid(phone)) {
+      setTouched((prev) => ({ ...prev, phone: true, email: true }));
+      setPromoError('Сначала укажите телефон и почту — промокод проверяется по ним.');
+      return;
+    }
+    setPromoChecking(true);
+    setPromoError('');
+    try {
+      const { data } = await apiClient.instance.get('/api/payment/cart-promo-check', {
+        params: { code, email: email.trim(), phone: toE164(phone) },
+      });
+      if (data?.valid) {
+        setAppliedPromo(data);
+        setPromoInput(data.code);
+      } else {
+        setAppliedPromo(null);
+        setPromoError(data?.message || 'Промокод не подошёл.');
+      }
+    } catch {
+      setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
+    } finally {
+      setPromoChecking(false);
+    }
+  };
 
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
   const phoneError = touched.phone && !phoneValid ? 'Введите корректный номер: +7 (999) 123-45-67.' : '';
@@ -87,6 +154,7 @@ const MarketplaceCheckout = () => {
         pvzCity: pvz.pvzCity,
         pvzStreet: pvz.pvzStreet,
         marketingConsent,
+        promoCode: appliedPromo ? appliedPromo.code : null,
         returnUrl: `${window.location.origin}/shop/success`,
       });
       if (data?.paymentUrl) {
@@ -148,9 +216,18 @@ const MarketplaceCheckout = () => {
             <span>Доставка СДЭК</span>
             <span>на ПВЗ при получении</span>
           </div>
+          {appliedPromo && (
+            <div className={styles.summaryRow}>
+              <span>Промокод {appliedPromo.code}</span>
+              <span>−{appliedPromo.discountPercent}%</span>
+            </div>
+          )}
           <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
             <span>К оплате сейчас ({count})</span>
-            <span>{formatPrice(total)}</span>
+            <span>
+              {appliedPromo && <span className={styles.oldTotal}>{formatPrice(total)}</span>}
+              {formatPrice(discountedTotal)}
+            </span>
           </div>
         </div>
 
@@ -188,6 +265,7 @@ const MarketplaceCheckout = () => {
             onChange={(e) => {
               setPhone(formatRuPhone(e.target.value));
               setError('');
+              resetPromo();
             }}
             onBlur={() => markTouched('phone')}
             required
@@ -208,6 +286,7 @@ const MarketplaceCheckout = () => {
             onChange={(e) => {
               setEmail(e.target.value);
               setError('');
+              resetPromo();
             }}
             onBlur={() => markTouched('email')}
             required
@@ -216,6 +295,39 @@ const MarketplaceCheckout = () => {
             <p className={styles.fieldError}>{emailError}</p>
           ) : (
             <p className={styles.hint}>На этот адрес пришлём чек и подтверждение заказа.</p>
+          )}
+
+          <label className={styles.label} htmlFor="promo">
+            Промокод
+          </label>
+          <div className={styles.promoRow}>
+            <input
+              id="promo"
+              className={`${styles.input} ${promoError ? styles.inputError : ''}`}
+              type="text"
+              autoComplete="off"
+              placeholder="Введите промокод, если есть"
+              value={promoInput}
+              onChange={(e) => {
+                setPromoInput(e.target.value);
+                resetPromo();
+              }}
+              aria-invalid={Boolean(promoError)}
+            />
+            <button
+              type="button"
+              className={styles.promoApplyBtn}
+              onClick={checkPromo}
+              disabled={promoChecking || !promoInput.trim() || Boolean(appliedPromo)}
+            >
+              {promoChecking ? 'Проверяем…' : appliedPromo ? 'Применён' : 'Применить'}
+            </button>
+          </div>
+          {promoError && <p className={styles.fieldError}>{promoError}</p>}
+          {appliedPromo && (
+            <p className={styles.promoOk}>
+              Промокод {appliedPromo.code} применён: скидка {appliedPromo.discountPercent}%.
+            </p>
           )}
 
           <label className={styles.label}>
@@ -266,7 +378,7 @@ const MarketplaceCheckout = () => {
           {error && <p className={styles.error}>{error}</p>}
 
           <button type="submit" className={styles.payBtn} disabled={!canSubmit}>
-            <span>{submitting ? 'Переходим к оплате…' : `Оплатить ${formatPrice(total)}`}</span>
+            <span>{submitting ? 'Переходим к оплате…' : `Оплатить ${formatPrice(discountedTotal)}`}</span>
             <span className={styles.ctaArrow} aria-hidden="true">→</span>
           </button>
 
