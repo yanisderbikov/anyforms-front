@@ -823,34 +823,6 @@ const CourseLandingWhite = () => {
         </div>
       </section>
 
-      {/* ═══════════════ ЭКРАН 10 · ПОДДЕРЖКА ═══════════════ */}
-      <section className={styles.guaranteeSection} aria-labelledby="support-title">
-        <div className={styles.sectionInner}>
-          <div className={styles.guaranteeCard}>
-            <span className={styles.guaranteeBadge} aria-hidden>
-              💬
-            </span>
-            <h2 className={styles.guaranteeTitle} id="support-title">
-              Всё под контролем — вы не&nbsp;одни
-            </h2>
-            <p className={styles.guaranteeText}>
-              Вы не остаётесь один на один с задачей. На каждом этапе мы рядом и поможем
-              довести изделие до результата.
-            </p>
-            <ul className={styles.supportList}>
-              {SUPPORT_ITEMS.map((item) => (
-                <li className={styles.supportItem} key={item}>
-                  <span className={styles.supportCheck} aria-hidden>
-                    →
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════ ЭКРАН 11 · ОФФЕР / ЦЕНА ═══════════════ */}
       <section id="buy" className={styles.buySection} aria-labelledby="buy-title">
         <div className={styles.sectionInner}>

@@ -66,6 +66,8 @@ const TARIFFS = [
       '10 готовых моделей для практики',
       'Закрытый чат мастеров (2000+)',
       'Поставщики, материалы и скидки на закупки',
+      'Пак с оснастками',
+
     ],
   },
   {
@@ -74,13 +76,23 @@ const TARIFFS = [
     desc: 'Месяц работы вместе с командой anyforms.',
     icon: <PersonIcon size={26} />,
     features: [
-      'Всё из тарифа «Самостоятельное изучение»',
+      '4 видео-модуля: от идеи до рабочей формы',
+      'Доступ к материалам — навсегда',
+      '10 готовых моделей для практики',
+      'Закрытый чат мастеров (2000+)',
+      'Поставщики, материалы и скидки на закупки',
+      'Пак с оснастками',
+      'Еженедельный созвон на все вопросы',
+      'Индивидуальная поддержка',
       'Ведение в течение месяца',
       'Разбор ошибок и обратная связь',
       'Доводим до топового результата',
     ],
   },
 ];
+
+// Фичи «Личного ведения», совпадающие с базовым тарифом, показываем приглушённо.
+const SELF_FEATURES = new Set(TARIFFS[0].features);
 const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
 const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/model-order.jpg';
 
@@ -136,9 +148,9 @@ const MODULES = [
   {
     title: 'Проектирование',
     items: [
-      '3D-модель будущего изделия',
-      'Опалубка (оснастка) под заливку',
-      'Мастер-модель для формы',
+      '3D-модель будущего изделия — выдаём или сделаем под заказ',
+      'Опалубка под заливку силиконом',
+      'Конечная оснастка для работы с молдом',
     ],
   },
   {
@@ -150,20 +162,19 @@ const MODULES = [
     ],
   },
   {
-    title: 'Подготовка к заливке',
+    title: 'Ручная обработка',
     items: [
-      'Какой силикон подобрать под задачу',
-      'Как изготовить и обработать мастер-модель',
-      'Сборка оснастки без перекосов',
-      'Разделительные составы и подготовка поверхностей',
+      'Как обработать мастер модель',
+      'Какие расходники использовать',
+      'Что считается приемлемым результатом в зависимости от задачи',
     ],
   },
   {
     title: 'Заливка силикона',
     items: [
-      'Техника заливки формы без пузырей',
-      'Как ускорить или замедлить схватывание силикона',
-      'Извлечение и проверка готовой формы',
+      'Подбор силикона',
+      'Как ускорить / замедлить процесс схватывания',
+      'Подбор оборудования: весы и камера дегазации',
     ],
   },
 ];
@@ -203,7 +214,7 @@ const FOUNDERS = [
     role: 'инженер 3D-моделирования',
     photo: 'https://storage.yandexcloud.net/anyforms/course/Egor.jpeg',
     bio:
-      'Проектирует оснастки, мастер-модели и сложные технические решения — в том числе с вытеснениями. Отвечает за инженерную часть форм.',
+      'Проектирует органические оснастки повторяющие мастер модель. Отвечает за инженерную часть форм.',
   },
 ];
 
@@ -244,27 +255,26 @@ const RESULT_FILES = [
 ];
 const CASES = RESULT_FILES.map((name) => `${RESULTS_BASE}${encodeURIComponent(name)}`);
 
+// Результаты клиентов — отливки. Фото загрузить в бакет course/castings/
+// и перечислить имена файлов здесь; блок на странице появится автоматически.
+const CASTINGS_BASE = 'https://storage.yandexcloud.net/anyforms/course/castings/';
+const CASTING_FILES = [];
+const CASTINGS = CASTING_FILES.map((name) => `${CASTINGS_BASE}${encodeURIComponent(name)}`);
+
 // Экран 8 — бонусы.
 const BONUSES = [
   'Ссылки на проверенные материалы и поставщиков',
   'Скидки на стартовые закупки',
   'Доступ в закрытый чат мастеров (2000+ участников)',
   '10 готовых моделей для отработки навыков',
-  'Материалы по монетизации изделий',
-  'Материалы по продвижению в соцсетях',
+  'Пак с онснастками (простая геометрия 1000+ stl)',
 ];
 
 // Экран 9 — что нужно, чтобы пройти.
-const NEED_CARDS = [
-  { title: '3D-модель', text: 'Цифровая модель будущего изделия — основа для мастер-модели и оснастки.' },
-  { title: '3D-моделирование', text: 'Навык превратить идею и размеры в готовую к печати модель. Разбираем на курсе.' },
-  { title: '3D-принтер', text: 'Печать мастер-модели и оснастки: SLA для модели, FDM для оснастки.' },
-];
-
 const OFFER_ITEMS = [
-  'От вас — только фото, размеры и идея',
-  'Сделаем быстро и чётко по вашему заданию',
-  'Цифровые услуги: 3D-модель, печать и другое',
+  'Дадим список всего, что необходимо для работы',
+  'Либо закажите печать у нас со скидкой 50% — минуя этап «Печать»',
+  'Чат мастеров: найдёте исполнителя из своего города',
 ];
 
 // Экран 10 — поддержка на каждом этапе.
@@ -282,16 +292,16 @@ const FAQ = [
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
-    a: 'Нет. Можно заказать 3D-модель и печать у нас — нужны только фото, размеры и идея. Ученикам курса действует 50% скидка на все цифровые услуги.',
+    a: 'Нет. Можно заказать печать у нас со скидкой 50% и изучать курс, минуя этап «Печать». А в чате мастеров вы сможете найти исполнителя из своего города.',
   },
   {
     q: 'Подойдёт ли новичку без опыта моделирования?',
     a: 'Да. Курс построен пошагово — от проектирования до заливки. Всё показываем на примере реального продукта, повторить можно с нуля, а на каждом этапе помогает поддержка.',
   },
-  {
-    q: 'Сколько денег нужно на материалы для старта?',
-    a: 'Бюджет на первую форму — примерно 5 000 ₽. Дадим ссылки на проверенных поставщиков и скидки на стартовые закупки, чтобы не переплачивать.',
-  },
+  // {
+  //   q: 'Сколько денег нужно на материалы для старта?',
+  //   a: 'Бюджет на первую форму — примерно 5 000 ₽. Дадим ссылки на проверенных поставщиков и скидки на стартовые закупки, чтобы не переплачивать.',
+  // },
   {
     q: 'Реально ли на этом заработать?',
     a: 'На выходе у вас рабочая форма, которую можно продавать или использовать для отливок на продажу. В бонусах — отдельные материалы по монетизации и продвижению в соцсетях.',
@@ -599,7 +609,7 @@ const CourseLanding = () => {
         <div className={styles.sectionInner}>
           <span className={styles.eyebrowAccent}>Зачем это вам</span>
           <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="pain-title">
-            Делайте уникальные молды — и&nbsp;стройте <span className={styles.textAccent}>своё дело</span>
+            Делайте уникальные молды — и&nbsp;стройте <span className={styles.textAccent}>своё </span> дело
           </h2>
           <blockquote className={styles.statementQuote}>
             «Вы сами решаете, что производить: любые уникальные формы под свои идеи и под
@@ -683,8 +693,8 @@ const CourseLanding = () => {
               Опыт компании — в&nbsp;одном курсе
             </h2>
             <p className={styles.sectionLead}>
-              Курс ведут сооснователи anyforms. Дмитрий годами отлаживал производство в
-              цеху, а Юрий умеет объяснить это простыми словами.
+              Курс ведут сооснователи anyforms — каждый отвечает за свой этап:
+              Егор — проектирование, Дмитрий — печать, Юрий — обработка.
             </p>
           </div>
           <div className={styles.foundersGrid}>
@@ -740,6 +750,25 @@ const CourseLanding = () => {
             </div>
           ))}
         </div>
+        {CASTINGS.length > 0 && (
+          <>
+            <div className={styles.sectionInner}>
+              <h3 className={styles.castingsTitle}>Результаты клиентов — отливки</h3>
+            </div>
+            <div className={styles.casesScroller}>
+              {CASTINGS.map((src, i) => (
+                <div className={styles.caseItem} key={src}>
+                  <img
+                    className={styles.caseImg}
+                    src={src}
+                    alt={`Отливка клиента №${i + 1}`}
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* ═══════════════ ЭКРАН 8 · БОНУСЫ ═══════════════ */}
@@ -771,31 +800,22 @@ const CourseLanding = () => {
               Что нужно для старта
             </h2>
             <p className={styles.sectionLead}>
-              Чтобы сделать форму, нужны три вещи. Если своего оборудования нет — это
-              не проблема, мы поможем.
+              Достаточно компьютера, на который можно установить Blender. Остальное
+              разберём по ходу курса.
             </p>
-          </div>
-
-          <div className={styles.needGrid}>
-            {NEED_CARDS.map((card, idx) => (
-              <article className={styles.needCard} key={card.title}>
-                <span className={styles.needNum}>
-                  {String(idx + 1).padStart(2, '0')}
-                </span>
-                <h3 className={styles.needCardTitle}>{card.title}</h3>
-                <p className={styles.needCardText}>{card.text}</p>
-              </article>
-            ))}
           </div>
 
           <div className={styles.offerPanel}>
             <div>
-              <span className={styles.offerLabel}>Нет оборудования?</span>
-              <h3 className={styles.offerTitle}>Сделаем 3D-модель и печать за вас</h3>
+              <span className={styles.offerLabel}>Частый вопрос</span>
+              <h3 className={styles.offerTitle}>
+                Что делать, если на старте нет оборудования?
+              </h3>
               <p className={styles.offerText}>
-                Не нужно покупать принтер и осваивать моделирование с нуля. Закажите
-                3D-модель и печать у нас — нужны только фото, размеры и идея, остальное
-                сделаем сами.
+                Мы предоставим список того, что вам необходимо для работы, либо вы
+                можете заказать у нас печать со скидкой 50% и изучать курс без покупки
+                оборудования, минуя этап «Печать». Также вам будет доступен чат
+                мастеров, где вы сможете найти исполнителя из своего города.
               </p>
               <ul className={styles.offerList}>
                 {OFFER_ITEMS.map((item) => (
@@ -807,9 +827,17 @@ const CourseLanding = () => {
                   </li>
                 ))}
               </ul>
-              <p className={styles.offerHighlight}>
-                Ученикам курса — 50% скидка на все наши цифровые услуги.
-              </p>
+              <a
+                className={`${styles.cta} ${styles.ctaInline} ${styles.offerCta}`}
+                href={SUPPORT_TG}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Обсудить детали
+                <span className={styles.ctaArrow} aria-hidden>
+                  <ArrowIcon />
+                </span>
+              </a>
             </div>
             <div>
               <img
@@ -819,34 +847,6 @@ const CourseLanding = () => {
                 loading="lazy"
               />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ ЭКРАН 10 · ПОДДЕРЖКА ═══════════════ */}
-      <section className={styles.guaranteeSection} aria-labelledby="support-title">
-        <div className={styles.sectionInner}>
-          <div className={styles.guaranteeCard}>
-            <span className={styles.guaranteeBadge} aria-hidden>
-              💬
-            </span>
-            <h2 className={styles.guaranteeTitle} id="support-title">
-              Всё под контролем — вы не&nbsp;одни
-            </h2>
-            <p className={styles.guaranteeText}>
-              Вы не остаётесь один на один с задачей. На каждом этапе мы рядом и поможем
-              довести изделие до результата.
-            </p>
-            <ul className={styles.supportList}>
-              {SUPPORT_ITEMS.map((item) => (
-                <li className={styles.supportItem} key={item}>
-                  <span className={styles.supportCheck} aria-hidden>
-                    →
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
@@ -862,22 +862,39 @@ const CourseLanding = () => {
             <div className={styles.tariffGrid}>
               {TARIFFS.map((tariff) => {
                 const promo = promoByPlan?.[tariff.key];
+                const isPersonal = tariff.key === 'personal';
                 return (
-                  <article key={tariff.key} className={styles.tariffCard}>
+                  <article
+                    key={tariff.key}
+                    className={`${styles.tariffCard} ${
+                      isPersonal ? styles.tariffCardFeatured : ''
+                    }`}
+                  >
+                    {isPersonal && (
+                      <span className={styles.tariffBadge}>Рекомендуем</span>
+                    )}
                     <span className={styles.tariffIcon} aria-hidden>
                       {tariff.icon}
                     </span>
                     <h3 className={styles.tariffName}>{tariff.name}</h3>
                     <p className={styles.tariffDesc}>{tariff.desc}</p>
                     <ul className={styles.tariffList}>
-                      {tariff.features.map((item) => (
-                        <li className={styles.buyIncludedItem} key={item}>
-                          <span className={styles.buyCheck} aria-hidden>
-                            ✓
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
+                      {tariff.features.map((item) => {
+                        const isShared = isPersonal && SELF_FEATURES.has(item);
+                        return (
+                          <li
+                            className={`${styles.buyIncludedItem} ${
+                              isShared ? styles.buyIncludedMuted : ''
+                            }`}
+                            key={item}
+                          >
+                            <span className={styles.buyCheck} aria-hidden>
+                              ✓
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        );
+                      })}
                     </ul>
                     <div className={styles.tariffPriceWrap}>
                       {promo && (
@@ -954,20 +971,15 @@ const CourseLanding = () => {
           <div className={styles.finalInner}>
             <span className={styles.eyebrowAccent}>Старт {LAUNCH}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="final-title">
-              Начните делать формы с&nbsp;<span className={styles.textAccent}>предсказуемым результатом</span>
+              Начните делать формы с&nbsp;<span className={styles.textAccent}>предсказуемым</span> результатом
             </h2>
-            <p className={styles.darkLead}>
-              Самостоятельное изучение — {COURSE_PLANS.self.price}, личное ведение —{' '}
-              {COURSE_PLANS.personal.price}. Доступ откроется {LAUNCH}. Материалы остаются
-              навсегда.
-            </p>
             <div className={styles.finalCtaRow}>
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline}`}
                 onClick={scrollToBuy}
               >
-                Оформить предзаказ
+                Начать учиться
                 <span className={styles.ctaArrow} aria-hidden>
                   <ArrowIcon />
                 </span>
