@@ -83,11 +83,10 @@ const TARIFFS = [
       'Закрытый чат мастеров (2000+)',
       'Поставщики, материалы и скидки на закупки',
       'Пак с оснастками',
-      'Еженедельный созвон на все вопросы',
+      'Еженедельный созвон с ответами на вопросы',
+      'Разбор ошибок и обратная связь',
       'Индивидуальная поддержка',
       'Ведение в течение месяца',
-      'Разбор ошибок и обратная связь',
-      'Доводим до топового результата',
     ],
   },
 ];
@@ -95,7 +94,7 @@ const TARIFFS = [
 // Фичи «Личного ведения», совпадающие с базовым тарифом, показываем приглушённо.
 const SELF_FEATURES = new Set(TARIFFS[0].features);
 const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
-const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/model-order.jpg';
+const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/printer.jpeg';
 
 // Плашка под заголовком — короткие факты о формате курса (с иконками).
 const HERO_FEATURES = [
@@ -138,10 +137,8 @@ const HERO_STATS = [
 
 // Экран 2 — что вы сделаете своими руками (галерея процесса).
 const RESULT_SHOTS = [
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-1.jpeg', alt: 'Опалубка' },
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-2.jpeg', alt: 'Литьё силикона' },
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-3.jpeg', alt: 'Процесс изготовления формы' },
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-4.jpeg', alt: 'Готовая форма' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-1.JPG', alt: 'Опалубка' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-2.JPG', alt: 'Литьё' },
 ];
 
 // Экран 4 — 4 модуля курса.
@@ -498,7 +495,7 @@ const CourseLanding = () => {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Научись делать <em className={styles.hAccent}>молды</em> своими руками
+              Научитесь делать <em className={styles.hAccent}>молды</em> своими руками
             </h1>
 
             <p className={styles.heroSub}>
@@ -795,16 +792,6 @@ const CourseLanding = () => {
       {/* ═══════════════ ЭКРАН 9 · ЧТО ПОНАДОБИТСЯ ═══════════════ */}
       <section id="need" className={styles.needSection} aria-labelledby="need-title">
         <div className={styles.sectionInner}>
-          <div className={styles.sectionHead}>
-            <span className={styles.eyebrow}>Что понадобится</span>
-            <h2 className={styles.sectionTitle} id="need-title">
-              Что нужно для старта
-            </h2>
-            <p className={styles.sectionLead}>
-              Достаточно компьютера, на который можно установить Blender. Остальное
-              разберём по ходу курса.
-            </p>
-          </div>
 
           <div className={styles.offerPanel}>
             <div>
