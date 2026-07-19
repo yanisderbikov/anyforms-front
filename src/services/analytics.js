@@ -76,6 +76,7 @@ function pushEcommerceEvent(event, ecommerce, extra = {}) {
 // корзины из CartContext ({id, price, quantity}).
 function buildItem(product, { quantity, index, listName } = {}) {
   const item = { item_id: String(product.id) };
+  if (product.name) item.item_name = String(product.name);
   const price = toPrice(product.price);
   if (price > 0) item.price = price;
   if (quantity != null) item.quantity = quantity;
@@ -300,6 +301,7 @@ export function saveCheckoutSnapshot(cartItems) {
         value: cartValue(cartItems),
         items: cartItems.map((i) => ({
           id: String(i.id),
+          name: i.name ?? '',
           price: toPrice(i.price),
           quantity: Number(i.quantity) || 1,
         })),
