@@ -606,7 +606,7 @@ const CourseLanding = () => {
         <div className={styles.sectionInner}>
           <span className={styles.eyebrowAccent}>Зачем это вам</span>
           <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="pain-title">
-            Сможете делать формы&nbsp;<span className={styles.textAccent}> самостоятельно </span> и не зависеть от чужих мастерских.
+            Сможете делать формы&nbsp;<span className={styles.textAccent}> самостоятельно </span> и не зависеть от чужих мастерских
           </h2>
           <p className={styles.darkLead}>
             Реализуете свои идеи в изделиях: от свечей до гипса и бетона.
