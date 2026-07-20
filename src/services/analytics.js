@@ -146,7 +146,11 @@ export function trackAddToWishlist(product, { placement, index } = {}) {
       value: toPrice(product.price),
       items: [buildItem(product, { quantity: 1, index, listName: placement })],
     },
-    placement ? { placement } : {}
+    {
+      item_id: String(product.id),
+      ...(product.name ? { item_name: String(product.name) } : {}),
+      ...(placement ? { placement } : {}),
+    }
   );
 }
 
@@ -157,7 +161,11 @@ export function trackRemoveFromWishlist(product, { placement, index } = {}) {
     {
       items: [buildItem(product, { quantity: 1, index, listName: placement })],
     },
-    placement ? { placement } : {}
+    {
+      item_id: String(product.id),
+      ...(product.name ? { item_name: String(product.name) } : {}),
+      ...(placement ? { placement } : {}),
+    }
   );
 }
 
@@ -175,7 +183,11 @@ export function trackAddToCart(product, { quantity = 1, placement, index } = {})
       value: toPrice(product.price) * quantity,
       items: [buildItem(product, { quantity, index, listName: placement })],
     },
-    placement ? { placement } : {}
+    {
+      item_id: String(product.id),
+      ...(product.name ? { item_name: String(product.name) } : {}),
+      ...(placement ? { placement } : {}),
+    }
   );
 }
 
