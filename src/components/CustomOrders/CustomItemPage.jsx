@@ -10,6 +10,7 @@ import {
 } from '../../services/customProducts';
 import CustomItemModal from './CustomItemModal';
 import LinkText from './LinkText';
+import OrderGallery from './OrderGallery';
 import apiClient from '../../apiClient';
 import styles from './CustomItemPage.module.css';
 
@@ -52,7 +53,6 @@ const CustomItemPage = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [idx, setIdx] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -80,17 +80,7 @@ const CustomItemPage = () => {
   const images = useMemo(() => (item?.files || []).filter(isImageFile), [item]);
   const others = useMemo(() => (item?.files || []).filter((f) => !isImageFile(f)), [item]);
 
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'ArrowRight') setIdx((i) => Math.min(i + 1, images.length - 1));
-      if (e.key === 'ArrowLeft') setIdx((i) => Math.max(i - 1, 0));
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [images.length]);
-
   const back = () => navigate('/orders/custom');
-  const current = images[idx];
   const createdLabel = item ? fmtDate(item.createdAt) : null;
 
   return (
@@ -134,24 +124,7 @@ const CustomItemPage = () => {
         <div className={styles.content}>
           <h1 className={styles.title}>{item.productName || 'без названия'}</h1>
 
-          {images.length > 0 && (
-            <div className={styles.viewer}>
-              {images.length > 1 && (
-                <button className={`${styles.nav} ${styles.prev}`} onClick={() => setIdx((i) => Math.max(i - 1, 0))} disabled={idx === 0}>‹</button>
-              )}
-              <img className={styles.viewerImg} src={current.url} alt={current.filename || ''} />
-              <button className={styles.download} onClick={() => downloadFile(current)} title="Скачать">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                скачать
-              </button>
-              {images.length > 1 && (
-                <button className={`${styles.nav} ${styles.next}`} onClick={() => setIdx((i) => Math.min(i + 1, images.length - 1))} disabled={idx === images.length - 1}>›</button>
-              )}
-              {images.length > 1 && <span className={styles.counter}>{idx + 1} / {images.length}</span>}
-            </div>
-          )}
+          {images.length > 0 && <OrderGallery images={images} onDownload={downloadFile} />}
 
           {item.description && <LinkText className={styles.description} text={item.description} />}
 
