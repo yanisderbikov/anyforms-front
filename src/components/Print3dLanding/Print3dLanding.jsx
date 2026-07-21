@@ -4,9 +4,13 @@ import toast from 'react-hot-toast';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
+import { getUtmParams, rememberUtmParams } from '../../utils/utm';
 import styles from './Print3dLanding.module.css';
 
 const LANDING_LEAD_NAME = 'Заявка с лендинга 3D-печати';
+// Воронка и статус amoCRM для заявок с лендинга 3D-печати
+const LANDING_PIPELINE_ID = 9999554;
+const LANDING_STATUS_ID = 79356490;
 const TELEGRAM_PRINT_BOT = 'https://t.me/AnyFormsPrintBot';
 const PHONE_E164 = '+79810403953';
 const PHONE_DISPLAY = '+7 981 040-39-53';
@@ -453,6 +457,10 @@ const Print3dLanding = () => {
   }, [typedHeroText, heroVariantIndex, isDeletingHeroText]);
 
   useEffect(() => {
+    rememberUtmParams();
+  }, []);
+
+  useEffect(() => {
     const target = calcSectionRef.current;
     if (!target || typeof IntersectionObserver === 'undefined') {
       return undefined;
@@ -500,6 +508,9 @@ const Print3dLanding = () => {
         leadName: details ? `${LANDING_LEAD_NAME} — ${details}` : LANDING_LEAD_NAME,
         name: trimmedName,
         phone: trimmedPhone,
+        pipelineId: LANDING_PIPELINE_ID,
+        statusId: LANDING_STATUS_ID,
+        ...getUtmParams(),
       });
       if (data?.success === false) {
         const message = data?.error || 'Не удалось отправить заявку. Попробуйте ещё раз.';

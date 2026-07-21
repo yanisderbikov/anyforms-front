@@ -4,9 +4,13 @@ import toast from 'react-hot-toast';
 import apiClient from '../../apiClient';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import { getUtmParams, rememberUtmParams } from '../../utils/utm';
 import styles from './ChiefLanding.module.css';
 
-const LANDING_LEAD_NAME = 'Заявка с леднига - версия 1';
+const LANDING_LEAD_NAME = 'Заявка с лендинга форм для ресторанов и кондитеров';
+// Воронка и статус amoCRM для заявок с лендинга /chief
+const LANDING_PIPELINE_ID = 10690470;
+const LANDING_STATUS_ID = 84238338;
 
 const TG_BOT = 'https://t.me/AnyFormsChiefBot';
 const TG_CHANNEL = 'https://t.me/anyforms';
@@ -119,6 +123,9 @@ const ChiefLanding = () => {
         leadName: LANDING_LEAD_NAME,
         name: name.trim() || undefined,
         phone: trimmedPhone,
+        pipelineId: LANDING_PIPELINE_ID,
+        statusId: LANDING_STATUS_ID,
+        ...getUtmParams(),
       });
       if (data?.success === false) {
         toast.error(data?.error || 'Не удалось отправить заявку');
@@ -138,6 +145,10 @@ const ChiefLanding = () => {
   const scrollToSection = useCallback((e, sectionId) => {
     e.preventDefault();
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    rememberUtmParams();
   }, []);
 
   useEffect(() => {
