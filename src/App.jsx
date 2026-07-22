@@ -10,6 +10,7 @@ import MarketplaceCheckout from "./components/Marketplace/MarketplaceCheckout";
 import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
+import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
@@ -59,6 +60,7 @@ const KNOWN_PATHS = new Set([
   '/orders/custom/create',
   '/orders/custom/ship',
   '/admin/products',
+  '/admin/invoices',
 ]);
 
 const PAGE_SEO = {
@@ -273,6 +275,7 @@ function App() {
         <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
         <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
         <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/invoices" element={<AdminInvoices />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
