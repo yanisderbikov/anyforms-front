@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
+import { SECTIONS, getAllowedSections, sectionForPath } from '../../permissions';
 import styles from './AdminLayout.module.css';
 
 const MENU = [
   {
     title: 'под заказ',
+    section: SECTIONS.CUSTOM_ORDERS,
     items: [
       { to: '/admin/orders/custom', label: 'В работе' },
       { to: '/admin/orders/custom/create', label: 'Клиенты' },
@@ -14,6 +16,7 @@ const MENU = [
   },
   {
     title: 'розница',
+    section: SECTIONS.RETAIL,
     items: [
       { to: '/admin/orders/without-tracker', label: 'Без трекера' },
       { to: '/admin/orders/created', label: 'К отправке' },
@@ -22,10 +25,12 @@ const MENU = [
   },
   {
     title: 'управление товарами',
+    section: SECTIONS.PRODUCTS,
     items: [{ to: '/admin/products', label: 'Товары розницы' }],
   },
   {
     title: 'деньги',
+    section: SECTIONS.INVOICES,
     items: [{ to: '/admin/invoices', label: 'Выставить счёт' }],
   },
 ];
@@ -34,6 +39,10 @@ const AdminLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const role = apiClient.getJwtMetadata()?.role;
+  const allowedSections = getAllowedSections(role);
+  const visibleMenu = MENU.filter((section) => allowedSections.includes(section.section));
 
   // Закрываем мобильное меню при переходе на другую страницу.
   useEffect(() => {
@@ -55,7 +64,7 @@ const AdminLayout = () => {
 
   const nav = (
     <nav className={styles.nav}>
-      {MENU.map((section) => (
+      {visibleMenu.map((section) => (
         <div key={section.title} className={styles.section}>
           <p className={styles.sectionTitle}>{section.title}</p>
           {section.items.map((item) => (
@@ -77,6 +86,12 @@ const AdminLayout = () => {
       </button>
     </nav>
   );
+
+  // Прямая ссылка на секцию, которая роли недоступна, — уводим на домашнюю.
+  const currentSection = sectionForPath(location.pathname);
+  if (role && currentSection && !allowedSections.includes(currentSection)) {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <div className={styles.layout}>
@@ -105,7 +120,7 @@ const AdminLayout = () => {
           />
           <span
             className={styles.logoLink}
-            onClick={() => navigate('/admin/orders/custom')}
+            onClick={() => navigate('/admin')}
             role="button"
             aria-label="anyforms"
           >

@@ -73,6 +73,7 @@ apiClient.getJwtMetadata = () => {
 
         return {
             role: decoded.role || null,
+            name: decoded.name || null,
             tempUser: decoded.temp_user || false,
             raw: decoded, // если хочешь посмотреть полный токен
         };
@@ -114,13 +115,27 @@ apiClient.instance.interceptors.response.use(
                 window.location.href = data.url;
             }
 
-            // 403 в админке — редирект на логин с запоминанием, куда шли.
+            // 403 в админке — на логин, но только если токена нет или он протух.
+            // Валидный токен без нужной роли на логин не бросаем (иначе петля логина),
+            // такие случаи разруливает гвард секций в AdminLayout.
             // Публичные страницы (/orders/custom/item/...) на логин не бросаем.
             const path = window.location.pathname;
             if (error.response.status === 403 && path.startsWith('/admin') && path !== '/admin/login') {
-                const from = encodeURIComponent(path + window.location.search);
-                window.location.href = `/admin/login?from=${from}`;
-                return;
+                let tokenAlive = false;
+                const token = getStoredToken();
+                if (token) {
+                    try {
+                        const { exp } = jwtDecode(token);
+                        tokenAlive = !exp || exp * 1000 > Date.now();
+                    } catch {
+                        tokenAlive = false;
+                    }
+                }
+                if (!tokenAlive) {
+                    const from = encodeURIComponent(path + window.location.search);
+                    window.location.href = `/admin/login?from=${from}`;
+                    return;
+                }
             }
 
             if (error.response.status === 402) {

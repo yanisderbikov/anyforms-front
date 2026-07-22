@@ -1,0 +1,28 @@
+.wrap {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 12px;
+  box-sizing: border-box;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+}
+
+.cat {
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 22px;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  background: #f1f1f1;
+}

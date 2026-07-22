@@ -12,6 +12,7 @@ import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
 import AdminLayout from "./components/AdminLayout/AdminLayout";
+import AdminHome from "./components/AdminHome/AdminHome";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
@@ -60,6 +61,7 @@ const KNOWN_PATHS = new Set([
   '/orders/custom',
   '/orders/custom/create',
   '/orders/custom/ship',
+  '/admin',
   '/admin/login',
   '/admin/orders',
   '/admin/orders/without-tracker',
@@ -276,6 +278,7 @@ function App() {
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />
         <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<AdminHome />} />
           <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
           <Route path="/admin/orders/without-tracker" element={<OrderList />} />
           <Route path="/admin/orders/created" element={<OrderList />} />

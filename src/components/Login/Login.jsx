@@ -38,9 +38,9 @@ const Login = () => {
     setLoading(true);
     try {
       await login(loginValue.trim(), password);
-      // Возвращаем туда, куда человек шёл до логина; иначе — на доску под заказов.
+      // Возвращаем туда, куда человек шёл до логина; иначе — на домашнюю страницу админки.
       const from = searchParams.get('from');
-      const target = from && from.startsWith('/') && !from.startsWith('//') ? from : '/admin/orders/custom';
+      const target = from && from.startsWith('/') && !from.startsWith('//') ? from : '/admin';
       navigate(target, { replace: true });
     } catch (err) {
       const message =
