@@ -114,7 +114,7 @@ const MarketplaceProduct = () => {
   const photos = product.photos?.length ? product.photos : [];
   const hasGallery = photos.length > 1;
   const image = photos[Math.min(activeImage, photos.length - 1)];
-  const onSale = product.crossedPrice != null && product.crossedPrice > product.price;
+  const onSale = product.crossedPrice != null && Number(product.crossedPrice) > Number(product.price);
   const inCart = cartItems.find((item) => item.id === String(product.id))?.quantity ?? 0;
 
   return (

@@ -6,11 +6,12 @@ const ProductCard = ({ item, index = null, onSelect }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
 
-  const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
+  const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
-  const isOnSale =
-    item.discountPercent > 0 ||
-    (item.crossedPrice != null && item.crossedPrice > item.price);
+  const hasCrossedPrice =
+    item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
+
+  const isOnSale = item.discountPercent > 0 || hasCrossedPrice;
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -46,7 +47,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
         )}
         <div className={styles.prices}>
           <span className={styles.price}>{formatPrice(item.price)}</span>
-          {item.crossedPrice != null && item.crossedPrice > item.price && (
+          {hasCrossedPrice && (
             <span className={styles.crossedPrice}>{formatPrice(item.crossedPrice)}</span>
           )}
         </div>
