@@ -189,12 +189,40 @@
   margin: 0 auto;
 }
 
+.sectionHead {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  margin: 0 0 1rem;
+  margin: 0;
   color: #111;
   text-transform: lowercase;
+}
+
+.shopLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f1f1f1;
+  color: #111;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.shopLink:hover {
+  background: #e5e5e5;
+}
+
+.shopLink svg {
+  display: block;
 }
 
 .message {
