@@ -7,9 +7,9 @@ const MENU = [
   {
     title: 'под заказ',
     items: [
-      { to: '/admin/orders/custom', label: 'Доска' },
-      { to: '/admin/orders/custom/create', label: 'Создать заказ' },
-      { to: '/admin/orders/custom/ship', label: 'Отправка' },
+      { to: '/admin/orders/custom', label: 'В работе' },
+      { to: '/admin/orders/custom/create', label: 'Клиенты' },
+      { to: '/admin/orders/custom/ship', label: 'Доставка' },
     ],
   },
   {
