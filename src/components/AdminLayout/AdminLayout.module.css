@@ -194,9 +194,7 @@
   }
 
   .userName {
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none;
   }
 
   .burger {
