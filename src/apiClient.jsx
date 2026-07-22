@@ -64,6 +64,18 @@ apiClient.clearToken = () => {
     apiClient.setSecurityData(null);
 };
 
+// Есть ли живой токен: существует, парсится и не истёк.
+apiClient.hasLiveToken = () => {
+    const token = getStoredToken();
+    if (!token) return false;
+    try {
+        const { exp } = jwtDecode(token);
+        return !exp || exp * 1000 > Date.now();
+    } catch {
+        return false;
+    }
+};
+
 apiClient.getJwtMetadata = () => {
     const token = getStoredToken();
     if (!token) return null;
@@ -121,17 +133,7 @@ apiClient.instance.interceptors.response.use(
             // Публичные страницы (/orders/custom/item/...) на логин не бросаем.
             const path = window.location.pathname;
             if (error.response.status === 403 && path.startsWith('/admin') && path !== '/admin/login') {
-                let tokenAlive = false;
-                const token = getStoredToken();
-                if (token) {
-                    try {
-                        const { exp } = jwtDecode(token);
-                        tokenAlive = !exp || exp * 1000 > Date.now();
-                    } catch {
-                        tokenAlive = false;
-                    }
-                }
-                if (!tokenAlive) {
+                if (!apiClient.hasLiveToken()) {
                     const from = encodeURIComponent(path + window.location.search);
                     window.location.href = `/admin/login?from=${from}`;
                     return;

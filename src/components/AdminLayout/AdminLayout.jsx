@@ -40,7 +40,9 @@ const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const role = apiClient.getJwtMetadata()?.role;
+  const jwtMeta = apiClient.getJwtMetadata();
+  const role = jwtMeta?.role;
+  const userName = jwtMeta?.name;
   const allowedSections = getAllowedSections(role);
   const visibleMenu = MENU.filter((section) => allowedSections.includes(section.section));
 
@@ -87,6 +89,12 @@ const AdminLayout = () => {
     </nav>
   );
 
+  // Без живого токена в админке делать нечего — на логин с возвратом обратно.
+  if (!apiClient.hasLiveToken()) {
+    const from = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/admin/login?from=${from}`} replace />;
+  }
+
   // Прямая ссылка на секцию, которая роли недоступна, — уводим на домашнюю.
   const currentSection = sectionForPath(location.pathname);
   if (role && currentSection && !allowedSections.includes(currentSection)) {
@@ -98,26 +106,29 @@ const AdminLayout = () => {
       <div className={styles.headerSafeArea} aria-hidden="true" />
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <button
-            type="button"
-            className={styles.burger}
-            aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineTop : ''}`} />
-            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineHidden : ''}`} />
-            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineBottom : ''}`} />
-          </button>
-          <img
-            className={styles.catImg}
-            src="https://cataas.com/cat?width=82&height=82"
-            alt="Случайный котик"
-            width={41}
-            height={41}
-            loading="lazy"
-            decoding="async"
-          />
+          <div className={styles.headerLeft}>
+            <button
+              type="button"
+              className={styles.burger}
+              aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineTop : ''}`} />
+              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineHidden : ''}`} />
+              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineBottom : ''}`} />
+            </button>
+            <img
+              className={styles.catImg}
+              src="https://cataas.com/cat?width=82&height=82"
+              alt="Случайный котик"
+              width={41}
+              height={41}
+              loading="lazy"
+              decoding="async"
+            />
+            {userName && <span className={styles.userName}>{userName}</span>}
+          </div>
           <span
             className={styles.logoLink}
             onClick={() => navigate('/admin')}
