@@ -114,11 +114,12 @@ apiClient.instance.interceptors.response.use(
                 window.location.href = data.url;
             }
 
-            // 403 в админке — редирект на логин с запоминанием, куда шли
+            // 403 в админке — редирект на логин с запоминанием, куда шли.
+            // Публичные страницы (/orders/custom/item/...) на логин не бросаем.
             const path = window.location.pathname;
-            if (error.response.status === 403 && (path.startsWith('/orders') || path.startsWith('/admin'))) {
+            if (error.response.status === 403 && path.startsWith('/admin') && path !== '/admin/login') {
                 const from = encodeURIComponent(path + window.location.search);
-                window.location.href = `/login?from=${from}`;
+                window.location.href = `/admin/login?from=${from}`;
                 return;
             }
 

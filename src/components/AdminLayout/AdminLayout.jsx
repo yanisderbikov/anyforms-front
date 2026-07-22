@@ -7,17 +7,17 @@ const MENU = [
   {
     title: 'под заказ',
     items: [
-      { to: '/orders/custom', label: 'Доска' },
-      { to: '/orders/custom/create', label: 'Создать заказ' },
-      { to: '/orders/custom/ship', label: 'Отправка' },
+      { to: '/admin/orders/custom', label: 'Доска' },
+      { to: '/admin/orders/custom/create', label: 'Создать заказ' },
+      { to: '/admin/orders/custom/ship', label: 'Отправка' },
     ],
   },
   {
     title: 'розница',
     items: [
-      { to: '/orders/without-tracker', label: 'Без трекера' },
-      { to: '/orders/created', label: 'К отправке' },
-      { to: '/orders/delivering', label: 'Доставляются' },
+      { to: '/admin/orders/without-tracker', label: 'Без трекера' },
+      { to: '/admin/orders/created', label: 'К отправке' },
+      { to: '/admin/orders/delivering', label: 'Доставляются' },
     ],
   },
   {
@@ -50,7 +50,7 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     apiClient.clearToken();
-    navigate('/login', { replace: true });
+    navigate('/admin/login', { replace: true });
   };
 
   const nav = (
@@ -105,7 +105,7 @@ const AdminLayout = () => {
           />
           <span
             className={styles.logoLink}
-            onClick={() => navigate('/orders/custom')}
+            onClick={() => navigate('/admin/orders/custom')}
             role="button"
             aria-label="anyforms"
           >

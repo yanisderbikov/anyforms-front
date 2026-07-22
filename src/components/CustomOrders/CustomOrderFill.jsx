@@ -120,7 +120,7 @@ const CustomOrderFill = () => {
   return (
     <div className={styles.page}>
       <div className={styles.topRow}>
-        <button className={styles.topBack} onClick={() => navigate('/orders/custom/create')}>← к заказам</button>
+        <button className={styles.topBack} onClick={() => navigate('/admin/orders/custom/create')}>← к заказам</button>
       </div>
 
       <div className={styles.orderInfo}>

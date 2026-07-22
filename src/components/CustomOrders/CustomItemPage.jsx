@@ -80,7 +80,7 @@ const CustomItemPage = () => {
   const images = useMemo(() => (item?.files || []).filter(isImageFile), [item]);
   const others = useMemo(() => (item?.files || []).filter((f) => !isImageFile(f)), [item]);
 
-  const back = () => navigate('/orders/custom');
+  const back = () => navigate('/admin/orders/custom');
   const createdLabel = item ? fmtDate(item.createdAt) : null;
 
   return (
@@ -89,7 +89,7 @@ const CustomItemPage = () => {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           {isAuthed && <button className={styles.back} onClick={back}>← назад</button>}
-          <span className={styles.logoLink} onClick={() => navigate(isAuthed ? '/orders/custom' : '/')} role="button" aria-label="anyforms">
+          <span className={styles.logoLink} onClick={() => navigate(isAuthed ? '/admin/orders/custom' : '/')} role="button" aria-label="anyforms">
             <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="anyforms" width={180} height={41} decoding="async" />
           </span>
           {isAuthed && item?.leadId && (
@@ -164,7 +164,7 @@ const CustomItemPage = () => {
           item={item}
           onClose={() => setEditing(false)}
           onSaved={(updated) => setItem(updated)}
-          onDeleted={() => navigate('/orders/custom')}
+          onDeleted={() => navigate('/admin/orders/custom')}
         />
       )}
     </div>

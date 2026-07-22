@@ -21,9 +21,9 @@ const OrderList = () => {
   // Определяем активный режим из URL
   const getActiveModeFromPath = () => {
     const path = location.pathname;
-    if (path === '/orders/without-tracker') return 'without-tracker';
-    if (path === '/orders/created') return 'created';
-    if (path === '/orders/delivering') return 'delivering';
+    if (path === '/admin/orders/without-tracker') return 'without-tracker';
+    if (path === '/admin/orders/created') return 'created';
+    if (path === '/admin/orders/delivering') return 'delivering';
     // Дефолтно для /orders
     return 'without-tracker';
   };
@@ -73,11 +73,11 @@ const OrderList = () => {
   const handleModeChange = (mode) => {
     setMenuOpen(false);
     if (mode === 'without-tracker') {
-      navigate('/orders/without-tracker');
+      navigate('/admin/orders/without-tracker');
     } else if (mode === 'created') {
-      navigate('/orders/created');
+      navigate('/admin/orders/created');
     } else if (mode === 'delivering') {
-      navigate('/orders/delivering');
+      navigate('/admin/orders/delivering');
     }
   };
 

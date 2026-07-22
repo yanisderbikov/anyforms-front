@@ -96,7 +96,7 @@ const CustomOrdersList = () => {
         pvzSdekStreet: form.pvzSdekStreet.trim() || null,
         deliveryMethod: form.pickup ? 'PICKUP' : 'CDEK',
       });
-      navigate(`/orders/custom/order/${created.id}`);
+      navigate(`/admin/orders/custom/order/${created.id}`);
     } catch {
       toast.error('Не удалось создать заказ');
     } finally {
@@ -132,7 +132,7 @@ const CustomOrdersList = () => {
       ) : (
         <div className={styles.cards}>
           {filtered.map((o) => (
-            <div key={o.id} className={styles.card} onClick={() => navigate(`/orders/custom/order/${o.id}`)}>
+            <div key={o.id} className={styles.card} onClick={() => navigate(`/admin/orders/custom/order/${o.id}`)}>
               <div className={styles.cardHead}>
                 <span className={styles.cardTitle}>
                   {o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`)}

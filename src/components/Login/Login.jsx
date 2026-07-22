@@ -40,7 +40,7 @@ const Login = () => {
       await login(loginValue.trim(), password);
       // Возвращаем туда, куда человек шёл до логина; иначе — на доску под заказов.
       const from = searchParams.get('from');
-      const target = from && from.startsWith('/') && !from.startsWith('//') ? from : '/orders/custom';
+      const target = from && from.startsWith('/') && !from.startsWith('//') ? from : '/admin/orders/custom';
       navigate(target, { replace: true });
     } catch (err) {
       const message =

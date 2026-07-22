@@ -6,18 +6,18 @@ import styles from './CustomTabs.module.css';
 const CustomTabs = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isCreate = pathname.startsWith('/orders/custom/create');
-  const isShip = pathname.startsWith('/orders/custom/ship');
+  const isCreate = pathname.startsWith('/admin/orders/custom/create');
+  const isShip = pathname.startsWith('/admin/orders/custom/ship');
   const isWork = !isCreate && !isShip;
   return (
     <div className={styles.tabs}>
-      <button className={`${styles.tab} ${isWork ? styles.active : ''}`} onClick={() => navigate('/orders/custom')}>
+      <button className={`${styles.tab} ${isWork ? styles.active : ''}`} onClick={() => navigate('/admin/orders/custom')}>
         в работе
       </button>
-      <button className={`${styles.tab} ${isCreate ? styles.active : ''}`} onClick={() => navigate('/orders/custom/create')}>
+      <button className={`${styles.tab} ${isCreate ? styles.active : ''}`} onClick={() => navigate('/admin/orders/custom/create')}>
         клиенты
       </button>
-      <button className={`${styles.tab} ${isShip ? styles.active : ''}`} onClick={() => navigate('/orders/custom/ship')}>
+      <button className={`${styles.tab} ${isShip ? styles.active : ''}`} onClick={() => navigate('/admin/orders/custom/ship')}>
         доставка
       </button>
     </div>

@@ -60,6 +60,14 @@ const KNOWN_PATHS = new Set([
   '/orders/custom',
   '/orders/custom/create',
   '/orders/custom/ship',
+  '/admin/login',
+  '/admin/orders',
+  '/admin/orders/without-tracker',
+  '/admin/orders/created',
+  '/admin/orders/delivering',
+  '/admin/orders/custom',
+  '/admin/orders/custom/create',
+  '/admin/orders/custom/ship',
   '/admin/products',
   '/admin/invoices',
 ]);
@@ -184,7 +192,7 @@ function App() {
       document.body.style.background = '#f1f0ec';
     } else if (isFounderPage) {
       document.body.style.background = '#f5f1e8';
-    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders'))) {
+    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
       document.body.style.background = '#000';
     } else {
       document.body.style.background = '#e5e5e5';
@@ -244,7 +252,8 @@ function App() {
   return (
     <div className={styles.app}>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Navigate to="/admin/login" replace />} />
+        <Route path="/admin/login" element={<Login />} />
         <Route path="/chief" element={<ChiefLanding />} />
         <Route path="/chief/privacy" element={<ChiefPrivacy />} />
         <Route path="/3d-print" element={<Print3dLanding />} />
@@ -267,18 +276,26 @@ function App() {
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />
         <Route element={<AdminLayout />}>
-          <Route path="/orders" element={<Navigate to="/orders/custom" replace />} />
-          <Route path="/orders/without-tracker" element={<OrderList />} />
-          <Route path="/orders/created" element={<OrderList />} />
-          <Route path="/orders/delivering" element={<OrderList />} />
-          <Route path="/orders/custom" element={<CustomOrders />} />
-          <Route path="/orders/custom/create" element={<CustomOrdersList />} />
-          <Route path="/orders/custom/ship" element={<CustomShipList />} />
-          <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
+          <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
+          <Route path="/admin/orders/without-tracker" element={<OrderList />} />
+          <Route path="/admin/orders/created" element={<OrderList />} />
+          <Route path="/admin/orders/delivering" element={<OrderList />} />
+          <Route path="/admin/orders/custom" element={<CustomOrders />} />
+          <Route path="/admin/orders/custom/create" element={<CustomOrdersList />} />
+          <Route path="/admin/orders/custom/ship" element={<CustomShipList />} />
+          <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/invoices" element={<AdminInvoices />} />
         </Route>
-        {/* Страница позиции доступна без логина (публичная ссылка для клиента) — вне админского layout. */}
+        {/* Старые адреса админки → новые под /admin */}
+        <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />
+        <Route path="/orders/without-tracker" element={<Navigate to="/admin/orders/without-tracker" replace />} />
+        <Route path="/orders/created" element={<Navigate to="/admin/orders/created" replace />} />
+        <Route path="/orders/delivering" element={<Navigate to="/admin/orders/delivering" replace />} />
+        <Route path="/orders/custom" element={<Navigate to="/admin/orders/custom" replace />} />
+        <Route path="/orders/custom/create" element={<Navigate to="/admin/orders/custom/create" replace />} />
+        <Route path="/orders/custom/ship" element={<Navigate to="/admin/orders/custom/ship" replace />} />
+        {/* Страница позиции доступна без логина (публичная ссылка для клиента) — вне админского layout и вне /admin. */}
         <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
