@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getAllCustomItems } from '../../services/customProducts';
-import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import CustomItemCard from './CustomItemCard';
 import CustomItemViewModal from './CustomItemViewModal';
@@ -87,7 +86,6 @@ const CustomOrders = () => {
 
   return (
     <div className={styles.page}>
-      <CustomHeader />
       <div className={styles.tabsWrap}>
         <CustomTabs />
       </div>

@@ -32,9 +32,11 @@ const formatAmount = (kopecks) => {
   return `${(kopecks / 100).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽`;
 };
 
-const formatDate = (iso) => {
-  if (!iso) return '';
-  return new Date(iso).toLocaleString('ru-RU', {
+const formatDate = (value) => {
+  if (!value) return '';
+  // Бэк может отдавать Instant как epoch-секунды — переводим в миллисекунды.
+  const date = typeof value === 'number' ? new Date(value * 1000) : new Date(value);
+  return date.toLocaleString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
@@ -283,7 +285,9 @@ const AdminInvoices = () => {
                 </p>
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Сумма:</span> {formatAmount(inv.amountKopecks)}
-                  {' '}· <span className={styles.itemLabel}>Выставлен:</span> {formatDate(inv.createdAt)}
+                </p>
+                <p className={styles.itemRow}>
+                  <span className={styles.itemLabel}>Выставлен:</span> {formatDate(inv.createdAt)}
                 </p>
                 {inv.description && (
                   <p className={styles.itemRow}>

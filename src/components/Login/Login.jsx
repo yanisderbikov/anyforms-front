@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './Login.module.css';
 import apiClient from "../../apiClient";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loginValue, setLoginValue] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -37,7 +38,10 @@ const Login = () => {
     setLoading(true);
     try {
       await login(loginValue.trim(), password);
-      navigate('/orders', { replace: true });
+      // Возвращаем туда, куда человек шёл до логина; иначе — на доску под заказов.
+      const from = searchParams.get('from');
+      const target = from && from.startsWith('/') && !from.startsWith('//') ? from : '/orders/custom';
+      navigate(target, { replace: true });
     } catch (err) {
       const message =
         err.response?.data?.message ||

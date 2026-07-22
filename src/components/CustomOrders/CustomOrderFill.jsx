@@ -119,15 +119,9 @@ const CustomOrderFill = () => {
 
   return (
     <div className={styles.page}>
-      <div className={styles.headerSafeArea} aria-hidden="true" />
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <button className={styles.back} onClick={() => navigate('/orders/custom/create')}>← к заказам</button>
-          <span className={styles.logoLink}>
-            <img className={styles.logo} src="/anyforms_logo_new_white.svg" alt="anyforms" width={180} height={41} decoding="async" />
-          </span>
-        </div>
-      </header>
+      <div className={styles.topRow}>
+        <button className={styles.topBack} onClick={() => navigate('/orders/custom/create')}>← к заказам</button>
+      </div>
 
       <div className={styles.orderInfo}>
         <h1 className={styles.orderTitle}>

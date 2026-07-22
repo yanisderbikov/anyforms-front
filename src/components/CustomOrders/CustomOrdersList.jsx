@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getCustomOrders, createCustomOrder, searchContacts, isPickup, PICKUP_BADGE_STYLE } from '../../services/customProducts';
-import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import styles from './CustomOrdersList.module.css';
 
@@ -107,7 +106,6 @@ const CustomOrdersList = () => {
 
   return (
     <div className={styles.page}>
-      <CustomHeader />
       <div className={styles.tabsWrap}>
         <CustomTabs />
       </div>

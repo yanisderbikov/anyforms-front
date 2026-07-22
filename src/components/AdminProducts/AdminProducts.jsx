@@ -227,7 +227,7 @@ const AdminProducts = () => {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Управление товарами</h1>
+      <h1 className={styles.title}>Управление товарами розницы</h1>
 
       <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGrid}>

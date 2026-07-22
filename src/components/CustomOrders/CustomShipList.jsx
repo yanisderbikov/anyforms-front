@@ -11,7 +11,6 @@ import {
   CUSTOM_STATUS_STYLE,
   CUSTOM_STATUS_LABELS,
 } from '../../services/customProducts';
-import CustomHeader from './CustomHeader';
 import CustomTabs from './CustomTabs';
 import styles from './CustomShipList.module.css';
 
@@ -146,7 +145,6 @@ const CustomShipList = () => {
 
   return (
     <div className={styles.page}>
-      <CustomHeader />
       <div className={styles.tabsWrap}>
         <CustomTabs />
       </div>

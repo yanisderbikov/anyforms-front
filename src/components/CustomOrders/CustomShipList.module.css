@@ -2,13 +2,13 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 3rem;
+  padding: 1rem 12px 3rem;
   box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
   .page {
-    padding: calc(84px + env(safe-area-inset-top, 0px)) 50px 3rem;
+    padding: 1rem 50px 3rem;
   }
 }
 

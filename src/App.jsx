@@ -11,6 +11,7 @@ import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
+import AdminLayout from "./components/AdminLayout/AdminLayout";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
@@ -265,17 +266,20 @@ function App() {
         <Route path="/shop/cart" element={<MarketplaceCart />} />
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />
-        <Route path="/orders" element={<Navigate to="/orders/without-tracker" replace />} />
-        <Route path="/orders/without-tracker" element={<OrderList />} />
-        <Route path="/orders/created" element={<OrderList />} />
-        <Route path="/orders/delivering" element={<OrderList />} />
-        <Route path="/orders/custom" element={<CustomOrders />} />
-        <Route path="/orders/custom/create" element={<CustomOrdersList />} />
-        <Route path="/orders/custom/ship" element={<CustomShipList />} />
+        <Route element={<AdminLayout />}>
+          <Route path="/orders" element={<Navigate to="/orders/custom" replace />} />
+          <Route path="/orders/without-tracker" element={<OrderList />} />
+          <Route path="/orders/created" element={<OrderList />} />
+          <Route path="/orders/delivering" element={<OrderList />} />
+          <Route path="/orders/custom" element={<CustomOrders />} />
+          <Route path="/orders/custom/create" element={<CustomOrdersList />} />
+          <Route path="/orders/custom/ship" element={<CustomShipList />} />
+          <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/invoices" element={<AdminInvoices />} />
+        </Route>
+        {/* Страница позиции доступна без логина (публичная ссылка для клиента) — вне админского layout. */}
         <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
-        <Route path="/orders/custom/order/:orderId" element={<CustomOrderFill />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/invoices" element={<AdminInvoices />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

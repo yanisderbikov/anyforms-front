@@ -158,34 +158,6 @@ const OrderList = () => {
 
   return (
     <div className={styles.orderList}>
-      <div className={styles.headerSafeArea} aria-hidden="true" />
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <img
-            className={styles.catImg}
-            src="https://cataas.com/cat?width=82&height=82"
-            alt="Случайный котик"
-            width={41}
-            height={41}
-            loading="lazy"
-            decoding="async"
-          />
-          <span className={styles.logoLink} aria-label="anyforms">
-            <img
-              className={styles.logo}
-              src="/anyforms_logo_new_white.svg"
-              alt=""
-              width={180}
-              height={41}
-              decoding="async"
-            />
-          </span>
-          <button className={styles.customLink} onClick={() => navigate('/orders/custom')}>
-            под заказ →
-          </button>
-        </div>
-      </header>
-
       <div className={styles.modeTabsWrap}>
         <div className={styles.modeTabs}>
           <button
