@@ -116,17 +116,17 @@
 }
 
 .navLink:hover {
-  background: rgba(17, 17, 17, 0.06);
+  background: #f1f1f1;
 }
 
 .navLinkActive {
-  background: #111;
-  color: #fff;
+  background: #e5e5e5;
+  color: #111;
   font-weight: 600;
 }
 
 .navLinkActive:hover {
-  background: #111;
+  background: #e5e5e5;
 }
 
 .logout {

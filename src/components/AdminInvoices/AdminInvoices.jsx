@@ -58,6 +58,7 @@ const AdminInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceRef = useRef(null);
@@ -85,6 +86,15 @@ const AdminInvoices = () => {
   useEffect(() => {
     loadInvoices();
   }, [loadInvoices]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadInvoices();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // Закрываем подсказки при клике вне поля ФИО.
   useEffect(() => {
@@ -260,7 +270,40 @@ const AdminInvoices = () => {
       </form>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Последние счета</h2>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Последние счета</h2>
+          <button
+            type="button"
+            className={styles.refreshBtn}
+            onClick={handleRefresh}
+            disabled={refreshing}
+            title="Обновить список счетов"
+            aria-label="Обновить список счетов"
+          >
+            <svg
+              className={refreshing ? styles.spinning : undefined}
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.9 8a5.9 5.9 0 1 1-1.73-4.17"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M13.9 1.6v2.8h-2.8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
         {loading ? (
           <p className={styles.message}>Загрузка…</p>
         ) : invoices.length === 0 ? (
