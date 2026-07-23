@@ -81,7 +81,20 @@ const CustomOrders = () => {
     if (statusFilter && it.status !== statusFilter) return false;
     const q = search.trim().toLowerCase();
     if (!q) return true;
-    return (it.productName || '').toLowerCase().includes(q) || (it.description || '').toLowerCase().includes(q);
+    const haystack = [
+      it.productName,
+      it.description,
+      it.clientName,
+      it.modeler,
+      it.statusDescription,
+      it.id,
+      it.orderId,
+      it.leadId,
+    ]
+      .filter((v) => v != null && v !== '')
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(q);
   });
 
   return (
@@ -94,7 +107,7 @@ const CustomOrders = () => {
         <input
           className={styles.searchInput}
           type="text"
-          placeholder="поиск по названию или описанию..."
+          placeholder="поиск: ФИО, описание, название, моделер, № заказа…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
