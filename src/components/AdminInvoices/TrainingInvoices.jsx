@@ -291,12 +291,12 @@ const TrainingInvoices = () => {
                 </p>
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Телефон:</span> {inv.contactPhone || '—'}
-                  {inv.email && (
-                    <>
-                      {' '}· <span className={styles.itemLabel}>Email:</span> {inv.email}
-                    </>
-                  )}
                 </p>
+                {inv.email && (
+                  <p className={styles.itemRow}>
+                    <span className={styles.itemLabel}>Email:</span> {inv.email}
+                  </p>
+                )}
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Сумма:</span> {formatAmount(inv.amountKopecks)}
                   {inv.promoCode && (
