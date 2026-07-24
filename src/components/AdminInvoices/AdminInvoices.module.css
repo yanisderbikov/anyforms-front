@@ -125,6 +125,91 @@
   color: #c00;
 }
 
+.promoRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.promoRow .input {
+  flex: 1;
+}
+
+.promoBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  cursor: pointer;
+  color: #111;
+  text-transform: lowercase;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.promoBtn:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.promoBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.promoOk {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a7f37;
+  text-transform: none;
+}
+
+.promoErr {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c00;
+  text-transform: none;
+}
+
+.priceInfo {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.priceOld {
+  margin-left: 0.5rem;
+  font-weight: 600;
+  color: #8c8c8c;
+  text-decoration: line-through;
+}
+
+.createdBox {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f4faf5;
+  border: 1px solid rgba(26, 127, 55, 0.35);
+  border-radius: 14px;
+}
+
+.createdLink {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #111;
+  word-break: break-all;
+}
+
 .submit {
   display: inline-flex;
   align-items: center;

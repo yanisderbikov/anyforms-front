@@ -31,7 +31,10 @@ const MENU = [
   {
     title: 'деньги',
     section: SECTIONS.INVOICES,
-    items: [{ to: '/admin/invoices', label: 'Выставить счёт' }],
+    items: [
+      { to: '/admin/invoices', label: 'Обычный счёт', section: SECTIONS.INVOICES },
+      { to: '/admin/invoices/training', label: 'Счета на обучение', section: SECTIONS.TRAINING_INVOICES },
+    ],
   },
 ];
 
@@ -44,7 +47,11 @@ const AdminLayout = () => {
   const role = jwtMeta?.role;
   const userName = jwtMeta?.name;
   const allowedSections = getAllowedSections(role);
-  const visibleMenu = MENU.filter((section) => allowedSections.includes(section.section));
+  // Пункт меню может иметь свою секцию (иначе берётся секция группы); пустые группы скрываем.
+  const visibleMenu = MENU.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => allowedSections.includes(item.section || section.section)),
+  })).filter((section) => section.items.length > 0);
 
   // Закрываем мобильное меню при переходе на другую страницу.
   useEffect(() => {

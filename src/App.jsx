@@ -11,6 +11,7 @@ import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
+import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoices";
 import AdminLayout from "./components/AdminLayout/AdminLayout";
 import AdminHome from "./components/AdminHome/AdminHome";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
@@ -72,6 +73,7 @@ const KNOWN_PATHS = new Set([
   '/admin/orders/custom/ship',
   '/admin/products',
   '/admin/invoices',
+  '/admin/invoices/training',
 ]);
 
 const PAGE_SEO = {
@@ -289,6 +291,7 @@ function App() {
           <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/invoices" element={<AdminInvoices />} />
+          <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
         </Route>
         {/* Старые адреса админки → новые под /admin */}
         <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />
