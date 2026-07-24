@@ -3,31 +3,48 @@
 // Простой, но строгий формат email.
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// Приводим ввод к российскому номеру (11 цифр, начинается с 7).
-export const normalizePhoneDigits = (value) => {
-  let digits = String(value ?? '').replace(/\D/g, '');
-  if (digits.startsWith('8')) digits = `7${digits.slice(1)}`;
-  if (digits && !digits.startsWith('7')) digits = `7${digits}`;
-  return digits.slice(0, 11);
+// Диапазон количества цифр в номере: E.164 допускает до 15,
+// короче 8 — заведомо не полный номер.
+const MIN_PHONE_DIGITS = 8;
+const MAX_PHONE_DIGITS = 15;
+
+// Ввод не подгоняем под конкретную страну: оставляем цифры, ведущий «+»
+// и привычные разделители (пробелы, скобки, дефисы). Буквы и прочий мусор
+// отбрасываем прямо при вводе.
+export const sanitizePhoneInput = (value) => {
+  const raw = String(value ?? '');
+  const hasPlus = /^\s*\+/.test(raw);
+  let out = '';
+  let digitCount = 0;
+  for (const ch of raw.replace(/[^\d\s()-]/g, '').trimStart()) {
+    if (/\d/.test(ch)) {
+      if (digitCount === MAX_PHONE_DIGITS) break;
+      digitCount += 1;
+    }
+    out += ch;
+  }
+  out = out.replace(/\s{2,}/g, ' ');
+  return hasPlus ? `+${out}` : out;
 };
 
-// Форматируем как +7 (999) 123-45-67, не оставляя «висящих» разделителей в конце.
-export const formatRuPhone = (value) => {
-  const digits = normalizePhoneDigits(value);
+export const isPhoneValid = (value) => {
+  const raw = String(value ?? '').trim();
+  const digits = raw.replace(/\D/g, '');
+  // «+7…» — заведомо российский номер: в нём ровно 11 цифр.
+  if (raw.startsWith('+7')) return digits.length === 11;
+  return digits.length >= MIN_PHONE_DIGITS && digits.length <= MAX_PHONE_DIGITS;
+};
+
+// Номер для отправки на бэкенд: привычные российские записи приводим к +7…,
+// остальные отправляем как ввёл пользователь (только цифры и ведущий «+»).
+export const toSubmitPhone = (value) => {
+  const raw = String(value ?? '').trim();
+  const digits = raw.replace(/\D/g, '');
   if (!digits) return '';
-  const rest = digits.slice(1); // 10 цифр после кода страны
-  let out = '+7';
-  if (rest.length > 0) out += ` (${rest.slice(0, 3)}`;
-  if (rest.length >= 3) out += `) ${rest.slice(3, 6)}`;
-  if (rest.length >= 6) out += `-${rest.slice(6, 8)}`;
-  if (rest.length >= 8) out += `-${rest.slice(8, 10)}`;
-  return out.replace(/[\s()-]+$/, '');
-};
-
-export const isPhoneValid = (value) => normalizePhoneDigits(value).length === 11;
-
-// Телефон в формате +7XXXXXXXXXX для отправки на бэкенд.
-export const toE164 = (value) => {
-  const digits = normalizePhoneDigits(value);
-  return digits ? `+${digits}` : '';
+  if (raw.startsWith('+')) return `+${digits}`;
+  if (digits.length === 11 && digits.startsWith('8')) return `+7${digits.slice(1)}`;
+  if (digits.length === 11 && digits.startsWith('7')) return `+${digits}`;
+  // 10 цифр с девятки — мобильный без кода страны.
+  if (digits.length === 10 && digits.startsWith('9')) return `+7${digits}`;
+  return digits;
 };

@@ -3,7 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
-import { EMAIL_RE, formatRuPhone, isPhoneValid, toE164 } from '../../utils/phone';
+import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { normalizePromoCode } from '../../shared/promoTracking';
 import {
   trackAddPaymentInfo,
@@ -92,7 +92,7 @@ const MarketplaceCheckout = () => {
     setPromoError('');
     try {
       const { data } = await apiClient.instance.get('/api/payment/cart-promo-check', {
-        params: { code, email: email.trim(), phone: toE164(phone) },
+        params: { code, email: email.trim(), phone: toSubmitPhone(phone) },
       });
       if (data?.valid) {
         setAppliedPromo(data);
@@ -109,7 +109,7 @@ const MarketplaceCheckout = () => {
   };
 
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
-  const phoneError = touched.phone && !phoneValid ? 'Введите корректный номер: +7 (999) 123-45-67.' : '';
+  const phoneError = touched.phone && !phoneValid ? 'Проверьте номер: в нём должно быть от 8 до 15 цифр.' : '';
   const emailError = touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
 
   // Фича-флаг: без ?tbpayment=true в URL чекаут недоступен — уводим в корзину.
@@ -148,7 +148,7 @@ const MarketplaceCheckout = () => {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
         items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
         fullName: fullName.trim(),
-        phone: toE164(phone),
+        phone: toSubmitPhone(phone),
         email: email.trim(),
         pvzCode: pvz.pvzCode,
         pvzCity: pvz.pvzCity,
@@ -260,10 +260,10 @@ const MarketplaceCheckout = () => {
             type="tel"
             inputMode="tel"
             autoComplete="tel"
-            placeholder="+7 (999) 123-45-67"
+            placeholder="+7 999 123-45-67"
             value={phone}
             onChange={(e) => {
-              setPhone(formatRuPhone(e.target.value));
+              setPhone(sanitizePhoneInput(e.target.value));
               setError('');
               resetPromo();
             }}

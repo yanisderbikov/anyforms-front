@@ -2,37 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
+import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import styles from './GuideCheckout.module.css';
 
 const PRODUCT_CODE = 'GUIDE';
 const PRICE = '1490 ₽';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
-
-// Простой, но строгий формат email.
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-// Приводим ввод к российскому номеру и форматируем: +7 (999) 123-45-67.
-const normalizePhoneDigits = (value) => {
-  let digits = value.replace(/\D/g, '');
-  if (digits.startsWith('8')) digits = `7${digits.slice(1)}`;
-  if (digits && !digits.startsWith('7')) digits = `7${digits}`;
-  return digits.slice(0, 11);
-};
-
-const formatRuPhone = (value) => {
-  const digits = normalizePhoneDigits(value);
-  if (!digits) return '';
-  const rest = digits.slice(1); // 10 цифр после кода страны
-  let out = '+7';
-  if (rest.length > 0) out += ` (${rest.slice(0, 3)}`;
-  if (rest.length >= 3) out += `) ${rest.slice(3, 6)}`;
-  if (rest.length >= 6) out += `-${rest.slice(6, 8)}`;
-  if (rest.length >= 8) out += `-${rest.slice(8, 10)}`;
-  // Убираем «висящие» разделители в конце, иначе их нельзя стереть бэкспейсом.
-  return out.replace(/[\s()-]+$/, '');
-};
-
-const isPhoneValid = (value) => normalizePhoneDigits(value).length === 11;
 
 const GuideCheckout = () => {
   const [fullName, setFullName] = useState('');
@@ -53,12 +28,12 @@ const GuideCheckout = () => {
 
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
   const phoneError =
-    touched.phone && !phoneValid ? 'Введите корректный номер: +7 (999) 123-45-67.' : '';
+    touched.phone && !phoneValid ? 'Проверьте номер: в нём должно быть от 8 до 15 цифр.' : '';
   const emailError =
     touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
 
   const handlePhoneChange = (e) => {
-    setPhone(formatRuPhone(e.target.value));
+    setPhone(sanitizePhoneInput(e.target.value));
     setError('');
   };
 
@@ -87,7 +62,7 @@ const GuideCheckout = () => {
       const { data } = await apiClient.instance.post('/api/payment/purchase', {
         productCode: PRODUCT_CODE,
         fullName: fullName.trim(),
-        phone: `+${normalizePhoneDigits(phone)}`,
+        phone: toSubmitPhone(phone),
         email: email.trim(),
         marketingConsent,
         returnUrl: `${window.location.origin}/guide/success`,
@@ -177,7 +152,7 @@ const GuideCheckout = () => {
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              placeholder="+7 (999) 123-45-67"
+              placeholder="+7 999 123-45-67"
               value={phone}
               onChange={handlePhoneChange}
               onBlur={() => markTouched('phone')}
