@@ -25,6 +25,7 @@ const CustomOrdersList = () => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
 
   const load = async () => {
     try {
@@ -59,7 +60,16 @@ const CustomOrdersList = () => {
   }, [query]);
 
   const cnt = (o) => o.customItemsCount || 0;
-  const filtered = orders.filter((o) => (filter === 'all' ? true : cnt(o) === 0));
+  const filtered = orders.filter((o) => {
+    if (filter !== 'all' && cnt(o) !== 0) return false;
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    const haystack = [o.contactName, o.contactPhone, o.pvzSdekCity, o.pvzSdekStreet, o.id, o.leadId]
+      .filter((v) => v != null && v !== '')
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(q);
+  });
 
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -110,6 +120,16 @@ const CustomOrdersList = () => {
         <CustomTabs />
       </div>
 
+      <div className={styles.controls}>
+        <input
+          className={styles.searchInput}
+          type="text"
+          placeholder="поиск: ФИО, телефон, город, адрес, № заказа…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       <div className={styles.subTabs}>
         <button className={`${styles.subTab} ${filter === 'empty' ? styles.subActive : ''}`} onClick={() => setFilter('empty')}>
           не оформленные
@@ -127,7 +147,9 @@ const CustomOrdersList = () => {
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>{filter === 'empty' ? 'нет не оформленных заказов' : 'под-заказов нет'}</p>
+          <p className={styles.emptyText}>
+            {search ? 'ничего не найдено' : filter === 'empty' ? 'нет не оформленных заказов' : 'под-заказов нет'}
+          </p>
         </div>
       ) : (
         <div className={styles.cards}>

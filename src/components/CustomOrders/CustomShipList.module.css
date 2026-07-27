@@ -56,6 +56,10 @@
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
   border-radius: 22px;
   overflow: hidden;
+  /* Карточка тянется на всю высоту строки грида — чтобы кнопка легла на низ. */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .groupBody {
@@ -63,6 +67,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
+  flex: 1;
 }
 
 /* Коллаж первых фото — сверху, с тонкими разделителями между фото. */
@@ -73,6 +78,9 @@
   aspect-ratio: 2 / 1;
   cursor: pointer;
   background: #fff;
+  /* Флекс-элемент: иначе min-height:auto раздувает коллаж под высоту картинок. */
+  flex: 0 0 auto;
+  min-height: 0;
 }
 
 .collageCell {
@@ -87,6 +95,8 @@
   width: 100%;
   aspect-ratio: 2 / 1;
   cursor: pointer;
+  flex: 0 0 auto;
+  min-height: 0;
   background: #f6f6f6;
   color: #999;
   font-size: 0.9rem;
@@ -213,7 +223,8 @@
 }
 
 .shipBtn {
-  margin-top: 0.25rem;
+  /* auto — прижимает кнопку к низу карточки при разном числе полей. */
+  margin-top: auto;
   width: 100%;
   padding: 0.9rem 1rem;
   background: #111;
@@ -233,7 +244,7 @@
 }
 
 .completeBtn {
-  margin-top: 0.25rem;
+  margin-top: auto;
   width: 100%;
   padding: 0.9rem 1rem;
   background: #fff;

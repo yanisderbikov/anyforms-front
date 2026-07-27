@@ -17,6 +17,35 @@
   justify-content: center;
 }
 
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 250px;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  font-size: 1rem;
+  background: #fff;
+  color: #111;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.searchInput::placeholder {
+  color: rgba(17, 17, 17, 0.4);
+}
+
 .subTabs {
   display: flex;
   align-items: center;
