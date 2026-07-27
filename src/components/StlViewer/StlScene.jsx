@@ -61,7 +61,7 @@ const FitCamera = ({ target, resetKey, geometry }) => {
  * STL приходит Z-вверх, сцена Y-вверх, поэтому группа повёрнута на -90° по X.
  * controlsRef отдаётся наружу: кнопки панели управления двигают камеру сами.
  */
-const StlScene = ({ geometry, maxDim, wireframe, resetKey, controlsRef }) => {
+const StlScene = ({ geometry, maxDim, resetKey, controlsRef }) => {
   const modelRef = useRef(null);
 
   // Шаг сетки подстраивается под габарит модели: круглый порядок величины,
@@ -78,13 +78,7 @@ const StlScene = ({ geometry, maxDim, wireframe, resetKey, controlsRef }) => {
 
       <group ref={modelRef} rotation={[-Math.PI / 2, 0, 0]}>
         <mesh geometry={geometry}>
-          <meshStandardMaterial
-            color={wireframe ? '#6d7480' : '#9aa2ae'}
-            metalness={0.1}
-            roughness={0.55}
-            wireframe={wireframe}
-            flatShading
-          />
+          <meshStandardMaterial color="#9aa2ae" metalness={0.1} roughness={0.55} flatShading />
         </mesh>
       </group>
 

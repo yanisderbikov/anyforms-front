@@ -61,39 +61,22 @@
   }
 }
 
+/* Заголовок слева, кнопка выбора файла — справа в той же строке. */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
 .title {
-  margin: 0 0 0.85rem;
+  margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
   text-transform: lowercase;
   letter-spacing: 0.01em;
-}
-
-.form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.url {
-  flex: 1 1 260px;
-  min-width: 0;
-  background: #fff;
-  border: 1px solid rgba(17, 17, 17, 0.16);
-  border-radius: 10px;
-  padding: 0.6rem 0.85rem;
-  color: #111;
-  font-size: 0.95rem;
-  outline: none;
-}
-
-.url:focus {
-  border-color: rgba(17, 17, 17, 0.45);
-}
-
-.url::placeholder {
-  color: #9a9a9a;
 }
 
 .pick {
@@ -137,6 +120,27 @@
   touch-action: none;
 }
 
+/* Полный экран без Fullscreen API: в iOS Safari на iPhone его нет.
+   dvh — чтобы панель управления не пряталась под адресной строкой. */
+.stageFull {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  border: none;
+  border-radius: 0;
+}
+
+.stageFull .pad {
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+.stageFull .fullBtn {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
 .stageDrag {
   border-color: rgba(17, 17, 17, 0.5);
   border-style: dashed;
@@ -171,7 +175,8 @@
 .padLeft,
 .padRight,
 .padCenter,
-.zoomBtn {
+.zoomBtn,
+.fullBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -193,9 +198,17 @@
 .padLeft:hover,
 .padRight:hover,
 .padCenter:hover,
-.zoomBtn:hover {
+.zoomBtn:hover,
+.fullBtn:hover {
   background: #fff;
   color: #000;
+}
+
+/* Полный экран — отдельно, в верхнем углу окна просмотра. */
+.fullBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .padUp {
@@ -223,25 +236,15 @@
   grid-row: 3;
 }
 
-/* Зум и каркас — отдельной колонкой левее крестовины. */
+/* Зум — отдельной колонкой по центру правого края. */
 .zoom {
   position: absolute;
   right: 12px;
-  bottom: 133px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   gap: 3px;
-}
-
-.zoomBtnOn {
-  background: #111;
-  border-color: #111;
-  color: #fff;
-}
-
-.zoomBtnOn:hover {
-  background: #000;
-  color: #fff;
 }
 
 .info {
@@ -264,4 +267,25 @@
   font-size: 0.82rem;
   line-height: 1.5;
   color: #8a8a8a;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.footerLink {
+  color: #111;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footerLink:hover {
+  color: #000;
+  text-decoration-thickness: 2px;
 }

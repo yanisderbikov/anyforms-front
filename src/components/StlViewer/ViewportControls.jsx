@@ -56,13 +56,14 @@ const CHEVRON = 'M15 5l-7 7 7 7';
 const PLUS = 'M12 6v12M6 12h12';
 const MINUS = 'M6 12h12';
 const RESET = 'M4 4v6h6M20 20v-6h-6M20 10a8 8 0 00-14-3M4 14a8 8 0 0014 3';
-const MESH = 'M4 9h16M4 15h16M9 4v16M15 4v16';
+const EXPAND = 'M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5';
+const COMPRESS = 'M4 9h5V4M20 9h-5V4M20 15h-5v5M4 15h5v5';
 
 /**
- * Панель управления камерой поверх канваса: вращение, зум, сброс, каркас.
+ * Панель управления камерой поверх канваса: вращение, зум, сброс.
  * Двигает ту же OrbitControls, что и мышь, — состояние не расходится.
  */
-const ViewportControls = ({ controlsRef, onReset, wireframe, onToggleWireframe }) => {
+const ViewportControls = ({ controlsRef, onReset, fullscreen, onToggleFullscreen }) => {
   const orbit = useCallback(
     (dTheta, dPhi) => (k) => {
       const controls = controlsRef.current;
@@ -126,6 +127,16 @@ const ViewportControls = ({ controlsRef, onReset, wireframe, onToggleWireframe }
         </HoldButton>
       </div>
 
+      <button
+        type="button"
+        className={styles.fullBtn}
+        onClick={onToggleFullscreen}
+        title={fullscreen ? 'Выйти из полноэкранного режима' : 'Во весь экран'}
+        aria-label={fullscreen ? 'Выйти из полноэкранного режима' : 'Во весь экран'}
+      >
+        <Icon d={fullscreen ? COMPRESS : EXPAND} />
+      </button>
+
       <div className={styles.zoom}>
         <HoldButton className={styles.zoomBtn} onAct={zoom(-1)} label="Приблизить">
           <Icon d={PLUS} />
@@ -133,15 +144,6 @@ const ViewportControls = ({ controlsRef, onReset, wireframe, onToggleWireframe }
         <HoldButton className={styles.zoomBtn} onAct={zoom(1)} label="Отдалить">
           <Icon d={MINUS} />
         </HoldButton>
-        <button
-          type="button"
-          className={`${styles.zoomBtn} ${wireframe ? styles.zoomBtnOn : ''}`}
-          onClick={onToggleWireframe}
-          title="Каркас"
-          aria-label="Каркас"
-        >
-          <Icon d={MESH} />
-        </button>
       </div>
     </>
   );

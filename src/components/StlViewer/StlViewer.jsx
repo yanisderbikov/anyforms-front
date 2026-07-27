@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import StlScene from './StlScene';
 import ViewportControls from './ViewportControls';
 import { nameFromUrl, parseStl, triangleCount, volume } from './stlGeometry';
@@ -21,15 +21,15 @@ const buildModel = (buffer, name) => {
 const StlViewer = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [input, setInput] = useState(params.get('url') || '');
   const [model, setModel] = useState(null);
   const [status, setStatus] = useState(null); // 'loading' | null
   const [error, setError] = useState(null);
-  const [wireframe, setWireframe] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const fileInput = useRef(null);
   const controlsRef = useRef(null);
+  const stageRef = useRef(null);
   // Отменяет применение результата, если пока грузили — открыли другую модель.
   const loadId = useRef(0);
 
@@ -64,7 +64,6 @@ const StlViewer = () => {
       if (id !== loadId.current) return;
       setModel(next);
       setStatus(null);
-      setInput('');
       setParams({}, { replace: true });
     } catch {
       if (id !== loadId.current) return;
@@ -79,13 +78,51 @@ const StlViewer = () => {
     if (urlParam) loadFromUrl(urlParam);
   }, [urlParam, loadFromUrl]);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    const url = input.trim();
-    if (!url) return;
-    if (url === urlParam) loadFromUrl(url);
-    else setParams({ url }, { replace: true });
-  };
+  // Полный экран держится на CSS: в iOS Safari на iPhone нативного fullscreen
+  // для обычных элементов нет вовсе. Нативный вызываем сверху, где он есть, —
+  // на Android он дополнительно прячет адресную строку.
+  const toggleFullscreen = useCallback(() => {
+    const stage = stageRef.current;
+    const next = !fullscreen;
+    setFullscreen(next);
+    if (next) {
+      const request = stage?.requestFullscreen || stage?.webkitRequestFullscreen;
+      try {
+        request?.call(stage)?.catch?.(() => {});
+      } catch {
+        /* нативный режим необязателен */
+      }
+    } else if (document.fullscreenElement || document.webkitFullscreenElement) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        exit?.call(document)?.catch?.(() => {});
+      } catch {
+        /* уже вышли */
+      }
+    }
+  }, [fullscreen]);
+
+  // Выход по Escape и по системной кнопке выхода из нативного полноэкранного.
+  useEffect(() => {
+    if (!fullscreen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setFullscreen(false);
+    };
+    const onNativeChange = () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) setFullscreen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('fullscreenchange', onNativeChange);
+    document.addEventListener('webkitfullscreenchange', onNativeChange);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('fullscreenchange', onNativeChange);
+      document.removeEventListener('webkitfullscreenchange', onNativeChange);
+    };
+  }, [fullscreen]);
 
   const onDrop = (e) => {
     e.preventDefault();
@@ -118,17 +155,8 @@ const StlViewer = () => {
       </header>
 
       <div className={styles.page}>
-        <h1 className={styles.title}>просмотр 3d-модели</h1>
-
-        <form className={styles.form} onSubmit={onSubmit}>
-          <input
-            className={styles.url}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="ссылка на .stl — enter, чтобы открыть"
-            spellCheck={false}
-          />
+        <div className={styles.head}>
+          <h1 className={styles.title}>просмотр 3d-модели</h1>
           <button className={styles.pick} type="button" onClick={() => fileInput.current?.click()}>
             выбрать с устройства
           </button>
@@ -145,12 +173,15 @@ const StlViewer = () => {
               e.target.value = '';
             }}
           />
-        </form>
+        </div>
 
         {error && <div className={styles.error}>{error}</div>}
 
         <div
-          className={`${styles.stage} ${dragging ? styles.stageDrag : ''}`}
+          ref={stageRef}
+          className={`${styles.stage} ${dragging ? styles.stageDrag : ''} ${
+            fullscreen ? styles.stageFull : ''
+          }`}
           onDragOver={(e) => {
             e.preventDefault();
             setDragging(true);
@@ -162,7 +193,6 @@ const StlViewer = () => {
             <StlScene
               geometry={model.geometry}
               maxDim={Math.max(model.size.x, model.size.y, model.size.z)}
-              wireframe={wireframe}
               resetKey={resetKey}
               controlsRef={controlsRef}
             />
@@ -172,7 +202,7 @@ const StlViewer = () => {
 
           {!model && status !== 'loading' && (
             <div className={styles.overlay}>
-              вставьте ссылку на .stl, выберите файл с устройства или перетащите его сюда
+              выберите .stl с устройства или перетащите его сюда
             </div>
           )}
 
@@ -180,8 +210,8 @@ const StlViewer = () => {
             <ViewportControls
               controlsRef={controlsRef}
               onReset={() => setResetKey((k) => k + 1)}
-              wireframe={wireframe}
-              onToggleWireframe={() => setWireframe((v) => !v)}
+              fullscreen={fullscreen}
+              onToggleFullscreen={toggleFullscreen}
             />
           )}
         </div>
@@ -202,6 +232,12 @@ const StlViewer = () => {
           двигать — правая кнопка или два пальца. Размеры считаются в миллиметрах: в STL нет
           единиц измерения, а слайсеры трактуют их как мм.
         </p>
+
+        <footer className={styles.footer}>
+          <Link className={styles.footerLink} to="/shop">
+            магазин молдов
+          </Link>
+        </footer>
       </div>
     </div>
   );
