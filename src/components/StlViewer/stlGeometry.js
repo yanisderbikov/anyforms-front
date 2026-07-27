@@ -10,6 +10,11 @@ const loader = new STLLoader();
  */
 export const parseStl = (buffer) => {
   const geometry = loader.parse(buffer);
+  // На чужом формате загрузчик не всегда падает — иногда молча отдаёт пустую
+  // геометрию, из которой дальше получаются NaN в габаритах.
+  if (!geometry.attributes.position || geometry.attributes.position.count < 3) {
+    throw new Error('в файле нет треугольников');
+  }
   if (!geometry.attributes.normal) geometry.computeVertexNormals();
   geometry.computeBoundingBox();
 

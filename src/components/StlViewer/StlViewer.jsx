@@ -66,10 +66,10 @@ const StlViewer = () => {
       setStatus(null);
       setInput('');
       setParams({}, { replace: true });
-    } catch (e) {
+    } catch {
       if (id !== loadId.current) return;
       setStatus(null);
-      setError(`не удалось разобрать файл: ${e.message}`);
+      setError('Не получилось прочитать файл. Нужен .stl — обычный или бинарный.');
     }
   }, [setParams]);
 
@@ -132,11 +132,13 @@ const StlViewer = () => {
           <button className={styles.pick} type="button" onClick={() => fileInput.current?.click()}>
             выбрать с устройства
           </button>
+          {/* Без accept: у .stl нет своего MIME-типа, мобильные пикеры отдают
+              его как application/octet-stream и с фильтром файл не выбрать.
+              Проверяем при разборе. */}
           <input
             ref={fileInput}
             className={styles.hidden}
             type="file"
-            accept=".stl,model/stl"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) loadFromFile(file);
