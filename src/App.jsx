@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
@@ -34,6 +34,9 @@ import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
 import CustomShipList from "./components/CustomOrders/CustomShipList";
 import CustomItemPage from "./components/CustomOrders/CustomItemPage";
 
+// three.js весит больше всего остального бандла — грузим его только на /stl.
+const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
+
 const SITE_URL = 'https://anyforms.ru';
 
 const KNOWN_PATHS = new Set([
@@ -54,6 +57,7 @@ const KNOWN_PATHS = new Set([
   '/guide/success',
   '/founders/yuri',
   '/pdf',
+  '/stl',
   '/shop',
   '/orders',
   '/orders/without-tracker',
@@ -196,6 +200,8 @@ function App() {
       document.body.style.background = '#f1f0ec';
     } else if (isFounderPage) {
       document.body.style.background = '#f5f1e8';
+    } else if (normalizedPathname === '/stl') {
+      document.body.style.background = '#fff';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
       document.body.style.background = '#000';
     } else {
@@ -220,6 +226,7 @@ function App() {
       normalizedPathname.startsWith('/orders') ||
       normalizedPathname.startsWith('/admin') ||
       normalizedPathname === '/pdf' ||
+      normalizedPathname === '/stl' ||
       normalizedPathname === '/guide/checkout' ||
       normalizedPathname === '/guide/success' ||
       normalizedPathname === '/course/checkout' ||
@@ -274,6 +281,14 @@ function App() {
         <Route path="/founders/yuri" element={<FounderYuri />} />
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />
+        <Route
+          path="/stl"
+          element={
+            <Suspense fallback={null}>
+              <StlViewer />
+            </Suspense>
+          }
+        />
         <Route path="/shop" element={<Marketplace />} />
         <Route path="/shop/product/:id" element={<MarketplaceProduct />} />
         <Route path="/shop/cart" element={<MarketplaceCart />} />

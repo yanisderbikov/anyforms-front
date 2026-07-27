@@ -1,0 +1,267 @@
+.wrap {
+  min-height: 100vh;
+}
+
+/* Хедер как в админке: чёрная полоса с логотипом по центру. */
+.headerSafeArea {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 71;
+  height: env(safe-area-inset-top, 0px);
+  background: #000;
+  pointer-events: none;
+}
+
+.header {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 70;
+  padding: 1rem 0;
+  background: #000;
+}
+
+.headerInner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 41px;
+  padding: 0 16px;
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.logo {
+  width: 180px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: calc(96px + env(safe-area-inset-top, 0px)) 12px 2.5rem;
+  box-sizing: border-box;
+  color: #111;
+}
+
+@media (min-width: 769px) {
+  .page {
+    padding: calc(101px + env(safe-area-inset-top, 0px)) 24px 3rem;
+  }
+}
+
+.title {
+  margin: 0 0 0.85rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.01em;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.url {
+  flex: 1 1 260px;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  color: #111;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.url:focus {
+  border-color: rgba(17, 17, 17, 0.45);
+}
+
+.url::placeholder {
+  color: #9a9a9a;
+}
+
+.pick {
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  background: #111;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.pick:hover {
+  background: #000;
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(214, 48, 48, 0.08);
+  border: 1px solid rgba(214, 48, 48, 0.3);
+  color: #a12121;
+  font-size: 0.9rem;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: min(70vh, 620px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f4f4f6;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  touch-action: none;
+}
+
+.stageDrag {
+  border-color: rgba(17, 17, 17, 0.5);
+  border-style: dashed;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  color: #8a8a8a;
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+/* Крестовина вращения: центр — сброс вида. */
+.pad {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 34px);
+  grid-template-rows: repeat(3, 34px);
+  gap: 3px;
+}
+
+.padUp,
+.padDown,
+.padLeft,
+.padRight,
+.padCenter,
+.zoomBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #333;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  touch-action: none;
+  user-select: none;
+}
+
+.padUp:hover,
+.padDown:hover,
+.padLeft:hover,
+.padRight:hover,
+.padCenter:hover,
+.zoomBtn:hover {
+  background: #fff;
+  color: #000;
+}
+
+.padUp {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.padLeft {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.padCenter {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.padRight {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.padDown {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* Зум и каркас — отдельной колонкой левее крестовины. */
+.zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 133px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.zoomBtnOn {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.zoomBtnOn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.name {
+  color: #111;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.hint {
+  margin: 0.9rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #8a8a8a;
+}
