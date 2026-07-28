@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getItems } from '../../services/itemsService';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getItems, getShops } from '../../services/itemsService';
 import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
 import { useLikes } from '../../hooks/useLikes';
 import ProductCard from '../ProductCard/ProductCard';
+import { SHOP_THEMES } from './shopThemes';
 import styles from './Marketplace.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
@@ -16,6 +17,17 @@ const PROMO_CODE = 'any-shop-10';
 const Marketplace = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  // /shop — общая витрина (товары всех магазинов), /shop/:shopSlug — витрина магазина.
+  const { shopSlug } = useParams();
+  const [shop, setShop] = useState(null);
+  const [shopMissing, setShopMissing] = useState(false);
+  // Базовый путь витрины: с него строятся ссылки на товары, чтобы покупка
+  // засчиталась магазину, с витрины которого пришёл покупатель.
+  const shopBase = shopSlug ? `/shop/${shopSlug}` : '/shop';
+  // Тема партнёрской витрины (цвета/типографика); без темы — стиль anyforms.
+  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
+  const wrapClass = theme ? `${styles.wrap} ${theme.className}` : styles.wrap;
+  const shopName = shop?.name ?? shopSlug;
   const { count } = useCart();
   const { isLiked, count: likesCount } = useLikes();
   const [items, setItems] = useState([]);
@@ -42,7 +54,7 @@ const Marketplace = () => {
 
   const openProduct = (item, index) => {
     trackSelectItem(item, index ?? undefined, 'catalog');
-    navigate(`/shop/product/${item.id}`);
+    navigate(`${shopBase}/product/${item.id}`);
   };
 
   const handlePromoCopy = async () => {
@@ -56,11 +68,31 @@ const Marketplace = () => {
   };
 
   useEffect(() => {
-    getItems()
+    setLoading(true);
+    getItems(shopSlug)
       .then(setItems)
       .catch((err) => setError(err?.message || 'Не удалось загрузить товары'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [shopSlug]);
+
+  // Витрина магазина: проверяем, что такой магазин есть и включён.
+  useEffect(() => {
+    if (!shopSlug) {
+      setShop(null);
+      setShopMissing(false);
+      return;
+    }
+    getShops()
+      .then((shops) => {
+        const found = shops.find((s) => s.slug === shopSlug) ?? null;
+        setShop(found);
+        setShopMissing(!found);
+      })
+      .catch(() => {
+        setShop(null);
+        setShopMissing(false);
+      });
+  }, [shopSlug]);
 
   // Совместимость со старыми ссылками вида /shop?id=<uuid>: уводим на страницу товара.
   useEffect(() => {
@@ -75,12 +107,12 @@ const Marketplace = () => {
     const matchingItem = items.find((item) => String(item.id) === normalizedId);
     if (!matchingItem) return;
 
-    navigate(`/shop/product/${matchingItem.id}`, { replace: true });
-  }, [items, location.search, navigate]);
+    navigate(`${shopBase}/product/${matchingItem.id}`, { replace: true });
+  }, [items, location.search, navigate, shopBase]);
 
   if (loading) {
     return (
-      <div className={styles.wrap}>
+      <div className={wrapClass}>
         <div className={styles.loader} role="status" aria-label="Загрузка товаров">
           <span className={styles.spinner} />
         </div>
@@ -90,22 +122,33 @@ const Marketplace = () => {
 
   if (error) {
     return (
-      <div className={styles.wrap}>
+      <div className={wrapClass}>
         <p className={styles.error}>{error}</p>
+      </div>
+    );
+  }
+
+  if (shopMissing) {
+    return (
+      <div className={wrapClass}>
+        <p className={styles.message}>Такого магазина нет.</p>
+        <p className={styles.message}>
+          <Link to="/shop" className={styles.promoLink}>Перейти в общий магазин</Link>
+        </p>
       </div>
     );
   }
 
   if (!items.length) {
     return (
-      <div className={styles.wrap}>
+      <div className={wrapClass}>
         <p className={styles.message}>Товаров пока нет.</p>
       </div>
     );
   }
 
   return (
-    <div className={styles.wrap}>
+    <div className={wrapClass}>
       <div className={styles.headerSafeArea} aria-hidden="true" />
       {copied && (
         <div className={styles.globalCopyToast} role="status">
@@ -114,16 +157,22 @@ const Marketplace = () => {
       )}
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <a className={styles.logoLink} href="#top" aria-label="anyforms — наверх">
-            <img
-              className={styles.logo}
-              src="/anyforms_logo_new_white.svg"
-              alt=""
-              width={180}
-              height={41}
-              decoding="async"
-            />
-          </a>
+          {theme ? (
+            <a className={styles.brandLink} href="#top" aria-label={`${shopName} — наверх`}>
+              <span className={styles.brandName}>{shopName}</span>
+            </a>
+          ) : (
+            <a className={styles.logoLink} href="#top" aria-label="anyforms — наверх">
+              <img
+                className={styles.logo}
+                src="/anyforms_logo_new_white.svg"
+                alt=""
+                width={180}
+                height={41}
+                decoding="async"
+              />
+            </a>
+          )}
           <button
             type="button"
             className={`${styles.likesToggle} ${showLiked ? styles.likesToggleActive : ''}`}
@@ -171,12 +220,22 @@ const Marketplace = () => {
         </div>
       </header>
       <div className={styles.intro}>
-        <h1 className={styles.subtitle}>
-          Профессиональные молды для чистого изделия{' '}
-          <strong className={styles.highlight}>без доработки</strong>. Если дефект
-          появился из-за формы —{' '}
-          <strong className={styles.highlight}>заменим молд или вернём деньги</strong>.
-        </h1>
+        {theme ? (
+          <>
+            <h1 className={styles.shopTitle}>{theme.tagline ?? shopName}</h1>
+            <span className={styles.shopDivider} aria-hidden="true" />
+          </>
+        ) : (
+          <>
+            {shopSlug && <p className={styles.shopBadge}>Магазин {shopName}</p>}
+            <h1 className={styles.subtitle}>
+              Профессиональные молды для чистого изделия{' '}
+              <strong className={styles.highlight}>без доработки</strong>. Если дефект
+              появился из-за формы —{' '}
+              <strong className={styles.highlight}>заменим молд или вернём деньги</strong>.
+            </h1>
+          </>
+        )}
       </div>
       {showLiked && visibleItems.length === 0 ? (
         <p className={styles.message}>
@@ -191,6 +250,7 @@ const Marketplace = () => {
           ))}
         </ul>
       )}
+      {!shopSlug && (
       <p className={styles.promoNote}>
         По промокоду{' '}
         <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
@@ -202,6 +262,7 @@ const Marketplace = () => {
         </a>
         .
       </p>
+      )}
 
       <footer className={styles.siteFooter}>
         <div className={styles.footerGrid}>

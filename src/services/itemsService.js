@@ -74,16 +74,29 @@ function mapProductToItem(product) {
 }
 
 /**
- * Получить список товаров через api.gen (apiClient.api.getProducts).
- * При ошибке или пустом ответе возвращает мок-данные.
- * @returns {Promise<Array<{id: string, name: string, description: string, photos: string[], price: number, crossedPrice: number|null, discountPercent: number, tgLink: string}>>}
+ * Получить товары витрины. Без shopSlug — общая витрина /shop (товары всех магазинов),
+ * со slug — только товары этого магазина (/shop/{slug}).
+ * При ошибке возвращает мок-данные.
+ * @param {string} [shopSlug]
+ * @returns {Promise<Array<{id: string, name: string, description: string, photos: string[], price: number, crossedPrice: number|null, discountPercent: number, tgLink: string, shopSlug: string}>>}
  */
-export async function getItems() {
+export async function getItems(shopSlug) {
   try {
-    const res = await apiClient.api.getAllProducts();
-    return res.data;
+    const res = await apiClient.instance.get('/api/product', {
+      params: shopSlug ? { shop: shopSlug } : undefined,
+    });
+    return Array.isArray(res.data) ? res.data : [];
   } catch (err) {
     console.error('getItems:', err);
     return MOCK_ITEMS;
   }
+}
+
+/**
+ * Магазины витрины: anyforms и партнёрские (у каждого своя страница /shop/{slug}).
+ * @returns {Promise<Array<{id: string, slug: string, name: string, active: boolean}>>}
+ */
+export async function getShops() {
+  const res = await apiClient.instance.get('/api/shop');
+  return Array.isArray(res.data) ? res.data : [];
 }

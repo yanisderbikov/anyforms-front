@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../apiClient';
-import { useCart } from '../../context/CartContext';
+import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import {
   trackPurchase,
   trackPaymentFailed,
@@ -21,7 +21,10 @@ const formatRub = (value) => {
 };
 
 const MarketplaceSuccess = () => {
-  const { clear } = useCart();
+  const { clear, shopSlug } = useCart();
+  // Витрина, с которой был оформлен заказ: clear() чистит только товары,
+  // поэтому после оплаты возвращаем покупателя в его магазин.
+  const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order');
   const isFail = searchParams.get('status') === 'fail';
@@ -135,7 +138,7 @@ const MarketplaceSuccess = () => {
             </div>
           )}
 
-          <Link className={styles.primaryLink} to={isFail ? '/shop/checkout' : '/shop'}>
+          <Link className={styles.primaryLink} to={isFail ? '/shop/checkout' : shopBase}>
             <span>{isFail ? 'Попробовать ещё раз' : 'Вернуться в магазин'}</span>
             <span className={styles.ctaArrow} aria-hidden="true">→</span>
           </Link>

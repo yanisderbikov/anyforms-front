@@ -131,7 +131,7 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background: #4a6fa5;
+  background: var(--shop-badge-bg, #4a6fa5);
   color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -153,6 +153,7 @@
   font-weight: 700;
   margin: 0 0 0.5rem;
   color: #000;
+  font-family: var(--shop-title-font, inherit);
   text-transform: lowercase;
   flex-shrink: 0;
 }
@@ -183,7 +184,7 @@
 .price {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #000;
+  color: var(--shop-accent, #000);
 }
 
 .crossedPrice {
