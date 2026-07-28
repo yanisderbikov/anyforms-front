@@ -494,6 +494,24 @@
   gap: 0.6rem;
 }
 
+.itemNameWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.sentBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f0b400;
+  flex-shrink: 0;
+}
+
 .clickable {
   cursor: pointer;
   user-select: none;

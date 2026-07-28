@@ -222,10 +222,27 @@ const YookassaReceipts = () => {
           <p className={styles.message}>Оплат пока нет.</p>
         ) : (
           <ul className={styles.list}>
-            {transactions.map((t) => (
+            {transactions.map((t) => {
+              const alreadySent = Boolean(t.email && sentEmails.has(t.email.toLowerCase()));
+              return (
               <li key={t.externalPaymentId} className={styles.item}>
                 <div className={styles.itemMain}>
-                  <span className={styles.itemName}>{t.contactName || t.email || '—'}</span>
+                  <span className={styles.itemNameWrap}>
+                    {alreadySent && (
+                      <span className={styles.sentBadge} title="Чек на этот email уже отправляли — см. «Последние чеки»">
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M2.5 6.5L5 9l4.5-6"
+                            stroke="#fff"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                    <span className={styles.itemName}>{t.contactName || t.email || '—'}</span>
+                  </span>
                   <span className={`${styles.status} ${styles.statusPaid}`}>
                     {PRODUCT_LABELS[t.productCode] || t.productCode}
                   </span>
@@ -257,9 +274,6 @@ const YookassaReceipts = () => {
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Оплачен:</span> {formatDate(t.paidAt)}
                 </p>
-                {t.email && sentEmails.has(t.email.toLowerCase()) && (
-                  <p className={styles.hintText}>Чек на этот email уже отправляли — см. «Последние чеки».</p>
-                )}
                 {!t.email ? (
                   <p className={styles.receiptErr}>У оплаты нет email — чек отправить некуда.</p>
                 ) : (
@@ -284,7 +298,8 @@ const YookassaReceipts = () => {
                   </div>
                 )}
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </section>
