@@ -494,6 +494,20 @@
   gap: 0.6rem;
 }
 
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.clickable:hover {
+  opacity: 0.6;
+}
+
+.clickable:active {
+  opacity: 0.4;
+}
+
 .receiptForm .input {
   flex: 1;
 }

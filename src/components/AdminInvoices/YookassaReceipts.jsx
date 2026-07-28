@@ -22,6 +22,14 @@ const LINK_RE = /^https?:\/\//;
 
 const initialForm = { email: '', link: '' };
 
+const copyText = (text, msg) => {
+  if (!text) return;
+  navigator.clipboard
+    .writeText(String(text))
+    .then(() => toast.success(msg, { position: 'top-right', duration: 1500 }))
+    .catch(() => toast.error('Ошибка копирования'));
+};
+
 const YookassaReceipts = () => {
   const [form, setForm] = useState(initialForm);
   const [tasks, setTasks] = useState([]);
@@ -174,7 +182,13 @@ const YookassaReceipts = () => {
               return (
                 <li key={`${t.email}-${t.createdAt}-${i}`} className={styles.item}>
                   <div className={styles.itemMain}>
-                    <span className={styles.itemName}>{t.email || '—'}</span>
+                    <span
+                      className={`${styles.itemName} ${t.email ? styles.clickable : ''}`}
+                      onClick={() => copyText(t.email, 'Email скопирован')}
+                      title={t.email ? 'Нажмите для копирования' : undefined}
+                    >
+                      {t.email || '—'}
+                    </span>
                     <span className={`${styles.status} ${styles[status.className]}`}>{status.label}</span>
                   </div>
                   {t.link && (
@@ -217,10 +231,28 @@ const YookassaReceipts = () => {
                   </span>
                 </div>
                 <p className={styles.itemRow}>
-                  <span className={styles.itemLabel}>Email:</span> {t.email || '—'}
+                  <span className={styles.itemLabel}>Email:</span>{' '}
+                  {t.email ? (
+                    <span
+                      className={styles.clickable}
+                      onClick={() => copyText(t.email, 'Email скопирован')}
+                      title="Нажмите для копирования"
+                    >
+                      {t.email}
+                    </span>
+                  ) : (
+                    '—'
+                  )}
                 </p>
                 <p className={styles.itemRow}>
-                  <span className={styles.itemLabel}>Сумма:</span> {formatAmount(t.amountKopecks)}
+                  <span className={styles.itemLabel}>Сумма:</span>{' '}
+                  <span
+                    className={styles.clickable}
+                    onClick={() => copyText(t.amountKopecks != null ? t.amountKopecks / 100 : '', 'Сумма скопирована')}
+                    title="Нажмите для копирования"
+                  >
+                    {formatAmount(t.amountKopecks)}
+                  </span>
                 </p>
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Оплачен:</span> {formatDate(t.paidAt)}
