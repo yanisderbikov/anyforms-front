@@ -6,6 +6,7 @@ export const SECTIONS = {
   PRODUCTS: 'PRODUCTS',
   INVOICES: 'INVOICES',
   TRAINING_INVOICES: 'TRAINING_INVOICES',
+  YOOKASSA_RECEIPTS: 'YOOKASSA_RECEIPTS',
 };
 
 const ROLE_SECTIONS = {
@@ -15,6 +16,7 @@ const ROLE_SECTIONS = {
     SECTIONS.PRODUCTS,
     SECTIONS.INVOICES,
     SECTIONS.TRAINING_INVOICES,
+    SECTIONS.YOOKASSA_RECEIPTS,
   ],
   SALES_MANAGER: [SECTIONS.CUSTOM_ORDERS, SECTIONS.RETAIL, SECTIONS.TRAINING_INVOICES],
   PROJECT_MANAGER: [SECTIONS.CUSTOM_ORDERS, SECTIONS.RETAIL],
@@ -28,6 +30,7 @@ export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/orders')) return SECTIONS.RETAIL;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
   if (pathname.startsWith('/admin/invoices/training')) return SECTIONS.TRAINING_INVOICES;
+  if (pathname.startsWith('/admin/invoices/receipts')) return SECTIONS.YOOKASSA_RECEIPTS;
   if (pathname.startsWith('/admin/invoices')) return SECTIONS.INVOICES;
   return null;
 };

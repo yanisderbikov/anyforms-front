@@ -34,6 +34,7 @@ const MENU = [
     items: [
       { to: '/admin/invoices', label: 'Обычный счёт', section: SECTIONS.INVOICES },
       { to: '/admin/invoices/training', label: 'Счета на обучение', section: SECTIONS.TRAINING_INVOICES },
+      { to: '/admin/invoices/receipts', label: 'Чеки Юра', section: SECTIONS.YOOKASSA_RECEIPTS },
     ],
   },
 ];
