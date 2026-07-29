@@ -34,7 +34,7 @@ const MarketplaceCart = () => {
   const changeQty = (item, delta) => {
     const newQty = Math.max(0, item.quantity + delta);
     if (newQty === item.quantity) return;
-    setQty(item.id, newQty);
+    setQty(item.id, newQty, item.variantId);
     if (delta > 0) {
       trackAddToCart(item, { quantity: delta, placement: 'cart' });
     } else {
@@ -48,7 +48,7 @@ const MarketplaceCart = () => {
   };
 
   const removeItem = (item) => {
-    remove(item.id);
+    remove(item.id, item.variantId);
     trackRemoveFromCart(item, {
       quantity: item.quantity,
       placement: 'cart',
@@ -87,7 +87,7 @@ const MarketplaceCart = () => {
           <>
             <div className={styles.cartList}>
               {items.map((item) => (
-                <div key={item.id} className={styles.cartRow}>
+                <div key={`${item.id}:${item.variantId ?? ''}`} className={styles.cartRow}>
                   {item.photo ? (
                     <img className={styles.cartPhoto} src={item.photo} alt={item.name} />
                   ) : (
@@ -95,7 +95,7 @@ const MarketplaceCart = () => {
                   )}
                   <div className={styles.cartInfo}>
                     <p className={styles.cartName}>
-                      {item.name}
+                      {item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name}
                       {item.preorder && <span className={styles.preorderTag}>Предзаказ</span>}
                     </p>
                     <div className={styles.cartUnit}>{formatPrice(item.price)} / шт</div>

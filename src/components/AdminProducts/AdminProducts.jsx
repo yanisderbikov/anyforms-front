@@ -20,8 +20,14 @@ const initialForm = {
   amoProductName: '',
   active: true,
   preorder: false,
-  shopSlug: DEFAULT_SHOP_SLUG,
+  shopSlugs: [DEFAULT_SHOP_SLUG],
+  // Варианты товара (размер/объём — цена); пусто — товар продаётся по основной цене.
+  variants: [],
 };
+
+// Слаги магазинов товара; поддерживаем и старый формат ответа с одним shopSlug.
+const productShopSlugs = (p) =>
+  Array.isArray(p.shops) ? p.shops.map((s) => s.slug) : (p.shopSlug ? [p.shopSlug] : []);
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -37,7 +43,18 @@ const AdminProducts = () => {
   const [shops, setShops] = useState([]);
   // Фильтр списка по магазину: '' — все магазины.
   const [shopFilter, setShopFilter] = useState('');
+  // Поиск по названию товара (без учёта регистра).
+  const [nameFilter, setNameFilter] = useState('');
   const formRef = React.useRef(null);
+  const descRef = React.useRef(null);
+
+  // Описание: минимум 7 строк, дальше высота подстраивается под текст.
+  React.useEffect(() => {
+    const el = descRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
+  }, [form.description]);
 
   const authHeaders = () => {
     const token = apiClient.getToken ? apiClient.getToken() : null;
@@ -90,6 +107,31 @@ const AdminProducts = () => {
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  // Галочки магазинов: в каких витринах продаётся товар.
+  const toggleShop = (slug) => {
+    setForm((prev) => ({
+      ...prev,
+      shopSlugs: prev.shopSlugs.includes(slug)
+        ? prev.shopSlugs.filter((s) => s !== slug)
+        : [...prev.shopSlugs, slug],
+    }));
+  };
+
+  const addVariant = () => {
+    setForm((prev) => ({ ...prev, variants: [...prev.variants, { id: '', label: '', price: '' }] }));
+  };
+
+  const changeVariant = (index, field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
+    }));
+  };
+
+  const removeVariant = (index) => {
+    setForm((prev) => ({ ...prev, variants: prev.variants.filter((_, i) => i !== index) }));
+  };
+
   // При выборе товара АМО запоминаем и id, и имя (имя уходит в позиции заказа).
   const handleAmoProductChange = (e) => {
     const id = e.target.value;
@@ -109,7 +151,12 @@ const AdminProducts = () => {
       tgLink: form.tgLink.trim(),
       active: Boolean(form.active),
       preorder: Boolean(form.preorder),
-      shopSlug: form.shopSlug || DEFAULT_SHOP_SLUG,
+      // Полный набор витрин товара; пустой список — товар нигде не показывается.
+      shopSlugs: form.shopSlugs,
+      // Полный набор вариантов; вариант с id обновляется (не ломает корзины), пустые строки не шлём.
+      variants: form.variants
+        .filter((v) => v.label.trim() || v.price.trim())
+        .map((v) => ({ id: v.id || undefined, label: v.label.trim(), price: v.price.trim() })),
     };
     // Папку шлём только если заполнена: при обновлении пустое поле не меняет текущую папку.
     if (form.folder?.trim()) payload.folder = form.folder.trim();
@@ -159,7 +206,8 @@ const AdminProducts = () => {
       amoProductName: p.amoProductName ?? '',
       active: p.active !== false,
       preorder: Boolean(p.preorder),
-      shopSlug: p.shopSlug || DEFAULT_SHOP_SLUG,
+      shopSlugs: productShopSlugs(p),
+      variants: (p.variants ?? []).map((v) => ({ id: v.id ?? '', label: v.label ?? '', price: v.price ?? '' })),
     });
     setMessage('');
     setError('');
@@ -236,9 +284,12 @@ const AdminProducts = () => {
     }
   };
 
-  const visibleProducts = shopFilter
-    ? products.filter((p) => (p.shopSlug || DEFAULT_SHOP_SLUG) === shopFilter)
-    : products;
+  const nameQuery = nameFilter.trim().toLowerCase();
+  const visibleProducts = products.filter(
+    (p) =>
+      (!shopFilter || productShopSlugs(p).includes(shopFilter)) &&
+      (!nameQuery || (p.name ?? '').toLowerCase().includes(nameQuery))
+  );
 
   if (loading) {
     return (
@@ -308,10 +359,11 @@ const AdminProducts = () => {
             Описание
             <textarea
               name="description"
+              ref={descRef}
               value={form.description}
               onChange={handleChange}
-              className={styles.textarea}
-              rows={3}
+              className={`${styles.textarea} ${styles.textareaAuto}`}
+              rows={7}
             />
           </label>
           <label className={styles.label}>
@@ -404,22 +456,34 @@ const AdminProducts = () => {
             </select>
             {amoError && <span className={styles.error}>{amoError}</span>}
           </label>
-          <label className={styles.label}>
-            Магазин *
-            <select
-              name="shopSlug"
-              value={form.shopSlug}
-              onChange={handleChange}
-              className={styles.input}
-            >
-              {shops.length === 0 && <option value={DEFAULT_SHOP_SLUG}>anyforms</option>}
+          <div className={styles.label}>
+            Магазины (где продаётся товар)
+            <div className={styles.shopChecks}>
+              {shops.length === 0 && (
+                <label className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={form.shopSlugs.includes(DEFAULT_SHOP_SLUG)}
+                    onChange={() => toggleShop(DEFAULT_SHOP_SLUG)}
+                  />
+                  anyforms
+                </label>
+              )}
               {shops.map((shop) => (
-                <option key={shop.slug} value={shop.slug}>
+                <label key={shop.slug} className={styles.checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={form.shopSlugs.includes(shop.slug)}
+                    onChange={() => toggleShop(shop.slug)}
+                  />
                   {shop.name} ({shop.slug})
-                </option>
+                </label>
               ))}
-            </select>
-          </label>
+            </div>
+            {form.shopSlugs.length === 0 && (
+              <span className={styles.hintText}>Не выбран ни один магазин — товар не попадёт ни на одну витрину.</span>
+            )}
+          </div>
           <label className={styles.checkLabel}>
             <input
               type="checkbox"
@@ -438,6 +502,44 @@ const AdminProducts = () => {
             />
             Предзаказ (плашка и пояснение на витрине)
           </label>
+        </div>
+
+        <div className={styles.variantsBlock}>
+          <span className={styles.variantsTitle}>Варианты (размер / объём — цена)</span>
+          {form.variants.map((v, index) => (
+            <div key={index} className={styles.variantRow}>
+              <input
+                type="text"
+                value={v.label}
+                onChange={(e) => changeVariant(index, 'label', e.target.value)}
+                className={styles.input}
+                placeholder="80 мл"
+              />
+              <input
+                type="text"
+                value={v.price}
+                onChange={(e) => changeVariant(index, 'price', e.target.value)}
+                className={styles.input}
+                placeholder="1990"
+              />
+              <button
+                type="button"
+                className={styles.variantRemove}
+                title="Удалить вариант"
+                onClick={() => removeVariant(index)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button type="button" className={styles.variantAdd} onClick={addVariant}>
+            + Добавить вариант
+          </button>
+          <p className={styles.hintText}>
+            Если вариантов нет — товар продаётся по основной цене. С вариантами покупатель выбирает
+            один из них, а в заказ позиция уходит как «Название + вариант» (например, «Лилит 20 см»)
+            с ценой варианта.
+          </p>
         </div>
         {form.id?.trim() ? (
           <div className={styles.uploadRow}>
@@ -475,9 +577,19 @@ const AdminProducts = () => {
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>Товары ({visibleProducts.length})</h2>
+          <input
+            type="search"
+            className={styles.nameFilter}
+            placeholder="Поиск по названию"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            aria-label="Поиск по названию"
+          />
         </div>
         {visibleProducts.length === 0 ? (
-          <p className={styles.message}>Товаров пока нет.</p>
+          <p className={styles.message}>
+            {products.length === 0 ? 'Товаров пока нет.' : 'Ничего не нашлось — измените поиск или фильтр магазина.'}
+          </p>
         ) : (
           <ul className={styles.list}>
             {visibleProducts.map((p, i) => {
@@ -487,8 +599,20 @@ const AdminProducts = () => {
                   <div className={styles.itemMain}>
                     <span className={styles.itemName}>
                       {p.name ?? '—'}
-                      {(p.shopSlug || DEFAULT_SHOP_SLUG) !== DEFAULT_SHOP_SLUG && (
-                        <span className={styles.badgeShop}>{p.shopSlug}</span>
+                      {productShopSlugs(p).map((slug) => (
+                        <span
+                          key={slug}
+                          className={
+                            slug === DEFAULT_SHOP_SLUG
+                              ? `${styles.badgeShop} ${styles.badgeShopDefault}`
+                              : styles.badgeShop
+                          }
+                        >
+                          {slug}
+                        </span>
+                      ))}
+                      {productShopSlugs(p).length === 0 && (
+                        <span className={styles.badgeOff}>Не на витрине</span>
                       )}
                       {p.active === false && <span className={styles.badgeOff}>Выключен</span>}
                       {p.preorder && <span className={styles.badgePreorder}>Предзаказ</span>}
@@ -522,9 +646,17 @@ const AdminProducts = () => {
                         </p>
                       )}
                       <p className={styles.itemRow}>
-                        <span className={styles.itemLabel}>Магазин:</span>{' '}
-                        {p.shopName || p.shopSlug || 'anyforms'}
+                        <span className={styles.itemLabel}>Магазины:</span>{' '}
+                        {Array.isArray(p.shops) && p.shops.length > 0
+                          ? p.shops.map((s) => s.name || s.slug).join(', ')
+                          : (p.shopName || p.shopSlug || '—')}
                       </p>
+                      {p.variants?.length > 0 && (
+                        <p className={styles.itemRow}>
+                          <span className={styles.itemLabel}>Варианты:</span>{' '}
+                          {p.variants.map((v) => `${v.label} — ${v.price} ₽`).join(', ')}
+                        </p>
+                      )}
                       {p.description && (
                         <p className={styles.itemRow}>
                           <span className={styles.itemLabel}>Описание:</span>{' '}

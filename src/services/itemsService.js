@@ -74,11 +74,13 @@ function mapProductToItem(product) {
 }
 
 /**
- * Получить товары витрины. Без shopSlug — общая витрина /shop (товары всех магазинов),
- * со slug — только товары этого магазина (/shop/{slug}).
+ * Получить товары витрины. Без shopSlug — витрина anyforms (/shop),
+ * со slug — товары, продающиеся в этом магазине (/shop/{slug}).
+ * Товар может продаваться в нескольких магазинах сразу (поле shops) и иметь
+ * варианты (размер/объём) со своими ценами (поле variants).
  * При ошибке возвращает мок-данные.
  * @param {string} [shopSlug]
- * @returns {Promise<Array<{id: string, name: string, description: string, photos: string[], price: number, crossedPrice: number|null, discountPercent: number, tgLink: string, shopSlug: string}>>}
+ * @returns {Promise<Array<{id: string, name: string, description: string, photos: string[], price: number, crossedPrice: number|null, discountPercent: number, tgLink: string, shops: Array<{slug: string, name: string}>, variants: Array<{id: string, label: string, price: string}>}>>}
  */
 export async function getItems(shopSlug) {
   try {

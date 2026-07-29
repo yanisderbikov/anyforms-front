@@ -37,15 +37,22 @@ const parsePrice = (value) => {
   return Number(cleaned) || 0;
 };
 
-const toCartItem = (product, quantity) => ({
+// Вариант товара (размер/объём) — отдельная позиция корзины со своей ценой.
+const toCartItem = (product, quantity, variant = null) => ({
   id: String(product.id),
+  variantId: variant?.id ?? null,
+  variantLabel: variant?.label ?? null,
   name: product.name ?? '',
   description: product.description ?? '',
-  price: parsePrice(product.price),
+  price: parsePrice(variant ? variant.price : product.price),
   photo: product.photos?.[0] ?? null,
   preorder: Boolean(product.preorder),
   quantity,
 });
+
+// Ключ позиции: товар + вариант (один товар в разных размерах — разные строки корзины).
+const sameLine = (item, id, variantId = null) =>
+  item.id === String(id) && (item.variantId ?? null) === (variantId ?? null);
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState(readStorage);
@@ -72,32 +79,31 @@ export const CartProvider = ({ children }) => {
    * есть товары с другой витрины, добавление не выполняется и возвращается false —
    * вызывающий код спрашивает пользователя и при согласии вызывает replaceCartShop.
    */
-  const add = useCallback((product, quantity = 1, shop = DEFAULT_SHOP_SLUG) => {
+  const add = useCallback((product, quantity = 1, shop = DEFAULT_SHOP_SLUG, variant = null) => {
     if (!isPurchasable(product)) return false;
     const targetShop = shop || DEFAULT_SHOP_SLUG;
     if (items.length > 0 && shopSlug !== targetShop) return false;
     if (items.length === 0) setShopSlug(targetShop);
     setItems((prev) => {
-      const id = String(product.id);
-      const existing = prev.find((i) => i.id === id);
+      const existing = prev.find((i) => sameLine(i, product.id, variant?.id));
       if (existing) {
-        return prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + quantity } : i));
+        return prev.map((i) => (sameLine(i, product.id, variant?.id) ? { ...i, quantity: i.quantity + quantity } : i));
       }
-      return [...prev, toCartItem(product, quantity)];
+      return [...prev, toCartItem(product, quantity, variant)];
     });
     return true;
   }, [items, shopSlug]);
 
-  const setQty = useCallback((id, quantity) => {
+  const setQty = useCallback((id, quantity, variantId = null) => {
     setItems((prev) => {
       const q = Math.max(0, Math.floor(Number(quantity) || 0));
-      if (q === 0) return prev.filter((i) => i.id !== String(id));
-      return prev.map((i) => (i.id === String(id) ? { ...i, quantity: q } : i));
+      if (q === 0) return prev.filter((i) => !sameLine(i, id, variantId));
+      return prev.map((i) => (sameLine(i, id, variantId) ? { ...i, quantity: q } : i));
     });
   }, []);
 
-  const remove = useCallback((id) => {
-    setItems((prev) => prev.filter((i) => i.id !== String(id)));
+  const remove = useCallback((id, variantId = null) => {
+    setItems((prev) => prev.filter((i) => !sameLine(i, id, variantId)));
   }, []);
 
   const clear = useCallback(() => setItems([]), []);
@@ -106,9 +112,9 @@ export const CartProvider = ({ children }) => {
    * Переключить корзину на другую витрину: старые товары удаляются (заказ = одна витрина).
    * Если передан товар, он сразу кладётся в новую корзину.
    */
-  const replaceCartShop = useCallback((shop, product = null, quantity = 1) => {
+  const replaceCartShop = useCallback((shop, product = null, quantity = 1, variant = null) => {
     setShopSlug(shop || DEFAULT_SHOP_SLUG);
-    setItems(isPurchasable(product) ? [toCartItem(product, quantity)] : []);
+    setItems(isPurchasable(product) ? [toCartItem(product, quantity, variant)] : []);
   }, []);
 
   const count = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);

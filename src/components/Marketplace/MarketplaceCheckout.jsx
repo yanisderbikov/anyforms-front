@@ -148,7 +148,7 @@ const MarketplaceCheckout = () => {
     setSubmitting(true);
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
-        items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
+        items: items.map((i) => ({ productId: i.id, variantId: i.variantId || undefined, quantity: i.quantity })),
         fullName: fullName.trim(),
         phone: toSubmitPhone(phone),
         email: email.trim(),
@@ -198,14 +198,16 @@ const MarketplaceCheckout = () => {
         <div className={styles.summary}>
           <div className={styles.orderItems}>
             {items.map((item) => (
-              <div key={item.id} className={styles.orderItem}>
+              <div key={`${item.id}:${item.variantId ?? ''}`} className={styles.orderItem}>
                 {item.photo ? (
                   <img className={styles.orderThumb} src={item.photo} alt={item.name} />
                 ) : (
                   <div className={styles.orderThumb} />
                 )}
                 <div className={styles.orderItemInfo}>
-                  <p className={styles.orderItemName}>{item.name}</p>
+                  <p className={styles.orderItemName}>
+                    {item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name}
+                  </p>
                   {item.description && <p className={styles.orderItemDesc}>{item.description}</p>}
                   <p className={styles.orderItemMeta}>
                     {formatPrice(item.price)} × {item.quantity}

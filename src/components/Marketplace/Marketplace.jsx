@@ -17,7 +17,7 @@ const PROMO_CODE = 'any-shop-10';
 const Marketplace = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // /shop — общая витрина (товары всех магазинов), /shop/:shopSlug — витрина магазина.
+  // /shop — витрина anyforms, /shop/:shopSlug — витрина магазина. Товар виден там, где он отмечен.
   const { shopSlug } = useParams();
   const [shop, setShop] = useState(null);
   const [shopMissing, setShopMissing] = useState(false);

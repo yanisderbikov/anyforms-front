@@ -97,10 +97,88 @@
   min-height: 4rem;
 }
 
+/* Описание: высота считается из текста (см. эффект в AdminProducts.jsx),
+   поэтому ручной resize и скроллбар не нужны. */
+.textareaAuto {
+  resize: none;
+  overflow-y: hidden;
+}
+
 .input:focus,
 .textarea:focus {
   border-color: #111;
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+/* Варианты товара: строки «ярлык — цена» с удалением и добавлением */
+.variantsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.variantsTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: lowercase;
+}
+
+.variantRow {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.variantRow .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.variantRemove {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(17, 17, 17, 0.15);
+  border-radius: 50%;
+  background: #fff;
+  color: #b3261e;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.variantRemove:hover {
+  border-color: #b3261e;
+}
+
+.variantAdd {
+  align-self: flex-start;
+  padding: 0.45rem 0.9rem;
+  border: 1px dashed rgba(17, 17, 17, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+}
+
+.variantAdd:hover {
+  border-color: #111;
+}
+
+/* Галочки магазинов, в которых продаётся товар — списком вниз */
+.shopChecks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  background: #fff;
 }
 
 .checkLabel {
@@ -143,9 +221,13 @@
   background: #4a6fa5;
 }
 
-/* Товар партнёрского магазина */
+/* Магазины товара: партнёрские — фиолетовые, anyforms — чёрный */
 .badgeShop {
   background: #6b4aa5;
+}
+
+.badgeShopDefault {
+  background: #111;
 }
 
 .shopFilter {
@@ -238,8 +320,30 @@
 .sectionHead {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
   margin-bottom: 1rem;
+}
+
+/* Поиск по названию в шапке списка товаров */
+.nameFilter {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+  margin-left: auto;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  outline: none;
+}
+
+.nameFilter:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
 .sectionTitle {

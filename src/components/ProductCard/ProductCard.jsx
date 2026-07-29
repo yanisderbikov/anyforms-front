@@ -8,8 +8,14 @@ const ProductCard = ({ item, index = null, onSelect }) => {
 
   const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
-  const hasCrossedPrice =
-    item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
+  // Товар с вариантами (размерами) — в карточке показываем цену «от минимальной».
+  const variantPrices = (item.variants ?? [])
+    .map((v) => Number(v.price))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  const minVariantPrice = variantPrices.length ? Math.min(...variantPrices) : null;
+
+  const hasCrossedPrice = minVariantPrice == null
+    && item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
 
   const isOnSale = item.discountPercent > 0 || hasCrossedPrice;
 
@@ -46,7 +52,9 @@ const ProductCard = ({ item, index = null, onSelect }) => {
           <p className={styles.description}>{item.description}</p>
         )}
         <div className={styles.prices}>
-          <span className={styles.price}>{formatPrice(item.price)}</span>
+          <span className={styles.price}>
+            {minVariantPrice != null ? `от ${formatPrice(minVariantPrice)}` : formatPrice(item.price)}
+          </span>
           {hasCrossedPrice && (
             <span className={styles.crossedPrice}>{formatPrice(item.crossedPrice)}</span>
           )}

@@ -36,6 +36,8 @@ const MarketplaceProduct = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  // Выбранный вариант (размер/объём); по умолчанию — первый из списка.
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
   const thumbsRef = useRef(null);
 
   useEffect(() => {
@@ -61,6 +63,7 @@ const MarketplaceProduct = () => {
 
   useEffect(() => {
     setActiveImage(0);
+    setSelectedVariantId(null);
   }, [id]);
 
   // Активное превью подъезжает в середину ленты (и по вертикали, и по горизонтали)
@@ -76,17 +79,21 @@ const MarketplaceProduct = () => {
   }, [activeImage]);
 
   // Заказ = одна витрина: товар с другой витрины можно добавить, только очистив корзину.
-  const handleAdd = (product) => {
-    if (add(product, 1, currentShop)) {
-      trackAddToCart(product, { quantity: 1, placement: 'product_page' });
+  const handleAdd = (product, variant) => {
+    // В аналитику вариант уходит со своей ценой и ярлыком («Лилит 20 см»).
+    const trackable = variant
+      ? { ...product, price: variant.price, variantLabel: variant.label }
+      : product;
+    if (add(product, 1, currentShop, variant)) {
+      trackAddToCart(trackable, { quantity: 1, placement: 'product_page' });
       return;
     }
     const confirmed = window.confirm(
       'В корзине уже есть товары из другого магазина. Очистить корзину и добавить этот товар?'
     );
     if (!confirmed) return;
-    replaceCartShop(currentShop, product, 1);
-    trackAddToCart(product, { quantity: 1, placement: 'product_page' });
+    replaceCartShop(currentShop, product, 1, variant);
+    trackAddToCart(trackable, { quantity: 1, placement: 'product_page' });
   };
 
   const cartLink = (
@@ -135,8 +142,17 @@ const MarketplaceProduct = () => {
   const photos = product.photos?.length ? product.photos : [];
   const hasGallery = photos.length > 1;
   const image = photos[Math.min(activeImage, photos.length - 1)];
-  const onSale = product.crossedPrice != null && Number(product.crossedPrice) > Number(product.price);
-  const inCart = cartItems.find((item) => item.id === String(product.id))?.quantity ?? 0;
+  const variants = product.variants ?? [];
+  const selectedVariant = variants.length
+    ? variants.find((v) => v.id === selectedVariantId) ?? variants[0]
+    : null;
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+  // Зачёркнутая цена/скидка относятся к основной цене — при вариантах не показываем.
+  const onSale = !selectedVariant
+    && product.crossedPrice != null && Number(product.crossedPrice) > Number(product.price);
+  const inCart = cartItems.find(
+    (item) => item.id === String(product.id) && (item.variantId ?? null) === (selectedVariant?.id ?? null)
+  )?.quantity ?? 0;
 
   return (
     <div className={pageClass} id="top">
@@ -203,8 +219,24 @@ const MarketplaceProduct = () => {
           <div className={styles.info}>
             <h1 className={styles.name}>{product.name}</h1>
             {product.description && <p className={styles.description}>{product.description}</p>}
+            {variants.length > 0 && (
+              <div className={styles.variants} role="radiogroup" aria-label="Вариант товара">
+                {variants.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    className={`${styles.variantBtn} ${v.id === selectedVariant?.id ? styles.variantBtnActive : ''}`}
+                    aria-pressed={v.id === selectedVariant?.id}
+                    onClick={() => setSelectedVariantId(v.id)}
+                  >
+                    {v.label}
+                    <span className={styles.variantPrice}>{formatPrice(v.price)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.prices}>
-              <span className={styles.price}>{formatPrice(product.price)}</span>
+              <span className={styles.price}>{formatPrice(displayPrice)}</span>
               {onSale && <span className={styles.crossedPrice}>{formatPrice(product.crossedPrice)}</span>}
             </div>
 
@@ -227,7 +259,7 @@ const MarketplaceProduct = () => {
                 <button
                   type="button"
                   className={`${styles.addBtn} ${inCart > 0 ? styles.addBtnAdded : ''}`}
-                  onClick={() => handleAdd(product)}
+                  onClick={() => handleAdd(product, selectedVariant)}
                 >
                   {inCart > 0 ? `В корзине ${inCart} шт · добавить ещё` : 'В корзину'}
                 </button>
@@ -243,7 +275,8 @@ const MarketplaceProduct = () => {
               </a>
             )}
 
-            {product.tgLink && (
+            {/* Ссылка ведёт в Telegram-канал anyforms — на партнёрских витринах не показываем. */}
+            {currentShop === DEFAULT_SHOP_SLUG && product.tgLink && (
               <a className={styles.detailsLink} href={product.tgLink} target="_blank" rel="noopener noreferrer">
                 Подробнее в Telegram
               </a>
