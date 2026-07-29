@@ -34,6 +34,7 @@ import CustomOrdersList from "./components/CustomOrders/CustomOrdersList";
 import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
 import CustomShipList from "./components/CustomOrders/CustomShipList";
 import CustomItemPage from "./components/CustomOrders/CustomItemPage";
+import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 
 // three.js весит больше всего остального бандла — грузим его только на /stl.
 const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
@@ -81,6 +82,9 @@ const KNOWN_PATHS = new Set([
   '/admin/invoices/training',
   '/admin/invoices/receipts',
 ]);
+
+// Служебные разделы магазина: не могут быть slug'ом витрины партнёра.
+const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success']);
 
 const PAGE_SEO = {
   '/': {
@@ -186,8 +190,16 @@ function App() {
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
   const isFounderPage = normalizedPathname.startsWith('/founders/');
-  const isShopProductPage = /^\/shop\/product\/[^/]+$/.test(normalizedPathname);
-  const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage;
+  const isShopProductPage = /^\/shop(\/[^/]+)?\/product\/[^/]+$/.test(normalizedPathname);
+  // Витрина магазина: /shop/<slug>, кроме служебных путей магазина (/shop/cart и т.п.).
+  const shopSlugMatch = normalizedPathname.match(/^\/shop\/([^/]+)$/);
+  const isShopPage = Boolean(shopSlugMatch) && !SHOP_RESERVED_SEGMENTS.has(shopSlugMatch[1]);
+  // Slug витрины и на странице списка, и на карточке товара — для фона body в цвет темы.
+  const shopPathSlug = isShopPage
+    ? shopSlugMatch[1]
+    : normalizedPathname.match(/^\/shop\/([^/]+)\/product\//)?.[1] ?? null;
+  const shopThemeBg = shopPathSlug ? SHOP_THEMES[shopPathSlug]?.pageBackground ?? null : null;
+  const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage && !isShopPage;
 
   useEffect(() => {
     if (isHomePage) {
@@ -206,13 +218,21 @@ function App() {
       document.body.style.background = '#fff';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
       document.body.style.background = '#000';
+    } else if (shopThemeBg) {
+      document.body.style.background = shopThemeBg;
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage]);
+  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg]);
 
   useEffect(() => {
-    const seo = PAGE_SEO[normalizedPathname] || (isNotFoundPage
+    const shopPageSeo = isShopPage
+      ? {
+          title: `Магазин ${shopSlugMatch[1]} — anyforms`,
+          description: `Товары магазина ${shopSlugMatch[1]} на anyforms.`,
+        }
+      : null;
+    const seo = PAGE_SEO[normalizedPathname] || shopPageSeo || (isNotFoundPage
       ? {
           title: 'Страница не найдена — anyforms',
           description: 'Запрашиваемая страница не найдена. Вернитесь на главную anyforms.',
@@ -252,7 +272,7 @@ function App() {
     upsertMetaTag('meta[name="twitter:description"]', { name: 'twitter:description', content: seo.description });
     upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
     upsertCanonical(pageUrl);
-  }, [normalizedPathname, isNotFoundPage]);
+  }, [normalizedPathname, isNotFoundPage, isShopPage, shopSlugMatch]);
   if (location.pathname !== normalizedPathname) {
     return (
       <Navigate
@@ -296,6 +316,10 @@ function App() {
         <Route path="/shop/cart" element={<MarketplaceCart />} />
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />
+        {/* Витрина отдельного магазина: /shop/af_pastry и его карточки товаров.
+            Статические пути выше (/shop/cart и др.) матчатся раньше. */}
+        <Route path="/shop/:shopSlug" element={<Marketplace />} />
+        <Route path="/shop/:shopSlug/product/:id" element={<MarketplaceProduct />} />
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<AdminHome />} />
           <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />

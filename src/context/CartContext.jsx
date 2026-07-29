@@ -1,6 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const STORAGE_KEY = 'anyforms_cart';
+// Витрина, с которой набрана корзина: с неё же уходит заказ (и ей засчитывается продажа).
+const SHOP_STORAGE_KEY = 'anyforms_cart_shop';
+export const DEFAULT_SHOP_SLUG = 'anyforms';
 const CartContext = createContext(null);
 
 const readStorage = () => {
@@ -11,6 +14,14 @@ const readStorage = () => {
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
+  }
+};
+
+const readShopStorage = () => {
+  try {
+    return localStorage.getItem(SHOP_STORAGE_KEY) || DEFAULT_SHOP_SLUG;
+  } catch {
+    return DEFAULT_SHOP_SLUG;
   }
 };
 
@@ -26,8 +37,19 @@ const parsePrice = (value) => {
   return Number(cleaned) || 0;
 };
 
+const toCartItem = (product, quantity) => ({
+  id: String(product.id),
+  name: product.name ?? '',
+  description: product.description ?? '',
+  price: parsePrice(product.price),
+  photo: product.photos?.[0] ?? null,
+  preorder: Boolean(product.preorder),
+  quantity,
+});
+
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState(readStorage);
+  const [shopSlug, setShopSlug] = useState(readShopStorage);
 
   useEffect(() => {
     try {
@@ -37,28 +59,34 @@ export const CartProvider = ({ children }) => {
     }
   }, [items]);
 
-  const add = useCallback((product, quantity = 1) => {
-    if (!isPurchasable(product)) return;
+  useEffect(() => {
+    try {
+      localStorage.setItem(SHOP_STORAGE_KEY, shopSlug);
+    } catch {
+      /* localStorage недоступен — молча пропускаем */
+    }
+  }, [shopSlug]);
+
+  /**
+   * Добавить товар в корзину с витрины shop. Заказ = одна витрина: если в корзине уже
+   * есть товары с другой витрины, добавление не выполняется и возвращается false —
+   * вызывающий код спрашивает пользователя и при согласии вызывает replaceCartShop.
+   */
+  const add = useCallback((product, quantity = 1, shop = DEFAULT_SHOP_SLUG) => {
+    if (!isPurchasable(product)) return false;
+    const targetShop = shop || DEFAULT_SHOP_SLUG;
+    if (items.length > 0 && shopSlug !== targetShop) return false;
+    if (items.length === 0) setShopSlug(targetShop);
     setItems((prev) => {
       const id = String(product.id);
       const existing = prev.find((i) => i.id === id);
       if (existing) {
         return prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + quantity } : i));
       }
-      return [
-        ...prev,
-        {
-          id,
-          name: product.name ?? '',
-          description: product.description ?? '',
-          price: parsePrice(product.price),
-          photo: product.photos?.[0] ?? null,
-          preorder: Boolean(product.preorder),
-          quantity,
-        },
-      ];
+      return [...prev, toCartItem(product, quantity)];
     });
-  }, []);
+    return true;
+  }, [items, shopSlug]);
 
   const setQty = useCallback((id, quantity) => {
     setItems((prev) => {
@@ -74,12 +102,21 @@ export const CartProvider = ({ children }) => {
 
   const clear = useCallback(() => setItems([]), []);
 
+  /**
+   * Переключить корзину на другую витрину: старые товары удаляются (заказ = одна витрина).
+   * Если передан товар, он сразу кладётся в новую корзину.
+   */
+  const replaceCartShop = useCallback((shop, product = null, quantity = 1) => {
+    setShopSlug(shop || DEFAULT_SHOP_SLUG);
+    setItems(isPurchasable(product) ? [toCartItem(product, quantity)] : []);
+  }, []);
+
   const count = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
   const total = useMemo(() => items.reduce((sum, i) => sum + i.price * i.quantity, 0), [items]);
 
   const value = useMemo(
-    () => ({ items, add, setQty, remove, clear, count, total }),
-    [items, add, setQty, remove, clear, count, total]
+    () => ({ items, add, setQty, remove, clear, count, total, shopSlug, replaceCartShop }),
+    [items, add, setQty, remove, clear, count, total, shopSlug, replaceCartShop]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

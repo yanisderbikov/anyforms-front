@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../apiClient';
+import { getShops } from '../../services/itemsService';
 import styles from './AdminProducts.module.css';
+
+// Магазин по умолчанию: витрина anyforms.
+const DEFAULT_SHOP_SLUG = 'anyforms';
 
 const initialForm = {
   id: '',
@@ -16,6 +20,7 @@ const initialForm = {
   amoProductName: '',
   active: true,
   preorder: false,
+  shopSlug: DEFAULT_SHOP_SLUG,
 };
 
 const AdminProducts = () => {
@@ -29,6 +34,9 @@ const AdminProducts = () => {
   const [amoProducts, setAmoProducts] = useState([]);
   const [amoError, setAmoError] = useState('');
   const [uploadingId, setUploadingId] = useState(null);
+  const [shops, setShops] = useState([]);
+  // Фильтр списка по магазину: '' — все магазины.
+  const [shopFilter, setShopFilter] = useState('');
   const formRef = React.useRef(null);
 
   const authHeaders = () => {
@@ -49,6 +57,14 @@ const AdminProducts = () => {
     }
   };
 
+  const loadShops = async () => {
+    try {
+      setShops(await getShops());
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || 'Не удалось загрузить магазины');
+    }
+  };
+
   const loadAmoProducts = async () => {
     try {
       // /api/amo/products под ADMIN — токен добавляем сами (securityWorker работает
@@ -66,6 +82,7 @@ const AdminProducts = () => {
   useEffect(() => {
     loadProducts();
     loadAmoProducts();
+    loadShops();
   }, []);
 
   const handleChange = (e) => {
@@ -92,6 +109,7 @@ const AdminProducts = () => {
       tgLink: form.tgLink.trim(),
       active: Boolean(form.active),
       preorder: Boolean(form.preorder),
+      shopSlug: form.shopSlug || DEFAULT_SHOP_SLUG,
     };
     // Папку шлём только если заполнена: при обновлении пустое поле не меняет текущую папку.
     if (form.folder?.trim()) payload.folder = form.folder.trim();
@@ -141,6 +159,7 @@ const AdminProducts = () => {
       amoProductName: p.amoProductName ?? '',
       active: p.active !== false,
       preorder: Boolean(p.preorder),
+      shopSlug: p.shopSlug || DEFAULT_SHOP_SLUG,
     });
     setMessage('');
     setError('');
@@ -217,6 +236,10 @@ const AdminProducts = () => {
     }
   };
 
+  const visibleProducts = shopFilter
+    ? products.filter((p) => (p.shopSlug || DEFAULT_SHOP_SLUG) === shopFilter)
+    : products;
+
   if (loading) {
     return (
       <div className={styles.wrap}>
@@ -227,7 +250,36 @@ const AdminProducts = () => {
 
   return (
     <div className={styles.wrap}>
-      <h1 className={styles.title}>Управление товарами розницы</h1>
+      <div className={styles.titleRow}>
+        <select
+          className={styles.shopFilter}
+          value={shopFilter}
+          onChange={(e) => setShopFilter(e.target.value)}
+          aria-label="Фильтр по магазину"
+        >
+          <option value="">Все магазины</option>
+          {shops.map((shop) => (
+            <option key={shop.slug} value={shop.slug}>
+              {shop.name}
+            </option>
+          ))}
+        </select>
+        <h1 className={styles.title}>Управление товарами розницы</h1>
+        <a
+          className={styles.shopLink}
+          href={shopFilter && shopFilter !== DEFAULT_SHOP_SLUG ? `/shop/${shopFilter}` : '/shop'}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Открыть витрину магазина"
+          aria-label="Открыть витрину магазина"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
+      </div>
 
       <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGrid}>
@@ -352,6 +404,22 @@ const AdminProducts = () => {
             </select>
             {amoError && <span className={styles.error}>{amoError}</span>}
           </label>
+          <label className={styles.label}>
+            Магазин *
+            <select
+              name="shopSlug"
+              value={form.shopSlug}
+              onChange={handleChange}
+              className={styles.input}
+            >
+              {shops.length === 0 && <option value={DEFAULT_SHOP_SLUG}>anyforms</option>}
+              {shops.map((shop) => (
+                <option key={shop.slug} value={shop.slug}>
+                  {shop.name} ({shop.slug})
+                </option>
+              ))}
+            </select>
+          </label>
           <label className={styles.checkLabel}>
             <input
               type="checkbox"
@@ -406,33 +474,22 @@ const AdminProducts = () => {
 
       <section className={styles.section}>
         <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Товары ({products.length})</h2>
-          <a
-            className={styles.shopLink}
-            href="/shop"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Открыть витрину магазина"
-            aria-label="Открыть витрину магазина"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
+          <h2 className={styles.sectionTitle}>Товары ({visibleProducts.length})</h2>
         </div>
-        {products.length === 0 ? (
+        {visibleProducts.length === 0 ? (
           <p className={styles.message}>Товаров пока нет.</p>
         ) : (
           <ul className={styles.list}>
-            {products.map((p, i) => {
+            {visibleProducts.map((p, i) => {
               const isExpanded = expandedId === (p.id ?? i);
               return (
                 <li key={p.id ?? `item-${i}`} className={styles.item}>
                   <div className={styles.itemMain}>
                     <span className={styles.itemName}>
                       {p.name ?? '—'}
+                      {(p.shopSlug || DEFAULT_SHOP_SLUG) !== DEFAULT_SHOP_SLUG && (
+                        <span className={styles.badgeShop}>{p.shopSlug}</span>
+                      )}
                       {p.active === false && <span className={styles.badgeOff}>Выключен</span>}
                       {p.preorder && <span className={styles.badgePreorder}>Предзаказ</span>}
                     </span>
@@ -464,6 +521,10 @@ const AdminProducts = () => {
                           <code className={styles.itemId}>{p.id}</code>
                         </p>
                       )}
+                      <p className={styles.itemRow}>
+                        <span className={styles.itemLabel}>Магазин:</span>{' '}
+                        {p.shopName || p.shopSlug || 'anyforms'}
+                      </p>
                       {p.description && (
                         <p className={styles.itemRow}>
                           <span className={styles.itemLabel}>Описание:</span>{' '}
