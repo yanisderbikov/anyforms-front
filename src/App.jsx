@@ -226,10 +226,11 @@ function App() {
   }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg]);
 
   useEffect(() => {
+    // Партнёрская витрина живёт под своим брендом — anyforms в заголовок не добавляем.
     const shopPageSeo = isShopPage
       ? {
-          title: `Магазин ${shopSlugMatch[1]} — anyforms`,
-          description: `Товары магазина ${shopSlugMatch[1]} на anyforms.`,
+          title: `Магазин ${shopSlugMatch[1]}`,
+          description: `Товары магазина ${shopSlugMatch[1]}.`,
         }
       : null;
     const seo = PAGE_SEO[normalizedPathname] || shopPageSeo || (isNotFoundPage

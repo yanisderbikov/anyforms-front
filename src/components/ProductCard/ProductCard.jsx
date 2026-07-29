@@ -17,8 +17,6 @@ const ProductCard = ({ item, index = null, onSelect }) => {
   const hasCrossedPrice = minVariantPrice == null
     && item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
 
-  const isOnSale = item.discountPercent > 0 || hasCrossedPrice;
-
   const handleClick = (e) => {
     e.preventDefault();
     onSelect?.(item, index);
@@ -26,7 +24,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
 
   return (
     <article
-      className={`${styles.card} ${isOnSale ? styles.cardSale : ''}`}
+      className={styles.card}
       onClick={handleClick}
       role="button"
       tabIndex={0}
