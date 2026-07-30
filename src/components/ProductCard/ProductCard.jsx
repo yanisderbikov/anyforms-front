@@ -5,6 +5,8 @@ import styles from './ProductCard.module.css';
 const ProductCard = ({ item, index = null, onSelect }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
+  // Вторая фотография (порядок задаётся в админке) проявляется при наведении на карточку.
+  const hoverPhoto = photos[1];
 
   const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
@@ -37,6 +39,16 @@ const ProductCard = ({ item, index = null, onSelect }) => {
             className={styles.photo}
             src={firstPhoto}
             alt={item.name}
+          />
+        ) : null}
+        {firstPhoto && hoverPhoto ? (
+          <img
+            className={styles.photoHover}
+            src={hoverPhoto}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
           />
         ) : null}
         {item.discountPercent > 0 && (

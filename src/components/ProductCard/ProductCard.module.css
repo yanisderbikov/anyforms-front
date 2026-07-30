@@ -34,6 +34,37 @@
   display: block;
 }
 
+/* Вторая фотография товара: лежит поверх первой и проявляется при наведении.
+   Бейджи идут ниже в разметке, поэтому остаются видны, лайк выше по z-index. */
+.photoHover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Только там, где есть настоящее наведение: на тач-экранах фото не «залипает». */
+@media (hover: hover) {
+  .card:hover .photoHover {
+    opacity: 1;
+  }
+}
+
+.card:focus-visible .photoHover {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoHover {
+    transition: none;
+  }
+}
+
 .photoNav {
   position: absolute;
   top: 0;
