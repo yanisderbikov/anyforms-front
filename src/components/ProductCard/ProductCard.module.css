@@ -218,3 +218,129 @@
 }
 
 /* Кнопки только в попапе, в карточке не показываем */
+
+/* ── Бутиковая подача (витрины с темой, /shop/{slug}) ─────────────────────
+   Фото — герой: крупная плитка 3:4 без рамки-карточки, под ней только
+   название и цена. Исходники у партнёров вертикальные (~3:5) с «воздухом»
+   сверху, поэтому кадрируем с прижимом к нижней части кадра. */
+
+.boutique {
+  max-width: none;
+  height: auto;
+  max-height: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.boutique:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.boutique .photoWrap {
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  background: var(--shop-photo-bg, #ece7dd);
+}
+
+.boutique .photo,
+.boutique .photoHover {
+  object-position: 50% 70%;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+}
+
+@media (hover: hover) {
+  .boutique:hover .photo,
+  .boutique:hover .photoHover {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boutique .photo,
+  .boutique .photoHover {
+    transition: none;
+  }
+}
+
+/* Сердечко на фото: мягкая светлая подложка, чтобы читалось и на тёмных
+   кадрах (у части товаров фон съёмки чёрный). */
+.boutique .photoWrap button {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.boutique .body {
+  padding: 0.7rem 2px 0;
+}
+
+/* Серифное имя строчными с заглавной первой буквой: выравнивает разнобой
+   регистра в названиях из админки («Барашек Удачи», «мышиный король»). */
+.boutique .name {
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.35;
+  margin: 0 0 0.3rem;
+  color: var(--shop-text, #333);
+}
+
+.boutique .name::first-letter {
+  text-transform: uppercase;
+}
+
+.boutique .prices {
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+/* Цена — гротеском (контраст к серифному имени), спокойный вес и цвет:
+   на витрине-галерее кричащая жирная цена ломает настроение. */
+.boutique .price {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--shop-text, #333);
+}
+
+.boutique .crossedPrice {
+  font-size: 0.82rem;
+  color: #a9968e;
+}
+
+@media (min-width: 769px) {
+  .boutique .name {
+    font-size: 1.05rem;
+  }
+
+  .boutique .price {
+    font-size: 1rem;
+  }
+}
+
+/* Бейджи в палитре витрины: скидка — акцентный цвет темы, предзаказ —
+   кремовая плашка; без теней и кислотных цветов. */
+.boutique .discountBadge {
+  background: var(--shop-accent, #9a3412);
+  color: var(--shop-btn-hover-fg, #fff);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 4px 7px;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.boutique .preorderBadge {
+  background: rgba(244, 238, 227, 0.94);
+  color: var(--shop-text, #444);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: none;
+}

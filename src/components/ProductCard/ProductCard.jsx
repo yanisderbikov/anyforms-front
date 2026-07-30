@@ -2,7 +2,9 @@ import React from 'react';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './ProductCard.module.css';
 
-const ProductCard = ({ item, index = null, onSelect }) => {
+// boutique — подача для витрин с темой: крупное фото 3:4 без рамки-карточки,
+// под ним только название и цена; описание показываем только в базовом виде.
+const ProductCard = ({ item, index = null, onSelect, boutique = false }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
   // Вторая фотография (порядок задаётся в админке) проявляется при наведении на карточку.
@@ -26,7 +28,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
 
   return (
     <article
-      className={styles.card}
+      className={boutique ? `${styles.card} ${styles.boutique}` : styles.card}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -39,6 +41,8 @@ const ProductCard = ({ item, index = null, onSelect }) => {
             className={styles.photo}
             src={firstPhoto}
             alt={item.name}
+            loading={index != null && index >= 4 ? 'lazy' : undefined}
+            decoding="async"
           />
         ) : null}
         {firstPhoto && hoverPhoto ? (
@@ -58,7 +62,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
       </div>
       <div className={styles.body}>
         <h2 className={styles.name}>{item.name}</h2>
-        {item.description && (
+        {!boutique && item.description && (
           <p className={styles.description}>{item.description}</p>
         )}
         <div className={styles.prices}>

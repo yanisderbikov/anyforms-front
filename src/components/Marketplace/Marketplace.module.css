@@ -169,17 +169,20 @@
   text-align: center;
 }
 
-/* Витрина с темой: серифный заголовок магазина + тонкий разделитель с ромбом */
+/* Витрина с темой: серифный заголовок магазина + тонкий разделитель с ромбом.
+   Размер и разрядка подобраны так, чтобы длинное название («Магазин молдов
+   Анны Феликовой») на телефоне спокойно ложилось в две ровные строки. */
 .shopTitle {
   /* Верхний отступ .wrap равен высоте шапки, поэтому воздух под логотипом
      задаётся здесь — иначе заголовок выглядит приклеенным к шапке. */
-  margin: clamp(1.75rem, 6vw, 2.75rem) 0 1rem;
-  font-family: inherit;
-  font-size: clamp(1.15rem, 4vw, 1.6rem);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0.1em;
+  margin: clamp(2rem, 6vw, 3rem) 0 1.1rem;
+  font-family: var(--shop-title-font, inherit);
+  font-size: clamp(1rem, 2.4vw, 1.3rem);
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--shop-accent, #111);
 }
 
@@ -282,6 +285,49 @@
     grid-template-columns: repeat(auto-fill, 200px);
     gap: 1rem;
     justify-content: center;
+  }
+}
+
+/* ── Бутиковая витрина (магазины с темой) ─────────────────────────────────
+   Плитки без «коробок» тянутся по ширине: 2 колонки на телефоне,
+   3–4 на десктопе; вертикальный gap больше горизонтального, потому что
+   под фото идёт текст. Правила лежат ниже базовых .grid и перекрывают их. */
+.wrapBoutique {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Кремовый подвал отделён только тонкой линией, поэтому ему нужно больше
+   воздуха после каталога, чем тёмному подвалу anyforms. */
+.wrapBoutique .siteFooter {
+  margin-top: 3.5rem;
+}
+
+.gridBoutique {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 0.8rem;
+  margin-top: 0.75rem;
+  justify-content: stretch;
+}
+
+@media (min-width: 640px) {
+  .gridBoutique {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem 1.25rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .wrapBoutique {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gridBoutique {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem 1.5rem;
   }
 }
 

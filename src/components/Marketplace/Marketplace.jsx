@@ -25,8 +25,13 @@ const Marketplace = () => {
   // засчиталась магазину, с витрины которого пришёл покупатель.
   const shopBase = shopSlug ? `/shop/${shopSlug}` : '/shop';
   // Тема партнёрской витрины (цвета/типографика); без темы — стиль anyforms.
+  // Витрина с темой получает «бутиковую» подачу каталога: крупные фото без
+  // рамок-карточек, только название и цена (описание живёт на странице товара).
   const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
-  const wrapClass = theme ? `${styles.wrap} ${theme.className}` : styles.wrap;
+  const boutique = Boolean(theme);
+  const wrapClass = theme
+    ? `${styles.wrap} ${styles.wrapBoutique} ${theme.className}`
+    : styles.wrap;
   const shopName = shop?.name ?? shopSlug;
   const { count } = useCart();
   const { isLiked, count: likesCount } = useLikes();
@@ -253,10 +258,10 @@ const Marketplace = () => {
           Пока ничего не выбрано — нажмите на сердечко у товара, чтобы сохранить его здесь.
         </p>
       ) : (
-        <ul className={styles.grid}>
+        <ul className={boutique ? `${styles.grid} ${styles.gridBoutique}` : styles.grid}>
           {visibleItems.map((item, index) => (
             <li key={item.name} className={styles.gridItem}>
-              <ProductCard item={item} index={index} onSelect={openProduct} />
+              <ProductCard item={item} index={index} onSelect={openProduct} boutique={boutique} />
             </li>
           ))}
         </ul>
