@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
 import styles from './AdminProducts.module.css';
 
 // Магазин по умолчанию: витрина anyforms.
 const DEFAULT_SHOP_SLUG = 'anyforms';
+
+// Фильтры списка живут в sessionStorage, чтобы пережить уход на карточку
+// товара и возврат к списку (в пределах текущей вкладки).
+const FILTERS_KEY = 'adminProductsFilters';
+
+const readSavedFilters = () => {
+  let saved = {};
+  try {
+    saved = JSON.parse(sessionStorage.getItem(FILTERS_KEY)) ?? {};
+  } catch {
+    /* sessionStorage недоступен или в нём мусор — начинаем с дефолтов */
+  }
+  return {
+    shop: typeof saved.shop === 'string' ? saved.shop : '',
+    status: saved.status === 'active' || saved.status === 'off' ? saved.status : 'all',
+    name: typeof saved.name === 'string' ? saved.name : '',
+  };
+};
 
 // Слаги магазинов товара; поддерживаем и старый формат ответа с одним shopSlug.
 const productShopSlugs = (p) =>
@@ -20,15 +38,14 @@ const pluralVariants = (n) => {
 };
 
 const AdminProducts = () => {
-  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState('');
   const [shops, setShops] = useState([]);
   // Фильтры списка: магазин ('' — все), статус, поиск по названию.
-  const [shopFilter, setShopFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [nameFilter, setNameFilter] = useState('');
+  const [shopFilter, setShopFilter] = useState(() => readSavedFilters().shop);
+  const [statusFilter, setStatusFilter] = useState(() => readSavedFilters().status);
+  const [nameFilter, setNameFilter] = useState(() => readSavedFilters().name);
 
   const authHeaders = () => {
     const token = apiClient.getToken ? apiClient.getToken() : null;
@@ -54,6 +71,17 @@ const AdminProducts = () => {
       .then(setShops)
       .catch((err) => setPageError(err?.message || 'Не удалось загрузить магазины'));
   }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        FILTERS_KEY,
+        JSON.stringify({ shop: shopFilter, status: statusFilter, name: nameFilter })
+      );
+    } catch {
+      /* sessionStorage недоступен — фильтры просто не сохранятся */
+    }
+  }, [shopFilter, statusFilter, nameFilter]);
 
   const nameQuery = nameFilter.trim().toLowerCase();
   const visibleProducts = products
@@ -113,13 +141,9 @@ const AdminProducts = () => {
             </svg>
             <span>Витрина</span>
           </a>
-          <button
-            type="button"
-            className={styles.addBtn}
-            onClick={() => navigate('/admin/products/new')}
-          >
+          <Link className={styles.addBtn} to="/admin/products/new">
             + Добавить товар
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -183,9 +207,8 @@ const AdminProducts = () => {
             const slugs = productShopSlugs(p);
             const photo = p.photos?.[0];
             const variants = p.variants ?? [];
-            const openProduct = () => p.id && navigate(`/admin/products/${p.id}`);
-            return (
-              <li key={p.id ?? `item-${i}`} className={styles.item} onClick={openProduct}>
+            const rowContent = (
+              <>
                 {photo ? (
                   <img className={styles.itemPhoto} src={photo} alt="" />
                 ) : (
@@ -226,17 +249,18 @@ const AdminProducts = () => {
                   )}
                 </div>
                 <span className={styles.itemPrice}>{p.price ?? '—'} ₽</span>
-                {p.id && (
-                  <button
-                    type="button"
-                    className={styles.editBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openProduct();
-                    }}
-                  >
-                    Открыть
-                  </button>
+                {p.id && <span className={styles.editBtn}>Открыть</span>}
+              </>
+            );
+            return (
+              <li key={p.id ?? `item-${i}`}>
+                {/* Строка — настоящая ссылка: работают Ctrl/Cmd+клик и средняя кнопка мыши. */}
+                {p.id ? (
+                  <Link className={styles.item} to={`/admin/products/${p.id}`}>
+                    {rowContent}
+                  </Link>
+                ) : (
+                  <div className={styles.item}>{rowContent}</div>
                 )}
               </li>
             );
