@@ -10,6 +10,7 @@ import MarketplaceCheckout from "./components/Marketplace/MarketplaceCheckout";
 import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
+import AdminProductEdit from "./components/AdminProducts/AdminProductEdit";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
 import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoices";
 import AdminYookassaReceipts from "./components/AdminInvoices/AdminYookassaReceipts";
@@ -332,6 +333,8 @@ function App() {
           <Route path="/admin/orders/custom/ship" element={<CustomShipList />} />
           <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
           <Route path="/admin/products" element={<AdminProducts />} />
+          {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
+          <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
           <Route path="/admin/invoices" element={<AdminInvoices />} />
           <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
           <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
