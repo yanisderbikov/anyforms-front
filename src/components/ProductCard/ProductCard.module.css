@@ -266,12 +266,18 @@
   }
 }
 
-/* Сердечко на фото: мягкая светлая подложка, чтобы читалось и на тёмных
-   кадрах (у части товаров фон съёмки чёрный). */
+/* Сердечко на фото: без плашки. Белый контур в режиме difference сам
+   «инвертируется» под фоном — тёмный на светлых кадрах, белый на чёрных. */
 .boutique .photoWrap button {
-  background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+/* «В избранном» — бордовая заливка витрины без инверсии, чтобы акцентный
+   цвет бренда не искажался блендингом. */
+.boutique .photoWrap button[aria-pressed='true'] {
+  color: var(--shop-accent, #f0808f);
+  mix-blend-mode: normal;
 }
 
 .boutique .body {
