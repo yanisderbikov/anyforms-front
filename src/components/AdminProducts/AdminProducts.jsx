@@ -29,23 +29,41 @@ const initialForm = {
 const productShopSlugs = (p) =>
   Array.isArray(p.shops) ? p.shops.map((s) => s.slug) : (p.shopSlug ? [p.shopSlug] : []);
 
+const pluralVariants = (n) => {
+  const tail10 = n % 10;
+  const tail100 = n % 100;
+  if (tail10 === 1 && tail100 !== 11) return 'вариант';
+  if (tail10 >= 2 && tail10 <= 4 && (tail100 < 12 || tail100 > 14)) return 'варианта';
+  return 'вариантов';
+};
+
+const Fieldset = ({ title, children }) => (
+  <section className={styles.fieldset}>
+    <h3 className={styles.fieldsetTitle}>{title}</h3>
+    {children}
+  </section>
+);
+
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  // Сообщения страницы (загрузка данных, результат сохранения после закрытия редактора).
+  const [pageError, setPageError] = useState('');
+  const [pageMessage, setPageMessage] = useState('');
+  // Сообщения внутри редактора (неудачное сохранение, работа с фото).
+  const [formError, setFormError] = useState('');
+  const [formMessage, setFormMessage] = useState('');
   const [form, setForm] = useState(initialForm);
-  const [expandedId, setExpandedId] = useState(null);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [amoProducts, setAmoProducts] = useState([]);
   const [amoError, setAmoError] = useState('');
   const [uploadingId, setUploadingId] = useState(null);
   const [shops, setShops] = useState([]);
-  // Фильтр списка по магазину: '' — все магазины.
+  // Фильтры списка: магазин ('' — все), статус, поиск по названию.
   const [shopFilter, setShopFilter] = useState('');
-  // Поиск по названию товара (без учёта регистра).
+  const [statusFilter, setStatusFilter] = useState('all');
   const [nameFilter, setNameFilter] = useState('');
-  const formRef = React.useRef(null);
   const descRef = React.useRef(null);
 
   // Описание: минимум 7 строк, дальше высота подстраивается под текст.
@@ -54,7 +72,29 @@ const AdminProducts = () => {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
-  }, [form.description]);
+  }, [form.description, editorOpen]);
+
+  // Пока редактор открыт: Escape закрывает, фон не скроллится.
+  useEffect(() => {
+    if (!editorOpen) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setEditorOpen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [editorOpen]);
+
+  // Сообщение об успехе на странице живёт недолго — дальше не мешает работе.
+  useEffect(() => {
+    if (!pageMessage) return undefined;
+    const timer = setTimeout(() => setPageMessage(''), 4000);
+    return () => clearTimeout(timer);
+  }, [pageMessage]);
 
   const authHeaders = () => {
     const token = apiClient.getToken ? apiClient.getToken() : null;
@@ -67,8 +107,9 @@ const AdminProducts = () => {
       const res = await apiClient.instance.get('/api/product/all', { headers: authHeaders() });
       const data = Array.isArray(res.data) ? res.data : [];
       setProducts(data);
+      setPageError('');
     } catch (err) {
-      setError(err?.response?.data?.error || err?.message || 'Не удалось загрузить товары');
+      setPageError(err?.response?.data?.error || err?.message || 'Не удалось загрузить товары');
     } finally {
       setLoading(false);
     }
@@ -78,7 +119,7 @@ const AdminProducts = () => {
     try {
       setShops(await getShops());
     } catch (err) {
-      setError(err?.response?.data?.error || err?.message || 'Не удалось загрузить магазины');
+      setPageError(err?.response?.data?.error || err?.message || 'Не удалось загрузить магазины');
     }
   };
 
@@ -175,23 +216,36 @@ const AdminProducts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
+    setFormError('');
+    setFormMessage('');
     setSaving(true);
+    const isUpdate = Boolean(form.id);
     try {
-      const payload = buildPayload();
-      await apiClient.api.saveOrUpdateProduct(payload);
-      setMessage(form.id ? 'Товар обновлён' : 'Товар добавлен');
-      setForm(initialForm);
+      await apiClient.api.saveOrUpdateProduct(buildPayload());
       await loadProducts();
+      setEditorOpen(false);
+      setForm(initialForm);
+      setPageMessage(isUpdate ? 'Товар обновлён' : 'Товар добавлен');
     } catch (err) {
-      setError(err?.response?.data?.error || err?.message || 'Ошибка сохранения');
+      // Редактор оставляем открытым: заполненные поля не должны потеряться.
+      setFormError(err?.response?.data?.error || err?.message || 'Ошибка сохранения');
     } finally {
       setSaving(false);
     }
   };
 
-  const fillForm = (p) => {
+  const openCreate = () => {
+    setForm({
+      ...initialForm,
+      // Новый товар сразу попадает в магазин, по которому отфильтрован список.
+      shopSlugs: [shopFilter || DEFAULT_SHOP_SLUG],
+    });
+    setFormError('');
+    setFormMessage('');
+    setEditorOpen(true);
+  };
+
+  const openEdit = (p) => {
     setForm({
       id: p.id ?? '',
       name: p.name ?? '',
@@ -209,14 +263,9 @@ const AdminProducts = () => {
       shopSlugs: productShopSlugs(p),
       variants: (p.variants ?? []).map((v) => ({ id: v.id ?? '', label: v.label ?? '', price: v.price ?? '' })),
     });
-    setMessage('');
-    setError('');
-    setExpandedId(null);
-    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const toggleExpand = (id) => {
-    setExpandedId((prev) => (prev === id ? null : id));
+    setFormError('');
+    setFormMessage('');
+    setEditorOpen(true);
   };
 
   const handleDeletePhoto = async (id, src) => {
@@ -228,80 +277,116 @@ const AdminProducts = () => {
     }
     if (!fileName) return;
     if (!window.confirm('Удалить это фото?')) return;
-    setError('');
-    setMessage('');
+    setFormError('');
+    setFormMessage('');
     try {
       await apiClient.instance.delete(`/api/product/${id}/photos`, {
         params: { file: fileName },
         headers: authHeaders(),
       });
-      setMessage('Фото удалено');
+      setFormMessage('Фото удалено');
       await loadProducts();
     } catch (err) {
-      setError(err?.response?.data?.error || err?.message || 'Не удалось удалить фото');
+      setFormError(err?.response?.data?.error || err?.message || 'Не удалось удалить фото');
     }
   };
-
-  // Превью фото с крестиком удаления — используется и в форме, и в раскрытом товаре.
-  const renderPhotos = (productId, photos) => (
-    <div className={styles.photosList}>
-      {photos.map((src, j) => (
-        <div key={j} className={styles.photoWrap}>
-          <a href={src} target="_blank" rel="noopener noreferrer" className={styles.photoThumb}>
-            <img src={src} alt="" />
-          </a>
-          <button
-            type="button"
-            className={styles.photoDelete}
-            title="Удалить фото"
-            onClick={() => handleDeletePhoto(productId, src)}
-          >
-            ×
-          </button>
-        </div>
-      ))}
-    </div>
-  );
 
   const handleUpload = async (id, fileList) => {
     const files = Array.from(fileList || []);
     if (!files.length) return;
     setUploadingId(id);
-    setError('');
-    setMessage('');
+    setFormError('');
+    setFormMessage('');
     try {
       const formData = new FormData();
       files.forEach((f) => formData.append('files', f));
       await apiClient.instance.post(`/api/product/${id}/photos`, formData, {
         headers: authHeaders(),
       });
-      setMessage(`Загружено фото: ${files.length}`);
+      setFormMessage(`Загружено фото: ${files.length}`);
       await loadProducts();
     } catch (err) {
-      setError(err?.response?.data?.error || err?.message || 'Не удалось загрузить фото');
+      setFormError(err?.response?.data?.error || err?.message || 'Не удалось загрузить фото');
     } finally {
       setUploadingId(null);
     }
   };
 
   const nameQuery = nameFilter.trim().toLowerCase();
-  const visibleProducts = products.filter(
-    (p) =>
-      (!shopFilter || productShopSlugs(p).includes(shopFilter)) &&
-      (!nameQuery || (p.name ?? '').toLowerCase().includes(nameQuery))
-  );
+  const visibleProducts = products
+    .filter((p) => {
+      if (shopFilter && !productShopSlugs(p).includes(shopFilter)) return false;
+      if (statusFilter === 'active' && p.active === false) return false;
+      if (statusFilter === 'off' && p.active !== false) return false;
+      if (nameQuery && !(p.name ?? '').toLowerCase().includes(nameQuery)) return false;
+      return true;
+    })
+    // Порядок витрины, а внутри — по алфавиту: у товаров без orderNumber бэкенд
+    // порядок не задаёт, и без этого строка прыгала по списку после сохранения.
+    .sort((a, b) => {
+      const orderA = a.orderNumber ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.orderNumber ?? Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.name ?? '').localeCompare(b.name ?? '', 'ru');
+    });
+
+  const onSaleCount = products.filter(
+    (p) => p.active !== false && productShopSlugs(p).length > 0
+  ).length;
+  const isFiltered = Boolean(shopFilter || nameQuery || statusFilter !== 'all');
+  // Фото товара, который сейчас в редакторе: приходят с сервера вместе со списком.
+  const editingProduct = form.id ? products.find((p) => p.id === form.id) : null;
+
+  const shopLinkHref =
+    shopFilter && shopFilter !== DEFAULT_SHOP_SLUG ? `/shop/${shopFilter}` : '/shop';
 
   if (loading) {
     return (
       <div className={styles.wrap}>
-        <p className={styles.message}>Загрузка товаров...</p>
+        <p className={styles.message}>Загрузка товаров…</p>
       </div>
     );
   }
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.titleRow}>
+      <header className={styles.pageHead}>
+        <div>
+          <h1 className={styles.title}>Товары розницы</h1>
+          <p className={styles.subtitle}>
+            {products.length} всего · {onSaleCount} на витрине
+          </p>
+        </div>
+        <div className={styles.headActions}>
+          <a
+            className={styles.shopLink}
+            href={shopLinkHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Открыть витрину магазина"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Витрина</span>
+          </a>
+          <button type="button" className={styles.addBtn} onClick={openCreate}>
+            + Добавить товар
+          </button>
+        </div>
+      </header>
+
+      <div className={styles.toolbar}>
+        <input
+          type="search"
+          className={styles.search}
+          placeholder="Поиск по названию"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          aria-label="Поиск по названию"
+        />
         <select
           className={styles.shopFilter}
           value={shopFilter}
@@ -315,404 +400,418 @@ const AdminProducts = () => {
             </option>
           ))}
         </select>
-        <h1 className={styles.title}>Управление товарами розницы</h1>
-        <a
-          className={styles.shopLink}
-          href={shopFilter && shopFilter !== DEFAULT_SHOP_SLUG ? `/shop/${shopFilter}` : '/shop'}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Открыть витрину магазина"
-          aria-label="Открыть витрину магазина"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
+        <div className={styles.statusTabs} role="group" aria-label="Фильтр по статусу">
+          {[
+            { key: 'all', label: 'Все' },
+            { key: 'active', label: 'Активные' },
+            { key: 'off', label: 'Выключенные' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={statusFilter === tab.key ? `${styles.tab} ${styles.tabActive}` : styles.tab}
+              aria-pressed={statusFilter === tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <form ref={formRef} onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.formGrid}>
-          <label className={styles.label}>
-            ID (для обновления, оставьте пустым для нового)
-            <input
-              type="text"
-              name="id"
-              value={form.id}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="uuid"
-            />
-          </label>
-          <label className={styles.label}>
-            Название *
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className={styles.input}
-            />
-          </label>
-          <label className={styles.label}>
-            Описание
-            <textarea
-              name="description"
-              ref={descRef}
-              value={form.description}
-              onChange={handleChange}
-              className={`${styles.textarea} ${styles.textareaAuto}`}
-              rows={7}
-            />
-          </label>
-          <label className={styles.label}>
-            Папка (S3, под shop/) — можно не заполнять, создастся сама при загрузке фото
-            <input
-              type="text"
-              name="folder"
-              value={form.folder}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="heart"
-            />
-          </label>
-          <label className={styles.label}>
-            Цена *
-            <input
-              type="text"
-              name="price"
-              value={form.price}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="890"
-            />
-          </label>
-          <label className={styles.label}>
-            Зачёркнутая цена
-            <input
-              type="text"
-              name="crossedPrice"
-              value={form.crossedPrice}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="1190"
-            />
-          </label>
-          <label className={styles.label}>
-            Скидка %
-            <input
-              type="text"
-              name="discountPercent"
-              value={form.discountPercent}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="26"
-            />
-          </label>
-          <label className={styles.label}>
-            Ссылка TG
-            <input
-              type="text"
-              name="tgLink"
-              value={form.tgLink}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="https://t.me/..."
-            />
-          </label>
-          <label className={styles.label}>
-            Порядок
-            <input
-              type="number"
-              name="orderNumber"
-              value={form.orderNumber}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="0"
-            />
-          </label>
-          <label className={styles.label}>
-            Товар в АМО
-            <select
-              name="amoProductId"
-              value={form.amoProductId}
-              onChange={handleAmoProductChange}
-              className={styles.input}
-            >
-              <option value="">— не привязан —</option>
-              {/* Если у товара сохранён ID, которого нет в загруженном списке — показываем как есть. */}
-              {form.amoProductId &&
-                !amoProducts.some((p) => String(p.id) === String(form.amoProductId)) && (
-                  <option value={form.amoProductId}>
-                    {form.amoProductName || `ID ${form.amoProductId}`}
-                  </option>
-                )}
-              {amoProducts.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name || `ID ${p.id}`}
-                </option>
-              ))}
-            </select>
-            {amoError && <span className={styles.error}>{amoError}</span>}
-          </label>
-          <div className={styles.label}>
-            Магазины (где продаётся товар)
-            <div className={styles.shopChecks}>
-              {shops.length === 0 && (
-                <label className={styles.checkLabel}>
-                  <input
-                    type="checkbox"
-                    checked={form.shopSlugs.includes(DEFAULT_SHOP_SLUG)}
-                    onChange={() => toggleShop(DEFAULT_SHOP_SLUG)}
-                  />
-                  anyforms
-                </label>
-              )}
-              {shops.map((shop) => (
-                <label key={shop.slug} className={styles.checkLabel}>
-                  <input
-                    type="checkbox"
-                    checked={form.shopSlugs.includes(shop.slug)}
-                    onChange={() => toggleShop(shop.slug)}
-                  />
-                  {shop.name} ({shop.slug})
-                </label>
-              ))}
-            </div>
-            {form.shopSlugs.length === 0 && (
-              <span className={styles.hintText}>Не выбран ни один магазин — товар не попадёт ни на одну витрину.</span>
-            )}
-          </div>
-          <label className={styles.checkLabel}>
-            <input
-              type="checkbox"
-              name="active"
-              checked={form.active}
-              onChange={handleChange}
-            />
-            Товар активен (доступен к продаже)
-          </label>
-          <label className={styles.checkLabel}>
-            <input
-              type="checkbox"
-              name="preorder"
-              checked={form.preorder}
-              onChange={handleChange}
-            />
-            Предзаказ (плашка и пояснение на витрине)
-          </label>
-        </div>
+      {pageError && <p className={`${styles.banner} ${styles.bannerError}`}>{pageError}</p>}
+      {pageMessage && <p className={`${styles.banner} ${styles.bannerSuccess}`}>{pageMessage}</p>}
 
-        <div className={styles.variantsBlock}>
-          <span className={styles.variantsTitle}>Варианты (размер / объём — цена)</span>
-          {form.variants.map((v, index) => (
-            <div key={index} className={styles.variantRow}>
-              <input
-                type="text"
-                value={v.label}
-                onChange={(e) => changeVariant(index, 'label', e.target.value)}
-                className={styles.input}
-                placeholder="80 мл"
-              />
-              <input
-                type="text"
-                value={v.price}
-                onChange={(e) => changeVariant(index, 'price', e.target.value)}
-                className={styles.input}
-                placeholder="1990"
-              />
+      <p className={styles.listCount}>
+        Найдено: {visibleProducts.length}
+        {isFiltered && visibleProducts.length !== products.length && ` из ${products.length}`}
+      </p>
+
+      {visibleProducts.length === 0 ? (
+        <p className={styles.message}>
+          {products.length === 0
+            ? 'Товаров пока нет — добавьте первый.'
+            : 'Ничего не нашлось — измените поиск или фильтры.'}
+        </p>
+      ) : (
+        <ul className={styles.list}>
+          {visibleProducts.map((p, i) => {
+            const slugs = productShopSlugs(p);
+            const photo = p.photos?.[0];
+            const variants = p.variants ?? [];
+            return (
+              <li
+                key={p.id ?? `item-${i}`}
+                className={styles.item}
+                onClick={() => p.id && openEdit(p)}
+              >
+                {photo ? (
+                  <img className={styles.itemPhoto} src={photo} alt="" />
+                ) : (
+                  <div className={`${styles.itemPhoto} ${styles.itemPhotoEmpty}`} aria-hidden="true">
+                    нет фото
+                  </div>
+                )}
+                <div className={styles.itemBody}>
+                  <span className={styles.itemName}>{p.name ?? '—'}</span>
+                  <span className={styles.itemBadges}>
+                    {slugs.map((slug) => (
+                      <span
+                        key={slug}
+                        className={
+                          slug === DEFAULT_SHOP_SLUG
+                            ? `${styles.badge} ${styles.badgeShopDefault}`
+                            : `${styles.badge} ${styles.badgeShop}`
+                        }
+                      >
+                        {slug}
+                      </span>
+                    ))}
+                    {slugs.length === 0 && (
+                      <span className={`${styles.badge} ${styles.badgeOff}`}>не на витрине</span>
+                    )}
+                    {p.active === false && (
+                      <span className={`${styles.badge} ${styles.badgeOff}`}>выключен</span>
+                    )}
+                    {p.preorder && (
+                      <span className={`${styles.badge} ${styles.badgePreorder}`}>предзаказ</span>
+                    )}
+                  </span>
+                  {variants.length > 0 && (
+                    <span className={styles.itemMeta}>
+                      {variants.length} {pluralVariants(variants.length)}:{' '}
+                      {variants.map((v) => `${v.label} — ${v.price} ₽`).join(' · ')}
+                    </span>
+                  )}
+                </div>
+                <span className={styles.itemPrice}>{p.price ?? '—'} ₽</span>
+                {p.id && (
+                  <button
+                    type="button"
+                    className={styles.editBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEdit(p);
+                    }}
+                  >
+                    Изменить
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {editorOpen && (
+        <>
+          <div
+            className={styles.overlay}
+            onClick={() => setEditorOpen(false)}
+            aria-hidden="true"
+          />
+          <aside className={styles.drawer} role="dialog" aria-modal="true" aria-label="Редактор товара">
+            <div className={styles.drawerHead}>
+              <div>
+                <h2 className={styles.drawerTitle}>
+                  {form.id ? 'Изменение товара' : 'Новый товар'}
+                </h2>
+                {form.id && <code className={styles.drawerId}>{form.id}</code>}
+              </div>
               <button
                 type="button"
-                className={styles.variantRemove}
-                title="Удалить вариант"
-                onClick={() => removeVariant(index)}
+                className={styles.drawerClose}
+                onClick={() => setEditorOpen(false)}
+                title="Закрыть"
+                aria-label="Закрыть редактор"
               >
                 ×
               </button>
             </div>
-          ))}
-          <button type="button" className={styles.variantAdd} onClick={addVariant}>
-            + Добавить вариант
-          </button>
-          <p className={styles.hintText}>
-            Если вариантов нет — товар продаётся по основной цене. С вариантами покупатель выбирает
-            один из них, а в заказ позиция уходит как «Название + вариант» (например, «Лилит 20 см»)
-            с ценой варианта.
-          </p>
-        </div>
-        {form.id?.trim() ? (
-          <div className={styles.uploadRow}>
-            {(() => {
-              const formProduct = products.find((p) => p.id === form.id.trim());
-              return formProduct?.photos?.length > 0 ? renderPhotos(formProduct.id, formProduct.photos) : null;
-            })()}
-            <label className={styles.uploadBtn}>
-              {uploadingId === form.id ? 'Загрузка…' : '+ Загрузить фото'}
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                hidden
-                disabled={uploadingId === form.id}
-                onChange={(e) => {
-                  handleUpload(form.id.trim(), e.target.files);
-                  e.target.value = '';
-                }}
-              />
-            </label>
-          </div>
-        ) : (
-          <p className={styles.hintText}>
-            Фото можно загрузить после сохранения товара — кнопка появится здесь и в «Подробнее» у товара в списке.
-          </p>
-        )}
-        {error && <p className={styles.error}>{error}</p>}
-        {message && <p className={styles.success}>{message}</p>}
-        <button type="submit" className={styles.submit} disabled={saving}>
-          {saving ? 'Сохранение…' : form.id ? 'Обновить товар' : 'Добавить товар'}
-        </button>
-      </form>
 
-      <section className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Товары ({visibleProducts.length})</h2>
-          <input
-            type="search"
-            className={styles.nameFilter}
-            placeholder="Поиск по названию"
-            value={nameFilter}
-            onChange={(e) => setNameFilter(e.target.value)}
-            aria-label="Поиск по названию"
-          />
-        </div>
-        {visibleProducts.length === 0 ? (
-          <p className={styles.message}>
-            {products.length === 0 ? 'Товаров пока нет.' : 'Ничего не нашлось — измените поиск или фильтр магазина.'}
-          </p>
-        ) : (
-          <ul className={styles.list}>
-            {visibleProducts.map((p, i) => {
-              const isExpanded = expandedId === (p.id ?? i);
-              return (
-                <li key={p.id ?? `item-${i}`} className={styles.item}>
-                  <div className={styles.itemMain}>
-                    <span className={styles.itemName}>
-                      {p.name ?? '—'}
-                      {productShopSlugs(p).map((slug) => (
-                        <span
-                          key={slug}
-                          className={
-                            slug === DEFAULT_SHOP_SLUG
-                              ? `${styles.badgeShop} ${styles.badgeShopDefault}`
-                              : styles.badgeShop
-                          }
-                        >
-                          {slug}
-                        </span>
-                      ))}
-                      {productShopSlugs(p).length === 0 && (
-                        <span className={styles.badgeOff}>Не на витрине</span>
-                      )}
-                      {p.active === false && <span className={styles.badgeOff}>Выключен</span>}
-                      {p.preorder && <span className={styles.badgePreorder}>Предзаказ</span>}
-                    </span>
-                    <span className={styles.itemPrice}>{p.price ?? '—'} ₽</span>
+            <form onSubmit={handleSubmit} className={styles.drawerForm}>
+              <div className={styles.drawerBody}>
+                <Fieldset title="Основное">
+                  <label className={styles.label}>
+                    Название *
+                    <input
+                      type="text"
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      className={styles.input}
+                      placeholder="Лилит"
+                    />
+                  </label>
+                  <label className={styles.label}>
+                    Описание
+                    <textarea
+                      name="description"
+                      ref={descRef}
+                      value={form.description}
+                      onChange={handleChange}
+                      className={`${styles.textarea} ${styles.textareaAuto}`}
+                      rows={7}
+                    />
+                  </label>
+                </Fieldset>
+
+                <Fieldset title="Цена">
+                  <div className={styles.row3}>
+                    <label className={styles.label}>
+                      Цена *
+                      <input
+                        type="text"
+                        name="price"
+                        value={form.price}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="890"
+                      />
+                    </label>
+                    <label className={styles.label}>
+                      Зачёркнутая
+                      <input
+                        type="text"
+                        name="crossedPrice"
+                        value={form.crossedPrice}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="1190"
+                      />
+                    </label>
+                    <label className={styles.label}>
+                      Скидка %
+                      <input
+                        type="text"
+                        name="discountPercent"
+                        value={form.discountPercent}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="26"
+                      />
+                    </label>
                   </div>
-                  <div className={styles.itemActions}>
-                    <button
-                      type="button"
-                      className={styles.viewBtn}
-                      onClick={() => toggleExpand(p.id ?? i)}
-                    >
-                      {isExpanded ? 'Свернуть' : 'Подробнее'}
-                    </button>
-                    {p.id && (
+                </Fieldset>
+
+                <Fieldset title="Варианты (размер / объём — цена)">
+                  {form.variants.map((v, index) => (
+                    <div key={index} className={styles.variantRow}>
+                      <input
+                        type="text"
+                        value={v.label}
+                        onChange={(e) => changeVariant(index, 'label', e.target.value)}
+                        className={styles.input}
+                        placeholder="80 мл"
+                      />
+                      <input
+                        type="text"
+                        value={v.price}
+                        onChange={(e) => changeVariant(index, 'price', e.target.value)}
+                        className={styles.input}
+                        placeholder="1990"
+                      />
                       <button
                         type="button"
-                        className={styles.editBtn}
-                        onClick={() => fillForm(p)}
+                        className={styles.variantRemove}
+                        title="Удалить вариант"
+                        onClick={() => removeVariant(index)}
                       >
-                        Изменить
+                        ×
                       </button>
-                    )}
-                  </div>
-                  {isExpanded && (
-                    <div className={styles.itemExpand}>
-                      {p.id && (
-                        <p className={styles.itemRow}>
-                          <span className={styles.itemLabel}>ID:</span>{' '}
-                          <code className={styles.itemId}>{p.id}</code>
-                        </p>
-                      )}
-                      <p className={styles.itemRow}>
-                        <span className={styles.itemLabel}>Магазины:</span>{' '}
-                        {Array.isArray(p.shops) && p.shops.length > 0
-                          ? p.shops.map((s) => s.name || s.slug).join(', ')
-                          : (p.shopName || p.shopSlug || '—')}
-                      </p>
-                      {p.variants?.length > 0 && (
-                        <p className={styles.itemRow}>
-                          <span className={styles.itemLabel}>Варианты:</span>{' '}
-                          {p.variants.map((v) => `${v.label} — ${v.price} ₽`).join(', ')}
-                        </p>
-                      )}
-                      {p.description && (
-                        <p className={styles.itemRow}>
-                          <span className={styles.itemLabel}>Описание:</span>{' '}
-                          {p.description}
-                        </p>
-                      )}
-                      <p className={styles.itemRow}>
-                        <span className={styles.itemLabel}>Цена:</span>{' '}
-                        {p.price ?? '—'} ₽
-                        {p.crossedPrice && (
-                          <> · зачёркнутая {p.crossedPrice} ₽</>
-                        )}
-                        {p.discountPercent != null && p.discountPercent !== '' && (
-                          <> · скидка {p.discountPercent}%</>
-                        )}
-                      </p>
-                      {p.tgLink && (
-                        <p className={styles.itemRow}>
-                          <span className={styles.itemLabel}>TG:</span>{' '}
-                          <a href={p.tgLink} target="_blank" rel="noopener noreferrer" className={styles.link}>
-                            {p.tgLink}
-                          </a>
-                        </p>
-                      )}
-                      {p.photos?.length > 0 && (
-                        <div className={styles.itemPhotos}>
-                          <span className={styles.itemLabel}>Фото:</span>
-                          {renderPhotos(p.id, p.photos)}
-                        </div>
-                      )}
-                      {p.id && (
-                        <div className={styles.uploadRow}>
-                          <label className={styles.uploadBtn}>
-                            {uploadingId === p.id ? 'Загрузка…' : '+ Загрузить фото'}
-                            <input
-                              type="file"
-                              multiple
-                              accept="image/*"
-                              hidden
-                              disabled={uploadingId === p.id}
-                              onChange={(e) => {
-                                handleUpload(p.id, e.target.files);
-                                e.target.value = '';
-                              }}
-                            />
-                          </label>
-                        </div>
-                      )}
                     </div>
+                  ))}
+                  <button type="button" className={styles.variantAdd} onClick={addVariant}>
+                    + Добавить вариант
+                  </button>
+                  <p className={styles.hintText}>
+                    Без вариантов товар продаётся по основной цене. С вариантами покупатель выбирает
+                    один из них, а в заказ позиция уходит как «Название + вариант» (например,
+                    «Лилит 20 см») с ценой варианта.
+                  </p>
+                </Fieldset>
+
+                <Fieldset title="Витрины и доступность">
+                  <div className={styles.shopChecks}>
+                    {shops.length === 0 && (
+                      <label className={styles.checkLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.shopSlugs.includes(DEFAULT_SHOP_SLUG)}
+                          onChange={() => toggleShop(DEFAULT_SHOP_SLUG)}
+                        />
+                        anyforms
+                      </label>
+                    )}
+                    {shops.map((shop) => (
+                      <label key={shop.slug} className={styles.checkLabel}>
+                        <input
+                          type="checkbox"
+                          checked={form.shopSlugs.includes(shop.slug)}
+                          onChange={() => toggleShop(shop.slug)}
+                        />
+                        {shop.name} ({shop.slug})
+                      </label>
+                    ))}
+                  </div>
+                  {form.shopSlugs.length === 0 && (
+                    <p className={styles.hintText}>
+                      Не выбран ни один магазин — товар не попадёт ни на одну витрину.
+                    </p>
                   )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+                  <label className={styles.checkLabel}>
+                    <input
+                      type="checkbox"
+                      name="active"
+                      checked={form.active}
+                      onChange={handleChange}
+                    />
+                    Активен (доступен к продаже)
+                  </label>
+                  <label className={styles.checkLabel}>
+                    <input
+                      type="checkbox"
+                      name="preorder"
+                      checked={form.preorder}
+                      onChange={handleChange}
+                    />
+                    Предзаказ (плашка и пояснение на витрине)
+                  </label>
+                </Fieldset>
+
+                <Fieldset title="Фото">
+                  {form.id ? (
+                    <div className={styles.uploadRow}>
+                      {editingProduct?.photos?.length > 0 && (
+                        <div className={styles.photosList}>
+                          {editingProduct.photos.map((src, j) => (
+                            <div key={j} className={styles.photoWrap}>
+                              <a
+                                href={src}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.photoThumb}
+                              >
+                                <img src={src} alt="" />
+                              </a>
+                              <button
+                                type="button"
+                                className={styles.photoDelete}
+                                title="Удалить фото"
+                                onClick={() => handleDeletePhoto(editingProduct.id, src)}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <label className={styles.uploadBtn}>
+                        {uploadingId === form.id ? 'Загрузка…' : '+ Загрузить фото'}
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          hidden
+                          disabled={uploadingId === form.id}
+                          onChange={(e) => {
+                            handleUpload(form.id.trim(), e.target.files);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <p className={styles.hintText}>
+                      Фото можно загрузить после сохранения товара — вернитесь в эту секцию,
+                      открыв товар из списка.
+                    </p>
+                  )}
+                </Fieldset>
+
+                <Fieldset title="Служебное">
+                  <label className={styles.label}>
+                    Товар в АМО
+                    <select
+                      name="amoProductId"
+                      value={form.amoProductId}
+                      onChange={handleAmoProductChange}
+                      className={styles.input}
+                    >
+                      <option value="">— не привязан —</option>
+                      {/* Если у товара сохранён ID, которого нет в загруженном списке — показываем как есть. */}
+                      {form.amoProductId &&
+                        !amoProducts.some((p) => String(p.id) === String(form.amoProductId)) && (
+                          <option value={form.amoProductId}>
+                            {form.amoProductName || `ID ${form.amoProductId}`}
+                          </option>
+                        )}
+                      {amoProducts.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name || `ID ${p.id}`}
+                        </option>
+                      ))}
+                    </select>
+                    {amoError && <span className={styles.formError}>{amoError}</span>}
+                  </label>
+                  <div className={styles.row2}>
+                    <label className={styles.label}>
+                      Ссылка TG
+                      <input
+                        type="text"
+                        name="tgLink"
+                        value={form.tgLink}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="https://t.me/..."
+                      />
+                    </label>
+                    <label className={styles.label}>
+                      Порядок на витрине
+                      <input
+                        type="number"
+                        name="orderNumber"
+                        value={form.orderNumber}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="0"
+                      />
+                    </label>
+                  </div>
+                  <label className={styles.label}>
+                    Папка в S3 (под shop/) — создастся сама при загрузке фото
+                    <input
+                      type="text"
+                      name="folder"
+                      value={form.folder}
+                      onChange={handleChange}
+                      className={styles.input}
+                      placeholder="heart"
+                    />
+                  </label>
+                </Fieldset>
+              </div>
+
+              <div className={styles.drawerFoot}>
+                {formError && <p className={styles.formError}>{formError}</p>}
+                {formMessage && <p className={styles.formSuccess}>{formMessage}</p>}
+                <div className={styles.footActions}>
+                  <button
+                    type="button"
+                    className={styles.cancelBtn}
+                    onClick={() => setEditorOpen(false)}
+                  >
+                    Отмена
+                  </button>
+                  <button type="submit" className={styles.submit} disabled={saving}>
+                    {saving ? 'Сохранение…' : form.id ? 'Сохранить' : 'Добавить товар'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </aside>
+        </>
+      )}
     </div>
   );
 };

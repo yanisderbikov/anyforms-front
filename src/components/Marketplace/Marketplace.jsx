@@ -159,7 +159,18 @@ const Marketplace = () => {
         <div className={styles.headerInner}>
           {theme ? (
             <a className={styles.brandLink} href="#top" aria-label={`${shopName} — наверх`}>
-              <span className={styles.brandName}>{shopName}</span>
+              {theme.headerLogo ? (
+                <img
+                  className={styles.brandLogo}
+                  src={theme.headerLogo.src}
+                  alt={shopName}
+                  width={theme.headerLogo.width}
+                  height={theme.headerLogo.height}
+                  decoding="async"
+                />
+              ) : (
+                <span className={styles.brandName}>{shopName}</span>
+              )}
             </a>
           ) : (
             <a className={styles.logoLink} href="#top" aria-label="anyforms — наверх">
