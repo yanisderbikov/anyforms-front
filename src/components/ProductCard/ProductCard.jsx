@@ -2,16 +2,24 @@ import React from 'react';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './ProductCard.module.css';
 
-const ProductCard = ({ item, index = null, onSelect }) => {
+// boutique — подача для витрин с темой: крупное фото 3:4 без рамки-карточки,
+// под ним только название и цена; описание показываем только в базовом виде.
+const ProductCard = ({ item, index = null, onSelect, boutique = false }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
+  // Вторая фотография (порядок задаётся в админке) проявляется при наведении на карточку.
+  const hoverPhoto = photos[1];
 
   const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
-  const hasCrossedPrice =
-    item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
+  // Товар с вариантами (размерами) — в карточке показываем цену «от минимальной».
+  const variantPrices = (item.variants ?? [])
+    .map((v) => Number(v.price))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  const minVariantPrice = variantPrices.length ? Math.min(...variantPrices) : null;
 
-  const isOnSale = item.discountPercent > 0 || hasCrossedPrice;
+  const hasCrossedPrice = minVariantPrice == null
+    && item.crossedPrice != null && Number(item.crossedPrice) > Number(item.price);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -20,7 +28,7 @@ const ProductCard = ({ item, index = null, onSelect }) => {
 
   return (
     <article
-      className={`${styles.card} ${isOnSale ? styles.cardSale : ''}`}
+      className={boutique ? `${styles.card} ${styles.boutique}` : styles.card}
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -33,6 +41,18 @@ const ProductCard = ({ item, index = null, onSelect }) => {
             className={styles.photo}
             src={firstPhoto}
             alt={item.name}
+            loading={index != null && index >= 4 ? 'lazy' : undefined}
+            decoding="async"
+          />
+        ) : null}
+        {firstPhoto && hoverPhoto ? (
+          <img
+            className={styles.photoHover}
+            src={hoverPhoto}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
           />
         ) : null}
         {item.discountPercent > 0 && (
@@ -42,11 +62,13 @@ const ProductCard = ({ item, index = null, onSelect }) => {
       </div>
       <div className={styles.body}>
         <h2 className={styles.name}>{item.name}</h2>
-        {item.description && (
+        {!boutique && item.description && (
           <p className={styles.description}>{item.description}</p>
         )}
         <div className={styles.prices}>
-          <span className={styles.price}>{formatPrice(item.price)}</span>
+          <span className={styles.price}>
+            {minVariantPrice != null ? `от ${formatPrice(minVariantPrice)}` : formatPrice(item.price)}
+          </span>
           {hasCrossedPrice && (
             <span className={styles.crossedPrice}>{formatPrice(item.crossedPrice)}</span>
           )}

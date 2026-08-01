@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
 import { trackViewItem, trackAddToCart } from '../../services/analytics';
-import { useCart, isPurchasable } from '../../context/CartContext';
+import { useCart, isPurchasable, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import AspectPhoto from '../shared/AspectPhoto/AspectPhoto';
+import { SHOP_THEMES } from './shopThemes';
 import styles from './MarketplaceProduct.module.css';
 
 const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
@@ -23,20 +24,28 @@ const ChevronRight = () => (
 );
 
 const MarketplaceProduct = () => {
-  const { id } = useParams();
-  const { add, count, items: cartItems } = useCart();
+  const { id, shopSlug } = useParams();
+  const { add, count, items: cartItems, replaceCartShop } = useCart();
+  // Витрина, с которой открыт товар: ей засчитывается продажа.
+  const currentShop = shopSlug || DEFAULT_SHOP_SLUG;
+  const shopBase = shopSlug ? `/shop/${shopSlug}` : '/shop';
+  // Тема партнёрской витрины: карточка товара оформляется в её стиле.
+  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
+  const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  // Выбранный вариант (размер/объём); по умолчанию — первый из списка.
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
   const thumbsRef = useRef(null);
 
   useEffect(() => {
-    getItems()
+    getItems(shopSlug)
       .then(setItems)
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [shopSlug]);
 
   const product = useMemo(
     () => items.find((item) => String(item.id) === String(id)) ?? null,
@@ -54,6 +63,7 @@ const MarketplaceProduct = () => {
 
   useEffect(() => {
     setActiveImage(0);
+    setSelectedVariantId(null);
   }, [id]);
 
   // Активное превью подъезжает в середину ленты (и по вертикали, и по горизонтали)
@@ -68,6 +78,24 @@ const MarketplaceProduct = () => {
     });
   }, [activeImage]);
 
+  // Заказ = одна витрина: товар с другой витрины можно добавить, только очистив корзину.
+  const handleAdd = (product, variant) => {
+    // В аналитику вариант уходит со своей ценой и ярлыком («Лилит 20 см»).
+    const trackable = variant
+      ? { ...product, price: variant.price, variantLabel: variant.label }
+      : product;
+    if (add(product, 1, currentShop, variant)) {
+      trackAddToCart(trackable, { quantity: 1, placement: 'product_page' });
+      return;
+    }
+    const confirmed = window.confirm(
+      'В корзине уже есть товары из другого магазина. Очистить корзину и добавить этот товар?'
+    );
+    if (!confirmed) return;
+    replaceCartShop(currentShop, product, 1, variant);
+    trackAddToCart(trackable, { quantity: 1, placement: 'product_page' });
+  };
+
   const cartLink = (
     <Link className={styles.cartLink} to="/shop/cart" aria-label={`Корзина${count ? `, товаров: ${count}` : ''}`}>
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -81,7 +109,7 @@ const MarketplaceProduct = () => {
 
   if (loading) {
     return (
-      <div className={styles.page} id="top">
+      <div className={pageClass} id="top">
         <div className={styles.inner}>
           <div className={styles.loader} role="status" aria-label="Загрузка товара">
             <span className={styles.spinner} />
@@ -93,15 +121,15 @@ const MarketplaceProduct = () => {
 
   if (!product) {
     return (
-      <div className={styles.page} id="top">
+      <div className={pageClass} id="top">
         <div className={styles.inner}>
           <div className={styles.topBar}>
-            <Link className={styles.back} to="/shop">← В магазин</Link>
+            <Link className={styles.back} to={shopBase}>← В магазин</Link>
             {cartLink}
           </div>
           <div className={styles.centered}>
             <p className={styles.centeredText}>Товар не найден или больше не доступен.</p>
-            <Link className={styles.primaryLink} to="/shop">
+            <Link className={styles.primaryLink} to={shopBase}>
               <span>Перейти к товарам</span>
               <span className={styles.ctaArrow} aria-hidden="true">→</span>
             </Link>
@@ -114,14 +142,23 @@ const MarketplaceProduct = () => {
   const photos = product.photos?.length ? product.photos : [];
   const hasGallery = photos.length > 1;
   const image = photos[Math.min(activeImage, photos.length - 1)];
-  const onSale = product.crossedPrice != null && Number(product.crossedPrice) > Number(product.price);
-  const inCart = cartItems.find((item) => item.id === String(product.id))?.quantity ?? 0;
+  const variants = product.variants ?? [];
+  const selectedVariant = variants.length
+    ? variants.find((v) => v.id === selectedVariantId) ?? variants[0]
+    : null;
+  const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+  // Зачёркнутая цена/скидка относятся к основной цене — при вариантах не показываем.
+  const onSale = !selectedVariant
+    && product.crossedPrice != null && Number(product.crossedPrice) > Number(product.price);
+  const inCart = cartItems.find(
+    (item) => item.id === String(product.id) && (item.variantId ?? null) === (selectedVariant?.id ?? null)
+  )?.quantity ?? 0;
 
   return (
-    <div className={styles.page} id="top">
+    <div className={pageClass} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
-          <Link className={styles.back} to="/shop">← В магазин</Link>
+          <Link className={styles.back} to={shopBase}>← В магазин</Link>
           {cartLink}
         </div>
 
@@ -182,8 +219,24 @@ const MarketplaceProduct = () => {
           <div className={styles.info}>
             <h1 className={styles.name}>{product.name}</h1>
             {product.description && <p className={styles.description}>{product.description}</p>}
+            {variants.length > 0 && (
+              <div className={styles.variants} role="radiogroup" aria-label="Вариант товара">
+                {variants.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    className={`${styles.variantBtn} ${v.id === selectedVariant?.id ? styles.variantBtnActive : ''}`}
+                    aria-pressed={v.id === selectedVariant?.id}
+                    onClick={() => setSelectedVariantId(v.id)}
+                  >
+                    {v.label}
+                    <span className={styles.variantPrice}>{formatPrice(v.price)}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.prices}>
-              <span className={styles.price}>{formatPrice(product.price)}</span>
+              <span className={styles.price}>{formatPrice(displayPrice)}</span>
               {onSale && <span className={styles.crossedPrice}>{formatPrice(product.crossedPrice)}</span>}
             </div>
 
@@ -206,10 +259,7 @@ const MarketplaceProduct = () => {
                 <button
                   type="button"
                   className={`${styles.addBtn} ${inCart > 0 ? styles.addBtnAdded : ''}`}
-                  onClick={() => {
-                    add(product);
-                    trackAddToCart(product, { quantity: 1, placement: 'product_page' });
-                  }}
+                  onClick={() => handleAdd(product, selectedVariant)}
                 >
                   {inCart > 0 ? `В корзине ${inCart} шт · добавить ещё` : 'В корзину'}
                 </button>
@@ -225,7 +275,8 @@ const MarketplaceProduct = () => {
               </a>
             )}
 
-            {product.tgLink && (
+            {/* Ссылка ведёт в Telegram-канал anyforms — на партнёрских витринах не показываем. */}
+            {currentShop === DEFAULT_SHOP_SLUG && product.tgLink && (
               <a className={styles.detailsLink} href={product.tgLink} target="_blank" rel="noopener noreferrer">
                 Подробнее в Telegram
               </a>

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
-import { useCart } from '../../context/CartContext';
+import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { normalizePromoCode } from '../../shared/promoTracking';
@@ -20,7 +20,9 @@ const PAYMENT_TYPE = 'online';
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
 const MarketplaceCheckout = () => {
-  const { items, total, count } = useCart();
+  const { items, total, count, shopSlug } = useCart();
+  // Возврат «к товарам» — на витрину, с которой набрана корзина.
+  const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -123,7 +125,7 @@ const MarketplaceCheckout = () => {
         <div className={styles.inner}>
           <div className={styles.centered}>
             <p className={styles.centeredText}>Корзина пуста — оформлять нечего.</p>
-            <Link className={styles.primaryLink} to="/shop">
+            <Link className={styles.primaryLink} to={shopBase}>
               <span>Перейти к товарам</span>
               <span className={styles.ctaArrow} aria-hidden="true">→</span>
             </Link>
@@ -146,7 +148,7 @@ const MarketplaceCheckout = () => {
     setSubmitting(true);
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
-        items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
+        items: items.map((i) => ({ productId: i.id, variantId: i.variantId || undefined, quantity: i.quantity })),
         fullName: fullName.trim(),
         phone: toSubmitPhone(phone),
         email: email.trim(),
@@ -156,6 +158,8 @@ const MarketplaceCheckout = () => {
         marketingConsent,
         promoCode: appliedPromo ? appliedPromo.code : null,
         returnUrl: `${window.location.origin}/shop/success`,
+        // Витрина, с которой набрана корзина: ей засчитывается продажа.
+        shopSlug,
       });
       if (data?.paymentUrl) {
         // Платёж создан: фиксируем выбор оплаты и сохраняем состав корзины,
@@ -194,14 +198,16 @@ const MarketplaceCheckout = () => {
         <div className={styles.summary}>
           <div className={styles.orderItems}>
             {items.map((item) => (
-              <div key={item.id} className={styles.orderItem}>
+              <div key={`${item.id}:${item.variantId ?? ''}`} className={styles.orderItem}>
                 {item.photo ? (
                   <img className={styles.orderThumb} src={item.photo} alt={item.name} />
                 ) : (
                   <div className={styles.orderThumb} />
                 )}
                 <div className={styles.orderItemInfo}>
-                  <p className={styles.orderItemName}>{item.name}</p>
+                  <p className={styles.orderItemName}>
+                    {item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name}
+                  </p>
                   {item.description && <p className={styles.orderItemDesc}>{item.description}</p>}
                   <p className={styles.orderItemMeta}>
                     {formatPrice(item.price)} × {item.quantity}

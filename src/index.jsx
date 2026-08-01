@@ -7,7 +7,8 @@ import { CartProvider } from './context/CartContext';
 import { initAnalytics } from './services/analytics';
 import './index.css';
 
-// Подключаем GTM (только при заданном VITE_GTM_ID).
+// Подключаем GTM: на прод-домене — боевой контейнер, иначе выключено
+// (управление — VITE_ANALYTICS_ENABLED / VITE_GTM_ID, см. services/analytics.js).
 initAnalytics();
 
 // Обработка редиректа с 404.html для SPA роутинга на GitHub Pages

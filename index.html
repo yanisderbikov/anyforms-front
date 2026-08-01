@@ -24,10 +24,11 @@
     <link rel="canonical" href="https://anyforms.ru/" />
     <script>
       // Боевые счётчики (gtag, Метрика, Top.Mail.Ru) инициализируются только на
-      // anyforms.ru — localhost и тестовые стенды не засоряют прод-статистику.
-      // GA4-события маркетплейса при этом всегда пишутся в dataLayer и уходят
-      // в GTM-контейнер из VITE_GTM_ID (см. src/services/analytics.js).
-      window.__ANYFORMS_PROD_HOST = /(^|\.)anyforms\.ru$/.test(location.hostname);
+      // anyforms.ru и www.anyforms.ru — localhost, dev-стенды и поддомены
+      // (dev.anyforms.ru и т.п.) прод-статистику не засоряют.
+      // GTM управляется отдельно в src/services/analytics.js: та же проверка хоста
+      // плюс рубильник VITE_ANALYTICS_ENABLED и тестовый контейнер VITE_GTM_ID.
+      window.__ANYFORMS_PROD_HOST = /^(www\.)?anyforms\.ru$/.test(location.hostname);
     </script>
     <!-- Google tag (gtag.js) -->
     <script>

@@ -4,29 +4,43 @@
 // у которой в index.html включён ecommerce:"dataLayer"). Компоненты вызывают
 // только track*-функции отсюда и не пишут в dataLayer напрямую.
 //
-// GTM подключается динамически и только при наличии VITE_GTM_ID — без него
-// события просто копятся в dataLayer и приложение работает как раньше.
+// Отправка аналитики управляется так (по убыванию приоритета):
+// 1. VITE_ANALYTICS_ENABLED=false — жёстко выключить всё (включая VITE_GTM_ID);
+// 2. VITE_ANALYTICS_ENABLED=true — принудительно включить (например, на стенде);
+// 3. иначе автоматика по домену: GTM грузится только на anyforms.ru/www.anyforms.ru.
+// Локальные запуски (pnpm dev/start, предпросмотр прод-сборки) и dev-стенды
+// (поддомены, gh-pages) аналитику НЕ шлют — события копятся в dataLayer,
+// но контейнер не подключается и наружу ничего не уходит.
+// Для отладки задайте ТЕСТОВЫЙ контейнер в VITE_GTM_ID — он грузится и вне прода.
 
 const YM_COUNTER_ID = 106593235;
 
 // Боевой контейнер GTM захардкожен: ID публичный, настраивать env на CI не нужно.
-// В dev-сборке GTM по умолчанию выключен, чтобы локальные клики не летели в
-// боевую статистику; для отладки укажите тестовый контейнер в VITE_GTM_ID
-// (.env.dev / .env.development).
 const PROD_GTM_ID = 'GTM-MBTTRF2N';
-const GTM_ID = import.meta.env.VITE_GTM_ID || (import.meta.env.PROD ? PROD_GTM_ID : '');
 const CURRENCY = 'RUB';
-
-// Метка окружения уходит с каждым событием: даже если тестовый и боевой
-// контейнеры GTM когда-нибудь укажут на одну GA4 property, события можно
-// разделить фильтром по environment. Переопределяется через VITE_ANALYTICS_ENV.
-const ANALYTICS_ENV =
-  import.meta.env.VITE_ANALYTICS_ENV || (import.meta.env.PROD ? 'production' : 'development');
 
 const CHECKOUT_SNAPSHOT_KEY = 'anyforms_checkout_snapshot';
 const PURCHASE_SENT_PREFIX = 'ga4_purchase_sent_';
 
 const isBrowser = () => typeof window !== 'undefined';
+
+// Прод-домены — как в index.html (__ANYFORMS_PROD_HOST): ровно anyforms.ru и www,
+// поддомены (dev-стенды) продом не считаются.
+const isProdHost = () =>
+  isBrowser() && /^(www\.)?anyforms\.ru$/.test(window.location.hostname);
+
+const analyticsEnabled = () => {
+  const flag = import.meta.env.VITE_ANALYTICS_ENABLED;
+  if (flag === 'false') return false;
+  if (flag === 'true') return true;
+  return isProdHost();
+};
+
+// Метка окружения уходит с каждым событием: даже если тестовый и боевой
+// контейнеры GTM когда-нибудь укажут на одну GA4 property, события можно
+// разделить фильтром по environment. Переопределяется через VITE_ANALYTICS_ENV.
+const analyticsEnv = () =>
+  import.meta.env.VITE_ANALYTICS_ENV || (isProdHost() ? 'production' : 'development');
 
 const callYm = (...args) => {
   if (!isBrowser() || typeof window.ym !== 'function') return;
@@ -41,7 +55,10 @@ const toPrice = (value) => {
 };
 
 export function initAnalytics() {
-  if (!isBrowser() || !GTM_ID) return;
+  if (!isBrowser()) return;
+  if (import.meta.env.VITE_ANALYTICS_ENABLED === 'false') return;
+  const gtmId = import.meta.env.VITE_GTM_ID || (analyticsEnabled() ? PROD_GTM_ID : '');
+  if (!gtmId) return;
   if (document.getElementById('gtm-loader')) return;
 
   window.dataLayer = window.dataLayer || [];
@@ -50,14 +67,14 @@ export function initAnalytics() {
   const script = document.createElement('script');
   script.id = 'gtm-loader';
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(GTM_ID)}`;
+  script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;
   document.head.appendChild(script);
 }
 
 export function pushAnalyticsEvent(event, payload = {}) {
   if (!isBrowser()) return;
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event, environment: ANALYTICS_ENV, ...payload });
+  window.dataLayer.push({ event, environment: analyticsEnv(), ...payload });
   if (import.meta.env.DEV) {
     console.debug('[analytics]', event, payload);
   }
@@ -73,10 +90,16 @@ function pushEcommerceEvent(event, ecommerce, extra = {}) {
 }
 
 // product — товар каталога/страницы товара ({id, price, ...}) или позиция
-// корзины из CartContext ({id, price, quantity}).
+// корзины из CartContext ({id, price, quantity, variantLabel}).
+// Вариант товара уходит в item_variant и добавляется к имени («Лилит 20 см»).
 function buildItem(product, { quantity, index, listName } = {}) {
   const item = { item_id: String(product.id) };
-  if (product.name) item.item_name = String(product.name);
+  if (product.name) {
+    item.item_name = product.variantLabel
+      ? `${product.name} ${product.variantLabel}`
+      : String(product.name);
+  }
+  if (product.variantLabel) item.item_variant = String(product.variantLabel);
   const price = toPrice(product.price);
   if (price > 0) item.price = price;
   if (quantity != null) item.quantity = quantity;
@@ -313,7 +336,7 @@ export function saveCheckoutSnapshot(cartItems) {
         value: cartValue(cartItems),
         items: cartItems.map((i) => ({
           id: String(i.id),
-          name: i.name ?? '',
+          name: i.variantLabel ? `${i.name ?? ''} ${i.variantLabel}` : (i.name ?? ''),
           price: toPrice(i.price),
           quantity: Number(i.quantity) || 1,
         })),

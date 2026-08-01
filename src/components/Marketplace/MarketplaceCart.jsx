@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import { isMarketplaceCheckoutEnabled, MARKETPLACE_ORDER_TG_LINK } from '../../config/features';
 import {
   trackViewCart,
@@ -14,7 +14,9 @@ import styles from './checkout.module.css';
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
 const MarketplaceCart = () => {
-  const { items, setQty, remove, total, count } = useCart();
+  const { items, setQty, remove, total, count, shopSlug } = useCart();
+  // Возврат на ту витрину, с которой набрана корзина.
+  const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
   const navigate = useNavigate();
   const location = useLocation();
   const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
@@ -32,7 +34,7 @@ const MarketplaceCart = () => {
   const changeQty = (item, delta) => {
     const newQty = Math.max(0, item.quantity + delta);
     if (newQty === item.quantity) return;
-    setQty(item.id, newQty);
+    setQty(item.id, newQty, item.variantId);
     if (delta > 0) {
       trackAddToCart(item, { quantity: delta, placement: 'cart' });
     } else {
@@ -46,7 +48,7 @@ const MarketplaceCart = () => {
   };
 
   const removeItem = (item) => {
-    remove(item.id);
+    remove(item.id, item.variantId);
     trackRemoveFromCart(item, {
       quantity: item.quantity,
       placement: 'cart',
@@ -64,17 +66,19 @@ const MarketplaceCart = () => {
     <div className={styles.page} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
-          <Link className={styles.back} to="/shop">
+          <Link className={styles.back} to={shopBase}>
             ← В магазин
           </Link>
         </div>
-        <span className={styles.eyebrow}>Корзина</span>
+        <span className={styles.eyebrow}>
+          Корзина{shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? ` · ${shopSlug}` : ''}
+        </span>
         <h1 className={styles.title}>Ваш заказ</h1>
 
         {items.length === 0 ? (
           <div className={styles.centered}>
             <p className={styles.centeredText}>В корзине пока пусто.</p>
-            <Link className={styles.primaryLink} to="/shop">
+            <Link className={styles.primaryLink} to={shopBase}>
               <span>Перейти к товарам</span>
               <span className={styles.ctaArrow} aria-hidden="true">→</span>
             </Link>
@@ -83,7 +87,7 @@ const MarketplaceCart = () => {
           <>
             <div className={styles.cartList}>
               {items.map((item) => (
-                <div key={item.id} className={styles.cartRow}>
+                <div key={`${item.id}:${item.variantId ?? ''}`} className={styles.cartRow}>
                   {item.photo ? (
                     <img className={styles.cartPhoto} src={item.photo} alt={item.name} />
                   ) : (
@@ -91,7 +95,7 @@ const MarketplaceCart = () => {
                   )}
                   <div className={styles.cartInfo}>
                     <p className={styles.cartName}>
-                      {item.name}
+                      {item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name}
                       {item.preorder && <span className={styles.preorderTag}>Предзаказ</span>}
                     </p>
                     <div className={styles.cartUnit}>{formatPrice(item.price)} / шт</div>

@@ -1,0 +1,36 @@
+/* Темы партнёрских витрин /shop/{slug}.
+   Тема — это набор CSS-переменных на корневом элементе страницы; стили
+   Marketplace, ProductCard и MarketplaceProduct читают их через var(…, fallback),
+   поэтому витрина anyforms без темы выглядит как раньше. */
+
+/* af_pastry: бордовый + крем, серифная типографика с разрядкой,
+   шалфейно-оливковый акцент — по фирменному стилю Instagram af_pastry_studio. */
+.afPastry {
+  --shop-header-bg: #572631;
+  --shop-header-fg: #f4eee3;
+  --shop-page-bg: #f4eee3;
+  --shop-accent: #6e2f3e;
+  --shop-accent-hover: #572631;
+  --shop-btn-hover-fg: #f4eee3;
+  --shop-title-font: 'Georgia', 'Times New Roman', serif;
+  --shop-badge-bg: #6f7a52;
+  --shop-added-bg: #6f7a52;
+  --shop-added-bg-hover: #5d6845;
+  --shop-note-bg: #eef0e5;
+  --shop-note-border: #cdd3bb;
+  --shop-note-fg: #4a5534;
+  --shop-note-text: #4d5741;
+  --shop-text: #5c4a44;
+  /* Подложка под фото товара, пока оно грузится: тёплый крем чуть темнее фона. */
+  --shop-photo-bg: #ece7dd;
+  /* Подвал сливается с кремовым фоном: отделён только тонкой линией,
+     текст приглушённый тёплый — реквизиты видны, но не бросаются в глаза. */
+  --shop-footer-bg: #f4eee3;
+  --shop-footer-border: rgba(87, 38, 49, 0.14);
+  --shop-footer-heading: rgba(92, 74, 68, 0.72);
+  --shop-footer-text: rgba(92, 74, 68, 0.58);
+  --shop-footer-link: rgba(92, 74, 68, 0.7);
+  --shop-footer-link-border: rgba(92, 74, 68, 0.28);
+  --shop-footer-link-hover: #572631;
+  --shop-footer-muted: rgba(92, 74, 68, 0.42);
+}
