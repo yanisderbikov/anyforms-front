@@ -535,6 +535,9 @@ const CourseLanding = () => {
                     <ArrowIcon />
                   </span>
                 </button>
+                <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
+                  Доступ к материалам откроется {LAUNCH}.
+                </p>
               </div>
             </div>
 
@@ -546,7 +549,7 @@ const CourseLanding = () => {
                   : '.'}
               </p>
             )}
-            <p className={styles.preorderNote}>
+            <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
               Это предзаказ. Доступ к материалам откроется {LAUNCH}.
             </p>
 
