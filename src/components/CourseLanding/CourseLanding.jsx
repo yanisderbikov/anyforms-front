@@ -92,7 +92,7 @@ const TARIFFS = [
 
 // Фичи «Личного ведения», совпадающие с базовым тарифом, показываем приглушённо.
 const SELF_FEATURES = new Set(TARIFFS[0].features);
-const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
+const HERO_VIDEO = 'https://storage.yandexcloud.net/anyforms/course/landing_course.webm';
 const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/printer.jpeg';
 
 // Плашка под заголовком — короткие факты о формате курса (с иконками).
@@ -564,11 +564,15 @@ const CourseLanding = () => {
 
           <div className={styles.heroMedia}>
             <span className={styles.heroBadge}>старт {LAUNCH}</span>
-            <img
+            <video
               className={styles.heroImg}
-              src={HERO_IMAGE}
-              alt="Изделие, отлитое в силиконовой форме"
-              loading="eager"
+              src={HERO_VIDEO}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-label="Изделие, отлитое в силиконовой форме"
             />
           </div>
         </div>
