@@ -494,12 +494,13 @@ const CourseLanding = () => {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Научитесь делать <em className={styles.hAccent}>молды</em> своими руками
+              Освойте <em className={styles.hAccent}>профессию</em> производителя
+              силиконовых форм
             </h1>
 
             <p className={styles.heroSub}>
-              Весь цикл производства — от идеи до рабочей формы. На примере реального
-              продукта: дизайнерской контейнерной свечи.
+              Покажем весь процесс на примере реального продукта — от выбора
+              оборудования до первой рабочей формы.
             </p>
 
             <div className={styles.heroCards}>
