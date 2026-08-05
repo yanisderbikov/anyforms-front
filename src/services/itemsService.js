@@ -96,7 +96,7 @@ export async function getItems(shopSlug) {
 
 /**
  * Магазины витрины: anyforms и партнёрские (у каждого своя страница /shop/{slug}).
- * @returns {Promise<Array<{id: string, slug: string, name: string, active: boolean}>>}
+ * @returns {Promise<Array<{id: string, slug: string, name: string, active: boolean, supportTelegram: string}>>}
  */
 export async function getShops() {
   const res = await apiClient.instance.get('/api/shop');

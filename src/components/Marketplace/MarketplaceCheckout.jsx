@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
+import { useShopSupport } from '../../hooks/useShopSupport';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { normalizePromoCode } from '../../shared/promoTracking';
@@ -23,6 +24,8 @@ const MarketplaceCheckout = () => {
   const { items, total, count, shopSlug } = useCart();
   // Возврат «к товарам» — на витрину, с которой набрана корзина.
   const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
+  // Поддержка ведёт в бот магазина, с витрины которого набрана корзина.
+  const { handle: supportTg, link: supportTgLink } = useShopSupport(shopSlug);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,6 +41,9 @@ const MarketplaceCheckout = () => {
   const [acceptTerms, setAcceptTerms] = useState(Boolean(savedForm.acceptTerms));
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
   const [error, setError] = useState('');
+  // Ошибка создания платежа (а не валидации формы): к тексту добавляем
+  // приглашение написать в поддержку магазина.
+  const [paymentError, setPaymentError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [promoInput, setPromoInput] = useState(savedForm.promoInput || '');
   const [appliedPromo, setAppliedPromo] = useState(savedForm.appliedPromo || null);
@@ -137,6 +143,7 @@ const MarketplaceCheckout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setPaymentError(false);
     setTouched({ fullName: true, phone: true, email: true });
     if (!nameValid) return setError('Укажите ваше ФИО.');
     if (!phoneValid) return setError('Укажите корректный номер телефона.');
@@ -170,16 +177,20 @@ const MarketplaceCheckout = () => {
         return;
       }
       trackPaymentFailed(PAYMENT_TYPE, 'no_payment_url');
-      setError('Не удалось создать платёж. Попробуйте ещё раз.');
+      setError('Произошла ошибка.');
+      setPaymentError(true);
       setSubmitting(false);
     } catch (err) {
       trackPaymentFailed(PAYMENT_TYPE, err?.response?.status ?? 'network_error');
-      const apiMessage = err?.response?.data?.message || err?.response?.data?.error;
+      // Показываем только осмысленные сообщения бэкенда (data.message);
+      // сырые тексты вроде «Internal Server Error» до покупателя не доходят.
+      const apiMessage = err?.response?.data?.message;
       setError(
-        typeof apiMessage === 'string'
-          ? apiMessage
-          : 'Не удалось создать платёж. Попробуйте ещё раз или напишите нам в Telegram.'
+        typeof apiMessage === 'string' && apiMessage.trim()
+          ? `${apiMessage.trim()}${/[.!?…]$/.test(apiMessage.trim()) ? '' : '.'}`
+          : 'Произошла ошибка.'
       );
+      setPaymentError(true);
       setSubmitting(false);
     }
   };
@@ -381,7 +392,25 @@ const MarketplaceCheckout = () => {
             </span>
           </label>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && (
+            <p className={styles.error}>
+              {error}
+              {paymentError && (
+                <>
+                  {' '}Попробуйте ещё раз или напишите нам в Telegram{' '}
+                  <a
+                    className={styles.inlineLink}
+                    href={supportTgLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    @{supportTg}
+                  </a>{' '}
+                  — поможем.
+                </>
+              )}
+            </p>
+          )}
 
           <button type="submit" className={styles.payBtn} disabled={!canSubmit}>
             <span>{submitting ? 'Переходим к оплате…' : `Оплатить ${formatPrice(discountedTotal)}`}</span>
@@ -390,8 +419,8 @@ const MarketplaceCheckout = () => {
 
           <p className={styles.support}>
             Возникли вопросы? Напишите нам в Telegram{' '}
-            <a className={styles.inlineLink} href="https://t.me/AnyFormsBot" target="_blank" rel="noopener noreferrer">
-              @AnyFormsBot
+            <a className={styles.inlineLink} href={supportTgLink} target="_blank" rel="noopener noreferrer">
+              @{supportTg}
             </a>
           </p>
         </form>

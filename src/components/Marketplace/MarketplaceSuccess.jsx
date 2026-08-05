@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
+import { useShopSupport } from '../../hooks/useShopSupport';
 import {
   trackPurchase,
   trackPaymentFailed,
@@ -12,7 +13,6 @@ import { clearCheckoutFormPromo } from './checkoutFormStorage';
 import styles from './checkout.module.css';
 
 const PAYMENT_TYPE = 'online';
-const TG_SUPPORT_LINK = 'https://t.me/AnyFormsBot';
 
 const formatRub = (value) => {
   const num = Number(value);
@@ -25,6 +25,8 @@ const MarketplaceSuccess = () => {
   // Витрина, с которой был оформлен заказ: clear() чистит только товары,
   // поэтому после оплаты возвращаем покупателя в его магазин.
   const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
+  // Поддержка ведёт в бот магазина, в котором оформлен заказ.
+  const { handle: supportTg, link: supportTgLink } = useShopSupport(shopSlug);
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order');
   const isFail = searchParams.get('status') === 'fail';
@@ -147,11 +149,11 @@ const MarketplaceSuccess = () => {
             Если понадобится помощь — напишите в поддержку в Telegram:{' '}
             <a
               className={styles.inlineLink}
-              href={TG_SUPPORT_LINK}
+              href={supportTgLink}
               target="_blank"
               rel="noopener noreferrer"
             >
-              @AnyFormsBot
+              @{supportTg}
             </a>
             {orderNumber && (
               <>

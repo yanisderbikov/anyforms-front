@@ -169,14 +169,16 @@ const CourseCheckout = () => {
         window.location.href = data.paymentUrl;
         return;
       }
-      setError('Не удалось создать платёж. Попробуйте ещё раз.');
+      setError('Произошла ошибка. Попробуйте ещё раз или напишите нам в Telegram @AnyFormsBot — поможем.');
       setSubmitting(false);
     } catch (err) {
-      const apiMessage = err?.response?.data?.message || err?.response?.data?.error;
+      // Показываем только осмысленные сообщения бэкенда (data.message);
+      // сырые тексты вроде «Internal Server Error» до покупателя не доходят.
+      const apiMessage = err?.response?.data?.message;
       setError(
-        typeof apiMessage === 'string'
+        typeof apiMessage === 'string' && apiMessage.trim()
           ? apiMessage
-          : 'Не удалось создать платёж. Попробуйте ещё раз или напишите нам в Telegram.'
+          : 'Произошла ошибка. Попробуйте ещё раз или напишите нам в Telegram @AnyFormsBot — поможем.'
       );
       setSubmitting(false);
     }

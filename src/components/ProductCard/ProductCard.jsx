@@ -2,8 +2,8 @@ import React from 'react';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import styles from './ProductCard.module.css';
 
-// boutique — подача для витрин с темой: крупное фото 3:4 без рамки-карточки,
-// под ним только название и цена; описание показываем только в базовом виде.
+// В каталоге у карточки только название и цена — описание живёт на странице
+// товара. boutique — подача для витрин с темой: крупное фото 3:4 без рамки.
 const ProductCard = ({ item, index = null, onSelect, boutique = false }) => {
   const photos = item.photos?.length ? item.photos : [];
   const firstPhoto = photos[0];
@@ -62,9 +62,6 @@ const ProductCard = ({ item, index = null, onSelect, boutique = false }) => {
       </div>
       <div className={styles.body}>
         <h2 className={styles.name}>{item.name}</h2>
-        {!boutique && item.description && (
-          <p className={styles.description}>{item.description}</p>
-        )}
         <div className={styles.prices}>
           <span className={styles.price}>
             {minVariantPrice != null ? `от ${formatPrice(minVariantPrice)}` : formatPrice(item.price)}
