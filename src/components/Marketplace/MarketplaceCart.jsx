@@ -9,6 +9,7 @@ import {
   trackChangeCartQuantity,
   trackBeginCheckout,
 } from '../../services/analytics';
+import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
@@ -17,6 +18,9 @@ const MarketplaceCart = () => {
   const { items, setQty, remove, total, count, shopSlug } = useCart();
   // Возврат на ту витрину, с которой набрана корзина.
   const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
+  // Корзина партнёрской витрины оформляется в её теме; anyforms — без изменений.
+  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
+  const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
   const navigate = useNavigate();
   const location = useLocation();
   const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
@@ -63,7 +67,7 @@ const MarketplaceCart = () => {
   };
 
   return (
-    <div className={styles.page} id="top">
+    <div className={pageClass} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
           <Link className={styles.back} to={shopBase}>

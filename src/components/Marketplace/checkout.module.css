@@ -1,11 +1,14 @@
 /* Чекаут маркетплейса в стиле основного сайта (/chief и др.):
    чёрный фон-рамка, белая карточка, строчные жирные заголовки,
-   чёрная пилюля-CTA с белой круглой стрелкой, инпуты как на лендинге. */
+   чёрная пилюля-CTA с белой круглой стрелкой, инпуты как на лендинге.
+   Партнёрская витрина вешает на корень страницы класс темы (shopThemes),
+   и переменные --shop-* перекрашивают флоу; без темы фолбэки дают
+   ровно прежний вид anyforms. */
 
 .page {
   width: 100%;
   min-height: 100vh;
-  background: #fff;
+  background: var(--shop-page-bg, #fff);
   color: var(--color-base-black);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
   padding: 28px 14px 64px;
@@ -57,8 +60,9 @@
   font-size: 1.6rem;
   line-height: 1.15;
   font-weight: 700;
-  color: var(--color-base-black);
-  text-transform: lowercase;
+  font-family: var(--shop-title-font, inherit);
+  color: var(--shop-heading, var(--color-base-black));
+  text-transform: var(--shop-title-transform, lowercase);
 }
 
 /* Список позиций корзины */
@@ -183,7 +187,7 @@
   outline: none;
   transition: border-color 0.2s ease;
 }
-.input:focus { border-color: var(--color-base-black); }
+.input:focus { border-color: var(--shop-accent, var(--color-base-black)); }
 .inputError { border-color: #c62828; }
 .inputError:focus { border-color: #b71c1c; }
 
@@ -199,14 +203,14 @@
   font-weight: 600;
   font-size: 0.86rem;
   padding: 0 18px;
-  border: 1px solid var(--color-base-black);
+  border: 1px solid var(--shop-accent, var(--color-base-black));
   border-radius: 10px;
   background: transparent;
-  color: var(--color-base-black);
+  color: var(--shop-accent, var(--color-base-black));
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.promoApplyBtn:hover:not(:disabled) { background: var(--color-base-black); color: #fff; }
+.promoApplyBtn:hover:not(:disabled) { background: var(--shop-accent, var(--color-base-black)); color: var(--shop-cta-fg, #fff); }
 .promoApplyBtn:disabled { opacity: 0.45; cursor: default; }
 .promoOk { color: #1d7a3d; font-size: 0.8rem; font-weight: 500; margin: 6px 0 0; }
 
@@ -225,9 +229,9 @@
 .oldTotal { color: #8c8c8c; text-decoration: line-through; font-weight: 500; font-size: 0.95rem; margin-right: 8px; }
 
 .checkRow { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; cursor: pointer; }
-.checkbox { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--color-base-black); }
+.checkbox { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--shop-accent, var(--color-base-black)); }
 .checkText { font-size: 0.86rem; line-height: 1.5; color: #444; }
-.inlineLink { color: var(--color-base-black); font-weight: 600; text-decoration: underline; }
+.inlineLink { color: var(--shop-accent, var(--color-base-black)); font-weight: 600; text-decoration: underline; }
 
 .error { color: #c62828; font-size: 0.88rem; margin: 16px 0 0; }
 
@@ -245,14 +249,14 @@
   font-size: 1.02rem;
   font-weight: 700;
   font-family: inherit;
-  color: #fff;
-  background: var(--color-base-black);
-  border: 1px solid var(--color-base-black);
+  color: var(--shop-cta-fg, #fff);
+  background: var(--shop-cta-bg, var(--color-base-black));
+  border: 1px solid var(--shop-cta-bg, var(--color-base-black));
   border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.25s ease, color 0.25s ease, opacity 0.2s ease, transform 0.15s ease;
 }
-.payBtn:hover:not(:disabled) { background: var(--color-base-gray); color: var(--color-base-black); }
+.payBtn:hover:not(:disabled) { background: var(--shop-cta-hover-bg, var(--color-base-gray)); color: var(--shop-cta-hover-fg, var(--color-base-black)); }
 .payBtn:active:not(:disabled) { transform: scale(0.99); }
 .payBtn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -264,14 +268,14 @@
   height: 2.1rem;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #fff;
-  color: var(--color-base-black);
+  background: var(--shop-cta-fg, #fff);
+  color: var(--shop-cta-bg, var(--color-base-black));
   font-size: 1.2rem;
   line-height: 1;
 }
 
 .support { font-size: 0.82rem; color: #8c8c8c; margin-top: 16px; text-align: center; }
-.support .inlineLink { color: #333; }
+.support .inlineLink { color: var(--shop-accent, #333); }
 
 /* PVZ combobox */
 .pvzWrap { position: relative; }
@@ -305,28 +309,35 @@
 
 /* Пустая корзина / успех */
 .centered { text-align: center; padding: 40px 0; }
-.centeredTitle { font-size: 1.5rem; font-weight: 700; margin: 0 0 12px; text-transform: lowercase; }
+.centeredTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  font-family: var(--shop-title-font, inherit);
+  color: var(--shop-heading, inherit);
+  text-transform: var(--shop-title-transform, lowercase);
+}
 .centeredText { font-size: 1rem; color: #444; margin: 0 0 24px; line-height: 1.6; }
 .primaryLink {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.3rem 0.35rem 0.3rem 1.25rem;
-  background: var(--color-base-black);
-  color: #fff;
-  border: 1px solid var(--color-base-black);
+  background: var(--shop-cta-bg, var(--color-base-black));
+  color: var(--shop-cta-fg, #fff);
+  border: 1px solid var(--shop-cta-bg, var(--color-base-black));
   border-radius: 999px;
   font-weight: 700;
   text-decoration: none;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
-.primaryLink:hover { background: var(--color-base-gray); color: var(--color-base-black); }
+.primaryLink:hover { background: var(--shop-cta-hover-bg, var(--color-base-gray)); color: var(--shop-cta-hover-fg, var(--color-base-black)); }
 .successIcon {
   width: 64px; height: 64px; margin: 0 auto 16px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  background: var(--color-base-black);
-  color: #fff;
+  background: var(--shop-cta-bg, var(--color-base-black));
+  color: var(--shop-cta-fg, #fff);
   font-size: 32px;
 }
 .failIcon {

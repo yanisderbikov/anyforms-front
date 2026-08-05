@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { useCart } from './context/CartContext';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
@@ -182,6 +183,9 @@ const upsertCanonical = (href) => {
 
 function App() {
   const location = useLocation();
+  // Магазин, с витрины которого набрана корзина: страницы чекаут-флоу
+  // (/shop/cart|checkout|success) красят фон body в цвет его темы.
+  const { shopSlug: cartShopSlug } = useCart();
   const normalizedPathname =
     location.pathname.length > 1 ? location.pathname.replace(/\/+$/, '') : location.pathname;
   const isHomePage = normalizedPathname === '/';
@@ -200,6 +204,8 @@ function App() {
     ? shopSlugMatch[1]
     : normalizedPathname.match(/^\/shop\/([^/]+)\/product\//)?.[1] ?? null;
   const shopThemeBg = shopPathSlug ? SHOP_THEMES[shopPathSlug]?.pageBackground ?? null : null;
+  const isCartFlowPage = ['/shop/cart', '/shop/checkout', '/shop/success'].includes(normalizedPathname);
+  const cartThemeBg = isCartFlowPage ? SHOP_THEMES[cartShopSlug]?.pageBackground ?? null : null;
   const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage && !isShopPage;
 
   useEffect(() => {
@@ -219,12 +225,12 @@ function App() {
       document.body.style.background = '#fff';
     } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
       document.body.style.background = '#000';
-    } else if (shopThemeBg) {
-      document.body.style.background = shopThemeBg;
+    } else if (shopThemeBg || cartThemeBg) {
+      document.body.style.background = shopThemeBg || cartThemeBg;
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg]);
+  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg, cartThemeBg]);
 
   useEffect(() => {
     // Партнёрская витрина живёт под своим брендом — anyforms в заголовок не добавляем.
