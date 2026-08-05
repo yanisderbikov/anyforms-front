@@ -456,6 +456,11 @@
     display: flex;
   }
 
+  .heroBadge {
+    top: 16px;
+    bottom: auto;
+  }
+
   .heroImg {
     aspect-ratio: auto;
     flex: 1;
