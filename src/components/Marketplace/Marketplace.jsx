@@ -4,11 +4,10 @@ import { getItems, getShops } from '../../services/itemsService';
 import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
 import { useLikes } from '../../hooks/useLikes';
+import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './Marketplace.module.css';
-
-const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
 const TG_CHANNEL = 'https://t.me/anyforms';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
@@ -33,6 +32,8 @@ const Marketplace = () => {
     ? `${styles.wrap} ${styles.wrapBoutique} ${theme.className}`
     : styles.wrap;
   const shopName = shop?.name ?? shopSlug;
+  // Связь с менеджером/поддержкой — бот магазина; общая витрина — AnyFormsBot.
+  const supportTgLink = tgLink(shop?.supportTelegram || DEFAULT_SUPPORT_TG);
   const { count } = useCart();
   const { isLiked, count: likesCount } = useLikes();
   const [items, setItems] = useState([]);
@@ -341,7 +342,7 @@ const Marketplace = () => {
           {PROMO_CODE}
         </button>{' '}
         скидка 10% на первый заказ. Отправьте это сообщение{' '}
-        <a href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
+        <a href={supportTgLink} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
           менеджеру в телеграм
         </a>
         .
@@ -382,7 +383,7 @@ const Marketplace = () => {
               <br />
               <a
                 className={styles.footerLink}
-                href={TG_ORDER_LINK}
+                href={supportTgLink}
                 target="_blank"
                 rel="noopener noreferrer"
               >

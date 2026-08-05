@@ -3,12 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import { getItems } from '../../services/itemsService';
 import { trackViewItem, trackAddToCart } from '../../services/analytics';
 import { useCart, isPurchasable, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
+import { useShopSupport } from '../../hooks/useShopSupport';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import AspectPhoto from '../shared/AspectPhoto/AspectPhoto';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './MarketplaceProduct.module.css';
-
-const TG_ORDER_LINK = 'https://t.me/AnyFormsBot';
 
 const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
@@ -32,6 +31,8 @@ const MarketplaceProduct = () => {
   // Тема партнёрской витрины: карточка товара оформляется в её стиле.
   const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
   const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
+  // Поддержка ведёт в бот магазина, а не в общий AnyFormsBot.
+  const { handle: supportTg, link: supportTgLink } = useShopSupport(shopSlug);
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -246,8 +247,8 @@ const MarketplaceProduct = () => {
                 <p className={styles.preorderNoteText}>
                   Форма ещё в производстве, поэтому сразу после оплаты вы её не получите — отправим,
                   как только она будет готова. Если есть вопросы — напишите нам в Telegram{' '}
-                  <a href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
-                    @AnyFormsBot
+                  <a href={supportTgLink} target="_blank" rel="noopener noreferrer">
+                    @{supportTg}
                   </a>
                   .
                 </p>
@@ -270,7 +271,7 @@ const MarketplaceProduct = () => {
                 )}
               </>
             ) : (
-              <a className={styles.orderLink} href={TG_ORDER_LINK} target="_blank" rel="noopener noreferrer">
+              <a className={styles.orderLink} href={supportTgLink} target="_blank" rel="noopener noreferrer">
                 Заказать
               </a>
             )}

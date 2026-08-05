@@ -33,4 +33,12 @@
   --shop-footer-link-border: rgba(92, 74, 68, 0.28);
   --shop-footer-link-hover: #572631;
   --shop-footer-muted: rgba(92, 74, 68, 0.42);
+  /* Чекаут-флоу (корзина/оформление/успех): кремовый фон, серифные заголовки
+     нормального регистра, бордовая CTA-пилюля. */
+  --shop-heading: #572631;
+  --shop-title-transform: none;
+  --shop-cta-bg: #572631;
+  --shop-cta-fg: #f4eee3;
+  --shop-cta-hover-bg: #6e2f3e;
+  --shop-cta-hover-fg: #f4eee3;
 }

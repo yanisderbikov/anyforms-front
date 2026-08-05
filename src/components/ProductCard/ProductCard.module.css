@@ -1,8 +1,9 @@
 .card {
   width: 100%;
   max-width: 200px;
-  height: 350px;
-  max-height: 350px;
+  /* Высота — по содержимому (фото + название + цена); карточки одного ряда
+     выравниваются между собой за счёт stretch у ячейки сетки. */
+  height: auto;
   background: #fff;
   border-radius: 22px;
   overflow: hidden;
@@ -173,27 +174,13 @@
 }
 
 .name {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
+  line-height: 1.3;
   margin: 0 0 0.5rem;
   color: #000;
   font-family: var(--shop-title-font, inherit);
   text-transform: lowercase;
-  flex-shrink: 0;
-}
-
-.description {
-  font-size: 0.9rem;
-  color: #333;
-  margin: 0 0 0.75rem;
-  line-height: 1.4;
-  /* Ровно 2 строки, остальное обрезается с ... */
-  height: 2.8em;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
   flex-shrink: 0;
 }
 
@@ -205,15 +192,24 @@
   flex-shrink: 0;
 }
 
+/* В карточке-плашке цена прижата к низу: у соседей по ряду название может
+   занять две строки, но цены всё равно стоят на одной линии. Отступ сверху —
+   чтобы название и цена не читались одной строкой. */
+.card:not(.boutique) .prices {
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+/* Цена мельче и легче названия: заголовок ведёт, цена — подпись под ним. */
 .price {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--shop-accent, #000);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--shop-accent, #222);
 }
 
 .crossedPrice {
-  font-size: 0.95rem;
-  color: #888;
+  font-size: 0.85rem;
+  color: #999;
   text-decoration: line-through;
 }
 
