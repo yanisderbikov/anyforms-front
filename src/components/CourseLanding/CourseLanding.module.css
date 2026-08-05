@@ -367,6 +367,11 @@
   color: rgba(255, 255, 255, 0.55);
 }
 
+/* Приписка под кнопкой — только на мобилке; на десктопе своя, внизу колонки */
+.preorderNoteMobile {
+  display: none;
+}
+
 .heroMedia {
   position: relative;
   min-width: 0;
@@ -374,7 +379,7 @@
 
 .heroBadge {
   position: absolute;
-  top: 16px;
+  bottom: 16px;
   left: 16px;
   z-index: 1;
   background: rgba(21, 21, 21, 0.72);
@@ -430,6 +435,84 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* Мобильный порядок hero: заголовок → подзаголовок → видео → цена с кнопкой →
+   фичи и остальное. heroContent «растворяется», и все блоки сортируются
+   в общем flex-контейнере heroInner. */
+@media (max-width: 899px) {
+  .heroInner {
+    gap: 0;
+  }
+
+  .heroContent {
+    display: contents;
+  }
+
+  .heroTitle {
+    order: 1;
+  }
+
+  .heroSub {
+    order: 2;
+  }
+
+  .heroMedia {
+    order: 3;
+    margin-top: 26px;
+  }
+
+  /* heroCards тоже растворяем, чтобы статистика встала между кнопкой и фичами */
+  .heroCards {
+    display: contents;
+  }
+
+  /* Карточка с ценой и кнопкой — сразу после видео, без белой подложки:
+     цена и кнопка лежат прямо на тёмном фоне. */
+  .heroPriceCard {
+    order: 4;
+    margin-top: 28px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .heroProof {
+    order: 5;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .heroFeatures {
+    order: 6;
+    margin-top: 26px;
+  }
+
+  .promoStrip {
+    order: 7;
+  }
+
+  .preorderNoteDesktop {
+    display: none;
+  }
+
+  .preorderNoteMobile {
+    display: block;
+  }
+
+  .heroPriceCol {
+    align-items: flex-start;
+  }
+
+  .heroPrice {
+    color: var(--white);
+  }
+
+  .heroPriceOld {
+    color: rgba(255, 255, 255, 0.45);
+  }
+}
+
 @media (min-width: 900px) {
   .hero {
     padding: 44px 0 56px;
@@ -454,6 +537,11 @@
 
   .heroMedia {
     display: flex;
+  }
+
+  .heroBadge {
+    top: 16px;
+    bottom: auto;
   }
 
   .heroImg {

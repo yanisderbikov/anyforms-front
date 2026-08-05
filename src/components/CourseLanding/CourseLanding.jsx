@@ -92,7 +92,7 @@ const TARIFFS = [
 
 // Фичи «Личного ведения», совпадающие с базовым тарифом, показываем приглушённо.
 const SELF_FEATURES = new Set(TARIFFS[0].features);
-const HERO_IMAGE = 'https://storage.yandexcloud.net/anyforms/shop/samovar/3.jpeg';
+const HERO_VIDEO = 'https://storage.yandexcloud.net/anyforms/course/landing_course.webm';
 const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/printer.jpeg';
 
 // Плашка под заголовком — короткие факты о формате курса (с иконками).
@@ -494,12 +494,13 @@ const CourseLanding = () => {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Научитесь делать <em className={styles.hAccent}>молды</em> своими руками
+              Освойте <em className={styles.hAccent}>профессию</em> производителя
+              силиконовых форм
             </h1>
 
             <p className={styles.heroSub}>
-              Весь цикл производства — от идеи до рабочей формы. На примере реального
-              продукта: дизайнерской контейнерной свечи.
+              Покажем весь процесс на примере реального продукта — от выбора
+              оборудования до первой рабочей формы.
             </p>
 
             <div className={styles.heroCards}>
@@ -534,6 +535,9 @@ const CourseLanding = () => {
                     <ArrowIcon />
                   </span>
                 </button>
+                <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
+                  Доступ к материалам откроется {LAUNCH}.
+                </p>
               </div>
             </div>
 
@@ -545,7 +549,7 @@ const CourseLanding = () => {
                   : '.'}
               </p>
             )}
-            <p className={styles.preorderNote}>
+            <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
               Это предзаказ. Доступ к материалам откроется {LAUNCH}.
             </p>
 
@@ -564,11 +568,15 @@ const CourseLanding = () => {
 
           <div className={styles.heroMedia}>
             <span className={styles.heroBadge}>старт {LAUNCH}</span>
-            <img
+            <video
               className={styles.heroImg}
-              src={HERO_IMAGE}
-              alt="Изделие, отлитое в силиконовой форме"
-              loading="eager"
+              src={HERO_VIDEO}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-label="Изделие, отлитое в силиконовой форме"
             />
           </div>
         </div>
