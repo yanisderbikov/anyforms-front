@@ -1383,6 +1383,14 @@
   max-width: 760px;
 }
 
+.faqA p {
+  margin: 0 0 12px;
+}
+
+.faqA p:last-child {
+  margin-bottom: 0;
+}
+
 /* ═══════════════ ЭКРАН 13 · ФИНАЛ ═══════════════ */
 .finalInner {
   max-width: 760px;
