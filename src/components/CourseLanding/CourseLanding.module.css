@@ -1328,6 +1328,45 @@
   width: 100%;
 }
 
+/* На узких экранах карточка должна помещаться в экран вместе с кнопкой */
+@media (max-width: 759px) {
+  .buySection {
+    padding: 60px 0;
+  }
+
+  .tariffGrid {
+    margin-top: 26px;
+  }
+
+  .tariffCard {
+    padding: 24px 20px 22px;
+  }
+
+  .tariffIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  .tariffList {
+    margin-top: 18px;
+    gap: 9px;
+  }
+
+  .tariffCard .tariffList {
+    margin-bottom: 20px;
+  }
+
+  .tariffPriceWrap {
+    padding-top: 18px;
+  }
+
+  .tariffCta {
+    margin-top: 16px;
+  }
+}
+
 /* ═══════════════ ЭКРАН 12 · FAQ ═══════════════ */
 .faqSection {
   padding: 72px 0;

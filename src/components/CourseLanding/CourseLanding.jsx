@@ -332,7 +332,25 @@ const scrollToId = (id) => {
 const CHECKOUT_PATH = '/course/checkout';
 
 // Все CTA ведут к единственному офферу (#buy); на чекаут уходит только кнопка внутри него.
-const scrollToBuy = () => scrollToId('buy');
+// Якорь ставим не на верх секции (там бейдж «Предзаказ» и большой заголовок съедают
+// экран, а кнопка «Оформить предзаказ» остаётся за кадром), а на первую карточку тарифа.
+const scrollToBuy = () => {
+  const card = document.getElementById('buy-tariffs')?.firstElementChild;
+  if (!card) {
+    scrollToId('buy');
+    return;
+  }
+  const headerH = document.querySelector('header')?.offsetHeight ?? 0;
+  const offset = headerH + 16;
+  const cardRect = card.getBoundingClientRect();
+  const cardTop = window.scrollY + cardRect.top;
+  // Карточка выше экрана — прижимаем её низ, чтобы цена и кнопка точно были видны.
+  const top =
+    cardRect.height <= window.innerHeight - offset
+      ? cardTop - offset
+      : cardTop + cardRect.height - window.innerHeight + 16;
+  window.scrollTo({ top, behavior: 'smooth' });
+};
 
 const NAV_LINKS = [
   { key: 'modules', label: 'Программа', id: 'modules' },
@@ -868,7 +886,7 @@ const CourseLanding = () => {
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               <em className={styles.hAccent}>Два</em> формата участия
             </h2>
-            <div className={styles.tariffGrid}>
+            <div className={styles.tariffGrid} id="buy-tariffs">
               {TARIFFS.map((tariff) => {
                 const promo = promoByPlan?.[tariff.key];
                 const isPersonal = tariff.key === 'personal';
