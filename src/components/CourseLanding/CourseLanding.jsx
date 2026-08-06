@@ -342,30 +342,14 @@ const scrollToBuy = () => {
   }
   const headerH = document.querySelector('header')?.offsetHeight ?? 0;
   const offset = headerH + 16;
+  const cardRect = card.getBoundingClientRect();
+  const cardTop = window.scrollY + cardRect.top;
   // Карточка выше экрана — прижимаем её низ, чтобы цена и кнопка точно были видны.
-  const targetTop = () => {
-    const rect = card.getBoundingClientRect();
-    const cardTop = window.scrollY + rect.top;
-    const top =
-      rect.height <= window.innerHeight - offset
-        ? cardTop - offset
-        : cardTop + rect.height - window.innerHeight + 16;
-    const maxTop = document.documentElement.scrollHeight - window.innerHeight;
-    return Math.min(Math.max(top, 0), maxTop);
-  };
-  window.scrollTo({ top: targetTop(), behavior: 'smooth' });
-  // Пока идёт плавный скролл, страница «едет» (lazy-картинки, сворачивание
-  // адресной строки на мобильных) — после остановки один раз доводим до цели.
-  const settle = () => {
-    if (Math.abs(window.scrollY - targetTop()) > 8) {
-      window.scrollTo({ top: targetTop(), behavior: 'smooth' });
-    }
-  };
-  if ('onscrollend' in window) {
-    window.addEventListener('scrollend', settle, { once: true });
-  } else {
-    setTimeout(settle, 750);
-  }
+  const top =
+    cardRect.height <= window.innerHeight - offset
+      ? cardTop - offset
+      : cardTop + cardRect.height - window.innerHeight + 16;
+  window.scrollTo({ top, behavior: 'smooth' });
 };
 
 const NAV_LINKS = [
