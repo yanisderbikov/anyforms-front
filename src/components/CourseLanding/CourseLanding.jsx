@@ -332,7 +332,41 @@ const scrollToId = (id) => {
 const CHECKOUT_PATH = '/course/checkout';
 
 // Все CTA ведут к единственному офферу (#buy); на чекаут уходит только кнопка внутри него.
-const scrollToBuy = () => scrollToId('buy');
+// Якорь ставим не на верх секции (там бейдж «Предзаказ» и большой заголовок съедают
+// экран, а кнопка «Оформить предзаказ» остаётся за кадром), а на первую карточку тарифа.
+const scrollToBuy = () => {
+  const card = document.getElementById('buy-tariffs')?.firstElementChild;
+  if (!card) {
+    scrollToId('buy');
+    return;
+  }
+  const headerH = document.querySelector('header')?.offsetHeight ?? 0;
+  const offset = headerH + 16;
+  // Карточка выше экрана — прижимаем её низ, чтобы цена и кнопка точно были видны.
+  const targetTop = () => {
+    const rect = card.getBoundingClientRect();
+    const cardTop = window.scrollY + rect.top;
+    const top =
+      rect.height <= window.innerHeight - offset
+        ? cardTop - offset
+        : cardTop + rect.height - window.innerHeight + 16;
+    const maxTop = document.documentElement.scrollHeight - window.innerHeight;
+    return Math.min(Math.max(top, 0), maxTop);
+  };
+  window.scrollTo({ top: targetTop(), behavior: 'smooth' });
+  // Пока идёт плавный скролл, страница «едет» (lazy-картинки, сворачивание
+  // адресной строки на мобильных) — после остановки один раз доводим до цели.
+  const settle = () => {
+    if (Math.abs(window.scrollY - targetTop()) > 8) {
+      window.scrollTo({ top: targetTop(), behavior: 'smooth' });
+    }
+  };
+  if ('onscrollend' in window) {
+    window.addEventListener('scrollend', settle, { once: true });
+  } else {
+    setTimeout(settle, 750);
+  }
+};
 
 const NAV_LINKS = [
   { key: 'modules', label: 'Программа', id: 'modules' },
@@ -868,7 +902,7 @@ const CourseLanding = () => {
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               <em className={styles.hAccent}>Два</em> формата участия
             </h2>
-            <div className={styles.tariffGrid}>
+            <div className={styles.tariffGrid} id="buy-tariffs">
               {TARIFFS.map((tariff) => {
                 const promo = promoByPlan?.[tariff.key];
                 const isPersonal = tariff.key === 'personal';
