@@ -588,11 +588,10 @@ const CourseLanding = () => {
           <div className={styles.sectionHead}>
             <span className={styles.eyebrow}>Результат</span>
             <h2 className={styles.sectionTitle} id="result-title">
-              Вот что вы сделаете своими руками
+              В одном проекте вы освоите технологии, которых <span className={styles.textAccent}>достаточно</span> для создания большинства силиконовых форм
             </h2>
             <p className={styles.sectionLead}>
-              Готовая силиконовая форма для контейнерной свечи — без пузырей, без шва,
-              со стабильной геометрией.
+              Далее большинство других изделий уже не вызовут сложностей.
             </p>
           </div>
           <div className={styles.galleryGrid}>
@@ -617,7 +616,7 @@ const CourseLanding = () => {
             Сможете делать формы&nbsp;<span className={styles.textAccent}> самостоятельно </span> и не зависеть от чужих мастерских
           </h2>
           <p className={styles.darkLead}>
-            Реализуете свои идеи в изделиях: от свечей до гипса и бетона.
+            Используйте навык для собственных проектов, выполняйте заказы или продавайте готовые формы другим мастерам.
           </p>
         </div>
       </section>
