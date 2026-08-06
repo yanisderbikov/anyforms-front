@@ -136,8 +136,8 @@ const HERO_STATS = [
 
 // Экран 2 — что вы сделаете своими руками (галерея процесса).
 const RESULT_SHOTS = [
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-1.JPG', alt: 'Опалубка' },
-  { src: 'https://storage.yandexcloud.net/anyforms/course/process-2.JPG', alt: 'Литьё' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-1.jpeg', alt: 'Опалубка' },
+  { src: 'https://storage.yandexcloud.net/anyforms/course/process-2.jpeg', alt: 'Литьё' },
 ];
 
 // Экран 4 — 4 модуля курса.
