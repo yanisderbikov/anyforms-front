@@ -6,25 +6,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.resolve(__dirname, '../dist');
 const serverDir = path.join(distDir, 'server');
 
-const SITE_URL = 'https://anyforms.ru';
-
-// Метаданные маршрутов, которые пререндерятся в статический HTML.
-// Должны совпадать с PAGE_SEO в src/App.jsx, чтобы клиент не перезаписывал
-// их другими значениями после гидрации.
-const ROUTE_META = {
-  '/': {
-    title: 'Силиконовые формы под заказ',
-    description:
-      'Силиконовые формы на заказ: рестораны, кондитерские, свечевары и производство. Подберём форму и рассчитаем под вашу задачу.',
-    ogImage: `${SITE_URL}/anyforms-logo.svg`,
-  },
-  '/3d-print': {
-    title: 'Корпуса для электроники на заказ — 3D-печать от 1 шт | anyforms',
-    description:
-      'Изготовим корпус для вашей электроники без пресс-формы: от образца за 3–7 рабочих дней до серии в тысячи штук. PETG, ABS GF, PA12. Расчёт за 15 минут.',
-    ogImage: `${SITE_URL}/og-3d-print.png`,
-  },
-};
+// Метаданные страниц живут в одном месте с клиентом (src/App.jsx использует
+// тот же модуль), поэтому после гидрации клиент не перезапишет их другими
+// значениями.
+import {
+  SITE_URL,
+  PAGE_SEO,
+  DEFAULT_OG_IMAGE,
+  META_PRERENDER_ROUTES,
+} from '../src/shared/pageSeo.mjs';
 
 // dist/index.html — одновременно и главная, и SPA-fallback для всех
 // непререндеренных маршрутов (nginx: try_files → /index.html). Чтобы при
@@ -44,6 +34,7 @@ const replaceMeta = (html, route, meta) => {
   const pageUrl = `${SITE_URL}${route}`;
   const title = escapeHtml(meta.title);
   const description = escapeHtml(meta.description);
+  const ogImage = meta.image || DEFAULT_OG_IMAGE;
 
   return html
     .replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`)
@@ -65,7 +56,7 @@ const replaceMeta = (html, route, meta) => {
     )
     .replace(
       /(<meta property="og:image" content=")[^"]*(")/,
-      (_, p1, p2) => `${p1}${meta.ogImage}${p2}`
+      (_, p1, p2) => `${p1}${ogImage}${p2}`
     )
     .replace(
       /(<meta name="twitter:title" content=")[^"]*(")/,
@@ -77,7 +68,7 @@ const replaceMeta = (html, route, meta) => {
     )
     .replace(
       /(<meta name="twitter:image" content=")[^"]*(")/,
-      (_, p1, p2) => `${p1}${meta.ogImage}${p2}`
+      (_, p1, p2) => `${p1}${ogImage}${p2}`
     )
     .replace(
       /(<link rel="canonical" href=")[^"]*(")/,
@@ -94,10 +85,17 @@ const main = async () => {
 
   const template = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
 
+  const writeRoute = (route, html) => {
+    const outDir = path.join(distDir, route.replace(/^\//, ''));
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.writeFileSync(path.join(outDir, 'index.html'), html);
+    console.log(`prerendered ${route} -> ${path.relative(distDir, path.join(outDir, 'index.html'))}`);
+  };
+
   for (const route of prerenderRoutes) {
-    const meta = ROUTE_META[route];
+    const meta = PAGE_SEO[route];
     if (!meta) {
-      throw new Error(`No ROUTE_META for prerendered route ${route}`);
+      throw new Error(`No PAGE_SEO entry for prerendered route ${route}`);
     }
     const appHtml = render(route);
     let html = replaceMeta(template, route, meta);
@@ -109,11 +107,20 @@ const main = async () => {
         ? `<div id="root">${appHtml}</div>${ROOT_GUARD}`
         : `<div id="root">${appHtml}</div>`;
     html = html.replace('<div id="root"></div>', rootReplacement);
+    writeRoute(route, html);
+  }
 
-    const outDir = path.join(distDir, route.replace(/^\//, ''));
-    fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(path.join(outDir, 'index.html'), html);
-    console.log(`prerendered ${route} -> ${path.relative(distDir, path.join(outDir, 'index.html'))}`);
+  // Страницы без SSR: только правильные мета-теги, #root остаётся пустым —
+  // контент рисует клиент. Этого хватает для превью в Telegram и соцсетях.
+  for (const route of META_PRERENDER_ROUTES) {
+    const meta = PAGE_SEO[route];
+    if (!meta) {
+      throw new Error(`No PAGE_SEO entry for meta-prerendered route ${route}`);
+    }
+    if (prerenderRoutes.includes(route)) {
+      continue; // уже отрендерен полноценно выше
+    }
+    writeRoute(route, replaceMeta(template, route, meta));
   }
 
   // SSR-бандл не нужен в продакшен-образе
