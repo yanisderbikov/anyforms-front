@@ -3,7 +3,10 @@
 // prerender-скрипте читал файл как ESM (package.json без "type": "module").
 export const SITE_URL = 'https://anyforms.ru';
 
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/anyforms-logo.svg`;
+// Растровый логотип на внешнем сторадже: SVG мессенджеры в og:image не понимают,
+// а внешний URL работает одинаково с прода и тестовой среды.
+export const DEFAULT_OG_IMAGE =
+  'https://storage.yandexcloud.net/anyforms/utils/logos/logo-black.jpg';
 
 export const PAGE_SEO = {
   '/': {
@@ -23,7 +26,6 @@ export const PAGE_SEO = {
     title: 'Корпуса для электроники на заказ — 3D-печать от 1 шт | anyforms',
     description:
       'Изготовим корпус для вашей электроники без пресс-формы: от образца за 3–7 рабочих дней до серии в тысячи штук. PETG, ABS GF, PA12. Расчёт за 15 минут.',
-    image: `${SITE_URL}/og-3d-print.png`,
   },
   '/guide': {
     title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
@@ -34,7 +36,6 @@ export const PAGE_SEO = {
     title: 'Курс по производству силиконовых форм — anyforms',
     description:
       'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
-    image: `${SITE_URL}/og-course.jpeg`,
   },
   '/course/offer': {
     title: 'Публичная оферта — курс anyforms',
