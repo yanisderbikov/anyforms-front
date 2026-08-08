@@ -16,6 +16,13 @@ import styles from './shopThemes.module.css';
  * без поддерживаемого формата витрина показывает обычный текстовый заголовок.
  */
 export const SHOP_THEMES = {
+  di_gips: {
+    className: styles.diGips,
+    pageBackground: '#faf3e6',
+    tagline: 'Магазин молдов Дианы di_gips',
+    description:
+      'Силиконовые молды для творчества из гипса — творчество, которое вдохновляет и объединяет. Подборка Дианы (di_gips)',
+  },
   af_pastry: {
     className: styles.afPastry,
     pageBackground: '#f4eee3',

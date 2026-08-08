@@ -225,7 +225,6 @@ const MarketplaceCheckout = () => {
                   <p className={styles.orderItemName}>
                     {item.variantLabel ? `${item.name} ${item.variantLabel}` : item.name}
                   </p>
-                  {item.description && <p className={styles.orderItemDesc}>{item.description}</p>}
                   <p className={styles.orderItemMeta}>
                     {formatPrice(item.price)} × {item.quantity}
                   </p>

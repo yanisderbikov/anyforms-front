@@ -154,16 +154,6 @@
 }
 .orderItemInfo { flex: 1; min-width: 0; }
 .orderItemName { font-size: 0.95rem; font-weight: 600; color: var(--color-base-black); margin: 0; }
-.orderItemDesc {
-  font-size: 0.82rem;
-  color: #8c8c8c;
-  line-height: 1.4;
-  margin: 3px 0 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 .orderItemMeta { font-size: 0.82rem; color: #8c8c8c; margin: 4px 0 0; }
 .orderItemPrice { font-size: 0.95rem; font-weight: 700; white-space: nowrap; color: var(--color-base-black); }
 .summaryDivider { border: none; border-top: 1px solid #ececec; margin: 4px 0 8px; }
