@@ -13,6 +13,7 @@ import {
 } from '../../services/analytics';
 import PvzSelect from './PvzSelect';
 import { readCheckoutForm, saveCheckoutForm } from './checkoutFormStorage';
+import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
@@ -36,10 +37,13 @@ const MarketplaceCheckout = () => {
   // Черновик формы: возвращение с других страниц (и после оплаты) не заставляет
   // вводить всё заново.
   const savedForm = useMemo(() => readCheckoutForm() || {}, []);
+  // Контакты общие для всех чекаутов (магазин, гайд, курс); черновик магазина —
+  // запасной источник для тех, кто заполнял форму до появления общего ключа.
+  const savedContact = useMemo(() => readCheckoutContact() || {}, []);
 
-  const [fullName, setFullName] = useState(savedForm.fullName || '');
-  const [phone, setPhone] = useState(savedForm.phone || '');
-  const [email, setEmail] = useState(savedForm.email || '');
+  const [fullName, setFullName] = useState(savedContact.fullName || savedForm.fullName || '');
+  const [phone, setPhone] = useState(savedContact.phone || savedForm.phone || '');
+  const [email, setEmail] = useState(savedContact.email || savedForm.email || '');
   const [pvz, setPvz] = useState(savedForm.pvz || null);
   const [marketingConsent, setMarketingConsent] = useState(Boolean(savedForm.marketingConsent));
   const [acceptTerms, setAcceptTerms] = useState(Boolean(savedForm.acceptTerms));
@@ -56,15 +60,13 @@ const MarketplaceCheckout = () => {
 
   useEffect(() => {
     saveCheckoutForm({
-      fullName,
-      phone,
-      email,
       pvz,
       marketingConsent,
       acceptTerms,
       promoInput,
       appliedPromo,
     });
+    saveCheckoutContact({ fullName, phone, email });
   }, [fullName, phone, email, pvz, marketingConsent, acceptTerms, promoInput, appliedPromo]);
 
   const nameValid = fullName.trim().length >= 2;

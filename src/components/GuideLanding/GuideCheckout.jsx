@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
+import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
 import styles from './GuideCheckout.module.css';
 
 const PRODUCT_CODE = 'GUIDE';
@@ -10,14 +11,21 @@ const PRICE = '1490 ₽';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 const GuideCheckout = () => {
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  // Контакты общие для всех чекаутов: заполнял магазин или курс — подставятся и здесь.
+  const savedContact = useMemo(() => readCheckoutContact() || {}, []);
+
+  const [fullName, setFullName] = useState(savedContact.fullName || '');
+  const [phone, setPhone] = useState(savedContact.phone || '');
+  const [email, setEmail] = useState(savedContact.email || '');
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    saveCheckoutContact({ fullName, phone, email });
+  }, [fullName, phone, email]);
 
   const nameValid = fullName.trim().length >= 2;
   const phoneValid = isPhoneValid(phone);

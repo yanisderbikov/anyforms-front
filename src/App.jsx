@@ -37,11 +37,10 @@ import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
 import CustomShipList from "./components/CustomOrders/CustomShipList";
 import CustomItemPage from "./components/CustomOrders/CustomItemPage";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
+import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
 
 // three.js весит больше всего остального бандла — грузим его только на /stl.
 const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
-
-const SITE_URL = 'https://anyforms.ru';
 
 const KNOWN_PATHS = new Set([
   '/',
@@ -87,78 +86,6 @@ const KNOWN_PATHS = new Set([
 
 // Служебные разделы магазина: не могут быть slug'ом витрины партнёра.
 const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success']);
-
-const PAGE_SEO = {
-  '/': {
-    title: 'Силиконовые формы под заказ',
-    description:
-      'Силиконовые формы на заказ: рестораны, кондитерские, свечевары и производство. Подберём форму и рассчитаем под вашу задачу.',
-  },
-  '/chief': {
-    title: 'anyforms Chief - Инструменты для руководителя',
-    description: 'Аналитика и управление процессом заказов для руководителей и команд.',
-  },
-  '/chief/privacy': {
-    title: 'anyforms - Политика конфиденциальности',
-    description: 'Политика обработки и защиты персональных данных сервиса anyforms.',
-  },
-  '/3d-print': {
-    title: 'Корпуса для электроники на заказ — 3D-печать от 1 шт | anyforms',
-    description:
-      'Изготовим корпус для вашей электроники без пресс-формы: от образца за 3–7 рабочих дней до серии в тысячи штук. PETG, ABS GF, PA12. Расчёт за 15 минут.',
-    image: `${SITE_URL}/og-3d-print.png`,
-  },
-  '/guide': {
-    title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
-    description:
-      'Пошаговый гайд для мастеров, производителей и экспертов: как получать заявки из Reels, Shorts, TikTok и Клипов, а не просто собирать просмотры.',
-  },
-  '/course': {
-    title: 'Курс по производству силиконовых форм — anyforms',
-    description:
-      'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
-  },
-  '/course/offer': {
-    title: 'Публичная оферта — курс anyforms',
-    description: 'Условия предзаказа и покупки видео-курса по производству силиконовых форм.',
-  },
-  '/course/privacy': {
-    title: 'Политика конфиденциальности — курс anyforms',
-    description: 'Как обрабатываются персональные данные при покупке курса anyforms.',
-  },
-  '/course/checkout': {
-    title: 'Предзаказ курса — anyforms',
-    description: 'Оформление и оплата предзаказа видео-курса по производству силиконовых форм.',
-  },
-  '/course/success': {
-    title: 'Предзаказ оформлен — доступ к курсу пришлём на почту',
-    description: 'Спасибо за оплату. Доступ к курсу откроется в день старта и придёт на вашу почту.',
-  },
-  '/founders/yuri': {
-    title: 'Реквизиты — Суворов Юрий Игоревич (самозанятый)',
-    description: 'Реквизиты продавца: Суворов Юрий Игоревич, самозанятый (плательщик НПД), ИНН 590621081613.',
-  },
-  '/guide/offer': {
-    title: 'Публичная оферта — гайд Юрия Суворова',
-    description: 'Условия покупки электронного гайда «Как продавать сложный продукт через короткие видео».',
-  },
-  '/guide/privacy': {
-    title: 'Политика конфиденциальности — гайд Юрия Суворова',
-    description: 'Как обрабатываются персональные данные при покупке электронного гайда.',
-  },
-  '/guide/checkout': {
-    title: 'Оплата гайда — anyforms',
-    description: 'Оформление и оплата электронного гайда «Как продавать сложный продукт через короткие видео».',
-  },
-  '/guide/success': {
-    title: 'Оплата прошла успешно — гайд отправлен на почту',
-    description: 'Спасибо за покупку. Гайд отправлен на вашу электронную почту.',
-  },
-  '/shop': {
-    title: 'Маркетплейс - anyforms',
-    description: 'Каталог товаров и оформление заказов в маркетплейсе anyforms.',
-  },
-};
 
 const upsertMetaTag = (selector, attributes) => {
   let tag = document.head.querySelector(selector);
@@ -262,7 +189,7 @@ function App() {
       normalizedPathname === '/course/checkout' ||
       normalizedPathname === '/course/success';
 
-    const ogImage = seo.image || `${SITE_URL}/anyforms-logo.svg`;
+    const ogImage = seo.image || DEFAULT_OG_IMAGE;
 
     document.title = seo.title;
     upsertMetaTag('meta[name="description"]', { name: 'description', content: seo.description });

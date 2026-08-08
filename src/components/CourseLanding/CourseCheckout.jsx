@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
@@ -9,6 +9,7 @@ import {
   normalizePromoCode,
 } from '../../shared/promoTracking';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
+import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
 import styles from './CourseCheckout.module.css';
 
 // Тарифы курса; code — продукт из payment_product на бэке.
@@ -40,9 +41,11 @@ const CourseCheckout = () => {
   const [plan, setPlan] = useState(
     searchParams.get('plan') === 'personal' ? 'personal' : 'self'
   );
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  // Контакты общие для всех чекаутов: заполнял магазин или гайд — подставятся и здесь.
+  const savedContact = useMemo(() => readCheckoutContact() || {}, []);
+  const [fullName, setFullName] = useState(savedContact.fullName || '');
+  const [phone, setPhone] = useState(savedContact.phone || '');
+  const [email, setEmail] = useState(savedContact.email || '');
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
@@ -55,6 +58,10 @@ const CourseCheckout = () => {
   const [promoChecking, setPromoChecking] = useState(false);
 
   const appliedPromo = appliedPromos[plan] || null;
+
+  useEffect(() => {
+    saveCheckoutContact({ fullName, phone, email });
+  }, [fullName, phone, email]);
 
   const checkPromo = async (rawCode) => {
     const code = normalizePromoCode(rawCode);
