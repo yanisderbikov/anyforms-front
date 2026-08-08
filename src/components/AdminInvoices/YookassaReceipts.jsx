@@ -20,7 +20,9 @@ const TASK_STATUS = {
 
 const LINK_RE = /^https?:\/\//;
 
-const initialForm = { email: '', link: '' };
+const initialForm = { email: '', link: '', productCode: '' };
+
+const productName = (t) => t.productTitle || PRODUCT_LABELS[t.productCode] || t.productCode || '';
 
 const copyText = (text, msg) => {
   if (!text) return;
@@ -71,8 +73,12 @@ const YookassaReceipts = () => {
     }
   };
 
-  const sendReceipt = async (email, link) => {
-    await apiClient.instance.post('/api/receipt/send', { email, link }, { headers: authHeaders() });
+  const sendReceipt = async (email, link, productCode) => {
+    await apiClient.instance.post(
+      '/api/receipt/send',
+      { email, link, productCode: productCode || null },
+      { headers: authHeaders() }
+    );
     toast.success('Чек поставлен в очередь — письмо уйдёт в течение минуты');
     await load();
   };
@@ -95,7 +101,7 @@ const YookassaReceipts = () => {
     }
     setSaving(true);
     try {
-      await sendReceipt(form.email.trim(), form.link.trim());
+      await sendReceipt(form.email.trim(), form.link.trim(), form.productCode);
       setForm(initialForm);
     } catch (err) {
       setError(
@@ -114,7 +120,7 @@ const YookassaReceipts = () => {
     }
     setSendingId(t.externalPaymentId);
     try {
-      await sendReceipt(t.email, link);
+      await sendReceipt(t.email, link, t.productCode);
       setLinks((prev) => ({ ...prev, [t.externalPaymentId]: '' }));
     } catch (err) {
       toast.error(
@@ -124,9 +130,6 @@ const YookassaReceipts = () => {
       setSendingId(null);
     }
   };
-
-  // Кому чек уже отправляли — по email в списке последних тасок.
-  const sentEmails = new Set(tasks.map((t) => (t.email || '').toLowerCase()).filter(Boolean));
 
   return (
     <>
@@ -155,6 +158,22 @@ const YookassaReceipts = () => {
               placeholder="https://…"
               required
             />
+          </label>
+          <label className={styles.label}>
+            Тип продукта
+            <select
+              name="productCode"
+              value={form.productCode}
+              onChange={handleChange}
+              className={styles.input}
+            >
+              <option value="">Не указан</option>
+              {Object.entries(PRODUCT_LABELS).map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         {error && <p className={styles.error}>{error}</p>}
@@ -191,6 +210,10 @@ const YookassaReceipts = () => {
                     </span>
                     <span className={`${styles.status} ${styles[status.className]}`}>{status.label}</span>
                   </div>
+                  <p className={styles.itemRow}>
+                    <span className={styles.itemLabel}>Продукт:</span>{' '}
+                    {PRODUCT_LABELS[t.productCode] || t.productCode || '—'}
+                  </p>
                   {t.link && (
                     <p className={styles.itemRow}>
                       <span className={styles.itemLabel}>Чек:</span>{' '}
@@ -223,13 +246,13 @@ const YookassaReceipts = () => {
         ) : (
           <ul className={styles.list}>
             {transactions.map((t) => {
-              const alreadySent = Boolean(t.email && sentEmails.has(t.email.toLowerCase()));
+              const alreadySent = Boolean(t.receiptSent);
               return (
               <li key={t.externalPaymentId} className={styles.item}>
                 <div className={styles.itemMain}>
                   <span className={styles.itemNameWrap}>
                     {alreadySent && (
-                      <span className={styles.sentBadge} title="Чек на этот email уже отправляли — см. «Последние чеки»">
+                      <span className={styles.sentBadge} title="Чек по этому продукту на этот email уже отправляли — см. «Последние чеки»">
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path
                             d="M2.5 6.5L5 9l4.5-6"
@@ -247,6 +270,20 @@ const YookassaReceipts = () => {
                     {PRODUCT_LABELS[t.productCode] || t.productCode}
                   </span>
                 </div>
+                <p className={styles.itemRow}>
+                  <span className={styles.itemLabel}>Продукт:</span>{' '}
+                  {productName(t) ? (
+                    <span
+                      className={styles.clickable}
+                      onClick={() => copyText(productName(t), 'Название продукта скопировано')}
+                      title="Нажмите для копирования"
+                    >
+                      {productName(t)}
+                    </span>
+                  ) : (
+                    '—'
+                  )}
+                </p>
                 <p className={styles.itemRow}>
                   <span className={styles.itemLabel}>Email:</span>{' '}
                   {t.email ? (
