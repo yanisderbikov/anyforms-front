@@ -19,9 +19,9 @@ export const SHOP_THEMES = {
   di_gips: {
     className: styles.diGips,
     pageBackground: '#faf3e6',
-    tagline: 'Магазин молдов Дианы di_gips',
+    tagline: 'Гипсовый декор и свечи ручной работы',
     description:
-      'Силиконовые молды для творчества из гипса — творчество, которое вдохновляет и объединяет. Подборка Дианы (di_gips)',
+      'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет',
   },
   af_pastry: {
     className: styles.afPastry,

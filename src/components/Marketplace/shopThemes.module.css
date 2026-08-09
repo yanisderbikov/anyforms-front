@@ -42,6 +42,9 @@
      активная малиновая CTA-пилюля с кремовым текстом. */
   --shop-heading: #b44e70;
   --shop-title-transform: none;
+  /* Тэглайн витрины строчными — как леттеринг на её баннерах
+     («творчество, которое вдохновляет и объединяет»). */
+  --shop-tagline-transform: lowercase;
   --shop-cta-bg: #b44e70;
   --shop-cta-fg: #fdf5ea;
   --shop-cta-hover-bg: #9d3f60;

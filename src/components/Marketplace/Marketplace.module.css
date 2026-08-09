@@ -181,7 +181,9 @@
   font-weight: 400;
   line-height: 1.7;
   letter-spacing: 0.18em;
-  text-transform: uppercase;
+  /* Отдельная переменная (не --shop-title-transform): та управляет чекаутом,
+     а здесь у af_pastry заголовок остаётся капсом, у di_gips — строчным. */
+  text-transform: var(--shop-tagline-transform, uppercase);
   text-wrap: balance;
   color: var(--shop-accent, #111);
 }
