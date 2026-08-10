@@ -38,7 +38,7 @@ export const PAGE_SEO = {
     title: 'Курс по производству силиконовых форм — anyforms',
     description:
       'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
-    image: `${SITE_URL}/og-course.jpeg`,
+    image: `${SITE_URL}/og-course-card.jpg`,
   },
   '/course/offer': {
     title: 'Публичная оферта — курс anyforms',
