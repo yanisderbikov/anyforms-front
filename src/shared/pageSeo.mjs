@@ -77,9 +77,29 @@ export const PAGE_SEO = {
     title: 'Маркетплейс - anyforms',
     description: 'Каталог товаров и оформление заказов в маркетплейсе anyforms.',
   },
+  // Партнёрские витрины: свой заголовок, описание и OG-карточка (превью в
+  // Telegram и соцсетях) — под брендом магазина, без anyforms в заголовке.
+  '/shop/af_pastry': {
+    title: 'Магазин молдов Анны Феликовой — af_pastry',
+    description:
+      'Профессиональные силиконовые молды для десертов — подборка Анны Феликовой.',
+    image: `${SITE_URL}/og-shop-af_pastry.jpg`,
+  },
+  '/shop/di_gips': {
+    title: 'Магазин молдов Дианы di_gips',
+    description:
+      'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет.',
+    image: `${SITE_URL}/og-shop-di_gips.jpg`,
+  },
 };
 
 // Публичные маршруты без SSR-рендера: пререндер кладёт для них HTML с правильными
 // мета-тегами и пустым #root (контент рисует клиент). Этого достаточно, чтобы
 // Telegram и соцсети показывали своё описание и картинку для каждой страницы.
-export const META_PRERENDER_ROUTES = ['/chief', '/guide', '/course'];
+export const META_PRERENDER_ROUTES = [
+  '/chief',
+  '/guide',
+  '/course',
+  '/shop/af_pastry',
+  '/shop/di_gips',
+];
