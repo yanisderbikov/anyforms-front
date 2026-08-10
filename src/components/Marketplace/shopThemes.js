@@ -23,6 +23,18 @@ export const SHOP_THEMES = {
     description:
       'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет',
   },
+  lunasvecha: {
+    className: styles.lunasvecha,
+    pageBackground: '#f4f1ea',
+    tagline: 'Свечи ручной работы lunasvecha',
+    description:
+      'Авторские свечи lunasvecha — лью свечи с 2020 года и обучаю свечеварению учеников по всему миру',
+    headerLogo: {
+      src: '/lunasvecha_logo.svg',
+      width: 680,
+      height: 121,
+    },
+  },
   af_pastry: {
     className: styles.afPastry,
     pageBackground: '#f4eee3',

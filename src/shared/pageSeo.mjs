@@ -94,6 +94,12 @@ export const PAGE_SEO = {
       'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет.',
     image: `${SITE_URL}/og-shop-di_gips.jpg`,
   },
+  '/shop/lunasvecha': {
+    title: 'Свечи ручной работы lunasvecha',
+    description:
+      'Авторские свечи lunasvecha — лью свечи с 2020 года и обучаю свечеварению учеников по всему миру.',
+    image: `${SITE_URL}/og-shop-lunasvecha.jpg`,
+  },
 };
 
 // Публичные маршруты без SSR-рендера: пререндер кладёт для них HTML с правильными
@@ -105,4 +111,5 @@ export const META_PRERENDER_ROUTES = [
   '/course',
   '/shop/af_pastry',
   '/shop/di_gips',
+  '/shop/lunasvecha',
 ];
