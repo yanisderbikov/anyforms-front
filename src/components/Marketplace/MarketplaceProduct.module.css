@@ -29,13 +29,15 @@
   margin-bottom: 20px;
 }
 
+/* Топбар лежит прямо на фоне страницы (в отличие от чекаута, где он на белой
+   карточке): у тёмных тем ссылка и иконка корзины перекрашиваются в светлое. */
 .back {
-  color: #666;
+  color: var(--shop-page-muted, #666);
   font-size: 0.92rem;
   text-decoration: none;
   transition: color 0.15s ease;
 }
-.back:hover { color: var(--color-base-black); }
+.back:hover { color: var(--shop-page-fg, var(--color-base-black)); }
 
 .cartLink {
   position: relative;
@@ -45,11 +47,11 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  color: var(--color-base-black);
+  color: var(--shop-page-fg, var(--color-base-black));
   text-decoration: none;
   transition: background 0.15s ease;
 }
-.cartLink:hover { background: #f0f0f0; }
+.cartLink:hover { background: var(--shop-page-hover-bg, #f0f0f0); }
 .cartLink svg { display: block; }
 
 .cartBadge {
@@ -60,7 +62,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 9px;
-  background: var(--color-base-black);
+  background: var(--shop-cart-badge-bg, var(--color-base-black));
   color: #fff;
   font-size: 11px;
   font-weight: 700;

@@ -62,6 +62,12 @@ const Marketplace = () => {
   }, [theme]);
   const showHeroVideo = Boolean(heroVideoSrc) && !heroVideoFailed;
 
+  // Фото-приветствие — как видео, но статичное: если в теме есть и видео,
+  // и фото, видео важнее, а фото остаётся запасным вариантом при ошибке.
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
+  const heroImage = !heroImageFailed ? theme?.heroImage ?? null : null;
+  const showHero = showHeroVideo || Boolean(heroImage);
+
   // Плавный скролл к каталогу; ссылка с #catalog остаётся рабочей и без JS.
   const scrollToCatalog = (e) => {
     const catalog = document.getElementById('catalog');
@@ -267,7 +273,7 @@ const Marketplace = () => {
           </Link>
         </div>
       </header>
-      {showHeroVideo ? (
+      {showHero ? (
         <section className={styles.hero}>
           <div className={styles.heroTitleBlock}>
             <h1 className={styles.shopTitle}>{theme.tagline ?? shopName}</h1>
@@ -277,17 +283,26 @@ const Marketplace = () => {
             )}
           </div>
           <div className={styles.heroMedia}>
-            <video
-              className={styles.heroVideo}
-              src={heroVideoSrc}
-              autoPlay={!prefersReducedMotion}
-              muted
-              loop
-              playsInline
-              preload="auto"
-              disablePictureInPicture
-              onError={() => setHeroVideoFailed(true)}
-            />
+            {showHeroVideo ? (
+              <video
+                className={styles.heroVideo}
+                src={heroVideoSrc}
+                autoPlay={!prefersReducedMotion}
+                muted
+                loop
+                playsInline
+                preload="auto"
+                disablePictureInPicture
+                onError={() => setHeroVideoFailed(true)}
+              />
+            ) : (
+              <img
+                className={styles.heroImage}
+                src={heroImage.src}
+                alt={heroImage.alt ?? ''}
+                onError={() => setHeroImageFailed(true)}
+              />
+            )}
           </div>
           <a className={styles.heroCta} href="#catalog" onClick={scrollToCatalog}>
             Смотреть каталог
@@ -313,7 +328,7 @@ const Marketplace = () => {
           )}
         </div>
       )}
-      {showHeroVideo && (
+      {showHero && (
         <div className={styles.catalogHead} id="catalog">
           <h2 className={styles.catalogTitle}>Каталог</h2>
           <span className={styles.shopDivider} aria-hidden="true" />

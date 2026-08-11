@@ -13,7 +13,9 @@ import styles from './shopThemes.module.css';
  * (src + натуральные пропорции для width/height);
  * heroVideo — квадратный ролик-приветствие над каталогом: webm основной,
  * mp4 (h264) — запасной для старых iPhone (iOS < 17.4 не играет webm);
- * без поддерживаемого формата витрина показывает обычный текстовый заголовок.
+ * без поддерживаемого формата витрина показывает обычный текстовый заголовок;
+ * heroImage — то же место, но статичное фото (src + alt); если заданы и видео,
+ * и фото — играет видео, фото остаётся запасным вариантом.
  */
 export const SHOP_THEMES = {
   di_gips: {
@@ -21,7 +23,11 @@ export const SHOP_THEMES = {
     pageBackground: '#faf3e6',
     tagline: 'Магазин молдов Дианы di_gips',
     description:
-      'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет',
+      'Диана — автор di_gips: молды, гипсовый декор и свечи ручной работы. Творчество, которое вдохновляет и объединяет',
+    heroImage: {
+      src: 'https://storage.yandexcloud.net/anyforms/shop/di_gips/di_gips_hero.jpg',
+      alt: 'Диана, автор di_gips, со своими изделиями из гипса',
+    },
   },
   lunasvecha: {
     className: styles.lunasvecha,
