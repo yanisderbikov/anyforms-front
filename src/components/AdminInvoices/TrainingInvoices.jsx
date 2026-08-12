@@ -232,7 +232,15 @@ const TrainingInvoices = () => {
             {promoInfo && (
               promoInfo.valid ? (
                 <span className={styles.promoOk}>
-                  Промокод действует: скидка {promoInfo.discountPercent}%
+                  Промокод действует: скидка{' '}
+                  {[
+                    promoInfo.discountPercent ? `${promoInfo.discountPercent}%` : null,
+                    promoInfo.discountAmountKopecks
+                      ? formatAmount(promoInfo.discountAmountKopecks)
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' + ')}
                 </span>
               ) : (
                 <span className={styles.promoErr}>{promoInfo.message || 'Промокод недействителен'}</span>

@@ -5,7 +5,7 @@ import apiClient from '../../apiClient';
 import {
   getPromoFromSearch,
   buildPassThroughQuery,
-  formatPromoDeadline,
+  formatPromoDeadlineNote,
 } from '../../shared/promoTracking';
 import { COURSE_PLANS } from './CourseCheckout';
 import styles from './CourseLanding.module.css';
@@ -19,6 +19,15 @@ const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen';
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
+
+// «35%», «5 000 ₽» или «35% + 5 000 ₽» — размер скидки промокода.
+const promoDiscountLabel = (promo) =>
+  [
+    promo?.discountPercent ? `${promo.discountPercent}%` : null,
+    promo?.discountAmountKopecks ? formatKopecks(promo.discountAmountKopecks) : null,
+  ]
+    .filter(Boolean)
+    .join(' + ');
 
 // Стрелка внутри белого кружка на CTA-кнопках.
 const ArrowIcon = () => (
@@ -440,7 +449,7 @@ const CourseLanding = () => {
 
   const heroSelfPromo = promoByPlan?.self;
   const isGuidePromo = heroSelfPromo?.code === GUIDE_PROMO_CODE;
-  const promoDeadline = formatPromoDeadline(heroSelfPromo?.validUntil);
+  const promoDeadline = formatPromoDeadlineNote(heroSelfPromo?.validUntil);
 
   return (
     <div className={styles.page}>
@@ -528,8 +537,8 @@ const CourseLanding = () => {
             </h2>
             <p className={styles.promoModalText}>
               По промокоду {heroSelfPromo.code} вам доступна скидка{' '}
-              {heroSelfPromo.discountPercent}% — она уже применилась к ценам курса.
-              {promoDeadline && <> Скидка действует до {promoDeadline}.</>}
+              {promoDiscountLabel(heroSelfPromo)} — она уже применилась к ценам курса.
+              {promoDeadline && <> Скидка действует {promoDeadline}.</>}
             </p>
             <button
               type="button"
@@ -597,10 +606,8 @@ const CourseLanding = () => {
 
             {heroSelfPromo && (
               <p className={styles.promoStrip}>
-                Промокод {heroSelfPromo.code} применён — скидка {heroSelfPromo.discountPercent}%
-                {formatPromoDeadline(heroSelfPromo.validUntil)
-                  ? `. Ваша скидка действует до ${formatPromoDeadline(heroSelfPromo.validUntil)}.`
-                  : '.'}
+                Промокод {heroSelfPromo.code} применён — скидка {promoDiscountLabel(heroSelfPromo)}
+                {promoDeadline ? `. Ваша скидка действует ${promoDeadline}.` : '.'}
               </p>
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
@@ -953,9 +960,9 @@ const CourseLanding = () => {
                     </div>
                     {promo && (
                       <p className={styles.tariffPromoNote}>
-                        Промокод {promo.code}: скидка {promo.discountPercent}%
-                        {formatPromoDeadline(promo.validUntil)
-                          ? `, действует до ${formatPromoDeadline(promo.validUntil)}`
+                        Промокод {promo.code}: скидка {promoDiscountLabel(promo)}
+                        {formatPromoDeadlineNote(promo.validUntil)
+                          ? `, действует ${formatPromoDeadlineNote(promo.validUntil)}`
                           : ''}
                         . Применится на оплате.
                       </p>

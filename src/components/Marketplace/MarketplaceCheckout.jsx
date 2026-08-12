@@ -5,7 +5,7 @@ import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import { useShopSupport } from '../../hooks/useShopSupport';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
-import { normalizePromoCode } from '../../shared/promoTracking';
+import { normalizePromoCode, formatPromoDeadlineNote } from '../../shared/promoTracking';
 import {
   trackAddPaymentInfo,
   trackPaymentFailed,
@@ -78,21 +78,42 @@ const MarketplaceCheckout = () => {
 
   const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
 
-  // Скидка считается как на сервере: с каждой единицы товара, с округлением до копейки.
-  const discountedTotal = appliedPromo
+  const promoPercent = appliedPromo?.discountPercent || 0;
+  const promoAmountRub = (appliedPromo?.discountAmountKopecks || 0) / 100;
+  // Скидка считается как на сервере: процент — с каждой единицы товара с округлением
+  // до копейки, затем фиксированная часть промокода; итог не опускается ниже 1 ₽.
+  const afterPercentTotal = appliedPromo
     ? items.reduce(
         (sum, i) =>
-          sum +
-          (Math.round((i.price * 100 * (100 - appliedPromo.discountPercent)) / 100) / 100) * i.quantity,
+          sum + (Math.round((i.price * 100 * (100 - promoPercent)) / 100) / 100) * i.quantity,
         0
       )
     : total;
+  const discountedTotal = promoAmountRub
+    ? Math.max(afterPercentTotal - promoAmountRub, Math.min(afterPercentTotal, 1))
+    : afterPercentTotal;
+  const promoDeadlineNote = formatPromoDeadlineNote(appliedPromo?.validUntil);
 
   // Промокод закреплён за контактами: сменили почту или телефон — проверяем заново.
   const resetPromo = () => {
     setAppliedPromo(null);
     setPromoError('');
   };
+
+  // Промокод из черновика мог протухнуть или перестать проходить по минимальной
+  // сумме после изменения корзины — снимаем его сразу и объясняем почему.
+  useEffect(() => {
+    if (!appliedPromo) return;
+    if (appliedPromo.validUntil && Date.parse(appliedPromo.validUntil) <= Date.now()) {
+      setAppliedPromo(null);
+      setPromoError('Срок действия промокода истёк.');
+    } else if (appliedPromo.minOrderKopecks && total * 100 < appliedPromo.minOrderKopecks) {
+      setAppliedPromo(null);
+      setPromoError(
+        `Промокод действует для заказов от ${formatPrice(appliedPromo.minOrderKopecks / 100)}.`
+      );
+    }
+  }, [appliedPromo, total]);
 
   const checkPromo = async () => {
     const code = normalizePromoCode(promoInput);
@@ -106,7 +127,14 @@ const MarketplaceCheckout = () => {
     setPromoError('');
     try {
       const { data } = await apiClient.instance.get('/api/payment/cart-promo-check', {
-        params: { code, email: email.trim(), phone: toSubmitPhone(phone) },
+        params: {
+          code,
+          email: email.trim(),
+          phone: toSubmitPhone(phone),
+          // Сумма корзины — для ранней проверки минимального порога промокода;
+          // при оформлении сервер пересчитает её по своим ценам.
+          totalKopecks: Math.round(total * 100),
+        },
       });
       if (data?.valid) {
         setAppliedPromo(data);
@@ -241,7 +269,14 @@ const MarketplaceCheckout = () => {
           {appliedPromo && (
             <div className={styles.summaryRow}>
               <span>Промокод {appliedPromo.code}</span>
-              <span>−{appliedPromo.discountPercent}%</span>
+              <span>
+                {[
+                  promoPercent ? `−${promoPercent}%` : null,
+                  promoAmountRub ? `−${formatPrice(promoAmountRub)}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              </span>
             </div>
           )}
           <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
@@ -352,7 +387,14 @@ const MarketplaceCheckout = () => {
           {promoError && <p className={styles.fieldError}>{promoError}</p>}
           {appliedPromo && (
             <p className={styles.promoOk}>
-              Промокод {appliedPromo.code} применён: скидка {appliedPromo.discountPercent}%.
+              Промокод {appliedPromo.code} применён: скидка{' '}
+              {[
+                promoPercent ? `${promoPercent}%` : null,
+                promoAmountRub ? formatPrice(promoAmountRub) : null,
+              ]
+                .filter(Boolean)
+                .join(' + ')}
+              .{promoDeadlineNote ? ` Действует ${promoDeadlineNote}.` : ''}
             </p>
           )}
 

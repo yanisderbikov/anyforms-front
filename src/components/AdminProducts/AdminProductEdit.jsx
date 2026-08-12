@@ -104,6 +104,11 @@ const AdminProductEdit = () => {
     loadProduct();
   }, [loadProduct]);
 
+  // Карточка открыта из середины списка — показываем её с начала.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [productId]);
+
   useEffect(() => {
     getShops()
       .then(setShops)
@@ -290,7 +295,7 @@ const AdminProductEdit = () => {
     return (
       <div className={styles.wrap}>
         <p className={styles.message}>Товар не найден.</p>
-        <Link className={styles.backLink} to="/admin/products">← Все товары</Link>
+        <Link className={styles.backLink} to="/admin/products" state={{ backToList: true }}>← Все товары</Link>
       </div>
     );
   }
@@ -300,7 +305,7 @@ const AdminProductEdit = () => {
 
   return (
     <div className={styles.wrap}>
-      <Link className={styles.backLink} to="/admin/products">← Все товары</Link>
+      <Link className={styles.backLink} to="/admin/products" state={{ backToList: true }}>← Все товары</Link>
 
       <form onSubmit={handleSubmit}>
         <header className={styles.pageHead}>
@@ -594,7 +599,7 @@ const AdminProductEdit = () => {
         </Section>
 
         <div className={styles.footActions}>
-          <Link className={styles.cancelBtn} to="/admin/products">К списку</Link>
+          <Link className={styles.cancelBtn} to="/admin/products" state={{ backToList: true }}>К списку</Link>
           <button type="submit" className={styles.saveBtn} disabled={saving}>
             {saving ? 'Сохранение…' : isNew ? 'Создать товар' : 'Сохранить'}
           </button>

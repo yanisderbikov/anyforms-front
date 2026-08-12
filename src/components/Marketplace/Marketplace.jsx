@@ -4,6 +4,7 @@ import { getItems, getShops } from '../../services/itemsService';
 import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
 import { useLikes } from '../../hooks/useLikes';
+import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
 import { SHOP_THEMES } from './shopThemes';
@@ -39,6 +40,8 @@ const Marketplace = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Возврат из карточки товара — на то же место каталога, а не в начало.
+  useListScrollMemory(`shop-scroll:${shopBase}`, !loading);
   const [copied, setCopied] = useState(false);
   const [showLiked, setShowLiked] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
