@@ -141,6 +141,25 @@
 .summaryTotal { font-size: 1.1rem; font-weight: 700; color: var(--color-base-black); border-top: 1px solid #e2e2e2; margin-top: 6px; padding-top: 14px; }
 .summaryNote { font-size: 0.8rem; color: #8c8c8c; margin: 8px 0 0; }
 
+/* Напоминание, что в заказе — формы, а не готовые изделия: на фото товаров
+   часто отлитое изделие, и покупатели путают. Красится в палитру магазина
+   теми же note-переменными, что плашка предзаказа на странице товара. */
+.moldNote {
+  background: var(--shop-note-bg, #eef3fa);
+  border: 1px solid var(--shop-note-border, #c4d3e8);
+  border-left: 4px solid var(--shop-badge-bg, #4a6fa5);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--shop-note-text, #3a4a5e);
+}
+
+.moldNote strong {
+  color: var(--shop-note-fg, #2e4a70);
+}
+
 /* Информативные позиции заказа: фото + название + описание + счёт */
 .orderItems { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
 .orderItem { display: flex; align-items: flex-start; gap: 12px; }

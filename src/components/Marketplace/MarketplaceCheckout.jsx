@@ -251,6 +251,10 @@ const MarketplaceCheckout = () => {
               {formatPrice(discountedTotal)}
             </span>
           </div>
+          <p className={styles.moldNote}>
+            <strong>Обратите внимание:</strong> вы покупаете силиконовые формы (молды)
+            для изготовления изделий, а не готовые изделия с фотографий.
+          </p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
