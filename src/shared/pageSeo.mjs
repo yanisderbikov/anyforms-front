@@ -95,9 +95,9 @@ export const PAGE_SEO = {
     image: `${SITE_URL}/og-shop-di_gips.jpg`,
   },
   '/shop/lunasvecha': {
-    title: 'Свечи ручной работы lunasvecha',
+    title: 'Магазин молдов lunasvecha',
     description:
-      'Авторские свечи lunasvecha — лью свечи с 2020 года и обучаю свечеварению учеников по всему миру.',
+      'Молды для свечей — подборка lunasvecha: лью свечи с 2020 года и обучаю свечеварению учеников по всему миру.',
     image: `${SITE_URL}/og-shop-lunasvecha.jpg`,
   },
 };

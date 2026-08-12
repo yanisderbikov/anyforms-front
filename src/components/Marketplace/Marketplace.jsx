@@ -200,8 +200,23 @@ const Marketplace = () => {
       )}
       <header className={styles.header}>
         <div className={styles.headerInner}>
+          {theme?.headerMark && (
+            <a className={styles.brandMark} href="#top" aria-label={`${shopName} — наверх`}>
+              <img
+                src={theme.headerMark.src}
+                alt=""
+                width={theme.headerMark.width}
+                height={theme.headerMark.height}
+                decoding="async"
+              />
+            </a>
+          )}
           {theme ? (
-            <a className={styles.brandLink} href="#top" aria-label={`${shopName} — наверх`}>
+            <a
+              className={`${styles.brandLink} ${theme.headerMark ? styles.brandLinkWithMark : ''}`}
+              href="#top"
+              aria-label={`${shopName} — наверх`}
+            >
               {theme.headerLogo ? (
                 <img
                   className={styles.brandLogo}

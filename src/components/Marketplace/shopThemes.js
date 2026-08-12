@@ -11,6 +11,9 @@ import styles from './shopThemes.module.css';
  * десктопе, рядом с видео-приветствием);
  * headerLogo — логотип в центре шапки вместо названия магазина
  * (src + натуральные пропорции для width/height);
+ * headerMark — знак бренда слева в шапке, парный к иконкам справа; вместе
+ * с headerLogo (словомаркой по центру) даёт «разобранный» логотип, при этом
+ * на узких экранах центр прячется и остаётся только знак;
  * heroVideo — квадратный ролик-приветствие над каталогом: webm основной,
  * mp4 (h264) — запасной для старых iPhone (iOS < 17.4 не играет webm);
  * без поддерживаемого формата витрина показывает обычный текстовый заголовок;
@@ -32,13 +35,20 @@ export const SHOP_THEMES = {
   lunasvecha: {
     className: styles.lunasvecha,
     pageBackground: '#f4f1ea',
-    tagline: 'Свечи ручной работы lunasvecha',
+    tagline: 'Магазин молдов lunasvecha',
     description:
-      'Авторские свечи lunasvecha — лью свечи с 2020 года и обучаю свечеварению учеников по всему миру',
+      'Молды для свечей — подборка lunasvecha: лью свечи с 2020 года и обучаю свечеварению учеников по всему миру',
+    // Логотип разобран на две части: знак «луна + лотос» слева, словомарка
+    // по центру; на узких экранах словомарка прячется (см. .brandLinkWithMark).
+    headerMark: {
+      src: '/lunasvecha_mark.svg',
+      width: 120,
+      height: 120,
+    },
     headerLogo: {
-      src: '/lunasvecha_logo.svg',
-      width: 680,
-      height: 121,
+      src: '/lunasvecha_wordmark.svg',
+      width: 673,
+      height: 64,
     },
   },
   af_pastry: {

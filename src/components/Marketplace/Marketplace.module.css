@@ -131,6 +131,40 @@
   text-decoration: none;
 }
 
+/* Знак бренда слева в шапке (headerMark): парный к иконкам справа. */
+.brandMark {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+}
+
+.brandMark img {
+  display: block;
+  height: 46px;
+  width: auto;
+}
+
+@media (max-width: 600px) {
+  /* На узких экранах центр шапки освобождаем: остаются знак слева и иконки
+     справа, словомарка по центру прячется. Знак становится потоковым —
+     иначе шапка без центрального контента схлопывается по высоте. */
+  .brandMark {
+    position: static;
+    transform: none;
+    margin-right: auto;
+  }
+
+  .brandMark img {
+    height: 40px;
+  }
+
+  .brandLinkWithMark {
+    display: none;
+  }
+}
+
 
 /* Логотип магазина в центре шапки: высота вписана в шапку (52 + 2×16 = 84px,
    как верхний отступ .wrap), ширина — по пропорциям файла. */
