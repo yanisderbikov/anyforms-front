@@ -65,6 +65,8 @@ const MarketplaceProduct = () => {
   useEffect(() => {
     setActiveImage(0);
     setSelectedVariantId(null);
+    // Товар открыт из середины каталога — карточку показываем с начала.
+    window.scrollTo(0, 0);
   }, [id]);
 
   // Активное превью подъезжает в середину ленты (и по вертикали, и по горизонтали)
@@ -125,12 +127,12 @@ const MarketplaceProduct = () => {
       <div className={pageClass} id="top">
         <div className={styles.inner}>
           <div className={styles.topBar}>
-            <Link className={styles.back} to={shopBase}>← В магазин</Link>
+            <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
             {cartLink}
           </div>
           <div className={styles.centered}>
             <p className={styles.centeredText}>Товар не найден или больше не доступен.</p>
-            <Link className={styles.primaryLink} to={shopBase}>
+            <Link className={styles.primaryLink} to={shopBase} state={{ backToList: true }}>
               <span>Перейти к товарам</span>
               <span className={styles.ctaArrow} aria-hidden="true">→</span>
             </Link>
@@ -159,7 +161,7 @@ const MarketplaceProduct = () => {
     <div className={pageClass} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
-          <Link className={styles.back} to={shopBase}>← В магазин</Link>
+          <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
           {cartLink}
         </div>
 

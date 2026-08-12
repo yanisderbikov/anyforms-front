@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
+import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import styles from './AdminProducts.module.css';
 
 // Магазин по умолчанию: витрина anyforms.
@@ -41,6 +42,8 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState('');
+  // Возврат с карточки товара — на то же место списка, а не в начало.
+  useListScrollMemory('admin-products-scroll', !loading);
   const [shops, setShops] = useState([]);
   // Фильтры списка: магазин ('' — все), статус, поиск по названию.
   const [shopFilter, setShopFilter] = useState(() => readSavedFilters().shop);

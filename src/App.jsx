@@ -13,6 +13,7 @@ import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import AdminProductEdit from "./components/AdminProducts/AdminProductEdit";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
+import AdminPromoCodes from "./components/AdminPromoCodes/AdminPromoCodes";
 import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoices";
 import AdminYookassaReceipts from "./components/AdminInvoices/AdminYookassaReceipts";
 import AdminLayout from "./components/AdminLayout/AdminLayout";
@@ -79,6 +80,7 @@ const KNOWN_PATHS = new Set([
   '/admin/orders/custom/create',
   '/admin/orders/custom/ship',
   '/admin/products',
+  '/admin/promo-codes',
   '/admin/invoices',
   '/admin/invoices/training',
   '/admin/invoices/receipts',
@@ -268,6 +270,7 @@ function App() {
           <Route path="/admin/products" element={<AdminProducts />} />
           {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
           <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
+          <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
           <Route path="/admin/invoices" element={<AdminInvoices />} />
           <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
           <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />

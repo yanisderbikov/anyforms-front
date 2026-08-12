@@ -5,7 +5,7 @@ import apiClient from '../../apiClient';
 import {
   getPromoFromSearch,
   buildPassThroughQuery,
-  formatPromoDeadline,
+  formatPromoDeadlineNote,
   normalizePromoCode,
 } from '../../shared/promoTracking';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
@@ -54,10 +54,14 @@ const CourseCheckout = () => {
   const [promoInput, setPromoInput] = useState('');
   // Промокод проверяем сразу для обоих тарифов: {self: data, personal: data}.
   const [appliedPromos, setAppliedPromos] = useState({});
+  // Причины отказа по тарифам: код может подойти одному тарифу и не подойти
+  // другому (например, не дотянул до минимальной суммы заказа).
+  const [planPromoMessages, setPlanPromoMessages] = useState({});
   const [promoError, setPromoError] = useState('');
   const [promoChecking, setPromoChecking] = useState(false);
 
   const appliedPromo = appliedPromos[plan] || null;
+  const shownPromoError = promoError || (!appliedPromo && planPromoMessages[plan]) || '';
 
   useEffect(() => {
     saveCheckoutContact({ fullName, phone, email });
@@ -83,6 +87,13 @@ const CourseCheckout = () => {
       );
       const valid = Object.fromEntries(
         entries.filter(([, data]) => data?.valid)
+      );
+      setPlanPromoMessages(
+        Object.fromEntries(
+          entries
+            .filter(([, data]) => data && !data.valid && data.message)
+            .map(([key, data]) => [key, data.message])
+        )
       );
       if (Object.keys(valid).length > 0) {
         setAppliedPromos(valid);
@@ -338,7 +349,7 @@ const CourseCheckout = () => {
             <div className={styles.promoRow}>
               <input
                 id="promo"
-                className={`${styles.input} ${promoError ? styles.inputError : ''}`}
+                className={`${styles.input} ${shownPromoError ? styles.inputError : ''}`}
                 type="text"
                 autoComplete="off"
                 placeholder="Введите промокод, если есть"
@@ -346,9 +357,10 @@ const CourseCheckout = () => {
                 onChange={(e) => {
                   setPromoInput(e.target.value);
                   setAppliedPromos({});
+                  setPlanPromoMessages({});
                   setPromoError('');
                 }}
-                aria-invalid={Boolean(promoError)}
+                aria-invalid={Boolean(shownPromoError)}
               />
               <button
                 type="button"
@@ -359,12 +371,20 @@ const CourseCheckout = () => {
                 {promoChecking ? 'Проверяем…' : appliedPromo ? 'Применён' : 'Применить'}
               </button>
             </div>
-            {promoError && <p className={styles.fieldError}>{promoError}</p>}
+            {shownPromoError && <p className={styles.fieldError}>{shownPromoError}</p>}
             {appliedPromo && (
               <p className={styles.promoOk}>
-                Промокод {appliedPromo.code} применён: скидка {appliedPromo.discountPercent}%
-                {formatPromoDeadline(appliedPromo.validUntil)
-                  ? `. Ваша скидка действует до ${formatPromoDeadline(appliedPromo.validUntil)}.`
+                Промокод {appliedPromo.code} применён: скидка{' '}
+                {[
+                  appliedPromo.discountPercent ? `${appliedPromo.discountPercent}%` : null,
+                  appliedPromo.discountAmountKopecks
+                    ? formatKopecks(appliedPromo.discountAmountKopecks)
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(' + ')}
+                {formatPromoDeadlineNote(appliedPromo.validUntil)
+                  ? `. Ваша скидка действует ${formatPromoDeadlineNote(appliedPromo.validUntil)}.`
                   : '.'}
               </p>
             )}

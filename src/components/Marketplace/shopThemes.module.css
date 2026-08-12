@@ -5,6 +5,100 @@
 
 /* af_pastry: бордовый + крем, серифная типографика с разрядкой,
    шалфейно-оливковый акцент — по фирменному стилю Instagram af_pastry_studio. */
+/* di_gips: тёплый крем + «пыльная роза» с bubble-логотипа (текст на розовом —
+   тёмно-ягодный, иначе не читается), оливково-фисташковый акцент, округлая
+   типографика — по фирменному стилю Instagram di_gips (кремовый баннер,
+   розовый bubble-логотип, сердечки, оливковые плашки). */
+.diGips {
+  --shop-header-bg: #d78da1;
+  --shop-header-fg: #7c2b45;
+  --shop-page-bg: #faf3e6;
+  /* Акцент — не пастель: он красит текст (цену, ссылки, промо) и кнопки,
+     пастельный тон здесь выглядит выцветшим. Глубокая малина той же гаммы. */
+  --shop-accent: #b44e70;
+  --shop-accent-hover: #9d3f60;
+  --shop-btn-hover-fg: #fdf5ea;
+  --shop-title-font: 'Arial Rounded MT Bold', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --shop-badge-bg: #9aa25c;
+  --shop-added-bg: #9aa25c;
+  --shop-added-bg-hover: #86904c;
+  --shop-note-bg: #fbe8ef;
+  --shop-note-border: #f2c9d8;
+  --shop-note-fg: #a53f63;
+  --shop-note-text: #8e5a68;
+  --shop-text: #6b5750;
+  /* Подложка под фото товара, пока оно грузится: тёплый крем чуть темнее фона. */
+  --shop-photo-bg: #f1e8d8;
+  /* Подвал сливается с кремовым фоном, приглушённый тёплый текст. */
+  --shop-footer-bg: #faf3e6;
+  --shop-footer-border: rgba(215, 141, 161, 0.4);
+  --shop-footer-heading: rgba(107, 87, 80, 0.72);
+  --shop-footer-text: rgba(107, 87, 80, 0.58);
+  --shop-footer-link: rgba(107, 87, 80, 0.7);
+  --shop-footer-link-border: rgba(107, 87, 80, 0.28);
+  --shop-footer-link-hover: #b44e70;
+  --shop-footer-muted: rgba(107, 87, 80, 0.42);
+  /* Чекаут-флоу: кремовый фон, округлые заголовки нормального регистра,
+     активная малиновая CTA-пилюля с кремовым текстом. */
+  --shop-heading: #b44e70;
+  --shop-title-transform: none;
+  /* Тэглайн витрины строчными — как леттеринг на её баннерах
+     («творчество, которое вдохновляет и объединяет»). */
+  --shop-tagline-transform: lowercase;
+  --shop-cta-bg: #b44e70;
+  --shop-cta-fg: #fdf5ea;
+  --shop-cta-hover-bg: #9d3f60;
+  --shop-cta-hover-fg: #fdf5ea;
+}
+
+/* lunasvecha: слоновая кость + шоколад этикеток, дымчато-голубая шапка
+   с перламутровым лого «луна + лотос», серифная типографика с разрядкой,
+   как леттеринг LUNASVECHA на упаковке. */
+.lunasvecha {
+  --shop-header-bg: #7f95a7;
+  /* Шапку занимает кремовый SVG-логотип; header-fg — фолбэк на случай текста
+     вместо логотипа, поэтому тёмный (крем на голубом не читается). */
+  --shop-header-fg: #2e3a44;
+  --shop-page-bg: #f4f1ea;
+  /* Акцент — тёплый шоколад этикеток (насыщенность ≥50%, серые тона грязнят):
+     цены, ссылки, кнопки, разделитель. */
+  --shop-accent: #4a3423;
+  --shop-accent-hover: #392718;
+  --shop-btn-hover-fg: #f3ede4;
+  --shop-title-font: 'Georgia', 'Times New Roman', serif;
+  /* Бейджи и состояние «в корзине» — глубокий пыльно-голубой (теневая грань
+     коробки): на светлом тоне #7f95a7 белый текст бейджа не добирает контраст. */
+  --shop-badge-bg: #62788b;
+  --shop-added-bg: #62788b;
+  --shop-added-bg-hover: #536879;
+  /* Плашка предзаказа — бледно-голубая, в тон коробкам. */
+  --shop-note-bg: #e9eef2;
+  --shop-note-border: #ccd8e0;
+  --shop-note-fg: #435a6c;
+  --shop-note-text: #5a6470;
+  --shop-text: #5c5047;
+  /* Подложка под фото товара, пока оно грузится: тёплая слоновая кость чуть темнее фона. */
+  --shop-photo-bg: #ebe7de;
+  /* Подвал сливается со светлым фоном, приглушённый тёплый текст,
+     линия-разделитель — голубая, как кант упаковки. */
+  --shop-footer-bg: #f4f1ea;
+  --shop-footer-border: rgba(127, 149, 167, 0.35);
+  --shop-footer-heading: rgba(92, 80, 71, 0.72);
+  --shop-footer-text: rgba(92, 80, 71, 0.58);
+  --shop-footer-link: rgba(92, 80, 71, 0.7);
+  --shop-footer-link-border: rgba(92, 80, 71, 0.28);
+  --shop-footer-link-hover: #4a3423;
+  --shop-footer-muted: rgba(92, 80, 71, 0.42);
+  /* Чекаут-флоу: светлый фон, серифные заголовки нормального регистра,
+     шоколадная CTA-пилюля с кремовым текстом. */
+  --shop-heading: #4a3423;
+  --shop-title-transform: none;
+  --shop-cta-bg: #4a3423;
+  --shop-cta-fg: #f3ede4;
+  --shop-cta-hover-bg: #5e452e;
+  --shop-cta-hover-fg: #f3ede4;
+}
+
 .afPastry {
   --shop-header-bg: #572631;
   --shop-header-fg: #f4eee3;

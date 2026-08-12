@@ -77,13 +77,43 @@ export const buildPassThroughQuery = (search, extra = {}) => {
   return qs ? `?${qs}` : '';
 };
 
-// «30 июля» — последний день действия кода. validUntil с бэка — исключительная
-// граница (первый момент, когда код уже не работает), поэтому минус миллисекунда.
-export const formatPromoDeadline = (validUntil) => {
+// Сроки промокодов задаются по Москве; validUntil с бэка — исключительная
+// граница (первый момент, когда код уже не работает), поэтому показываем
+// последнюю действующую минуту: минус миллисекунда и обрезка до минут.
+const MSK_TIME_ZONE = 'Europe/Moscow';
+
+const parseValidUntil = (validUntil) => {
   if (!validUntil) return null;
   // Бэк отдаёт ISO-строку; число на всякий случай трактуем как секунды эпохи.
   const source = typeof validUntil === 'number' ? validUntil * 1000 : validUntil;
-  const lastDay = new Date(new Date(source).getTime() - 1);
-  if (Number.isNaN(lastDay.getTime())) return null;
-  return lastDay.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  const lastMoment = new Date(new Date(source).getTime() - 1);
+  return Number.isNaN(lastMoment.getTime()) ? null : lastMoment;
+};
+
+const formatDeadline = (date, timeZone) =>
+  date.toLocaleString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone,
+  });
+
+// «до 31 августа, 23:59 МСК», а если пояс посетителя показывает другое время —
+// «до 31 августа, 23:59 МСК (по вашему времени — до 1 сентября, 03:59)».
+// null — бессрочный код или нечитаемая дата.
+export const formatPromoDeadlineNote = (validUntil) => {
+  const lastMoment = parseValidUntil(validUntil);
+  if (!lastMoment) return null;
+  const msk = formatDeadline(lastMoment, MSK_TIME_ZONE);
+  let local = null;
+  try {
+    // Без timeZone — пояс устройства; сравниваем готовые строки: совпали —
+    // посетитель живёт по московскому времени, дублировать незачем.
+    local = formatDeadline(lastMoment, undefined);
+  } catch {
+    local = null;
+  }
+  const base = `до ${msk} МСК`;
+  return local && local !== msk ? `${base} (по вашему времени — до ${local})` : base;
 };

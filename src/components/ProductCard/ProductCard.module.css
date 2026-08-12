@@ -337,7 +337,9 @@
 
 .boutique .preorderBadge {
   background: rgba(244, 238, 227, 0.94);
-  color: var(--shop-text, #444);
+  /* Текст контрастирует с кремовой плашкой, а не с фоном страницы: у тёмных
+     тем --shop-text светлый, поэтому цвет переопределяется отдельно. */
+  color: var(--shop-preorder-badge-fg, var(--shop-text, #444));
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.07em;

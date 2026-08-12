@@ -4,6 +4,7 @@ import { getItems, getShops } from '../../services/itemsService';
 import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
 import { useLikes } from '../../hooks/useLikes';
+import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
 import { SHOP_THEMES } from './shopThemes';
@@ -39,6 +40,8 @@ const Marketplace = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Возврат из карточки товара — на то же место каталога, а не в начало.
+  useListScrollMemory(`shop-scroll:${shopBase}`, !loading);
   const [copied, setCopied] = useState(false);
   const [showLiked, setShowLiked] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
@@ -61,6 +64,12 @@ const Marketplace = () => {
     return sources.find((s) => s.src && probe.canPlayType(s.type))?.src ?? null;
   }, [theme]);
   const showHeroVideo = Boolean(heroVideoSrc) && !heroVideoFailed;
+
+  // Фото-приветствие — как видео, но статичное: если в теме есть и видео,
+  // и фото, видео важнее, а фото остаётся запасным вариантом при ошибке.
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
+  const heroImage = !heroImageFailed ? theme?.heroImage ?? null : null;
+  const showHero = showHeroVideo || Boolean(heroImage);
 
   // Плавный скролл к каталогу; ссылка с #catalog остаётся рабочей и без JS.
   const scrollToCatalog = (e) => {
@@ -194,8 +203,23 @@ const Marketplace = () => {
       )}
       <header className={styles.header}>
         <div className={styles.headerInner}>
+          {theme?.headerMark && (
+            <a className={styles.brandMark} href="#top" aria-label={`${shopName} — наверх`}>
+              <img
+                src={theme.headerMark.src}
+                alt=""
+                width={theme.headerMark.width}
+                height={theme.headerMark.height}
+                decoding="async"
+              />
+            </a>
+          )}
           {theme ? (
-            <a className={styles.brandLink} href="#top" aria-label={`${shopName} — наверх`}>
+            <a
+              className={`${styles.brandLink} ${theme.headerMark ? styles.brandLinkWithMark : ''}`}
+              href="#top"
+              aria-label={`${shopName} — наверх`}
+            >
               {theme.headerLogo ? (
                 <img
                   className={styles.brandLogo}
@@ -267,7 +291,7 @@ const Marketplace = () => {
           </Link>
         </div>
       </header>
-      {showHeroVideo ? (
+      {showHero ? (
         <section className={styles.hero}>
           <div className={styles.heroTitleBlock}>
             <h1 className={styles.shopTitle}>{theme.tagline ?? shopName}</h1>
@@ -277,17 +301,26 @@ const Marketplace = () => {
             )}
           </div>
           <div className={styles.heroMedia}>
-            <video
-              className={styles.heroVideo}
-              src={heroVideoSrc}
-              autoPlay={!prefersReducedMotion}
-              muted
-              loop
-              playsInline
-              preload="auto"
-              disablePictureInPicture
-              onError={() => setHeroVideoFailed(true)}
-            />
+            {showHeroVideo ? (
+              <video
+                className={styles.heroVideo}
+                src={heroVideoSrc}
+                autoPlay={!prefersReducedMotion}
+                muted
+                loop
+                playsInline
+                preload="auto"
+                disablePictureInPicture
+                onError={() => setHeroVideoFailed(true)}
+              />
+            ) : (
+              <img
+                className={styles.heroImage}
+                src={heroImage.src}
+                alt={heroImage.alt ?? ''}
+                onError={() => setHeroImageFailed(true)}
+              />
+            )}
           </div>
           <a className={styles.heroCta} href="#catalog" onClick={scrollToCatalog}>
             Смотреть каталог
@@ -313,7 +346,7 @@ const Marketplace = () => {
           )}
         </div>
       )}
-      {showHeroVideo && (
+      {showHero && (
         <div className={styles.catalogHead} id="catalog">
           <h2 className={styles.catalogTitle}>Каталог</h2>
           <span className={styles.shopDivider} aria-hidden="true" />

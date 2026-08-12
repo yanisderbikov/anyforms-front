@@ -26,16 +26,19 @@ export const PAGE_SEO = {
     title: 'Корпуса для электроники на заказ — 3D-печать от 1 шт | anyforms',
     description:
       'Изготовим корпус для вашей электроники без пресс-формы: от образца за 3–7 рабочих дней до серии в тысячи штук. PETG, ABS GF, PA12. Расчёт за 15 минут.',
+    image: `${SITE_URL}/og-3d-print.png`,
   },
   '/guide': {
     title: 'Как продавать сложный продукт через короткие видео — гайд Юрия Суворова',
     description:
       'Пошаговый гайд для мастеров, производителей и экспертов: как получать заявки из Reels, Shorts, TikTok и Клипов, а не просто собирать просмотры.',
+    image: `${SITE_URL}/og-guide.jpg`,
   },
   '/course': {
     title: 'Курс по производству силиконовых форм — anyforms',
     description:
       'Видео-курс из 4 модулей: полный цикл производства силиконовых форм от идеи до рабочей формы на примере дизайнерской контейнерной свечи.',
+    image: `${SITE_URL}/og-course-card.jpg`,
   },
   '/course/offer': {
     title: 'Публичная оферта — курс anyforms',
@@ -77,9 +80,36 @@ export const PAGE_SEO = {
     title: 'Маркетплейс - anyforms',
     description: 'Каталог товаров и оформление заказов в маркетплейсе anyforms.',
   },
+  // Партнёрские витрины: свой заголовок, описание и OG-карточка (превью в
+  // Telegram и соцсетях) — под брендом магазина, без anyforms в заголовке.
+  '/shop/af_pastry': {
+    title: 'Магазин молдов Анны Феликовой — af_pastry',
+    description:
+      'Профессиональные силиконовые молды для десертов — подборка Анны Феликовой.',
+    image: `${SITE_URL}/og-shop-af_pastry.jpg`,
+  },
+  '/shop/di_gips': {
+    title: 'Магазин молдов Дианы di_gips',
+    description:
+      'Гипсовый декор и свечи ручной работы от Дианы (di_gips) — творчество, которое вдохновляет и объединяет.',
+    image: `${SITE_URL}/og-shop-di_gips.jpg`,
+  },
+  '/shop/lunasvecha': {
+    title: 'Магазин молдов lunasvecha',
+    description:
+      'Молды для свечей — подборка lunasvecha: лью свечи с 2020 года и обучаю свечеварению учеников по всему миру.',
+    image: `${SITE_URL}/og-shop-lunasvecha.jpg`,
+  },
 };
 
 // Публичные маршруты без SSR-рендера: пререндер кладёт для них HTML с правильными
 // мета-тегами и пустым #root (контент рисует клиент). Этого достаточно, чтобы
 // Telegram и соцсети показывали своё описание и картинку для каждой страницы.
-export const META_PRERENDER_ROUTES = ['/chief', '/guide', '/course'];
+export const META_PRERENDER_ROUTES = [
+  '/chief',
+  '/guide',
+  '/course',
+  '/shop/af_pastry',
+  '/shop/di_gips',
+  '/shop/lunasvecha',
+];
