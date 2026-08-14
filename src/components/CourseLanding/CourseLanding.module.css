@@ -615,6 +615,66 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
+/* ═══════════════ ЭКРАН 1.5 · РОЗЫГРЫШ ПРИНТЕРА ═══════════════ */
+.raffleSection {
+  background: var(--bg);
+  color: var(--white);
+  padding: 84px 0;
+}
+
+.raffleInner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 44px;
+  align-items: center;
+}
+
+.raffleMedia {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.raffleImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
+
+/* Спонсор — маленький логотип на белой плашке (тёмный контур сливается с фоном). */
+.raffleSponsor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.raffleSponsorChip {
+  flex: none;
+  display: flex;
+  background: var(--white);
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.raffleSponsorLogo {
+  width: 38px;
+  height: auto;
+}
+
+.raffleSponsorNote {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@media (min-width: 900px) {
+  .raffleInner {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+  }
+}
+
 /* ═══════════════ ЭКРАН 4 · МОДУЛИ ═══════════════ */
 .modulesSection {
   padding: 72px 0;
@@ -920,6 +980,20 @@
   flex: none;
   color: var(--accent);
   font-weight: 600;
+}
+
+/* Подсвеченный бонус — розыгрыш принтера. */
+.bonusItemFeatured {
+  background: rgba(108, 134, 189, 0.16);
+  border: 1px solid rgba(108, 134, 189, 0.5);
+  border-radius: 14px;
+  padding: 18px 16px;
+}
+
+@media (min-width: 760px) {
+  .bonusItemFeatured {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 760px) {
