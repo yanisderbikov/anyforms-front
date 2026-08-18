@@ -914,7 +914,12 @@ const CourseLanding = () => {
               <p className={styles.darkLead}>
                 Среди всех участников курса разыграем Bambu Lab P2S Combo —
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
-                Оформите предзаказ на любой тариф — и вы автоматически участвуете.
+                Оформите предзаказ на любой тариф — и вы автоматически
+                участвуете.
+              </p>
+              <p className={styles.raffleSub}>
+                Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто
+                определит рандомайзер.
               </p>
               <button
                 type="button"
@@ -944,7 +949,16 @@ const CourseLanding = () => {
                   />
                 </span>
                 <span className={styles.raffleSponsorNote}>
-                  Спонсор розыгрыша — 3D OUTLET
+                  Спонсор розыгрыша — 3D OUTLET, официальный представитель
+                  Bambu&nbsp;Lab в&nbsp;СНГ{' '}
+                  <a
+                    className={styles.raffleSponsorLink}
+                    href="https://t.me/dddOutlet"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    @dddOutlet
+                  </a>
                 </span>
               </div>
             </div>

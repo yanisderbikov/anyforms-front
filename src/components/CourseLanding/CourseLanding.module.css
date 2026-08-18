@@ -672,6 +672,25 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
+.raffleSponsorLink {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.raffleSponsorLink:hover {
+  color: var(--accent-hover);
+}
+
+/* Короткая приписка о формате розыгрыша. */
+.raffleSub {
+  margin: 14px 0 0;
+  max-width: 620px;
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.55);
+}
+
 @media (min-width: 900px) {
   .raffleInner {
     grid-template-columns: 1.1fr 0.9fr;
