@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
+import { uploadToS3 } from '../../services/uploads';
 import AutoTextarea from '../CustomOrders/AutoTextarea';
 import styles from './AdminProductEdit.module.css';
 
@@ -203,20 +204,27 @@ const AdminProductEdit = () => {
     }
   };
 
+  // Фото уходят из браузера сразу в S3 (presign → PUT), confirm сбрасывает кеш папки на бэке.
   const uploadPhotos = async (fileList) => {
     const files = Array.from(fileList || []);
     if (!files.length) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      files.forEach((f) => formData.append('files', f));
-      const res = await apiClient.instance.post(`/api/product/${productId}/photos`, formData, {
+      for (const f of files) {
+        const { data } = await apiClient.instance.post(
+          `/api/product/${productId}/photos/presign`,
+          { filename: f.name, contentType: f.type || null },
+          { headers: authHeaders() }
+        );
+        await uploadToS3(data.uploadUrl, f);
+      }
+      const res = await apiClient.instance.post(`/api/product/${productId}/photos/confirm`, null, {
         headers: authHeaders(),
       });
       setProduct(res.data);
       toast.success(files.length === 1 ? 'Фото загружено' : `Загружено фото: ${files.length}`);
     } catch (err) {
-      toast.error(err?.response?.data?.error || 'Не удалось загрузить фото');
+      toast.error(err?.response?.data?.error || err?.message || 'Не удалось загрузить фото');
     } finally {
       setUploading(false);
     }
