@@ -338,6 +338,42 @@ const FAQ = [
   // },
 ];
 
+// Пункт FAQ: высота анимируется grid-переходом 0fr → 1fr, без замера контента.
+const FaqItem = ({ q, a }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`${styles.faqItem} ${open ? styles.faqItemOpen : ''}`}>
+      <button
+        type="button"
+        className={styles.faqQ}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span>{q}</span>
+        <span className={styles.faqIcon} aria-hidden>
+          {/* SVG вместо текстового «+»: у глифа центр не совпадает с центром
+              бокса, из-за чего поворот его смещал. */}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M8 1v14M1 8h14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      </button>
+      <div className={styles.faqAWrap} aria-hidden={!open}>
+        <div className={styles.faqA}>
+          {(Array.isArray(a) ? a : [a]).map((par) => (
+            <p key={par}>{par}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const scrollToId = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 };
@@ -1066,19 +1102,7 @@ const CourseLanding = () => {
           </div>
           <div className={styles.faqList}>
             {FAQ.map((item) => (
-              <details className={styles.faqItem} key={item.q}>
-                <summary className={styles.faqQ}>
-                  <span>{item.q}</span>
-                  <span className={styles.faqIcon} aria-hidden>
-                    +
-                  </span>
-                </summary>
-                <div className={styles.faqA}>
-                  {(Array.isArray(item.a) ? item.a : [item.a]).map((par) => (
-                    <p key={par}>{par}</p>
-                  ))}
-                </div>
-              </details>
+              <FaqItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
         </div>
