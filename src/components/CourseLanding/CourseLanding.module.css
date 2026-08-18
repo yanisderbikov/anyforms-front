@@ -625,18 +625,42 @@
 .raffleInner {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 44px;
+  gap: 24px;
   align-items: center;
 }
 
-.raffleCta {
-  margin-top: 30px;
+/* Мобилка: обёртки-колонки растворяются (display: contents), элементы становятся
+   ячейками raffleInner, порядок задаёт order: заголовок → фото → текст → спонсор →
+   кнопка. На десктопе (≥900px) колонки возвращаются, order перестаёт действовать. */
+.raffleContent,
+.raffleMedia {
+  display: contents;
 }
 
-.raffleMedia {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.raffleHead {
+  order: 1;
+}
+
+.raffleImg {
+  order: 2;
+}
+
+.raffleInner .darkLead {
+  order: 3;
+  margin-top: 0;
+}
+
+.raffleSub {
+  order: 4;
+}
+
+.raffleSponsor {
+  order: 5;
+}
+
+.raffleCta {
+  order: 6;
+  margin-top: 0;
 }
 
 .raffleImg {
@@ -684,7 +708,7 @@
 
 /* Короткая приписка о формате розыгрыша. */
 .raffleSub {
-  margin: 14px 0 0;
+  margin: 0;
   max-width: 620px;
   font-size: clamp(14px, 2vw, 16px);
   line-height: 1.4;
@@ -695,6 +719,28 @@
   .raffleInner {
     grid-template-columns: 1.1fr 0.9fr;
     gap: 64px;
+  }
+
+  .raffleContent {
+    display: block;
+  }
+
+  .raffleMedia {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .raffleInner .darkLead {
+    margin-top: 34px;
+  }
+
+  .raffleSub {
+    margin-top: 14px;
+  }
+
+  .raffleCta {
+    margin-top: 30px;
   }
 }
 

@@ -901,16 +901,18 @@ const CourseLanding = () => {
         <div className={styles.sectionInner}>
           <div className={styles.raffleInner}>
             <div className={styles.raffleContent}>
-              <span className={styles.pillBadge}>Розыгрыш</span>
-              <h2
-                className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`}
-                id="raffle-title"
-              >
-                Разыгрываем 3D&#8209;принтер{' '}
-                <span className={styles.textAccent}>
-                  Bambu&nbsp;Lab P2S&nbsp;Combo
-                </span>
-              </h2>
+              <div className={styles.raffleHead}>
+                <span className={styles.pillBadge}>Розыгрыш</span>
+                <h2
+                  className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`}
+                  id="raffle-title"
+                >
+                  Разыгрываем 3D&#8209;принтер{' '}
+                  <span className={styles.textAccent}>
+                    Bambu&nbsp;Lab P2S&nbsp;Combo
+                  </span>
+                </h2>
+              </div>
               <p className={styles.darkLead}>
                 Среди всех участников курса разыграем Bambu Lab P2S Combo —
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
