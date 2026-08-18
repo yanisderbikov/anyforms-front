@@ -14,6 +14,7 @@ import {
 } from '../../services/customProducts';
 import AutoTextarea from './AutoTextarea';
 import ModelerSelect from './ModelerSelect';
+import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomItemModal.module.css';
 
 const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
@@ -29,6 +30,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
   const [removedIds, setRemovedIds] = useState(() => new Set());
   const [drafts, setDrafts] = useState([]); // [{ file, url }]
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // { percent, index, count, filename }
   const fileRef = useRef(null);
 
   useEffect(() => {
@@ -97,7 +99,9 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
       }
       const files = drafts.map((d) => d.file);
       if (files.length) {
-        latest = await addItemFiles(item.id, files);
+        latest = await addItemFiles(item.id, files, (percent, meta) =>
+          setUploadProgress({ percent, ...meta })
+        );
       }
       clearDrafts();
       onSaved?.(latest);
@@ -107,6 +111,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
       toast.error('Не удалось сохранить');
     } finally {
       setSaving(false);
+      setUploadProgress(null);
     }
   };
 
@@ -189,6 +194,8 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
             +<input ref={fileRef} type="file" multiple hidden onChange={onPick} />
           </label>
         </div>
+
+        {saving && uploadProgress && <UploadProgress progress={uploadProgress} />}
 
         <div className={styles.footer}>
           <button className={styles.deletePos} onClick={removePosition}>удалить позицию</button>

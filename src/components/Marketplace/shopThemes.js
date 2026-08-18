@@ -50,6 +50,9 @@ export const SHOP_THEMES = {
       width: 673,
       height: 64,
     },
+    heroVideo: {
+      webm: 'https://storage.yandexcloud.net/anyforms/shop/lunasvecha/gypsum.webm',
+    },
   },
   af_pastry: {
     className: styles.afPastry,

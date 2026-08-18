@@ -14,6 +14,7 @@ import {
 import CustomItemCard from './CustomItemCard';
 import CustomItemModal from './CustomItemModal';
 import AutoTextarea from './AutoTextarea';
+import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomOrderFill.module.css';
 
 const EMPTY = { productName: '', description: '', quantity: 1, status: 'MODELING' };
@@ -27,6 +28,7 @@ const CustomOrderFill = () => {
   const [form, setForm] = useState(EMPTY);
   const [drafts, setDrafts] = useState([]); // [{ file, url }]
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // { percent, index, count, filename }
   const [selected, setSelected] = useState(null);
   const fileRef = useRef(null);
 
@@ -91,7 +93,9 @@ const CustomOrderFill = () => {
       const files = drafts.map((d) => d.file);
       if (files.length) {
         try {
-          result = await addItemFiles(created.id, files);
+          result = await addItemFiles(created.id, files, (percent, meta) =>
+            setUploadProgress({ percent, ...meta })
+          );
         } catch {
           toast.error('Позиция создана, но файлы не загрузились');
         }
@@ -103,6 +107,7 @@ const CustomOrderFill = () => {
       toast.error('Не удалось создать позицию');
     } finally {
       setSaving(false);
+      setUploadProgress(null);
     }
   };
 
@@ -174,6 +179,8 @@ const CustomOrderFill = () => {
             +<input ref={fileRef} type="file" multiple hidden onChange={onPick} />
           </label>
         </div>
+
+        {saving && uploadProgress && <UploadProgress progress={uploadProgress} />}
 
         <button className={styles.submit} type="submit" disabled={saving}>
           {saving ? 'добавляю…' : 'добавить позицию'}

@@ -267,13 +267,17 @@ const CASTINGS_BASE = 'https://storage.yandexcloud.net/anyforms/course/castings/
 const CASTING_FILES = [];
 const CASTINGS = CASTING_FILES.map((name) => `${CASTINGS_BASE}${encodeURIComponent(name)}`);
 
-// Экран 8 — бонусы.
+// Экран 8 — бонусы. featured — подсвеченный пункт (розыгрыш принтера).
 const BONUSES = [
-  'Ссылки на проверенные материалы и поставщиков',
-  'Скидки на стартовые закупки',
-  'Доступ в закрытый чат мастеров (2000+ участников)',
-  '10 готовых моделей для отработки навыков',
-  'Пак с оснастками (простая геометрия 1000+ stl)',
+  {
+    text: 'Розыгрыш 3D-принтера Bambu Lab P2S Combo среди всех участников курса',
+    featured: true,
+  },
+  { text: 'Ссылки на проверенные материалы и поставщиков' },
+  { text: 'Скидки на стартовые закупки' },
+  { text: 'Доступ в закрытый чат мастеров (2000+ участников)' },
+  { text: '10 готовых моделей для отработки навыков' },
+  { text: 'Пак с оснастками (простая геометрия 1000+ stl)' },
 ];
 
 // Экран 9 — что нужно, чтобы пройти.
@@ -333,6 +337,42 @@ const FAQ = [
   //   a: 'Бюджет на первую форму — примерно 5 000 ₽. Дадим ссылки на проверенных поставщиков и скидки на стартовые закупки, чтобы не переплачивать.',
   // },
 ];
+
+// Пункт FAQ: высота анимируется grid-переходом 0fr → 1fr, без замера контента.
+const FaqItem = ({ q, a }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`${styles.faqItem} ${open ? styles.faqItemOpen : ''}`}>
+      <button
+        type="button"
+        className={styles.faqQ}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span>{q}</span>
+        <span className={styles.faqIcon} aria-hidden>
+          {/* SVG вместо текстового «+»: у глифа центр не совпадает с центром
+              бокса, из-за чего поворот его смещал. */}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M8 1v14M1 8h14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      </button>
+      <div className={styles.faqAWrap} aria-hidden={!open}>
+        <div className={styles.faqA}>
+          {(Array.isArray(a) ? a : [a]).map((par) => (
+            <p key={par}>{par}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const scrollToId = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -840,62 +880,89 @@ const CourseLanding = () => {
           </h2>
           <div className={styles.bonusGrid}>
             {BONUSES.map((item) => (
-              <div className={styles.bonusItem} key={item}>
+              <div
+                className={`${styles.bonusItem} ${
+                  item.featured ? styles.bonusItemFeatured : ''
+                }`}
+                key={item.text}
+              >
                 <span className={styles.bonusStar} aria-hidden>
                   ★
                 </span>
-                <span>{item}</span>
+                <span>{item.text}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ ЭКРАН 9 · ЧТО ПОНАДОБИТСЯ ═══════════════ */}
-      <section id="need" className={styles.needSection} aria-labelledby="need-title">
+      {/* ═══════════════ ЭКРАН 8.5 · РОЗЫГРЫШ ПРИНТЕРА ═══════════════ */}
+      <section className={styles.raffleSection} aria-labelledby="raffle-title">
         <div className={styles.sectionInner}>
-
-          <div className={styles.offerPanel}>
-            <div>
-              <span className={styles.offerLabel}>Частый вопрос</span>
-              <h3 className={styles.offerTitle}>
-                Что делать, если на старте нет оборудования?
-              </h3>
-              <p className={styles.offerText}>
-                Мы предоставим список того, что вам необходимо для работы, либо вы
-                можете заказать у нас печать со скидкой 50% и изучать курс без покупки
-                оборудования, минуя этап «Печать». Также вам будет доступен чат
-                мастеров, где вы сможете найти исполнителя из своего города.
+          <div className={styles.raffleInner}>
+            <div className={styles.raffleContent}>
+              <div className={styles.raffleHead}>
+                <span className={styles.pillBadge}>Розыгрыш</span>
+                <h2
+                  className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`}
+                  id="raffle-title"
+                >
+                  Разыгрываем 3D&#8209;принтер{' '}
+                  <span className={styles.textAccent}>
+                    Bambu&nbsp;Lab P2S&nbsp;Combo
+                  </span>
+                </h2>
+              </div>
+              <p className={styles.darkLead}>
+                Среди всех участников курса разыграем Bambu Lab P2S Combo —
+                принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
+                Оформите предзаказ на любой тариф — и вы автоматически
+                участвуете.
               </p>
-              <ul className={styles.offerList}>
-                {OFFER_ITEMS.map((item) => (
-                  <li className={styles.offerItem} key={item}>
-                    <span className={styles.offerCheck} aria-hidden>
-                      →
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                className={`${styles.cta} ${styles.ctaInline} ${styles.offerCta}`}
-                href={SUPPORT_TG}
-                target="_blank"
-                rel="noopener noreferrer"
+              <p className={styles.raffleSub}>
+                Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто
+                определит рандомайзер.
+              </p>
+              <button
+                type="button"
+                className={`${styles.cta} ${styles.ctaInline} ${styles.raffleCta}`}
+                onClick={scrollToBuy}
               >
-                Обсудить детали
+                Участвовать в розыгрыше
                 <span className={styles.ctaArrow} aria-hidden>
                   <ArrowIcon />
                 </span>
-              </a>
+              </button>
             </div>
-            <div>
+            <div className={styles.raffleMedia}>
               <img
-                className={styles.offerImg}
-                src={OFFER_IMAGE}
-                alt="Заказ 3D-модели и печати"
+                className={styles.raffleImg}
+                src="/bambu-p2s-combo.jpeg"
+                alt="3D-принтер Bambu Lab P2S Combo с системой AMS 2"
                 loading="lazy"
               />
+              <div className={styles.raffleSponsor}>
+                <span className={styles.raffleSponsorChip}>
+                  <img
+                    className={styles.raffleSponsorLogo}
+                    src="/3d-outlet-logo.svg"
+                    alt="3D OUTLET"
+                    loading="lazy"
+                  />
+                </span>
+                <span className={styles.raffleSponsorNote}>
+                  Спонсор розыгрыша — 3D OUTLET, официальный представитель
+                  Bambu&nbsp;Lab в&nbsp;СНГ{' '}
+                  <a
+                    className={styles.raffleSponsorLink}
+                    href="https://3d-outlet.ru/?utm_source=anyforms-course"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    3d-outlet.ru
+                  </a>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -990,6 +1057,56 @@ const CourseLanding = () => {
         </div>
       </section>
 
+      {/* ═══════════════ ЭКРАН 11.5 · ЧТО ПОНАДОБИТСЯ ═══════════════ */}
+      <section id="need" className={styles.needSection} aria-labelledby="need-title">
+        <div className={styles.sectionInner}>
+
+          <div className={styles.offerPanel}>
+            <div>
+              <span className={styles.offerLabel}>Частый вопрос</span>
+              <h3 className={styles.offerTitle}>
+                Что делать, если на старте нет оборудования?
+              </h3>
+              <p className={styles.offerText}>
+                Мы предоставим список того, что вам необходимо для работы, либо вы
+                можете заказать у нас печать со скидкой 50% и изучать курс без покупки
+                оборудования, минуя этап «Печать». Также вам будет доступен чат
+                мастеров, где вы сможете найти исполнителя из своего города.
+              </p>
+              <ul className={styles.offerList}>
+                {OFFER_ITEMS.map((item) => (
+                  <li className={styles.offerItem} key={item}>
+                    <span className={styles.offerCheck} aria-hidden>
+                      →
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                className={`${styles.cta} ${styles.ctaInline} ${styles.offerCta}`}
+                href={SUPPORT_TG}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Обсудить детали
+                <span className={styles.ctaArrow} aria-hidden>
+                  <ArrowIcon />
+                </span>
+              </a>
+            </div>
+            <div>
+              <img
+                className={styles.offerImg}
+                src={OFFER_IMAGE}
+                alt="Заказ 3D-модели и печати"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════ ЭКРАН 12 · FAQ ═══════════════ */}
       <section id="faq" className={styles.faqSection} aria-labelledby="faq-title">
         <div className={styles.sectionInner}>
@@ -1001,19 +1118,7 @@ const CourseLanding = () => {
           </div>
           <div className={styles.faqList}>
             {FAQ.map((item) => (
-              <details className={styles.faqItem} key={item.q}>
-                <summary className={styles.faqQ}>
-                  <span>{item.q}</span>
-                  <span className={styles.faqIcon} aria-hidden>
-                    +
-                  </span>
-                </summary>
-                <div className={styles.faqA}>
-                  {(Array.isArray(item.a) ? item.a : [item.a]).map((par) => (
-                    <p key={par}>{par}</p>
-                  ))}
-                </div>
-              </details>
+              <FaqItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
         </div>
