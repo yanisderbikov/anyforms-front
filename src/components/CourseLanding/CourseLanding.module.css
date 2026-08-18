@@ -629,6 +629,10 @@
   align-items: center;
 }
 
+.raffleCta {
+  margin-top: 30px;
+}
+
 .raffleMedia {
   display: flex;
   flex-direction: column;

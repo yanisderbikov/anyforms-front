@@ -880,6 +880,16 @@ const CourseLanding = () => {
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
                 Оформите предзаказ на любой тариф — и вы автоматически участвуете.
               </p>
+              <button
+                type="button"
+                className={`${styles.cta} ${styles.ctaInline} ${styles.raffleCta}`}
+                onClick={scrollToBuy}
+              >
+                Участвовать в розыгрыше
+                <span className={styles.ctaArrow} aria-hidden>
+                  <ArrowIcon />
+                </span>
+              </button>
             </div>
             <div className={styles.raffleMedia}>
               <img
