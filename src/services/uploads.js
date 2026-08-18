@@ -4,6 +4,34 @@
  * Нарочно мимо apiClient: Bearer-заголовок в запросе к S3 не нужен,
  * а Content-Type входит в подпись — заголовок должен совпадать с presign-запросом.
  */
+/**
+ * Загружает файлы по очереди: presign(file) → { uploadUrl, key } → PUT в S3.
+ * Прогресс общий по всем файлам и считается по байтам, а не по числу файлов:
+ * onProgress(percent, { index, count, filename }). Возвращает [{ key, filename }].
+ */
+export const uploadAllToS3 = async (files, presign, onProgress) => {
+  const list = Array.from(files);
+  const totalBytes = list.reduce((sum, f) => sum + (f.size || 0), 0);
+  let doneBytes = 0;
+  const refs = [];
+  for (let i = 0; i < list.length; i += 1) {
+    const file = list[i];
+    const meta = { index: i, count: list.length, filename: file.name };
+    onProgress?.(totalBytes ? (doneBytes / totalBytes) * 100 : 0, meta);
+    const { uploadUrl, key } = await presign(file);
+    await uploadToS3(uploadUrl, file, (filePercent) => {
+      const loaded = doneBytes + ((file.size || 0) * filePercent) / 100;
+      onProgress?.(totalBytes ? (loaded / totalBytes) * 100 : filePercent, meta);
+    });
+    doneBytes += file.size || 0;
+    refs.push({ key, filename: file.name });
+  }
+  if (list.length) {
+    onProgress?.(100, { index: list.length - 1, count: list.length, filename: list[list.length - 1].name });
+  }
+  return refs;
+};
+
 export const uploadToS3 = (uploadUrl, file, onProgress) =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

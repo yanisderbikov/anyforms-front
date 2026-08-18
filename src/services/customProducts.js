@@ -1,5 +1,5 @@
 import apiClient from '../apiClient';
-import { uploadToS3 } from './uploads';
+import { uploadAllToS3 } from './uploads';
 
 // Под-заказы (custom products). Бьём напрямую через axios-инстанс; токен добавляем сами
 // (securityWorker работает только для сгенерированных вызовов apiClient.api.*).
@@ -54,19 +54,20 @@ export const getModelers = () =>
 
 // ---- Файлы ----
 // Файлы уходят из браузера сразу в S3 (presign → PUT → confirm), бэкенд их не проксирует.
-export const addItemFiles = async (itemId, files) => {
-  const refs = [];
-  for (const f of Array.from(files)) {
-    const { uploadUrl, key } = await http
-      .post(
-        `/api/custom-product-items/${itemId}/files/presign`,
-        { filename: f.name, contentType: f.type || null },
-        cfg()
-      )
-      .then((r) => r.data);
-    await uploadToS3(uploadUrl, f);
-    refs.push({ key, filename: f.name });
-  }
+// onProgress(percent, { index, count, filename }) — общий прогресс по байтам всех файлов.
+export const addItemFiles = async (itemId, files, onProgress) => {
+  const refs = await uploadAllToS3(
+    files,
+    (f) =>
+      http
+        .post(
+          `/api/custom-product-items/${itemId}/files/presign`,
+          { filename: f.name, contentType: f.type || null },
+          cfg()
+        )
+        .then((r) => r.data),
+    onProgress
+  );
   return http
     .post(`/api/custom-product-items/${itemId}/files/confirm`, { files: refs }, cfg())
     .then((r) => r.data);

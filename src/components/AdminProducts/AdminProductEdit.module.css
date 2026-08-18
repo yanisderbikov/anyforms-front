@@ -277,6 +277,15 @@
 
 .thumbAdd:disabled {
   cursor: wait;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+}
+
+.uploadProgress {
+  margin-top: 0.9rem;
+  max-width: 460px;
 }
 
 /* ---------- Поля ---------- */

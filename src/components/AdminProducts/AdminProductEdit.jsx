@@ -3,7 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
-import { uploadToS3 } from '../../services/uploads';
+import { uploadAllToS3 } from '../../services/uploads';
+import UploadProgress from '../shared/UploadProgress';
 import AutoTextarea from '../CustomOrders/AutoTextarea';
 import styles from './AdminProductEdit.module.css';
 
@@ -75,6 +76,7 @@ const AdminProductEdit = () => {
   const [notFound, setNotFound] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null); // { percent, index, count, filename }
   const [previewIndex, setPreviewIndex] = useState(0);
   const [dragIndex, setDragIndex] = useState(null);
   const photos = product?.photos ?? [];
@@ -210,14 +212,18 @@ const AdminProductEdit = () => {
     if (!files.length) return;
     setUploading(true);
     try {
-      for (const f of files) {
-        const { data } = await apiClient.instance.post(
-          `/api/product/${productId}/photos/presign`,
-          { filename: f.name, contentType: f.type || null },
-          { headers: authHeaders() }
-        );
-        await uploadToS3(data.uploadUrl, f);
-      }
+      await uploadAllToS3(
+        files,
+        (f) =>
+          apiClient.instance
+            .post(
+              `/api/product/${productId}/photos/presign`,
+              { filename: f.name, contentType: f.type || null },
+              { headers: authHeaders() }
+            )
+            .then((r) => r.data),
+        (percent, meta) => setUploadProgress({ percent, ...meta })
+      );
       const res = await apiClient.instance.post(`/api/product/${productId}/photos/confirm`, null, {
         headers: authHeaders(),
       });
@@ -227,6 +233,7 @@ const AdminProductEdit = () => {
       toast.error(err?.response?.data?.error || err?.message || 'Не удалось загрузить фото');
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -412,10 +419,13 @@ const AdminProductEdit = () => {
                   disabled={uploading}
                   onClick={() => uploadInputRef.current?.click()}
                 >
-                  {uploading ? '…' : '+'}
+                  {uploading ? `${Math.round(uploadProgress?.percent ?? 0)}%` : '+'}
                 </button>
                 {uploadInput}
               </div>
+              {uploading && (
+                <UploadProgress className={styles.uploadProgress} progress={uploadProgress} />
+              )}
             </>
           )}
         </Section>
