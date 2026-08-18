@@ -955,11 +955,11 @@ const CourseLanding = () => {
                   Bambu&nbsp;Lab в&nbsp;СНГ{' '}
                   <a
                     className={styles.raffleSponsorLink}
-                    href="https://t.me/dddOutlet"
+                    href="https://3d-outlet.ru/?utm_source=anyforms-course"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    @dddOutlet
+                    3d-outlet.ru
                   </a>
                 </span>
               </div>
