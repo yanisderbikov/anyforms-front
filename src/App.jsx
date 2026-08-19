@@ -115,8 +115,17 @@ function App() {
   // Магазин, с витрины которого набрана корзина: страницы чекаут-флоу
   // (/shop/cart|checkout|success) красят фон body в цвет его темы.
   const { shopSlug: cartShopSlug } = useCart();
+  // Ссылки из соцсетей иногда приходят с закодированным якорем в пути
+  // (/shop/di_gips%23top): возвращаем '#' на место — путь /shop/di_gips, якорь #top.
+  const encodedHashIndex = location.pathname.indexOf('%23');
+  const pathnameWithoutEncodedHash =
+    encodedHashIndex === -1 ? location.pathname : location.pathname.slice(0, encodedHashIndex);
+  const recoveredHash =
+    encodedHashIndex === -1 ? location.hash : `#${location.pathname.slice(encodedHashIndex + 3)}`;
   const normalizedPathname =
-    location.pathname.length > 1 ? location.pathname.replace(/\/+$/, '') : location.pathname;
+    pathnameWithoutEncodedHash.length > 1
+      ? pathnameWithoutEncodedHash.replace(/\/+$/, '')
+      : pathnameWithoutEncodedHash;
   const isHomePage = normalizedPathname === '/';
   const isChiefPrivacyPage = normalizedPathname === '/chief/privacy';
   const isChiefPage = normalizedPathname === '/chief';
@@ -213,7 +222,7 @@ function App() {
   if (location.pathname !== normalizedPathname) {
     return (
       <Navigate
-        to={{ pathname: normalizedPathname, search: location.search, hash: location.hash }}
+        to={{ pathname: normalizedPathname, search: location.search, hash: recoveredHash }}
         replace
       />
     );
