@@ -92,7 +92,7 @@ const MarketplaceSuccess = () => {
               'Оплата не прошла'
             ) : orderNumber ? (
               <>
-                Заказ <span style={{ textTransform: 'uppercase' }}>#{orderNumber}</span> оформлен
+                Заказ <span className={styles.orderNumber}>#{orderNumber}</span> оформлен
               </>
             ) : (
               'Заказ оформлен'
@@ -107,7 +107,7 @@ const MarketplaceSuccess = () => {
                   <>
                     {' '}
                     Если деньги всё же списались — напишите в поддержку и укажите номер заказа{' '}
-                    <strong style={{ textTransform: 'uppercase' }}>#{orderNumber}</strong>.
+                    <strong className={styles.orderNumber}>#{orderNumber}</strong>.
                   </>
                 )}
               </>
