@@ -161,6 +161,15 @@
   color: #777;
 }
 
+.statCardCommission {
+  background: #fdf6ec;
+  border-color: rgba(196, 138, 44, 0.35);
+}
+
+.statCardCommission .statValue {
+  color: #a2691a;
+}
+
 .table {
   width: 100%;
   border-collapse: separate;

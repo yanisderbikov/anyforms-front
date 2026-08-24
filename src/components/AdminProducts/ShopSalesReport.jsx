@@ -45,6 +45,10 @@ const PRESETS = [
   { key: 'all', label: 'всё время', range: () => [new Date(2020, 0, 1), new Date()] },
 ];
 
+// Все магазины-партнёры платят комиссию 20% от оборота; свой магазин anyforms — нет.
+const COMMISSION_RATE = 0.2;
+const OWN_SHOP_SLUG = 'anyforms';
+
 const formatRub = (kopecks) =>
   (kopecks / 100).toLocaleString('ru-RU', {
     minimumFractionDigits: 0,
@@ -211,6 +215,14 @@ const ShopSalesReport = () => {
               </span>
               <span className={styles.statLabel}>средний чек</span>
             </div>
+            {shopSlug !== OWN_SHOP_SLUG && (
+              <div className={`${styles.statCard} ${styles.statCardCommission}`}>
+                <span className={styles.statValue}>
+                  {formatRub(Math.round(report.totalKopecks * COMMISSION_RATE))} ₽
+                </span>
+                <span className={styles.statLabel}>к выплате комиссий (20% от оборота)</span>
+              </div>
+            )}
           </div>
 
           {report.products?.length > 0 ? (
