@@ -32,7 +32,7 @@ const MarketplaceSuccess = () => {
   const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
   const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
   const [searchParams] = useSearchParams();
-  const orderNumber = searchParams.get('order');
+  const orderNumber = searchParams.get('order')?.toUpperCase() || null;
   const isFail = searchParams.get('status') === 'fail';
   const [order, setOrder] = useState(null);
 
@@ -88,11 +88,15 @@ const MarketplaceSuccess = () => {
         <div className={styles.centered}>
           <div className={isFail ? styles.failIcon : styles.successIcon}>{isFail ? '✕' : '✓'}</div>
           <h1 className={styles.centeredTitle}>
-            {isFail
-              ? 'Оплата не прошла'
-              : orderNumber
-                ? `Заказ #${orderNumber} оформлен`
-                : 'Заказ оформлен'}
+            {isFail ? (
+              'Оплата не прошла'
+            ) : orderNumber ? (
+              <>
+                Заказ <span style={{ textTransform: 'uppercase' }}>#{orderNumber}</span> оформлен
+              </>
+            ) : (
+              'Заказ оформлен'
+            )}
           </h1>
           <p className={styles.centeredText}>
             {isFail ? (
@@ -103,7 +107,7 @@ const MarketplaceSuccess = () => {
                   <>
                     {' '}
                     Если деньги всё же списались — напишите в поддержку и укажите номер заказа{' '}
-                    <strong>#{orderNumber}</strong>.
+                    <strong style={{ textTransform: 'uppercase' }}>#{orderNumber}</strong>.
                   </>
                 )}
               </>

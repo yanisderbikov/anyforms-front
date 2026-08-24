@@ -123,7 +123,8 @@ const OrderList = () => {
     const matchesBasicInfo = 
       order.contactName?.toLowerCase().includes(query) ||
       order.contactPhone?.includes(query) ||
-      order.leadId?.toString().includes(query);
+      order.leadId?.toString().includes(query) ||
+      order.publicId?.toLowerCase().includes(query);
     
     const matchesProductType = order.items.some((item) =>
       item.productName.toLowerCase().includes(query)

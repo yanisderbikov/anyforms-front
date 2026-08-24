@@ -130,11 +130,21 @@ const CustomOrderFill = () => {
 
       <div className={styles.orderInfo}>
         <h1 className={styles.orderTitle}>
-          {order?.contactName || (order?.leadId ? `сделка #${order.leadId}` : `заказ #${orderId}`)}
+          {order?.contactName || (order?.publicId ? `#${order.publicId}` : `заказ #${orderId}`)}
         </h1>
         <div className={styles.orderMeta}>
           {order?.contactPhone && <span>{order.contactPhone}</span>}
-          {order?.leadId && <span>amo #{order.leadId}</span>}
+          {order?.leadId && (
+            <a
+              className={styles.crmLink}
+              href={`https://anyforms.amocrm.ru/leads/detail/${order.leadId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Открыть сделку в AmoCRM"
+            >
+              {order.publicId ? `#${order.publicId}` : `amo #${order.leadId}`}
+            </a>
+          )}
           <span>позиций: {items.length}</span>
           <button
             type="button"

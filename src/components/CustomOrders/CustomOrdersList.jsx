@@ -157,7 +157,7 @@ const CustomOrdersList = () => {
             <div key={o.id} className={styles.card} onClick={() => navigate(`/admin/orders/custom/order/${o.id}`)}>
               <div className={styles.cardHead}>
                 <span className={styles.cardTitle}>
-                  {o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`)}
+                  {o.contactName || (o.publicId ? `#${o.publicId}` : `заказ #${o.id}`)}
                 </span>
                 <span className={styles.headBadges}>
                   {isPickup(o) && (

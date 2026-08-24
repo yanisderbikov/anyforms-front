@@ -74,7 +74,11 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady }) => {
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h3 className={styles.leadId}>
-          Сделка #{order.leadId}
+          {order.publicId ? (
+            <span className={styles.orderNumber}>#{order.publicId}</span>
+          ) : (
+            `Сделка #${order.leadId}`
+          )}
         </h3>
         {isPickup(order) && (
           <span className={styles.pickupBadge} style={PICKUP_BADGE_STYLE}>

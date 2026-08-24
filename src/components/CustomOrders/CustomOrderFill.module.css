@@ -100,6 +100,16 @@
   color: #555;
 }
 
+.crmLink {
+  color: #555;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.crmLink:hover {
+  color: #111;
+}
+
 .form {
   display: flex;
   flex-direction: column;
