@@ -297,16 +297,6 @@ const SUPPORT_ITEMS = [
 // Экран 12 — FAQ.
 const PARTNERS = [
   {
-    name: '3D OUTLET',
-    role: 'оборудование для 3D-печати',
-    domain: '3d-outlet.ru',
-    href: 'https://3d-outlet.ru/?utm_source=anyforms-course',
-    src: '/3d-outlet-logo.svg',
-    square: true,
-    bio:
-      'Официальный представитель Bambu Lab в СНГ. Спонсор нашего розыгрыша — предоставил принтер Bambu Lab P2S Combo.',
-  },
-  {
     name: 'ХимСнаб Композит',
     role: 'силиконы и материалы',
     domain: 'igc-market.ru',
@@ -324,6 +314,16 @@ const PARTNERS = [
     square: true,
     bio:
       'Магазин компонентов для свечеварения, мыловарения и косметики: воски, аромамасла, фитили и красители.',
+  },
+  {
+    name: '3D OUTLET',
+    role: 'оборудование для 3D-печати',
+    domain: '3d-outlet.ru',
+    href: 'https://3d-outlet.ru/?utm_source=anyforms-course',
+    src: '/3d-outlet-logo.svg',
+    square: true,
+    bio:
+      'Официальный представитель Bambu Lab в СНГ. Спонсор нашего розыгрыша — предоставил принтер Bambu Lab P2S Combo.',
   },
 ];
 
