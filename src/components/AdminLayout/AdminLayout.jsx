@@ -26,7 +26,10 @@ const MENU = [
   {
     title: 'управление товарами',
     section: SECTIONS.PRODUCTS,
-    items: [{ to: '/admin/products', label: 'Товары розницы' }],
+    items: [
+      { to: '/admin/products', label: 'Товары розницы' },
+      { to: '/admin/products/analytics', label: 'Аналитика' },
+    ],
   },
   {
     title: 'деньги',
