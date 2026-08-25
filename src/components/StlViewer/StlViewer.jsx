@@ -1,11 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import * as THREE from 'three';
 import StlScene from './StlScene';
 import ViewportControls from './ViewportControls';
 import { nameFromUrl, parseStl, triangleCount, volume } from './stlGeometry';
 import styles from './StlViewer.module.css';
 
 const fmtMm = (v) => `${v.toFixed(v < 10 ? 2 : 1)} мм`;
+
+// Оси кнопок поворота — печатные (как в слайсере: Z вверх), переведённые в оси
+// сцены (Y вверх). Правая тройка: X × Y = Z, поэтому повороты ведут себя привычно.
+const ROTATE_AXES = {
+  x: new THREE.Vector3(1, 0, 0),
+  y: new THREE.Vector3(0, 0, -1),
+  z: new THREE.Vector3(0, 1, 0),
+};
 
 const buildModel = (buffer, name) => {
   const { geometry, size } = parseStl(buffer);
@@ -25,6 +34,9 @@ const StlViewer = () => {
   const [status, setStatus] = useState(null); // 'loading' | null
   const [error, setError] = useState(null);
   const [resetKey, setResetKey] = useState(0);
+  // Дополнительный поворот модели: STL приходят и Z-вверх, и Y-вверх,
+  // угадать по файлу нельзя — пользователь поправляет кнопками осей.
+  const [orientation, setOrientation] = useState(() => new THREE.Quaternion());
   const [dragging, setDragging] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const fileInput = useRef(null);
@@ -44,6 +56,7 @@ const StlViewer = () => {
       const next = buildModel(buffer, nameFromUrl(url));
       if (id !== loadId.current) return;
       setModel(next);
+      setOrientation(new THREE.Quaternion());
       setStatus(null);
     } catch {
       if (id !== loadId.current) return;
@@ -63,6 +76,7 @@ const StlViewer = () => {
       const next = buildModel(buffer, file.name);
       if (id !== loadId.current) return;
       setModel(next);
+      setOrientation(new THREE.Quaternion());
       setStatus(null);
       setParams({}, { replace: true });
     } catch {
@@ -71,6 +85,20 @@ const StlViewer = () => {
       setError('Не получилось прочитать файл. Нужен .stl — обычный или бинарный.');
     }
   }, [setParams]);
+
+  // Поворот вокруг мировых осей, а не осей самой модели: кнопка делает одно и
+  // то же видимое движение независимо от уже накопленных поворотов.
+  const rotateModel = useCallback((axis) => {
+    setOrientation((q) =>
+      new THREE.Quaternion().setFromAxisAngle(ROTATE_AXES[axis], Math.PI / 2).multiply(q),
+    );
+  }, []);
+
+  const resetAxes = useCallback(() => setOrientation(new THREE.Quaternion()), []);
+
+  // После поворотов на 90° кватернион идентичности — с точностью до знака и
+  // ошибок округления.
+  const rotated = 1 - Math.abs(orientation.w) > 1e-6;
 
   // Ссылка живёт в ?url=, чтобы вьювер можно было переслать как есть.
   const urlParam = params.get('url');
@@ -195,6 +223,7 @@ const StlViewer = () => {
               maxDim={Math.max(model.size.x, model.size.y, model.size.z)}
               resetKey={resetKey}
               controlsRef={controlsRef}
+              orientation={orientation}
             />
           )}
 
@@ -212,6 +241,9 @@ const StlViewer = () => {
               onReset={() => setResetKey((k) => k + 1)}
               fullscreen={fullscreen}
               onToggleFullscreen={toggleFullscreen}
+              onRotate={rotateModel}
+              onResetAxes={resetAxes}
+              rotated={rotated}
             />
           )}
         </div>
@@ -229,8 +261,10 @@ const StlViewer = () => {
 
         <p className={styles.hint}>
           Крутить — левая кнопка мыши или кнопки на окне просмотра, приблизить — колесо,
-          двигать — правая кнопка или два пальца. Размеры считаются в миллиметрах: в STL нет
-          единиц измерения, а слайсеры трактуют их как мм.
+          двигать — правая кнопка или два пальца. Если модель открылась на боку или вверх
+          ногами, поверните её кнопками X, Y, Z в левом верхнем углу — каждая крутит модель
+          на 90° вокруг своей оси. Размеры считаются в миллиметрах: в STL нет единиц
+          измерения, а слайсеры трактуют их как мм.
         </p>
 
         <footer className={styles.footer}>
