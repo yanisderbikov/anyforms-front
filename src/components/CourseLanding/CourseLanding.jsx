@@ -273,6 +273,10 @@ const BONUSES = [
     text: 'Розыгрыш 3D-принтера Bambu Lab P2S Combo среди всех участников курса',
     featured: true,
   },
+  {
+    text: 'Розыгрыш материалов от ХимСнаб — 10 кг силикона на основе олова',
+    featured: true,
+  },
   { text: 'Ссылки на проверенные материалы и поставщиков' },
   { text: 'Скидки на стартовые закупки' },
   { text: 'Доступ в закрытый чат мастеров (2000+ участников)' },
@@ -295,6 +299,38 @@ const SUPPORT_ITEMS = [
 ];
 
 // Экран 12 — FAQ.
+const PARTNERS = [
+  {
+    name: 'ХимСнаб Композит',
+    role: 'силиконы и материалы',
+    domain: 'igc-market.ru',
+    href: 'https://igc-market.ru/?utm_source=anyforms-course',
+    src: '/himsnab-logo.png',
+    bio:
+      'Поставщик силиконов и материалов для литья — у них мы закупаем силикон для производства. Для розыгрыша предоставили два комплекта по 5 кг.',
+  },
+  {
+    name: '24 Grams',
+    role: 'компоненты для рукоделия',
+    domain: '24gr.ru',
+    href: 'https://24gr.ru/?utm_source=anyforms-course',
+    src: '/24grams-logo.png',
+    square: true,
+    bio:
+      'Магазин компонентов для свечеварения, мыловарения и косметики: воски, аромамасла, фитили и красители.',
+  },
+  {
+    name: '3D OUTLET',
+    role: 'оборудование для 3D-печати',
+    domain: '3d-outlet.ru',
+    href: 'https://3d-outlet.ru/?utm_source=anyforms-course',
+    src: '/3d-outlet-logo.svg',
+    square: true,
+    bio:
+      'Официальный представитель Bambu Lab в СНГ. Спонсор нашего розыгрыша — предоставил принтер Bambu Lab P2S Combo.',
+  },
+];
+
 const FAQ = [
   {
     q: 'С каким силиконом будем работать?',
@@ -683,6 +719,46 @@ const CourseLanding = () => {
         </div>
       </section>
 
+      {/* ═══════════════ ЭКРАН 1.2 · ПАРТНЁРЫ ═══════════════ */}
+      <section className={styles.partnersSection} aria-labelledby="partners-title">
+        <div className={styles.sectionInner}>
+          <div className={styles.sectionHead}>
+            <span className={styles.eyebrow}>Партнёры</span>
+            <h2 className={styles.sectionTitle} id="partners-title">
+              Наши партнёры
+            </h2>
+          </div>
+          <div className={styles.partnersScroller}>
+            {PARTNERS.map((p) => (
+              <a
+                className={styles.partnerCard}
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={styles.partnerCardChip}>
+                  <img
+                    className={`${styles.partnerCardLogo} ${
+                      p.square ? styles.partnerLogoSquare : ''
+                    }`}
+                    src={p.src}
+                    alt={p.name}
+                    loading="lazy"
+                  />
+                </span>
+                <div>
+                  <h3 className={styles.founderName}>{p.name}</h3>
+                  <p className={styles.founderRole}>{p.role}</p>
+                  <p className={styles.founderBio}>{p.bio}</p>
+                  <span className={styles.partnerDomain}>{p.domain}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════ ЭКРАН 2 · РЕЗУЛЬТАТ ═══════════════ */}
       <section className={styles.resultSection} aria-labelledby="result-title">
         <div className={styles.sectionInner}>
@@ -916,8 +992,9 @@ const CourseLanding = () => {
               <p className={styles.darkLead}>
                 Среди всех участников курса разыграем Bambu Lab P2S Combo —
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
-                Оформите предзаказ на любой тариф — и вы автоматически
-                участвуете.
+                А также два комплекта силикона от ХимСнаб Композит — по
+                5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Оформите
+                предзаказ на любой тариф — и вы автоматически участвуете.
               </p>
               <p className={styles.raffleSub}>
                 Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто

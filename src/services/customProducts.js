@@ -35,8 +35,23 @@ export const PICKUP_BADGE_STYLE = {
 // ---- Позиции ----
 export const getAllCustomItems = (status) =>
   http.get('/api/custom-product-items', cfg(status ? { params: { status } } : {})).then((r) => r.data);
-export const getCustomItem = (id) =>
-  http.get(`/api/public/custom-product-items/${id}`, cfg()).then((r) => r.data);
+// По публичному номеру: авторизованным — полная позиция (с id/leadId для правок),
+// остальным — публичная без внутренних id.
+export const getCustomItem = (publicId) => {
+  const authed = !!(apiClient.getToken && apiClient.getToken());
+  const publicPath = `/api/public/custom-product-items/${publicId}`;
+  const path = authed ? `/api/custom-product-items/by-public-id/${publicId}` : publicPath;
+  return http
+    .get(path, cfg())
+    .then((r) => r.data)
+    .catch((e) => {
+      const status = e?.response?.status;
+      if (authed && (status === 401 || status === 403)) {
+        return http.get(publicPath).then((r) => r.data);
+      }
+      throw e;
+    });
+};
 export const getItemsByOrder = (orderId) =>
   http.get('/api/custom-product-items', cfg({ params: { orderId } })).then((r) => r.data);
 export const createItem = (orderId, body) =>

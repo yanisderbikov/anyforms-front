@@ -39,6 +39,10 @@
   flex: 1;
 }
 
+.orderNumber {
+  text-transform: uppercase;
+}
+
 .linkIcon,
 .refreshIcon {
   background: #f1f1f1;

@@ -7,6 +7,13 @@ import OrderCard from '../OrderCard/OrderCard';
 import TrackerModal from '../TrackerModal/TrackerModal';
 import styles from './OrderList.module.css';
 
+const cleanProductName = (name) =>
+  name
+    .replace(/[\u00A0\u2007\u202F]/g, ' ')
+    .replace(/[\u2010-\u2015\u2212]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 const OrderList = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,7 +123,8 @@ const OrderList = () => {
     const matchesBasicInfo = 
       order.contactName?.toLowerCase().includes(query) ||
       order.contactPhone?.includes(query) ||
-      order.leadId?.toString().includes(query);
+      order.leadId?.toString().includes(query) ||
+      order.publicId?.toLowerCase().includes(query);
     
     const matchesProductType = order.items.some((item) =>
       item.productName.toLowerCase().includes(query)
@@ -132,8 +140,11 @@ const OrderList = () => {
       if (order.items && Array.isArray(order.items)) {
         order.items.forEach((item) => {
           if (item.productName && item.quantity) {
-            const productName = item.productName;
-            counts[productName] = (counts[productName] || 0) + item.quantity;
+            const name = cleanProductName(item.productName);
+            const key = name.toLowerCase();
+            if (!key) return;
+            if (!counts[key]) counts[key] = { name, quantity: 0 };
+            counts[key].quantity += item.quantity;
           }
         });
       }
@@ -185,10 +196,10 @@ const OrderList = () => {
         <div className={styles.summaryBox}>
           <h2 className={styles.summaryTitle}>Саммари: {getModeTitle()}</h2>
           <div className={styles.summaryContent}>
-            {Object.entries(productCounts).map(([productName, count]) => (
-              <div key={productName} className={styles.summaryItem}>
-                <span className={styles.summaryProductName}>{productName}</span>
-                <span className={styles.summaryCount}>{count}</span>
+            {Object.entries(productCounts).map(([key, { name, quantity }]) => (
+              <div key={key} className={styles.summaryItem}>
+                <span className={styles.summaryProductName}>{name}</span>
+                <span className={styles.summaryCount}>{quantity}</span>
               </div>
             ))}
           </div>

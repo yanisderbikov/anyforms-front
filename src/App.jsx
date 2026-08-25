@@ -12,6 +12,7 @@ import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
 import Login from "./components/Login/Login";
 import AdminProducts from "./components/AdminProducts/AdminProducts";
 import AdminProductEdit from "./components/AdminProducts/AdminProductEdit";
+import ShopSalesReport from "./components/AdminProducts/ShopSalesReport";
 import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
 import AdminPromoCodes from "./components/AdminPromoCodes/AdminPromoCodes";
 import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoices";
@@ -80,6 +81,7 @@ const KNOWN_PATHS = new Set([
   '/admin/orders/custom/create',
   '/admin/orders/custom/ship',
   '/admin/products',
+  '/admin/products/analytics',
   '/admin/promo-codes',
   '/admin/invoices',
   '/admin/invoices/training',
@@ -277,6 +279,7 @@ function App() {
           <Route path="/admin/orders/custom/ship" element={<CustomShipList />} />
           <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
           <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/products/analytics" element={<ShopSalesReport />} />
           {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
           <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
           <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />

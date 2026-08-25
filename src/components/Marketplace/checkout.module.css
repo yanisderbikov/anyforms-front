@@ -327,6 +327,14 @@
   text-transform: var(--shop-title-transform, lowercase);
 }
 .centeredText { font-size: 1rem; color: #444; margin: 0 0 24px; line-height: 1.6; }
+
+/* Номер заказа: всегда заглавные и обычные (lining) цифры — в Georgia у af_pastry/lunasvecha
+   ноль старостильный, высотой со строчную букву, и читается как «o». */
+.orderNumber {
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
 .primaryLink {
   display: inline-flex;
   align-items: center;

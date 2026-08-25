@@ -124,7 +124,7 @@ const CustomShipList = () => {
     }
   };
 
-  const title = (o = {}) => o.contactName || (o.leadId ? `сделка #${o.leadId}` : `заказ #${o.id}`);
+  const title = (o = {}) => o.contactName || (o.publicId ? `#${o.publicId}` : `заказ #${o.id}`);
 
   const handleComplete = async () => {
     const g = shipping;

@@ -75,7 +75,7 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
         <div className={styles.head}>
           <a
             className={styles.title}
-            href={`/orders/custom/item/${item.id}`}
+            href={`/orders/custom/item/${item.publicId || item.id}`}
             target="_blank"
             rel="noreferrer"
             title="Открыть в отдельной вкладке"
