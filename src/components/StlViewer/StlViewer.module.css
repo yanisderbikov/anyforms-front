@@ -141,6 +141,11 @@
   top: calc(12px + env(safe-area-inset-top, 0px));
 }
 
+.stageFull .axes {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: calc(12px + env(safe-area-inset-left, 0px));
+}
+
 .stageDrag {
   border-color: rgba(17, 17, 17, 0.5);
   border-style: dashed;
@@ -176,7 +181,8 @@
 .padRight,
 .padCenter,
 .zoomBtn,
-.fullBtn {
+.fullBtn,
+.axisBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -199,9 +205,19 @@
 .padRight:hover,
 .padCenter:hover,
 .zoomBtn:hover,
-.fullBtn:hover {
+.fullBtn:hover,
+.axisBtn:hover {
   background: #fff;
   color: #000;
+}
+
+/* Повороты модели вокруг осей — в левом верхнем углу окна просмотра. */
+.axes {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 3px;
 }
 
 /* Полный экран — отдельно, в верхнем углу окна просмотра. */
