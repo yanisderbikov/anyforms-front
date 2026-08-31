@@ -88,7 +88,6 @@ const KNOWN_PATHS = new Set([
   '/admin/invoices/receipts',
 ]);
 
-// Служебные разделы магазина: не могут быть slug'ом витрины партнёра.
 const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success']);
 
 const upsertMetaTag = (selector, attributes) => {
