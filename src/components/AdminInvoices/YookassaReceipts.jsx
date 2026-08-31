@@ -22,6 +22,11 @@ const LINK_RE = /^https?:\/\//;
 
 const initialForm = { email: '', link: '', productCode: '' };
 
+const TASKS_LIMIT = 200;
+const TRANSACTIONS_LIMIT = 500;
+
+const initialFilters = { receiptSent: '', from: '', to: '' };
+
 const productName = (t) => t.productTitle || PRODUCT_LABELS[t.productCode] || t.productCode || '';
 
 const copyText = (text, msg) => {
@@ -42,12 +47,17 @@ const YookassaReceipts = () => {
   const [sendingId, setSendingId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const [filters, setFilters] = useState(initialFilters);
 
   const load = useCallback(async () => {
+    const txParams = { limit: TRANSACTIONS_LIMIT };
+    if (filters.receiptSent !== '') txParams.receiptSent = filters.receiptSent === 'sent';
+    if (filters.from) txParams.from = filters.from;
+    if (filters.to) txParams.to = filters.to;
     try {
       const [tasksRes, txRes] = await Promise.all([
-        apiClient.instance.get('/api/receipt/recent', { params: { limit: 20 }, headers: authHeaders() }),
-        apiClient.instance.get('/api/receipt/transactions', { params: { limit: 50 }, headers: authHeaders() }),
+        apiClient.instance.get('/api/receipt/recent', { params: { limit: TASKS_LIMIT }, headers: authHeaders() }),
+        apiClient.instance.get('/api/receipt/transactions', { params: txParams, headers: authHeaders() }),
       ]);
       setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : []);
       setTransactions(Array.isArray(txRes.data) ? txRes.data : []);
@@ -58,7 +68,7 @@ const YookassaReceipts = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     load();
@@ -110,6 +120,11 @@ const YookassaReceipts = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCardSend = async (t) => {
@@ -239,10 +254,50 @@ const YookassaReceipts = () => {
         <div className={styles.sectionHead}>
           <h2 className={styles.sectionTitle}>Оплаты через Юкассу</h2>
         </div>
+        <div className={styles.filters}>
+          <label className={styles.filterLabel}>
+            Чек
+            <select
+              name="receiptSent"
+              value={filters.receiptSent}
+              onChange={handleFilterChange}
+              className={styles.input}
+            >
+              <option value="">Все</option>
+              <option value="notSent">Не отправлен</option>
+              <option value="sent">Отправлен</option>
+            </select>
+          </label>
+          <label className={styles.filterLabel}>
+            Оплачен с
+            <input
+              type="date"
+              name="from"
+              value={filters.from}
+              onChange={handleFilterChange}
+              className={styles.input}
+            />
+          </label>
+          <label className={styles.filterLabel}>
+            Оплачен по
+            <input
+              type="date"
+              name="to"
+              value={filters.to}
+              onChange={handleFilterChange}
+              className={styles.input}
+            />
+          </label>
+          {(filters.receiptSent || filters.from || filters.to) && (
+            <button type="button" className={styles.filterReset} onClick={() => setFilters(initialFilters)}>
+              Сбросить
+            </button>
+          )}
+        </div>
         {loading ? (
           <p className={styles.message}>Загрузка…</p>
         ) : transactions.length === 0 ? (
-          <p className={styles.message}>Оплат пока нет.</p>
+          <p className={styles.message}>Оплат по этим фильтрам нет.</p>
         ) : (
           <ul className={styles.list}>
             {transactions.map((t) => {

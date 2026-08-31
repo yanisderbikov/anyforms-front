@@ -255,6 +255,45 @@
   margin-bottom: 1rem;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.filterLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 150px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8c8c8c;
+  text-transform: lowercase;
+}
+
+.filters .input {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.filterReset {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.filterReset:hover {
+  background: #f1f1f1;
+}
+
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
