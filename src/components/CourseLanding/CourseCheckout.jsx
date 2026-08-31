@@ -231,13 +231,13 @@ const CourseCheckout = () => {
       <main className={styles.main}>
         <div className={styles.inner}>
           <span className={styles.eyebrow}>Оформление</span>
-          <h1 className={styles.title}>Предзаказ курса</h1>
+          <h1 className={styles.title}>Покупка курса</h1>
 
           {saleLeft.closed ? (
             <div className={styles.closedBox}>
-              <p className={styles.closedTitle}>Предзаказ закрыт</p>
+              <p className={styles.closedTitle}>Набор закрыт</p>
               <p className={styles.closedNote}>
-                Приём заявок завершился {LAUNCH_SHORT} в 00:00 по Москве. Напишите нам в
+                Курс стартовал {LAUNCH_SHORT} — набор закрыт. Напишите нам в
                 Telegram{' '}
                 <a
                   className={styles.inlineLink}
@@ -311,15 +311,15 @@ const CourseCheckout = () => {
               </span>
             </div>
             <p className={styles.saleTimer}>
-              До закрытия предзаказа:{' '}
+              До закрытия набора:{' '}
               <strong>
                 {saleLeft.days} {daysLabel(saleLeft.days)} {saleLeft.hours}:{saleLeft.minutes}:
                 {saleLeft.seconds}
               </strong>
             </p>
             <p className={styles.summaryNote}>
-              Это предзаказ. Доступ к курсу откроется {LAUNCH} — ссылку пришлём на
-              указанную почту. Сразу после оплаты отправим письмо-подтверждение.
+              Запуск курса — {LAUNCH}. Доступ откроется сразу после старта — ссылку
+              пришлём на указанную почту. После оплаты отправим письмо-подтверждение.
             </p>
           </div>
 

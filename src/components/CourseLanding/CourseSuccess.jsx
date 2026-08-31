@@ -33,7 +33,7 @@ const CourseSuccess = () => {
           <div className={styles.successMark} aria-hidden>
             ✓
           </div>
-          <h1 className={styles.title}>Предзаказ оформлен</h1>
+          <h1 className={styles.title}>Вы записаны на курс</h1>
           <p className={styles.successLead}>
             Спасибо за оплату! Доступ к курсу откроется {LAUNCH} — мы пришлём ссылку на
             указанную почту. На неё уже отправлено письмо-подтверждение: проверьте

@@ -360,7 +360,7 @@ const FAQ = [
   },
   {
     q: 'Когда откроется доступ к курсу?',
-    a: `Сейчас идёт предзаказ. Доступ ко всем материалам откроется ${LAUNCH}.`,
+    a: `Сейчас открыт набор. Доступ ко всем материалам откроется ${LAUNCH} — сразу после старта.`,
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
@@ -419,8 +419,8 @@ const scrollToId = (id) => {
 const CHECKOUT_PATH = '/course/checkout';
 
 // Все CTA ведут к единственному офферу (#buy); на чекаут уходит только кнопка внутри него.
-// Якорь ставим не на верх секции (там бейдж «Предзаказ» и большой заголовок съедают
-// экран, а кнопка «Оформить предзаказ» остаётся за кадром), а на первую карточку тарифа.
+// Якорь ставим не на верх секции (там бейдж запуска и большой заголовок съедают
+// экран, а кнопка «Записаться на курс» остаётся за кадром), а на первую карточку тарифа.
 const scrollToBuy = () => {
   const card = document.getElementById('buy-tariffs')?.firstElementChild;
   if (!card) {
@@ -462,14 +462,14 @@ const NAV_LINKS = [
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
-// Обратный отсчёт до закрытия предзаказа: «время заканчивается — успевайте».
+// Обратный отсчёт до закрытия набора: «время заканчивается — успевайте».
 const Countdown = ({ left, className = '' }) => {
   if (left.closed) {
     return (
       <div className={`${styles.countdown} ${styles.countdownClosed} ${className}`}>
-        <span className={styles.countdownLabel}>Предзаказ закрыт</span>
+        <span className={styles.countdownLabel}>Набор закрыт</span>
         <p className={styles.countdownNote}>
-          Приём заявок завершён {LAUNCH_SHORT} в 00:00 по Москве. Напишите нам в
+          Курс стартовал {LAUNCH_SHORT} — набор закрыт. Напишите нам в
           Telegram — подскажем, когда откроется следующий набор.
         </p>
       </div>
@@ -485,7 +485,7 @@ const Countdown = ({ left, className = '' }) => {
     <div className={`${styles.countdown} ${className}`} role="timer">
       <span className={styles.countdownLabel}>
         <span className={styles.countdownPulse} aria-hidden />
-        До закрытия предзаказа — успейте попасть в набор
+        Набор скоро закроется! Успей записаться
       </span>
       <div className={styles.countdownDigits}>
         {cells.map(([value, label], i) => (
@@ -503,7 +503,7 @@ const Countdown = ({ left, className = '' }) => {
         ))}
       </div>
       <p className={styles.countdownNote}>
-        Продажи закрываются {LAUNCH_SHORT} в 00:00 по Москве.
+        Набор закрывается {LAUNCH_SHORT} в 00:00 по Москве.
       </p>
     </div>
   );
@@ -512,7 +512,7 @@ const Countdown = ({ left, className = '' }) => {
 // Компактный отсчёт внутри карточки цены в hero — «времени осталось мало».
 const HeroTimer = ({ left }) => {
   if (left.closed) {
-    return <span className={styles.heroTimer}>Предзаказ закрыт</span>;
+    return <span className={styles.heroTimer}>Набор закрыт</span>;
   }
   return (
     <span className={styles.heroTimer} role="timer">
@@ -625,7 +625,7 @@ const CourseLanding = () => {
             key: 'buy-desktop',
             kind: 'link',
             href: '#buy',
-            label: 'Оформить предзаказ',
+            label: 'Записаться на курс',
             variant: 'pill',
             onClick: (e) => {
               e.preventDefault();
@@ -639,7 +639,7 @@ const CourseLanding = () => {
             key: 'buy-mobile',
             kind: 'link',
             href: '#buy',
-            label: 'Оформить предзаказ',
+            label: 'Записаться на курс',
             variant: 'primary',
             onClick: (e) => {
               e.preventDefault();
@@ -738,11 +738,11 @@ const CourseLanding = () => {
                 </div>
                 {saleClosed ? (
                   <button type="button" className={`${styles.cta} ${styles.ctaDisabled}`} disabled>
-                    Предзаказ закрыт
+                    Набор закрыт
                   </button>
                 ) : (
                   <button type="button" className={styles.cta} onClick={scrollToBuy}>
-                    Оформить предзаказ
+                    Записаться на курс
                     <span className={styles.ctaArrow} aria-hidden>
                       <ArrowIcon />
                     </span>
@@ -750,7 +750,7 @@ const CourseLanding = () => {
                 )}
                 <HeroTimer left={saleLeft} />
                 <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
-                  Доступ к материалам откроется {LAUNCH}.
+                  Запуск — {LAUNCH}. Успейте записаться до старта.
                 </p>
               </div>
             </div>
@@ -762,7 +762,7 @@ const CourseLanding = () => {
               </p>
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
-              Это предзаказ. Доступ к материалам откроется {LAUNCH}.
+              Запуск — {LAUNCH}. Успейте записаться до старта: после запуска набор закрывается.
             </p>
 
             <div className={styles.heroProof}>
@@ -1068,8 +1068,8 @@ const CourseLanding = () => {
                 Среди всех участников курса разыграем Bambu Lab P2S Combo —
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
                 А также два комплекта силикона от ХимСнаб Композит — по
-                5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Оформите
-                предзаказ на любой тариф — и вы автоматически участвуете.
+                5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Запишитесь
+                на любой тариф — и вы автоматически участвуете.
               </p>
               <p className={styles.raffleSub}>
                 Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто
@@ -1124,7 +1124,7 @@ const CourseLanding = () => {
       <section id="buy" className={styles.buySection} aria-labelledby="buy-title">
         <div className={styles.sectionInner}>
           <div className={styles.buyInner}>
-            <span className={styles.pillBadge}>Предзаказ</span>
+            <span className={styles.pillBadge}>Запуск — {LAUNCH_SHORT}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               <em className={styles.hAccent}>Два</em> формата участия
             </h2>
@@ -1203,12 +1203,12 @@ const CourseLanding = () => {
                           className={`${styles.cta} ${styles.tariffCta} ${styles.ctaDisabled}`}
                           disabled
                         >
-                          {personalClosed ? 'Набор закрыт' : 'Предзаказ закрыт'}
+                          Набор закрыт
                         </button>
                         <p className={styles.tariffClosedNote}>
                           {personalClosed
                             ? 'Мест на личное ведение больше нет. Остался тариф «Самостоятельное изучение».'
-                            : 'Продажи предзаказа завершены.'}
+                            : 'Курс стартовал — набор завершён.'}
                         </p>
                       </>
                     ) : (
@@ -1217,7 +1217,7 @@ const CourseLanding = () => {
                         className={`${styles.cta} ${styles.tariffCta}`}
                         onClick={() => goToCheckout(tariff.key)}
                       >
-                        Оформить предзаказ
+                        Записаться на курс
                         <span className={styles.ctaArrow} aria-hidden>
                           <ArrowIcon />
                         </span>
@@ -1228,7 +1228,7 @@ const CourseLanding = () => {
               })}
             </div>
             <span className={styles.buyMeta}>
-              <span>Цена предзаказа</span>
+              <span>Цена до старта</span>
               <span>Доступ откроется {LAUNCH}</span>
               <span>Материалы — навсегда</span>
             </span>
@@ -1372,9 +1372,9 @@ const CourseLanding = () => {
 
           <div className={styles.footerOffer}>
             <p className={styles.footerOfferText}>
-              Курс — цифровой информационный продукт. Сейчас доступен предзаказ; доступ
+              Курс — цифровой информационный продукт. Доступ
               к материалам откроется {LAUNCH}. Материалы остаются бессрочно, ведение
-              специалистов на тарифе «Личное ведение» — 1 месяц. Оформляя предзаказ, вы
+              специалистов на тарифе «Личное ведение» — 1 месяц. Оформляя покупку, вы
               принимаете условия{' '}
               <a className={styles.footerLink} href="/course/offer">
                 оферты
