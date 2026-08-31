@@ -8,9 +8,11 @@ import {
   formatPromoDeadlineNote,
 } from '../../shared/promoTracking';
 import { COURSE_PLANS } from './CourseCheckout';
+import { useSaleCountdown, daysLabel, PERSONAL_CLOSED } from './courseSale';
 import styles from './CourseLanding.module.css';
 
 const LAUNCH = '1 сентября 2026';
+const LAUNCH_SHORT = '1 сентября';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 // Промокод гайда — по нему в попапе показывается заголовок-благодарность.
 const GUIDE_PROMO_CODE = 'ГАЙД';
@@ -358,7 +360,7 @@ const FAQ = [
   },
   {
     q: 'Когда откроется доступ к курсу?',
-    a: `Сейчас идёт предзаказ. Доступ ко всем материалам откроется ${LAUNCH}.`,
+    a: `Сейчас открыт набор. Доступ ко всем материалам откроется ${LAUNCH} — сразу после старта.`,
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
@@ -417,8 +419,8 @@ const scrollToId = (id) => {
 const CHECKOUT_PATH = '/course/checkout';
 
 // Все CTA ведут к единственному офферу (#buy); на чекаут уходит только кнопка внутри него.
-// Якорь ставим не на верх секции (там бейдж «Предзаказ» и большой заголовок съедают
-// экран, а кнопка «Оформить предзаказ» остаётся за кадром), а на первую карточку тарифа.
+// Якорь ставим не на верх секции (там бейдж запуска и большой заголовок съедают
+// экран, а кнопка «Записаться на курс» остаётся за кадром), а на первую карточку тарифа.
 const scrollToBuy = () => {
   const card = document.getElementById('buy-tariffs')?.firstElementChild;
   if (!card) {
@@ -460,6 +462,70 @@ const NAV_LINKS = [
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
+// Обратный отсчёт до закрытия набора: «время заканчивается — успевайте».
+const Countdown = ({ left, className = '' }) => {
+  if (left.closed) {
+    return (
+      <div className={`${styles.countdown} ${styles.countdownClosed} ${className}`}>
+        <span className={styles.countdownLabel}>Набор закрыт</span>
+        <p className={styles.countdownNote}>
+          Курс стартовал {LAUNCH_SHORT} — набор закрыт. Напишите нам в
+          Telegram — подскажем, когда откроется следующий набор.
+        </p>
+      </div>
+    );
+  }
+  const cells = [
+    [String(left.days), daysLabel(left.days)],
+    [left.hours, 'ч'],
+    [left.minutes, 'мин'],
+    [left.seconds, 'сек'],
+  ];
+  return (
+    <div className={`${styles.countdown} ${className}`} role="timer">
+      <span className={styles.countdownLabel}>
+        <span className={styles.countdownPulse} aria-hidden />
+        Набор скоро закроется! Успей записаться
+      </span>
+      <div className={styles.countdownDigits}>
+        {cells.map(([value, label], i) => (
+          <React.Fragment key={label}>
+            {i > 0 && (
+              <span className={styles.countdownColon} aria-hidden>
+                :
+              </span>
+            )}
+            <span className={styles.countdownCell}>
+              <span className={styles.countdownValue}>{value}</span>
+              <span className={styles.countdownUnit}>{label}</span>
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+      <p className={styles.countdownNote}>
+        Набор закрывается {LAUNCH_SHORT} в 00:00 по Москве.
+      </p>
+    </div>
+  );
+};
+
+// Компактный отсчёт внутри карточки цены в hero — «времени осталось мало».
+const HeroTimer = ({ left }) => {
+  if (left.closed) {
+    return <span className={styles.heroTimer}>Набор закрыт</span>;
+  }
+  return (
+    <span className={styles.heroTimer} role="timer">
+      <span className={styles.heroTimerDot} aria-hidden />
+      Осталось{' '}
+      <strong>
+        {left.days > 0 && `${left.days} ${daysLabel(left.days)} `}
+        {left.hours}:{left.minutes}:{left.seconds}
+      </strong>
+    </span>
+  );
+};
+
 const Placeholder = ({ label, ratio, dark }) => (
   <div className={`${styles.ph} ${dark ? styles.phDark : ''}`} data-ratio={ratio}>
     <span className={styles.phLabel}>{label}</span>
@@ -477,6 +543,8 @@ const CourseLanding = () => {
 
   // Промокод из ссылки (?promo=...): проверяем на бэке по обоим тарифам и,
   // если валиден, зачёркиваем цены и показываем скидочные.
+  const saleLeft = useSaleCountdown();
+  const saleClosed = saleLeft.closed;
   const [promoByPlan, setPromoByPlan] = useState(null);
   const [promoPopupOpen, setPromoPopupOpen] = useState(false);
   useEffect(() => {
@@ -557,7 +625,7 @@ const CourseLanding = () => {
             key: 'buy-desktop',
             kind: 'link',
             href: '#buy',
-            label: 'Оформить предзаказ',
+            label: 'Записаться на курс',
             variant: 'pill',
             onClick: (e) => {
               e.preventDefault();
@@ -571,7 +639,7 @@ const CourseLanding = () => {
             key: 'buy-mobile',
             kind: 'link',
             href: '#buy',
-            label: 'Оформить предзаказ',
+            label: 'Записаться на курс',
             variant: 'primary',
             onClick: (e) => {
               e.preventDefault();
@@ -668,14 +736,21 @@ const CourseLanding = () => {
                     </span>
                   )}
                 </div>
-                <button type="button" className={styles.cta} onClick={scrollToBuy}>
-                  Оформить предзаказ
-                  <span className={styles.ctaArrow} aria-hidden>
-                    <ArrowIcon />
-                  </span>
-                </button>
+                {saleClosed ? (
+                  <button type="button" className={`${styles.cta} ${styles.ctaDisabled}`} disabled>
+                    Набор закрыт
+                  </button>
+                ) : (
+                  <button type="button" className={styles.cta} onClick={scrollToBuy}>
+                    Записаться на курс
+                    <span className={styles.ctaArrow} aria-hidden>
+                      <ArrowIcon />
+                    </span>
+                  </button>
+                )}
+                <HeroTimer left={saleLeft} />
                 <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
-                  Доступ к материалам откроется {LAUNCH}.
+                  Запуск — {LAUNCH}. Успейте записаться до старта.
                 </p>
               </div>
             </div>
@@ -687,7 +762,7 @@ const CourseLanding = () => {
               </p>
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
-              Это предзаказ. Доступ к материалам откроется {LAUNCH}.
+              Запуск — {LAUNCH}. Успейте записаться до старта: после запуска набор закрывается.
             </p>
 
             <div className={styles.heroProof}>
@@ -993,8 +1068,8 @@ const CourseLanding = () => {
                 Среди всех участников курса разыграем Bambu Lab P2S Combo —
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
                 А также два комплекта силикона от ХимСнаб Композит — по
-                5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Оформите
-                предзаказ на любой тариф — и вы автоматически участвуете.
+                5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Запишитесь
+                на любой тариф — и вы автоматически участвуете.
               </p>
               <p className={styles.raffleSub}>
                 Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто
@@ -1049,23 +1124,33 @@ const CourseLanding = () => {
       <section id="buy" className={styles.buySection} aria-labelledby="buy-title">
         <div className={styles.sectionInner}>
           <div className={styles.buyInner}>
-            <span className={styles.pillBadge}>Предзаказ</span>
+            <span className={styles.pillBadge}>Запуск — {LAUNCH_SHORT}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               <em className={styles.hAccent}>Два</em> формата участия
             </h2>
+            <Countdown left={saleLeft} className={styles.countdownBuy} />
             <div className={styles.tariffGrid} id="buy-tariffs">
               {TARIFFS.map((tariff) => {
                 const promo = promoByPlan?.[tariff.key];
                 const isPersonal = tariff.key === 'personal';
+                // «Личное ведение» больше не продаём; после дедлайна закрыты оба тарифа.
+                const personalClosed = isPersonal && PERSONAL_CLOSED;
+                const closed = saleClosed || personalClosed;
                 return (
                   <article
                     key={tariff.key}
                     className={`${styles.tariffCard} ${
-                      isPersonal ? styles.tariffCardFeatured : ''
-                    }`}
+                      isPersonal && !personalClosed ? styles.tariffCardFeatured : ''
+                    } ${closed ? styles.tariffCardClosed : ''}`}
                   >
                     {isPersonal && (
-                      <span className={styles.tariffBadge}>Рекомендуем</span>
+                      <span
+                        className={`${styles.tariffBadge} ${
+                          personalClosed ? styles.tariffBadgeClosed : ''
+                        }`}
+                      >
+                        {personalClosed ? 'Набор закрыт' : 'Рекомендуем'}
+                      </span>
                     )}
                     <span className={styles.tariffIcon} aria-hidden>
                       {tariff.icon}
@@ -1111,22 +1196,39 @@ const CourseLanding = () => {
                         . Применится на оплате.
                       </p>
                     )}
-                    <button
-                      type="button"
-                      className={`${styles.cta} ${styles.tariffCta}`}
-                      onClick={() => goToCheckout(tariff.key)}
-                    >
-                      Оформить предзаказ
-                      <span className={styles.ctaArrow} aria-hidden>
-                        <ArrowIcon />
-                      </span>
-                    </button>
+                    {closed ? (
+                      <>
+                        <button
+                          type="button"
+                          className={`${styles.cta} ${styles.tariffCta} ${styles.ctaDisabled}`}
+                          disabled
+                        >
+                          Набор закрыт
+                        </button>
+                        <p className={styles.tariffClosedNote}>
+                          {personalClosed
+                            ? 'Мест на личное ведение больше нет. Остался тариф «Самостоятельное изучение».'
+                            : 'Курс стартовал — набор завершён.'}
+                        </p>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className={`${styles.cta} ${styles.tariffCta}`}
+                        onClick={() => goToCheckout(tariff.key)}
+                      >
+                        Записаться на курс
+                        <span className={styles.ctaArrow} aria-hidden>
+                          <ArrowIcon />
+                        </span>
+                      </button>
+                    )}
                   </article>
                 );
               })}
             </div>
             <span className={styles.buyMeta}>
-              <span>Цена предзаказа</span>
+              <span>Цена до старта</span>
               <span>Доступ откроется {LAUNCH}</span>
               <span>Материалы — навсегда</span>
             </span>
@@ -1270,9 +1372,9 @@ const CourseLanding = () => {
 
           <div className={styles.footerOffer}>
             <p className={styles.footerOfferText}>
-              Курс — цифровой информационный продукт. Сейчас доступен предзаказ; доступ
+              Курс — цифровой информационный продукт. Доступ
               к материалам откроется {LAUNCH}. Материалы остаются бессрочно, ведение
-              специалистов на тарифе «Личное ведение» — 1 месяц. Оформляя предзаказ, вы
+              специалистов на тарифе «Личное ведение» — 1 месяц. Оформляя покупку, вы
               принимаете условия{' '}
               <a className={styles.footerLink} href="/course/offer">
                 оферты
