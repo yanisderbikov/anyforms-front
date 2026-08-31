@@ -10,6 +10,7 @@ import {
 } from '../../shared/promoTracking';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
+import { useSaleCountdown, daysLabel, PERSONAL_CLOSED } from './courseSale';
 import styles from './CourseCheckout.module.css';
 
 // Тарифы курса; code — продукт из payment_product на бэке.
@@ -31,6 +32,7 @@ export const COURSE_PLANS = {
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
 const LAUNCH = '1 сентября 2026';
+const LAUNCH_SHORT = '1 сентября';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 const CourseCheckout = () => {
@@ -38,9 +40,11 @@ const CourseCheckout = () => {
   const [searchParams] = useSearchParams();
   // Обратные ссылки на лендинг сохраняют promo/utm из текущего URL.
   const backToCourse = `/course${buildPassThroughQuery(location.search)}`;
+  // «Личное ведение» закрыто: ссылку ?plan=personal молча переводим на базовый тариф.
   const [plan, setPlan] = useState(
-    searchParams.get('plan') === 'personal' ? 'personal' : 'self'
+    !PERSONAL_CLOSED && searchParams.get('plan') === 'personal' ? 'personal' : 'self'
   );
+  const saleLeft = useSaleCountdown();
   // Контакты общие для всех чекаутов: заполнял магазин или гайд — подставятся и здесь.
   const savedContact = useMemo(() => readCheckoutContact() || {}, []);
   const [fullName, setFullName] = useState(savedContact.fullName || '');
@@ -126,6 +130,7 @@ const CourseCheckout = () => {
   // Скидки для обоих тарифов уже загружены — при смене тарифа перепроверять не нужно.
   const selectPlan = (planKey) => {
     if (planKey === plan) return;
+    if (planKey === 'personal' && PERSONAL_CLOSED) return;
     setPlan(planKey);
   };
 
@@ -228,19 +233,51 @@ const CourseCheckout = () => {
           <span className={styles.eyebrow}>Оформление</span>
           <h1 className={styles.title}>Предзаказ курса</h1>
 
+          {saleLeft.closed ? (
+            <div className={styles.closedBox}>
+              <p className={styles.closedTitle}>Предзаказ закрыт</p>
+              <p className={styles.closedNote}>
+                Приём заявок завершился {LAUNCH_SHORT} в 00:00 по Москве. Напишите нам в
+                Telegram{' '}
+                <a
+                  className={styles.inlineLink}
+                  href={SUPPORT_TG}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  @AnyFormsBot
+                </a>{' '}
+                — расскажем про следующий набор.
+              </p>
+              <p className={styles.backWrap}>
+                <Link className={styles.back} to={backToCourse}>
+                  ← Назад к курсу
+                </Link>
+              </p>
+            </div>
+          ) : (
+          <>
+
           <div className={styles.planPicker} role="radiogroup" aria-label="Тариф курса">
             {Object.entries(COURSE_PLANS).map(([key, p]) => {
               const planPromo = appliedPromos[key];
+              const planClosed = key === 'personal' && PERSONAL_CLOSED;
               return (
                 <button
                   type="button"
                   key={key}
                   role="radio"
                   aria-checked={plan === key}
-                  className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''}`}
+                  disabled={planClosed}
+                  className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''} ${
+                    planClosed ? styles.planCardClosed : ''
+                  }`}
                   onClick={() => selectPlan(key)}
                 >
-                  <span className={styles.planName}>{p.label}</span>
+                  <span className={styles.planName}>
+                    {p.label}
+                    {planClosed && <span className={styles.planClosedTag}>Набор закрыт</span>}
+                  </span>
                   {planPromo ? (
                     <span className={styles.planPriceRow}>
                       <span className={styles.planPriceOld}>
@@ -273,6 +310,13 @@ const CourseCheckout = () => {
                 <span className={styles.summaryPrice}>{displayPrice}</span>
               </span>
             </div>
+            <p className={styles.saleTimer}>
+              До закрытия предзаказа:{' '}
+              <strong>
+                {saleLeft.days} {daysLabel(saleLeft.days)} {saleLeft.hours}:{saleLeft.minutes}:
+                {saleLeft.seconds}
+              </strong>
+            </p>
             <p className={styles.summaryNote}>
               Это предзаказ. Доступ к курсу откроется {LAUNCH} — ссылку пришлём на
               указанную почту. Сразу после оплаты отправим письмо-подтверждение.
@@ -450,6 +494,8 @@ const CourseCheckout = () => {
               ← Назад к курсу
             </Link>
           </p>
+          </>
+          )}
         </div>
       </main>
     </div>

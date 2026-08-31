@@ -8,9 +8,11 @@ import {
   formatPromoDeadlineNote,
 } from '../../shared/promoTracking';
 import { COURSE_PLANS } from './CourseCheckout';
+import { useSaleCountdown, daysLabel, PERSONAL_CLOSED } from './courseSale';
 import styles from './CourseLanding.module.css';
 
 const LAUNCH = '1 сентября 2026';
+const LAUNCH_SHORT = '1 сентября';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 // Промокод гайда — по нему в попапе показывается заголовок-благодарность.
 const GUIDE_PROMO_CODE = 'ГАЙД';
@@ -460,6 +462,70 @@ const NAV_LINKS = [
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
+// Обратный отсчёт до закрытия предзаказа: «время заканчивается — успевайте».
+const Countdown = ({ left, className = '' }) => {
+  if (left.closed) {
+    return (
+      <div className={`${styles.countdown} ${styles.countdownClosed} ${className}`}>
+        <span className={styles.countdownLabel}>Предзаказ закрыт</span>
+        <p className={styles.countdownNote}>
+          Приём заявок завершён {LAUNCH_SHORT} в 00:00 по Москве. Напишите нам в
+          Telegram — подскажем, когда откроется следующий набор.
+        </p>
+      </div>
+    );
+  }
+  const cells = [
+    [String(left.days), daysLabel(left.days)],
+    [left.hours, 'ч'],
+    [left.minutes, 'мин'],
+    [left.seconds, 'сек'],
+  ];
+  return (
+    <div className={`${styles.countdown} ${className}`} role="timer">
+      <span className={styles.countdownLabel}>
+        <span className={styles.countdownPulse} aria-hidden />
+        До закрытия предзаказа — успейте попасть в набор
+      </span>
+      <div className={styles.countdownDigits}>
+        {cells.map(([value, label], i) => (
+          <React.Fragment key={label}>
+            {i > 0 && (
+              <span className={styles.countdownColon} aria-hidden>
+                :
+              </span>
+            )}
+            <span className={styles.countdownCell}>
+              <span className={styles.countdownValue}>{value}</span>
+              <span className={styles.countdownUnit}>{label}</span>
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+      <p className={styles.countdownNote}>
+        Продажи закрываются {LAUNCH_SHORT} в 00:00 по Москве.
+      </p>
+    </div>
+  );
+};
+
+// Компактный отсчёт внутри карточки цены в hero — «времени осталось мало».
+const HeroTimer = ({ left }) => {
+  if (left.closed) {
+    return <span className={styles.heroTimer}>Предзаказ закрыт</span>;
+  }
+  return (
+    <span className={styles.heroTimer} role="timer">
+      <span className={styles.heroTimerDot} aria-hidden />
+      Осталось{' '}
+      <strong>
+        {left.days > 0 && `${left.days} ${daysLabel(left.days)} `}
+        {left.hours}:{left.minutes}:{left.seconds}
+      </strong>
+    </span>
+  );
+};
+
 const Placeholder = ({ label, ratio, dark }) => (
   <div className={`${styles.ph} ${dark ? styles.phDark : ''}`} data-ratio={ratio}>
     <span className={styles.phLabel}>{label}</span>
@@ -477,6 +543,8 @@ const CourseLanding = () => {
 
   // Промокод из ссылки (?promo=...): проверяем на бэке по обоим тарифам и,
   // если валиден, зачёркиваем цены и показываем скидочные.
+  const saleLeft = useSaleCountdown();
+  const saleClosed = saleLeft.closed;
   const [promoByPlan, setPromoByPlan] = useState(null);
   const [promoPopupOpen, setPromoPopupOpen] = useState(false);
   useEffect(() => {
@@ -668,12 +736,19 @@ const CourseLanding = () => {
                     </span>
                   )}
                 </div>
-                <button type="button" className={styles.cta} onClick={scrollToBuy}>
-                  Оформить предзаказ
-                  <span className={styles.ctaArrow} aria-hidden>
-                    <ArrowIcon />
-                  </span>
-                </button>
+                {saleClosed ? (
+                  <button type="button" className={`${styles.cta} ${styles.ctaDisabled}`} disabled>
+                    Предзаказ закрыт
+                  </button>
+                ) : (
+                  <button type="button" className={styles.cta} onClick={scrollToBuy}>
+                    Оформить предзаказ
+                    <span className={styles.ctaArrow} aria-hidden>
+                      <ArrowIcon />
+                    </span>
+                  </button>
+                )}
+                <HeroTimer left={saleLeft} />
                 <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
                   Доступ к материалам откроется {LAUNCH}.
                 </p>
@@ -1053,19 +1128,29 @@ const CourseLanding = () => {
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
               <em className={styles.hAccent}>Два</em> формата участия
             </h2>
+            <Countdown left={saleLeft} className={styles.countdownBuy} />
             <div className={styles.tariffGrid} id="buy-tariffs">
               {TARIFFS.map((tariff) => {
                 const promo = promoByPlan?.[tariff.key];
                 const isPersonal = tariff.key === 'personal';
+                // «Личное ведение» больше не продаём; после дедлайна закрыты оба тарифа.
+                const personalClosed = isPersonal && PERSONAL_CLOSED;
+                const closed = saleClosed || personalClosed;
                 return (
                   <article
                     key={tariff.key}
                     className={`${styles.tariffCard} ${
-                      isPersonal ? styles.tariffCardFeatured : ''
-                    }`}
+                      isPersonal && !personalClosed ? styles.tariffCardFeatured : ''
+                    } ${closed ? styles.tariffCardClosed : ''}`}
                   >
                     {isPersonal && (
-                      <span className={styles.tariffBadge}>Рекомендуем</span>
+                      <span
+                        className={`${styles.tariffBadge} ${
+                          personalClosed ? styles.tariffBadgeClosed : ''
+                        }`}
+                      >
+                        {personalClosed ? 'Набор закрыт' : 'Рекомендуем'}
+                      </span>
                     )}
                     <span className={styles.tariffIcon} aria-hidden>
                       {tariff.icon}
@@ -1111,16 +1196,33 @@ const CourseLanding = () => {
                         . Применится на оплате.
                       </p>
                     )}
-                    <button
-                      type="button"
-                      className={`${styles.cta} ${styles.tariffCta}`}
-                      onClick={() => goToCheckout(tariff.key)}
-                    >
-                      Оформить предзаказ
-                      <span className={styles.ctaArrow} aria-hidden>
-                        <ArrowIcon />
-                      </span>
-                    </button>
+                    {closed ? (
+                      <>
+                        <button
+                          type="button"
+                          className={`${styles.cta} ${styles.tariffCta} ${styles.ctaDisabled}`}
+                          disabled
+                        >
+                          {personalClosed ? 'Набор закрыт' : 'Предзаказ закрыт'}
+                        </button>
+                        <p className={styles.tariffClosedNote}>
+                          {personalClosed
+                            ? 'Мест на личное ведение больше нет. Остался тариф «Самостоятельное изучение».'
+                            : 'Продажи предзаказа завершены.'}
+                        </p>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className={`${styles.cta} ${styles.tariffCta}`}
+                        onClick={() => goToCheckout(tariff.key)}
+                      >
+                        Оформить предзаказ
+                        <span className={styles.ctaArrow} aria-hidden>
+                          <ArrowIcon />
+                        </span>
+                      </button>
+                    )}
                   </article>
                 );
               })}

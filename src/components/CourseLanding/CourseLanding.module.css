@@ -360,6 +360,52 @@
   white-space: nowrap;
 }
 
+.heroTimer {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(21, 21, 21, 0.07);
+  color: rgba(21, 21, 21, 0.62);
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.heroTimer strong {
+  font-weight: 600;
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--bg);
+}
+
+/* Пульсирующая точка — «время идёт» */
+.heroTimerDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: heroTimerPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes heroTimerPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroTimerDot {
+    animation: none;
+  }
+}
+
 .preorderNote {
   margin: 14px 0 0;
   font-size: 13px;
@@ -510,6 +556,15 @@
 
   .heroPriceOld {
     color: rgba(255, 255, 255, 0.45);
+  }
+
+  .heroTimer {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .heroTimer strong {
+    color: var(--white);
   }
 }
 
@@ -1831,4 +1886,217 @@
   .footerGrid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* ═══════════════ ОБРАТНЫЙ ОТСЧЁТ ДО ЗАКРЫТИЯ ПРЕДЗАКАЗА ═══════════════ */
+.countdown {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 26px 22px;
+  border-radius: 22px;
+  /* Градиентная рамка: фон карточки в padding-box, градиент в border-box */
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, #26282e, #1c1d21) padding-box,
+    linear-gradient(135deg, rgba(108, 134, 189, 0.9), rgba(108, 134, 189, 0.15) 45%, rgba(108, 134, 189, 0.7)) border-box;
+  box-shadow: 0 18px 50px rgba(108, 134, 189, 0.18);
+  text-align: center;
+}
+
+.countdownHero {
+  margin-top: 22px;
+}
+
+.countdownBuy {
+  margin-top: 26px;
+}
+
+.countdownLabel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Пульсирующая точка — «время идёт» */
+.countdownPulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(108, 134, 189, 0.6);
+  animation: countdownPulse 1.8s ease-out infinite;
+}
+
+@keyframes countdownPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(108, 134, 189, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(108, 134, 189, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(108, 134, 189, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdownPulse {
+    animation: none;
+  }
+}
+
+.countdownDigits {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.countdownCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 76px;
+  padding: 12px 8px 10px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Двоеточия между ячейками, мигают в такт секундам */
+.countdownColon {
+  align-self: center;
+  font-weight: 600;
+  font-size: clamp(22px, 4vw, 30px);
+  line-height: 1;
+  color: rgba(108, 134, 189, 0.9);
+  padding-bottom: 16px;
+  animation: countdownBlink 2s steps(2, jump-none) infinite;
+}
+
+@keyframes countdownBlink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdownColon {
+    animation: none;
+  }
+}
+
+.countdownValue {
+  font-weight: 600;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  color: var(--white);
+}
+
+.countdownUnit {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.countdownNote {
+  position: relative;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Время вышло — тот же блок, но без акцента */
+.countdownClosed {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: var(--panel);
+  box-shadow: none;
+}
+
+@media (max-width: 759px) {
+  .countdown {
+    padding: 18px 14px 16px;
+    gap: 12px;
+  }
+
+  .countdownDigits {
+    gap: 4px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .countdownCell {
+    min-width: 0;
+    flex: 1;
+    max-width: 88px;
+    padding: 10px 4px 9px;
+    border-radius: 13px;
+  }
+
+  .countdownColon {
+    padding-bottom: 14px;
+  }
+
+  .countdownLabel {
+    letter-spacing: 1.2px;
+  }
+}
+
+/* ═══════════════ ЗАКРЫТЫЙ ТАРИФ ═══════════════ */
+.tariffCardClosed {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel);
+  box-shadow: none;
+}
+
+.tariffCardClosed .tariffIcon,
+.tariffCardClosed .tariffName,
+.tariffCardClosed .tariffDesc,
+.tariffCardClosed .tariffList,
+.tariffCardClosed .tariffPriceWrap {
+  opacity: 0.5;
+}
+
+.tariffBadgeClosed {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tariffClosedNote {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.cta.ctaDisabled,
+.cta.ctaDisabled:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+  transform: none;
 }
