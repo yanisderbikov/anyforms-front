@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
@@ -14,6 +14,8 @@ import styles from './CourseLanding.module.css';
 const LAUNCH = '1 сентября 2026';
 const LAUNCH_SHORT = '1 сентября';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
+// Канал, куда уводим опоздавших: расскажем о следующем наборе.
+const TG_CHANNEL = 'https://t.me/anyforms';
 // Промокод гайда — по нему в попапе показывается заголовок-благодарность.
 const GUIDE_PROMO_CODE = 'ГАЙД';
 // Флаг «попап уже показывали» — чтобы не всплывал заново при возврате с чекаута.
@@ -512,7 +514,7 @@ const Countdown = ({ left, className = '' }) => {
 // Компактный отсчёт внутри карточки цены в hero — «времени осталось мало».
 const HeroTimer = ({ left }) => {
   if (left.closed) {
-    return <span className={styles.heroTimer}>Набор закрыт</span>;
+    return <span className={styles.heroTimer}>Курс стартовал {LAUNCH_SHORT}</span>;
   }
   return (
     <span className={styles.heroTimer} role="timer">
@@ -591,6 +593,39 @@ const CourseLanding = () => {
     }
   };
 
+  // Попап «запись закрыта»: при открытии страницы, при долистывании до конца
+  // и при клике на любую CTA. Задача — увести опоздавших в телеграм-канал.
+  const [closedPopupOpen, setClosedPopupOpen] = useState(false);
+  const bottomShownRef = useRef(false);
+  useEffect(() => {
+    if (!saleClosed) return undefined;
+    const id = setTimeout(() => setClosedPopupOpen(true), 800);
+    const onScroll = () => {
+      if (bottomShownRef.current) return;
+      const scrolledToEnd =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 200;
+      if (scrolledToEnd) {
+        bottomShownRef.current = true;
+        setClosedPopupOpen(true);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [saleClosed]);
+
+  // Все CTA: пока набор открыт — скроллим к тарифам, после закрытия — попап.
+  const onCtaClick = () => {
+    if (saleClosed) {
+      setClosedPopupOpen(true);
+      return;
+    }
+    scrollToBuy();
+  };
+
   const heroSelfPromo = promoByPlan?.self;
   const isGuidePromo = heroSelfPromo?.code === GUIDE_PROMO_CODE;
   const promoDeadline = formatPromoDeadlineNote(heroSelfPromo?.validUntil);
@@ -629,7 +664,7 @@ const CourseLanding = () => {
             variant: 'pill',
             onClick: (e) => {
               e.preventDefault();
-              scrollToBuy();
+              onCtaClick();
             },
           },
         ]}
@@ -643,7 +678,7 @@ const CourseLanding = () => {
             variant: 'primary',
             onClick: (e) => {
               e.preventDefault();
-              scrollToBuy();
+              onCtaClick();
             },
           },
         ]}
@@ -695,6 +730,55 @@ const CourseLanding = () => {
         </div>
       )}
 
+      {closedPopupOpen && (
+        <div
+          className={styles.promoModalOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="closed-popup-title"
+          onClick={() => setClosedPopupOpen(false)}
+        >
+          <div className={styles.promoModal} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.promoModalClose}
+              onClick={() => setClosedPopupOpen(false)}
+              aria-label="Закрыть"
+            >
+              ×
+            </button>
+            <h2 className={styles.promoModalTitle} id="closed-popup-title">
+              Запись закрыта
+            </h2>
+            <p className={styles.promoModalText}>
+              Курс стартовал {LAUNCH_SHORT}, и набор этого потока завершён. Подпишитесь
+              на наш телеграм-канал — там мы первыми сообщим о следующем наборе и
+              делимся закулисьем производства.
+            </p>
+            <div className={styles.closedModalBtns}>
+              <a
+                className={`${styles.cta} ${styles.closedModalTg}`}
+                href={TG_CHANNEL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Перейти в Telegram
+                <span className={styles.ctaArrow} aria-hidden>
+                  <ArrowIcon />
+                </span>
+              </a>
+              <button
+                type="button"
+                className={styles.closedModalDismiss}
+                onClick={() => setClosedPopupOpen(false)}
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══════════════ ЭКРАН 1 · HERO ═══════════════ */}
       <div id="top" />
       <section className={styles.hero} aria-label="О курсе">
@@ -737,11 +821,15 @@ const CourseLanding = () => {
                   )}
                 </div>
                 {saleClosed ? (
-                  <button type="button" className={`${styles.cta} ${styles.ctaDisabled}`} disabled>
+                  <button
+                    type="button"
+                    className={`${styles.cta} ${styles.ctaDisabled}`}
+                    onClick={() => setClosedPopupOpen(true)}
+                  >
                     Набор закрыт
                   </button>
                 ) : (
-                  <button type="button" className={styles.cta} onClick={scrollToBuy}>
+                  <button type="button" className={styles.cta} onClick={onCtaClick}>
                     Записаться на курс
                     <span className={styles.ctaArrow} aria-hidden>
                       <ArrowIcon />
@@ -1078,7 +1166,7 @@ const CourseLanding = () => {
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline} ${styles.raffleCta}`}
-                onClick={scrollToBuy}
+                onClick={onCtaClick}
               >
                 Участвовать в розыгрыше
                 <span className={styles.ctaArrow} aria-hidden>
@@ -1201,7 +1289,8 @@ const CourseLanding = () => {
                         <button
                           type="button"
                           className={`${styles.cta} ${styles.tariffCta} ${styles.ctaDisabled}`}
-                          disabled
+                          disabled={!saleClosed}
+                          onClick={saleClosed ? () => setClosedPopupOpen(true) : undefined}
                         >
                           Набор закрыт
                         </button>
@@ -1315,7 +1404,7 @@ const CourseLanding = () => {
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline}`}
-                onClick={scrollToBuy}
+                onClick={onCtaClick}
               >
                 Начать учиться
                 <span className={styles.ctaArrow} aria-hidden>
