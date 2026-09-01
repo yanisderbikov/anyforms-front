@@ -2100,3 +2100,51 @@
   cursor: not-allowed;
   transform: none;
 }
+
+/* На белой карточке цены белёсая «отключённая» кнопка невидима — делаем тёмную */
+.heroPriceCard .cta.ctaDisabled,
+.heroPriceCard .cta.ctaDisabled:hover {
+  background: rgba(21, 21, 21, 0.08);
+  color: rgba(21, 21, 21, 0.55);
+  cursor: pointer;
+}
+
+@media (max-width: 899px) {
+  /* На мобилке карточка теряет белый фон — возвращаем светлый вариант */
+  .heroPriceCard .cta.ctaDisabled,
+  .heroPriceCard .cta.ctaDisabled:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* ── попап «запись закрыта» ── */
+.closedModalBtns {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.closedModalTg {
+  margin-top: 0;
+  text-decoration: none;
+  text-align: center;
+  justify-content: center;
+}
+
+.closedModalDismiss {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.closedModalDismiss:hover {
+  color: var(--white);
+}
