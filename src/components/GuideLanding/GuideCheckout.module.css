@@ -299,6 +299,12 @@
   box-shadow: 0 10px 28px rgba(203, 106, 66, 0.35);
 }
 
+/* Неуспешная оплата: тот же кружок, но нейтрально-серый вместо акцента */
+.failMark {
+  background: #8a8a8a;
+  box-shadow: none;
+}
+
 .successLead {
   font-size: clamp(15px, 2.4vw, 18px);
   line-height: 1.6;

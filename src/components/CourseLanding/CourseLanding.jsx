@@ -1423,11 +1423,11 @@ const CourseLanding = () => {
             <div>
               <h2 className={styles.footerHeading}>О продавце</h2>
               <p className={styles.footerText}>
-                Суворов Юрий Игоревич
+                ИП Суворов Дмитрий Игоревич
                 <br />
-                Самозанятый (НПД) · г. Пермь
+                ИНН 590699241510 · г. Санкт-Петербург
                 <br />
-                <a className={styles.footerLink} href="/founders/yuri?from=course">
+                <a className={styles.footerLink} href="/founders/dmitry?from=course">
                   Реквизиты
                 </a>
               </p>

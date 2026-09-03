@@ -4,7 +4,7 @@ import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import { COURSE_OFFER, buildPrivacy } from '../shared/legal/legalDocs';
 import styles from '../GuideLanding/GuideLegal.module.css';
 
-// Юр-тексты под продавца-самозанятого (НПД). Источник — модуль legalDocs (см. OWNER_ACTIONS).
+// Юр-тексты под продавца — ИП Суворов Д. И. Источник — модуль legalDocs (см. OWNER_ACTIONS).
 const COURSE_PRIVACY = buildPrivacy('курс');
 
 const LegalLayout = ({ doc }) => (
@@ -46,7 +46,7 @@ const LegalLayout = ({ doc }) => (
           ))}
           <p>
             Актуальные реквизиты продавца —{' '}
-            <Link to="/founders/yuri?from=course" className={styles.inlineLink}>
+            <Link to="/founders/dmitry?from=course" className={styles.inlineLink}>
               на странице реквизитов
             </Link>
             .

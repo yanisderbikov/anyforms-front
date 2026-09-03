@@ -28,7 +28,7 @@ import CourseLanding from "./components/CourseLanding/CourseLanding";
 import { CourseOffer, CoursePrivacy } from "./components/CourseLanding/CourseLegal";
 import CourseCheckout from "./components/CourseLanding/CourseCheckout";
 import CourseSuccess from "./components/CourseLanding/CourseSuccess";
-import FounderYuri from "./components/Founders/FounderYuri";
+import SellerRequisites from "./components/Founders/SellerRequisites";
 import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
 import GuideSuccess from "./components/GuideLanding/GuideSuccess";
@@ -60,6 +60,7 @@ const KNOWN_PATHS = new Set([
   '/guide/privacy',
   '/guide/checkout',
   '/guide/success',
+  '/founders/dmitry',
   '/founders/yuri',
   '/pdf',
   '/stl',
@@ -247,7 +248,9 @@ function App() {
         <Route path="/guide/privacy" element={<GuidePrivacy />} />
         <Route path="/guide/checkout" element={<GuideCheckout />} />
         <Route path="/guide/success" element={<GuideSuccess />} />
-        <Route path="/founders/yuri" element={<FounderYuri />} />
+        <Route path="/founders/dmitry" element={<SellerRequisites />} />
+        {/* Старый адрес реквизитов (продавцом был Суворов Ю. И.) — ведёт на те же реквизиты. */}
+        <Route path="/founders/yuri" element={<SellerRequisites />} />
         <Route path="/" element={<MainLanding />} />
         <Route path="/pdf" element={<PDFViewer />} />
         <Route
