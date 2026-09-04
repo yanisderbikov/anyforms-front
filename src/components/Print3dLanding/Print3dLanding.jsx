@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import toast from 'react-hot-toast';
 import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
@@ -1262,12 +1263,15 @@ const Print3dLanding = () => {
                   <CTAButton type="submit" disabled={formSubmitting}>
                     {formSubmitting ? 'Отправляем…' : 'Получить расчёт за 15 минут'}
                   </CTAButton>
+                  {/* 152-ФЗ: заявка — согласие на обработку ПДн конклюдентным действием,
+                      политика доступна до отправки данных */}
                   <p className={styles.formDisclaimer}>
-                    Файлы и данные не передаём третьим лицам, по запросу подпишем NDA.
-                    Нажимая кнопку, вы соглашаетесь с{' '}
-                    <Link to="/chief/privacy" className={styles.formDisclaimerLink}>
-                      политикой конфиденциальности
+                    Нажимая кнопку, вы даёте согласие на обработку персональных данных и
+                    подтверждаете, что ознакомлены с{' '}
+                    <Link to={LEGAL_LINKS.privacy} className={styles.formDisclaimerLink}>
+                      политикой обработки персональных данных
                     </Link>
+                    . Файлы и чертежи видят только наши инженеры, по запросу подпишем NDA.
                   </p>
                 </form>
               </>
@@ -1384,11 +1388,13 @@ const Print3dLanding = () => {
             <div className={styles.footerBlock}>
               <h3 className={styles.footerHeading}>О компании</h3>
               <p className={styles.footerText}>
-                ИП Суворов Дмитрий Игоревич
+                {SELLER.shortName}
                 <br />
-                ИНН 590699241510
+                ИНН {SELLER.inn}
                 <br />
-                Производство: г. Санкт-Петербург
+                ОГРНИП {SELLER.ogrnip}
+                <br />
+                Юридический адрес: {SELLER.address}
               </p>
             </div>
             <div className={styles.footerBlock}>
@@ -1438,8 +1444,12 @@ const Print3dLanding = () => {
             Главная
           </Link>
           {' · '}
-          <Link to="/chief/privacy" className={styles.footerLegalLink}>
+          <Link to={LEGAL_LINKS.privacy} className={styles.footerLegalLink}>
             Политика конфиденциальности
+          </Link>
+          {' · '}
+          <Link to={LEGAL_LINKS.requisites} className={styles.footerLegalLink}>
+            Реквизиты
           </Link>
         </p>
         <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>

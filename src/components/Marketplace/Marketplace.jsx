@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import { getItems, getShops } from '../../services/itemsService';
 import { trackViewItemList, trackSelectItem } from '../../services/analytics';
 import { useCart } from '../../context/CartContext';
@@ -387,11 +388,13 @@ const Marketplace = () => {
           <div className={styles.footerBlock}>
             <h2 className={styles.footerHeading}>О компании</h2>
             <p className={styles.footerText}>
-              ИП Суворов Дмитрий Игоревич
+              {SELLER.shortName}
               <br />
-              ИНН 590699241510
+              ИНН {SELLER.inn}
               <br />
-              Юридический адрес: г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404
+              ОГРНИП {SELLER.ogrnip}
+              <br />
+              Юридический адрес: {SELLER.address}
             </p>
           </div>
           <div className={styles.footerBlock}>
@@ -426,8 +429,16 @@ const Marketplace = () => {
           </div>
         </div>
         <p className={styles.footerLegal}>
-          <Link to="/chief/privacy" className={styles.footerLegalLink}>
+          <Link to={LEGAL_LINKS.shopOffer} className={styles.footerLegalLink}>
+            Публичная оферта магазина
+          </Link>
+          {' · '}
+          <Link to={LEGAL_LINKS.privacy} className={styles.footerLegalLink}>
             Политика конфиденциальности
+          </Link>
+          {' · '}
+          <Link to={LEGAL_LINKS.requisites} className={styles.footerLegalLink}>
+            Реквизиты
           </Link>
         </p>
         <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>

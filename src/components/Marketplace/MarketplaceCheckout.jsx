@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
+import { LEGAL_LINKS } from '../../shared/seller';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import { useShopSupport } from '../../hooks/useShopSupport';
 import { isMarketplaceCheckoutEnabled } from '../../config/features';
@@ -183,7 +184,7 @@ const MarketplaceCheckout = () => {
     if (!phoneValid) return setError('Укажите корректный номер телефона.');
     if (!emailValid) return setError('Укажите корректный адрес электронной почты.');
     if (!pvzValid) return setError('Выберите пункт выдачи СДЭК.');
-    if (!acceptTerms) return setError('Подтвердите согласие с условиями.');
+    if (!acceptTerms) return setError('Подтвердите согласие с офертой и политикой обработки данных.');
 
     setError('');
     setSubmitting(true);
@@ -435,9 +436,13 @@ const MarketplaceCheckout = () => {
               required
             />
             <span className={styles.checkText}>
-              Я согласен с условиями продажи и{' '}
-              <Link to="/chief/privacy" target="_blank" className={styles.inlineLink}>
-                политикой конфиденциальности
+              Я принимаю условия{' '}
+              <Link to={LEGAL_LINKS.shopOffer} target="_blank" className={styles.inlineLink}>
+                публичной оферты
+              </Link>{' '}
+              и подтверждаю, что ознакомлен с{' '}
+              <Link to={LEGAL_LINKS.privacy} target="_blank" className={styles.inlineLink}>
+                политикой обработки персональных данных
               </Link>
               .
             </span>

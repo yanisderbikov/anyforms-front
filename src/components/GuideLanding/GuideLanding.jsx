@@ -426,11 +426,11 @@ const GuideLanding = () => {
             <div className={styles.footerBlock}>
               <h2 className={styles.footerHeading}>О продавце</h2>
               <p className={styles.footerText}>
-                Суворов Юрий Игоревич
+                ИП Суворов Дмитрий Игоревич
                 <br />
-                Самозанятый (НПД) · г. Пермь
+                ИНН 590699241510 · г. Санкт-Петербург
                 <br />
-                <Link to="/founders/yuri?from=guide" className={styles.footerLink}>
+                <Link to="/requisites?from=guide" className={styles.footerLink}>
                   Реквизиты
                 </Link>
               </p>
@@ -438,8 +438,8 @@ const GuideLanding = () => {
             <div className={styles.footerBlock}>
               <h2 className={styles.footerHeading}>Контакты</h2>
               <p className={styles.footerText}>
-                <a className={styles.footerLink} href="mailto:yuri@anyforms.ru">
-                  yuri@anyforms.ru
+                <a className={styles.footerLink} href="mailto:suvorov@anyforms.ru">
+                  suvorov@anyforms.ru
                 </a>
                 <br />
                 <a
@@ -478,8 +478,7 @@ const GuideLanding = () => {
                 политикой конфиденциальности
               </Link>
               . После предоставления доступа цифровой товар возврату не подлежит.
-              Продавец — Суворов Юрий Игоревич, самозанятый (плательщик НПД),
-              ИНН 590621081613.
+              Продавец — ИП Суворов Дмитрий Игоревич, ИНН 590699241510.
             </p>
           </div>
 

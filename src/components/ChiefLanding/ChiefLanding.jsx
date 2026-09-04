@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import toast from 'react-hot-toast';
 import apiClient from '../../apiClient';
 import CTAButton from '../shared/CTAButton/CTAButton';
@@ -482,10 +483,13 @@ const ChiefLanding = () => {
                         →
                       </span>
                     </button>
+                    {/* 152-ФЗ: заявка — согласие на обработку ПДн конклюдентным действием,
+                        политика доступна до отправки данных */}
                     <p className={styles.formDisclaimer}>
-                      Нажимая на кнопку вы соглашаетесь с условиями обработки данных и{' '}
-                      <Link to="/chief/privacy" className={styles.formDisclaimerLink}>
-                        политикой конфиденциальности
+                      Нажимая на кнопку, вы даёте согласие на обработку персональных данных
+                      и подтверждаете, что ознакомлены с{' '}
+                      <Link to={LEGAL_LINKS.privacy} className={styles.formDisclaimerLink}>
+                        политикой обработки персональных данных
                       </Link>
                     </p>
                   </form>
@@ -856,11 +860,13 @@ const ChiefLanding = () => {
             <div className={styles.footerBlock}>
               <h2 className={styles.footerHeading}>О компании</h2>
               <p className={styles.footerText}>
-                ИП Суворов Дмитрий Игоревич
+                {SELLER.shortName}
                 <br />
-                ИНН 590699241510
+                ИНН {SELLER.inn}
                 <br />
-                Юридический адрес: г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404
+                ОГРНИП {SELLER.ogrnip}
+                <br />
+                Юридический адрес: {SELLER.address}
               </p>
             </div>
             <div className={styles.footerBlock}>
@@ -895,8 +901,12 @@ const ChiefLanding = () => {
             </div>
           </div>
           <p className={styles.footerLegal}>
-            <Link to="/chief/privacy" className={styles.footerLegalLink}>
+            <Link to={LEGAL_LINKS.privacy} className={styles.footerLegalLink}>
               Политика конфиденциальности
+            </Link>
+            {' · '}
+            <Link to={LEGAL_LINKS.requisites} className={styles.footerLegalLink}>
+              Реквизиты
             </Link>
           </p>
           <p className={styles.footerCopyright}>
