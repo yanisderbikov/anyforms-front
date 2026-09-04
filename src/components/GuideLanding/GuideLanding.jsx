@@ -430,7 +430,7 @@ const GuideLanding = () => {
                 <br />
                 ИНН 590699241510 · г. Санкт-Петербург
                 <br />
-                <Link to="/founders/dmitry?from=guide" className={styles.footerLink}>
+                <Link to="/requisites?from=guide" className={styles.footerLink}>
                   Реквизиты
                 </Link>
               </p>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
-import { GUIDE_OFFER, buildPrivacy } from '../shared/legal/legalDocs';
+import { GUIDE_OFFER, SITE_PRIVACY } from '../shared/legal/legalDocs';
 import styles from './GuideLegal.module.css';
 
 // Юр-тексты под продавца — ИП Суворов Д. И. Источник — модуль legalDocs (см. OWNER_ACTIONS).
-const GUIDE_PRIVACY = buildPrivacy('гайд');
+// Политика одна на весь сайт (SITE_PRIVACY), здесь она в раскладке гайда.
 
 const LegalLayout = ({ doc }) => (
   <div className={styles.page} id="top">
@@ -46,7 +46,7 @@ const LegalLayout = ({ doc }) => (
           ))}
           <p>
             Актуальные реквизиты продавца —{' '}
-            <Link to="/founders/dmitry?from=guide" className={styles.inlineLink}>
+            <Link to="/requisites?from=guide" className={styles.inlineLink}>
               на странице реквизитов
             </Link>
             .
@@ -64,4 +64,4 @@ const LegalLayout = ({ doc }) => (
 
 export const GuideOffer = () => <LegalLayout doc={GUIDE_OFFER} />;
 
-export const GuidePrivacy = () => <LegalLayout doc={GUIDE_PRIVACY} />;
+export const GuidePrivacy = () => <LegalLayout doc={SITE_PRIVACY} />;

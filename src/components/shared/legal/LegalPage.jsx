@@ -1,31 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
-import { COURSE_OFFER, SITE_PRIVACY } from '../shared/legal/legalDocs';
-import styles from '../GuideLanding/GuideLegal.module.css';
+import LandingHeader from '../LandingHeader/LandingHeader';
+import { LEGAL_LINKS } from '../../../shared/seller';
+import styles from './LegalPage.module.css';
 
-// Юр-тексты под продавца — ИП Суворов Д. И. Источник — модуль legalDocs (см. OWNER_ACTIONS).
-// Политика одна на весь сайт (SITE_PRIVACY), здесь она в раскладке курса.
-
-const LegalLayout = ({ doc }) => (
+/* Нейтральная страница юр-документа для всего сайта (политика, оферта магазина).
+   Гайд и курс рендерят те же документы в своих тематических раскладках
+   (GuideLegal / CourseLegal), здесь — общий вид под главную и магазин. */
+const LegalPage = ({ doc, backTo = '/', backLabel = '← На главную', headerLabel = 'Главная' }) => (
   <div className={styles.page} id="top">
     <LandingHeader
       logo={{
-        href: '/course',
-        ariaLabel: 'anyforms — к курсу',
+        href: '/',
+        ariaLabel: 'anyforms — на главную',
         src: '/anyforms-wordmark-white.svg',
         width: 152,
         height: 21,
       }}
       navLinks={[]}
       navAriaLabel="Разделы"
-      rightItems={[
-        { key: 'course', kind: 'link', to: '/course', label: 'Курс', variant: 'pill' },
-      ]}
+      rightItems={[{ key: 'back', kind: 'link', to: backTo, label: headerLabel, variant: 'pill' }]}
       mobileMenuId="legal-mobile-menu"
-      mobileTopItems={[
-        { key: 'course-m', kind: 'link', to: '/course', label: 'Курс', variant: 'primary' },
-      ]}
+      mobileTopItems={[{ key: 'back-m', kind: 'link', to: backTo, label: headerLabel, variant: 'primary' }]}
     />
     <main className={styles.main}>
       <div className={styles.inner}>
@@ -46,15 +42,15 @@ const LegalLayout = ({ doc }) => (
           ))}
           <p>
             Актуальные реквизиты продавца —{' '}
-            <Link to="/requisites?from=course" className={styles.inlineLink}>
+            <Link to={LEGAL_LINKS.requisites} className={styles.inlineLink}>
               на странице реквизитов
             </Link>
             .
           </p>
         </div>
         <p className={styles.backWrap}>
-          <Link className={styles.back} to="/course">
-            ← К курсу
+          <Link className={styles.back} to={backTo}>
+            {backLabel}
           </Link>
         </p>
       </div>
@@ -62,6 +58,4 @@ const LegalLayout = ({ doc }) => (
   </div>
 );
 
-export const CourseOffer = () => <LegalLayout doc={COURSE_OFFER} />;
-
-export const CoursePrivacy = () => <LegalLayout doc={SITE_PRIVACY} />;
+export default LegalPage;

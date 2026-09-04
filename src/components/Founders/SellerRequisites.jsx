@@ -1,35 +1,35 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import styles from './SellerRequisites.module.css';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// РЕКВИЗИТЫ продавца гайда и курса — ИП Суворов Дмитрий Игоревич (с 3 сентября
-// 2026 г.; до этого продавцом был самозанятый Суворов Ю. И.). Те же реквизиты,
-// что в футерах главной, /chief, /3d-print и /shop. Строку можно скрыть, удалив её
-// из массива. ОГРНИП — из ЕГРИП (регистрация 27.08.2024, Санкт-Петербург).
-// ─────────────────────────────────────────────────────────────────────────────
-const FULL_NAME = 'ИП Суворов Дмитрий Игоревич';
-
+// Реквизиты продавца всего сайта (магазин, изготовление, гайд, курс) — ИП Суворов
+// Дмитрий Игоревич. Значения берутся из src/shared/seller.js, чтобы совпадать
+// с футерами. ОГРНИП — из ЕГРИП (регистрация 27.08.2024, Санкт-Петербург).
 const REQUISITES = [
-  { label: 'Продавец', value: 'Индивидуальный предприниматель Суворов Дмитрий Игоревич' },
-  { label: 'ИНН', value: '590699241510' },
-  { label: 'ОГРНИП', value: '324784700274710' },
-  { label: 'Юридический адрес', value: 'г. Санкт-Петербург, ул. Заречная, д. 36, корп. 1, кв. 404' },
-  { label: 'Email', value: 'suvorov@anyforms.ru' },
-  { label: 'Телефон', value: '+7 981 040-39-53' },
+  { label: 'Продавец', value: SELLER.fullName },
+  { label: 'ИНН', value: SELLER.inn },
+  { label: 'ОГРНИП', value: SELLER.ogrnip },
+  { label: 'Юридический адрес', value: SELLER.address },
+  { label: 'Email', value: SELLER.email },
+  { label: 'Телефон', value: SELLER.phone },
   { label: 'Приём платежей', value: 'Т-Касса (АО «ТБанк»)' },
   { label: 'Чек', value: 'Кассовый чек по 54-ФЗ направляется на e-mail покупателя после оплаты' },
   { label: 'НДС', value: 'Не облагается (упрощённая система налогообложения)' },
 ];
 
+// Откуда пришли (?from=course|guide|shop) — туда и ведёт «назад»; по умолчанию на главную.
+const BACK = {
+  course: { to: '/course', label: '← К курсу', header: 'Курс' },
+  guide: { to: '/guide', label: '← К гайду', header: 'Гайд' },
+  shop: { to: '/shop', label: '← В магазин', header: 'Магазин' },
+};
+const DEFAULT_BACK = { to: '/', label: '← На главную', header: 'Главная' };
+
 const SellerRequisites = () => {
-  // Страница реквизитов общая для гайда и курса — «назад» ведёт туда, откуда пришли (?from=course|guide).
   const [searchParams] = useSearchParams();
-  const fromCourse = searchParams.get('from') === 'course';
-  const backTo = fromCourse ? '/course' : '/guide';
-  const backLabel = fromCourse ? '← К курсу' : '← К гайду';
-  const productLabel = fromCourse ? 'Курс' : 'Гайд';
+  const back = BACK[searchParams.get('from')] || DEFAULT_BACK;
 
   return (
     <div className={styles.page} id="top">
@@ -43,28 +43,18 @@ const SellerRequisites = () => {
         }}
         navLinks={[]}
         navAriaLabel="Разделы"
-        rightItems={[
-          {
-            key: 'back',
-            kind: 'link',
-            to: backTo,
-            label: productLabel,
-            variant: 'pill',
-          },
-        ]}
+        rightItems={[{ key: 'back', kind: 'link', to: back.to, label: back.header, variant: 'pill' }]}
         mobileMenuId="founder-mobile-menu"
-        mobileTopItems={[
-          { key: 'back-m', kind: 'link', to: backTo, label: productLabel, variant: 'primary' },
-        ]}
+        mobileTopItems={[{ key: 'back-m', kind: 'link', to: back.to, label: back.header, variant: 'primary' }]}
       />
 
       <main className={styles.main}>
         <div className={styles.inner}>
           <span className={styles.eyebrow}>Реквизиты</span>
-          <h1 className={styles.title}>{FULL_NAME}</h1>
+          <h1 className={styles.title}>{SELLER.shortName}</h1>
           <p className={styles.lead}>
-            Регистрационные данные продавца гайда и курса — для оформления документов
-            и оплаты.
+            Регистрационные данные продавца товаров и услуг anyforms — для оформления
+            документов и оплаты.
           </p>
 
           <dl className={styles.table}>
@@ -77,8 +67,13 @@ const SellerRequisites = () => {
           </dl>
 
           <p className={styles.backWrap}>
-            <Link className={styles.back} to={backTo}>
-              {backLabel}
+            <Link className={styles.back} to={LEGAL_LINKS.privacy}>
+              Политика обработки персональных данных
+            </Link>
+          </p>
+          <p className={styles.backWrap}>
+            <Link className={styles.back} to={back.to}>
+              {back.label}
             </Link>
           </p>
         </div>

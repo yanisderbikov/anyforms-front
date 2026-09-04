@@ -20,7 +20,6 @@ import AdminYookassaReceipts from "./components/AdminInvoices/AdminYookassaRecei
 import AdminLayout from "./components/AdminLayout/AdminLayout";
 import AdminHome from "./components/AdminHome/AdminHome";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
-import ChiefPrivacy from "./components/ChiefLanding/ChiefPrivacy";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import GuideLanding from "./components/GuideLanding/GuideLanding";
@@ -30,6 +29,8 @@ import CourseCheckout from "./components/CourseLanding/CourseCheckout";
 import CourseSuccess from "./components/CourseLanding/CourseSuccess";
 import SellerRequisites from "./components/Founders/SellerRequisites";
 import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
+import LegalPage from "./components/shared/legal/LegalPage";
+import { SITE_PRIVACY, SHOP_OFFER } from "./components/shared/legal/legalDocs";
 import GuideCheckout from "./components/GuideLanding/GuideCheckout";
 import GuideSuccess from "./components/GuideLanding/GuideSuccess";
 import NotFound from "./components/NotFound/NotFound";
@@ -49,6 +50,9 @@ const KNOWN_PATHS = new Set([
   '/login',
   '/chief',
   '/chief/privacy',
+  '/privacy',
+  '/requisites',
+  '/shop/offer',
   '/3d-print',
   '/guide',
   '/course',
@@ -89,7 +93,7 @@ const KNOWN_PATHS = new Set([
   '/admin/invoices/receipts',
 ]);
 
-const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success']);
+const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success', 'offer']);
 
 const upsertMetaTag = (selector, attributes) => {
   let tag = document.head.querySelector(selector);
@@ -129,12 +133,13 @@ function App() {
       ? pathnameWithoutEncodedHash.replace(/\/+$/, '')
       : pathnameWithoutEncodedHash;
   const isHomePage = normalizedPathname === '/';
-  const isChiefPrivacyPage = normalizedPathname === '/chief/privacy';
+  // Общие юр-страницы сайта: нейтральная белая раскладка (LegalPage)
+  const isLegalPage = normalizedPathname === '/privacy' || normalizedPathname === '/shop/offer';
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
   const isCoursePage = normalizedPathname === '/course' || normalizedPathname.startsWith('/course/');
-  const isFounderPage = normalizedPathname.startsWith('/founders/');
+  const isFounderPage = normalizedPathname.startsWith('/founders/') || normalizedPathname === '/requisites';
   const isShopProductPage = /^\/shop(\/[^/]+)?\/product\/[^/]+$/.test(normalizedPathname);
   // Витрина магазина: /shop/<slug>, кроме служебных путей магазина (/shop/cart и т.п.).
   const shopSlugMatch = normalizedPathname.match(/^\/shop\/([^/]+)$/);
@@ -161,16 +166,16 @@ function App() {
       document.body.style.background = '#f1f0ec';
     } else if (isFounderPage) {
       document.body.style.background = '#f5f1e8';
-    } else if (normalizedPathname === '/stl') {
+    } else if (normalizedPathname === '/stl' || isLegalPage) {
       document.body.style.background = '#fff';
-    } else if (isChiefPage || isChiefPrivacyPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
+    } else if (isChiefPage || is3dPrintPage || (isNotFoundPage && !normalizedPathname.startsWith('/orders') && !normalizedPathname.startsWith('/admin'))) {
       document.body.style.background = '#000';
     } else if (shopThemeBg || cartThemeBg) {
       document.body.style.background = shopThemeBg || cartThemeBg;
     } else {
       document.body.style.background = '#e5e5e5';
     }
-  }, [normalizedPathname, isHomePage, isChiefPage, isChiefPrivacyPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg, cartThemeBg]);
+  }, [normalizedPathname, isHomePage, isChiefPage, isLegalPage, is3dPrintPage, isGuidePage, isCoursePage, isFounderPage, isNotFoundPage, shopThemeBg, cartThemeBg]);
 
   useEffect(() => {
     // Партнёрская витрина живёт под своим брендом — anyforms в заголовок не добавляем.
@@ -236,7 +241,10 @@ function App() {
         <Route path="/login" element={<Navigate to="/admin/login" replace />} />
         <Route path="/admin/login" element={<Login />} />
         <Route path="/chief" element={<ChiefLanding />} />
-        <Route path="/chief/privacy" element={<ChiefPrivacy />} />
+        {/* Единая политика и реквизиты для всего сайта; старые адреса ведут туда же */}
+        <Route path="/privacy" element={<LegalPage doc={SITE_PRIVACY} />} />
+        <Route path="/chief/privacy" element={<Navigate to="/privacy" replace />} />
+        <Route path="/requisites" element={<SellerRequisites />} />
         <Route path="/3d-print" element={<Print3dLanding />} />
         <Route path="/guide" element={<GuideLanding />} />
         <Route path="/course" element={<CourseLanding />} />
@@ -266,6 +274,10 @@ function App() {
         <Route path="/shop/cart" element={<MarketplaceCart />} />
         <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
         <Route path="/shop/success" element={<MarketplaceSuccess />} />
+        <Route
+          path="/shop/offer"
+          element={<LegalPage doc={SHOP_OFFER} backTo="/shop" backLabel="← В магазин" headerLabel="Магазин" />}
+        />
         {/* Витрина отдельного магазина: /shop/af_pastry и его карточки товаров.
             Статические пути выше (/shop/cart и др.) матчатся раньше. */}
         <Route path="/shop/:shopSlug" element={<Marketplace />} />

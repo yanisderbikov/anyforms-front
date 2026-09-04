@@ -1427,7 +1427,7 @@ const CourseLanding = () => {
                 <br />
                 ИНН 590699241510 · г. Санкт-Петербург
                 <br />
-                <a className={styles.footerLink} href="/founders/dmitry?from=course">
+                <a className={styles.footerLink} href="/requisites?from=course">
                   Реквизиты
                 </a>
               </p>
