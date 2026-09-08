@@ -28,8 +28,10 @@ const ManualInvoice = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestField, setSuggestField] = useState('name');
   const debounceRef = useRef(null);
   const nameWrapRef = useRef(null);
+  const phoneWrapRef = useRef(null);
 
   const loadInvoices = useCallback(async () => {
     try {
@@ -58,10 +60,11 @@ const ManualInvoice = () => {
     }
   };
 
-  // Закрываем подсказки при клике вне поля ФИО.
   useEffect(() => {
     const onClickOutside = (e) => {
-      if (nameWrapRef.current && !nameWrapRef.current.contains(e.target)) {
+      const insideName = nameWrapRef.current && nameWrapRef.current.contains(e.target);
+      const insidePhone = phoneWrapRef.current && phoneWrapRef.current.contains(e.target);
+      if (!insideName && !insidePhone) {
         setShowSuggestions(false);
       }
     };
@@ -69,8 +72,10 @@ const ManualInvoice = () => {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
-  const searchContacts = (q) => {
+  const searchContacts = (field, raw) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    const q = field === 'phone' ? (raw || '').replace(/[\s()-]/g, '') : raw;
+    setSuggestField(field);
     if (!q || q.trim().length < 2) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -95,8 +100,27 @@ const ManualInvoice = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (name === 'name') searchContacts(value);
+    if (name === 'name' || name === 'phone') searchContacts(name, value);
   };
+
+  const openSuggestions = (field) => {
+    if (suggestions.length > 0 && suggestField === field) setShowSuggestions(true);
+  };
+
+  const renderSuggestions = (field) =>
+    showSuggestions &&
+    suggestField === field && (
+      <ul className={styles.suggestList}>
+        {suggestions.map((s, i) => (
+          <li key={i}>
+            <button type="button" className={styles.suggestItem} onClick={() => pickSuggestion(s)}>
+              <span className={styles.suggestName}>{s.contactName || '—'}</span>
+              {s.contactPhone && <span className={styles.suggestPhone}>{s.contactPhone}</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
 
   const pickSuggestion = (s) => {
     setForm((prev) => ({
@@ -148,41 +172,31 @@ const ManualInvoice = () => {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                onFocus={() => openSuggestions('name')}
                 className={styles.input}
                 placeholder="Иванов Иван Иванович"
                 autoComplete="off"
                 required
               />
-              {showSuggestions && (
-                <ul className={styles.suggestList}>
-                  {suggestions.map((s, i) => (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className={styles.suggestItem}
-                        onClick={() => pickSuggestion(s)}
-                      >
-                        <span className={styles.suggestName}>{s.contactName || '—'}</span>
-                        {s.contactPhone && <span className={styles.suggestPhone}>{s.contactPhone}</span>}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {renderSuggestions('name')}
             </div>
           </label>
-          <label className={styles.label}>
+          <label className={styles.label} ref={phoneWrapRef}>
             Телефон * (уходит в чек)
-            <input
-              type="tel"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              className={styles.input}
-              placeholder="+79991234567"
-              required
-            />
+            <div className={styles.suggestWrap}>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                onFocus={() => openSuggestions('phone')}
+                className={styles.input}
+                placeholder="+79991234567"
+                autoComplete="off"
+                required
+              />
+              {renderSuggestions('phone')}
+            </div>
           </label>
           <label className={styles.label}>
             Email (если нужно — чек уйдёт и на почту)

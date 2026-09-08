@@ -19,6 +19,9 @@ import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoi
 import AdminYookassaReceipts from "./components/AdminInvoices/AdminYookassaReceipts";
 import AdminLayout from "./components/AdminLayout/AdminLayout";
 import AdminHome from "./components/AdminHome/AdminHome";
+import AdminSalesbot from "./components/AdminSalesbot/AdminSalesbot";
+import AdminSalesbotAnalytics from "./components/AdminSalesbot/AdminSalesbotAnalytics";
+import AdminSalesbotManualRun from "./components/AdminSalesbot/AdminSalesbotManualRun";
 import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
@@ -91,6 +94,9 @@ const KNOWN_PATHS = new Set([
   '/admin/invoices',
   '/admin/invoices/training',
   '/admin/invoices/receipts',
+  '/admin/salesbot',
+  '/admin/salesbot/manual',
+  '/admin/salesbot/analytics',
 ]);
 
 const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success', 'offer']);
@@ -300,6 +306,9 @@ function App() {
           <Route path="/admin/invoices" element={<AdminInvoices />} />
           <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
           <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
+          <Route path="/admin/salesbot" element={<AdminSalesbot />} />
+          <Route path="/admin/salesbot/manual" element={<AdminSalesbotManualRun />} />
+          <Route path="/admin/salesbot/analytics" element={<AdminSalesbotAnalytics />} />
         </Route>
         {/* Старые адреса админки → новые под /admin */}
         <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />

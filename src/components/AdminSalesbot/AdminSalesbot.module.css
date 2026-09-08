@@ -1,0 +1,533 @@
+/* Админка дрип-цепочек SalesBot: те же токены, что в AdminPromoCodes/AdminInvoices. */
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 12px 3rem;
+}
+
+@media (min-width: 769px) {
+  .wrap {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+}
+
+.pageHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-transform: lowercase;
+  color: #111;
+  margin: 0;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #8c8c8c;
+}
+
+/* ── подсказка о механике ── */
+.note {
+  background: #f6f4ee;
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  border-radius: 18px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #444;
+}
+
+.note p {
+  margin: 0;
+}
+
+.note p + p {
+  margin-top: 6px;
+}
+
+.banner {
+  background: #fdecea;
+  color: #b3261e;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.bannerWarn {
+  background: #fdf6ec;
+  color: #8a5a12;
+  border: 1px solid rgba(196, 138, 44, 0.3);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.linkBtn {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #555;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 17, 17, 0.3);
+}
+
+.linkBtn:hover {
+  color: #111;
+  text-decoration-color: #111;
+}
+
+/* ── карточка типа ── */
+.card {
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.cardHeadText {
+  min-width: 0;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: lowercase;
+  color: #111;
+  margin: 0;
+}
+
+.typeCode {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #8c8c8c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.cardDesc {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #666;
+}
+
+.badge {
+  flex: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #fff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.badgeOn {
+  background: #1a7f37;
+}
+
+.badgeOff {
+  background: #c48a2c;
+}
+
+.badgeMuted {
+  background: #8c8c8c;
+}
+
+.blockTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: #999;
+  margin: 18px 0 8px;
+}
+
+/* ── строка воронки ── */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-radius: 14px;
+}
+
+.rowText {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #111;
+}
+
+.rowText b {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.amoLink {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #111;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 17, 17, 0.3);
+}
+
+.amoLink:hover {
+  text-decoration-color: #111;
+}
+
+.rowTextMuted {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #8c8c8c;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+/* ── таблица шагов ── */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.table th {
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: lowercase;
+  text-align: left;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.thPos {
+  width: 70px;
+}
+
+.thBot {
+  width: auto;
+}
+
+.thActions {
+  width: 280px;
+}
+
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+  color: #111;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tdPos {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tdBot {
+  font-variant-numeric: tabular-nums;
+}
+
+.botName {
+  font-weight: 600;
+  color: #111;
+}
+
+.botId,
+.botIdOnly {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  color: #8c8c8c;
+}
+
+.botId {
+  margin-left: 8px;
+}
+
+.botIdOnly {
+  font-size: 0.88rem;
+  color: #111;
+}
+
+/* ── выбор бота ── */
+.picker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.select {
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: #111;
+  padding: 8px 12px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  max-width: 340px;
+  min-width: 0;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.pickerHint {
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-transform: none;
+  color: #8a5a12;
+}
+
+.tdActions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tdActions > * + * {
+  margin-left: 8px;
+}
+
+/* ── стрелки порядка ── */
+.arrows {
+  display: inline-flex;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.arrowBtn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.arrowBtn:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+}
+
+.arrowBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.editBtn:disabled,
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.editRow td {
+  background: #fafafa;
+}
+
+/* ── формы на месте ── */
+.inlineForm,
+.addForm {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+
+.addForm {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(17, 17, 17, 0.12);
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: #555;
+}
+
+.input {
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: #111;
+  padding: 8px 12px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  width: 160px;
+  min-width: 0;
+}
+
+.inputShort {
+  width: 80px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.inlineActions {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  flex-basis: 100%;
+  color: #c00;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* ── кнопки ── */
+.primaryBtn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #fff;
+  background: #111;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: #8a8a8a;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghostBtn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ghostBtn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.editBtn,
+.deleteBtn {
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.editBtn {
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+}
+
+.editBtn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.deleteBtn {
+  color: #b3261e;
+  background: #fff;
+  border: 1px solid rgba(179, 38, 30, 0.35);
+}
+
+.deleteBtn:hover {
+  background: #b3261e;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .thActions {
+    width: auto;
+  }
+
+  .tdActions {
+    white-space: normal;
+  }
+
+  .input {
+    width: 130px;
+  }
+}

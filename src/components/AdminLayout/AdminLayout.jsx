@@ -41,6 +41,15 @@ const MENU = [
       { to: '/admin/promo-codes', label: 'Промокоды', section: SECTIONS.PROMO_CODES },
     ],
   },
+  {
+    title: 'боты amocrm',
+    section: SECTIONS.SALESBOT,
+    items: [
+      { to: '/admin/salesbot', label: 'Цепочки' },
+      { to: '/admin/salesbot/manual', label: 'Ручной запуск' },
+      { to: '/admin/salesbot/analytics', label: 'Аналитика' },
+    ],
+  },
 ];
 
 const AdminLayout = () => {
