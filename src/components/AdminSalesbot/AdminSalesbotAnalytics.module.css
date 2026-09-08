@@ -1,0 +1,476 @@
+/* Аналитика ботов: раскладка как у ShopSalesReport (панель периода, стат-карточки, таблицы). */
+
+.wrap {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 12px 3rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .wrap {
+    padding: 1.5rem 50px 3rem;
+  }
+}
+
+.pageHead {
+  margin-bottom: 1.25rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111;
+  text-transform: lowercase;
+}
+
+.subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #8c8c8c;
+}
+
+/* ── период ── */
+.controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 18px;
+  margin-bottom: 1rem;
+}
+
+.dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dateInput {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  outline: none;
+}
+
+.dateInput:focus {
+  border-color: #111;
+}
+
+.dateDash {
+  color: #888;
+}
+
+.presets {
+  display: inline-flex;
+  flex-wrap: wrap;
+  padding: 3px;
+  gap: 2px;
+  background: #f1f1f1;
+  border-radius: 999px;
+}
+
+.presetBtn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #555;
+  cursor: pointer;
+  text-transform: lowercase;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.presetBtn:hover {
+  color: #111;
+}
+
+.presetActive {
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.error {
+  margin: 0.4rem 0 0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  color: #a02020;
+  background: rgba(200, 40, 40, 0.08);
+  border-radius: 12px;
+}
+
+/* ── итоги ── */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.statCard {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 18px;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 0.78rem;
+  color: #777;
+}
+
+.statCardAccent {
+  background: #fdf0ee;
+  border-color: rgba(179, 38, 30, 0.3);
+}
+
+.statCardAccent .statValue {
+  color: #b3261e;
+}
+
+/* ── секции ── */
+.typeSection,
+.logsSection {
+  margin-bottom: 1.1rem;
+}
+
+.logsSection {
+  margin-top: 1.6rem;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #111;
+  margin: 0;
+}
+
+.typeCode {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #8c8c8c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.count {
+  font-size: 0.8rem;
+  color: #8c8c8c;
+}
+
+/* ── таблицы ── */
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
+}
+
+.table th {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: lowercase;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+  white-space: nowrap;
+}
+
+.thLeft {
+  text-align: left;
+}
+
+.thNum {
+  text-align: right;
+  width: 1%;
+}
+
+.thShare {
+  text-align: left;
+  min-width: 170px;
+}
+
+.thBot {
+  text-align: left;
+  width: 1%;
+}
+
+.table td.tdBot {
+  text-align: left;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.05);
+  color: #111;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table td.tdNum {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  width: 1%;
+}
+
+.table td.tdNowrap {
+  white-space: nowrap;
+}
+
+.table td.tdBlocked {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.rowWorst td {
+  background: #fdf6f5;
+}
+
+.botName {
+  font-weight: 600;
+}
+
+.botId {
+  margin-left: 6px;
+  font-size: 0.78rem;
+  color: #8c8c8c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.stale {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #8c8c8c;
+  border: 1px solid rgba(17, 17, 17, 0.15);
+  border-radius: 999px;
+  padding: 1px 7px;
+  vertical-align: middle;
+}
+
+.table td.tdShare {
+  min-width: 170px;
+}
+
+.shareWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  flex: 1 1 90px;
+  height: 6px;
+  background: #f1f1f1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: #b3261e;
+  border-radius: 999px;
+}
+
+.shareText {
+  flex: none;
+  min-width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── журнал ── */
+.logFilters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.select {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.86rem;
+  font-family: inherit;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  outline: none;
+}
+
+.select:focus {
+  border-color: #111;
+}
+
+.leadForm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.leadInput {
+  width: 130px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.86rem;
+  font-family: inherit;
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 999px;
+  outline: none;
+}
+
+.leadInput:focus {
+  border-color: #111;
+}
+
+.leadBtn,
+.leadReset,
+.pagerBtn {
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.leadBtn {
+  color: #fff;
+  background: #111;
+  border: none;
+}
+
+.leadBtn:hover {
+  background: #8a8a8a;
+}
+
+.leadReset,
+.pagerBtn {
+  color: #111;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+}
+
+.leadReset:hover,
+.pagerBtn:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+}
+
+.pagerBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.leadLink {
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 17, 17, 0.3);
+  font-variant-numeric: tabular-nums;
+}
+
+.leadLink:hover {
+  text-decoration-color: #111;
+}
+
+.status {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.statusOk {
+  background: #1a7f37;
+}
+
+.statusFailed {
+  background: #8c8c8c;
+}
+
+.statusBlocked {
+  background: #b3261e;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 0.7rem;
+}
+
+.pagerText {
+  font-size: 0.82rem;
+  color: #666;
+}

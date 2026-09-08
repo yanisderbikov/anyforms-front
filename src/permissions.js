@@ -8,6 +8,7 @@ export const SECTIONS = {
   TRAINING_INVOICES: 'TRAINING_INVOICES',
   YOOKASSA_RECEIPTS: 'YOOKASSA_RECEIPTS',
   PROMO_CODES: 'PROMO_CODES',
+  SALESBOT: 'SALESBOT',
 };
 
 const ROLE_SECTIONS = {
@@ -19,6 +20,7 @@ const ROLE_SECTIONS = {
     SECTIONS.TRAINING_INVOICES,
     SECTIONS.YOOKASSA_RECEIPTS,
     SECTIONS.PROMO_CODES,
+    SECTIONS.SALESBOT,
   ],
   SALES_MANAGER: [
     SECTIONS.CUSTOM_ORDERS,
@@ -37,6 +39,7 @@ export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/orders')) return SECTIONS.RETAIL;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
   if (pathname.startsWith('/admin/promo-codes')) return SECTIONS.PROMO_CODES;
+  if (pathname.startsWith('/admin/salesbot')) return SECTIONS.SALESBOT;
   if (pathname.startsWith('/admin/invoices/training')) return SECTIONS.TRAINING_INVOICES;
   if (pathname.startsWith('/admin/invoices/receipts')) return SECTIONS.YOOKASSA_RECEIPTS;
   if (pathname.startsWith('/admin/invoices')) return SECTIONS.INVOICES;
