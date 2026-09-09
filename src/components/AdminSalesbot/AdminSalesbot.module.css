@@ -142,6 +142,58 @@
   color: #666;
 }
 
+.cardHeadActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 12px;
+  flex: none;
+}
+
+.linkDanger {
+  color: #b3261e;
+}
+
+.linkDanger:hover {
+  color: #8f1d17;
+}
+
+.newGroupBtn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #111;
+  background: #fff;
+  border: 1px dashed rgba(17, 17, 17, 0.3);
+  border-radius: 999px;
+  padding: 10px 22px;
+  margin-bottom: 18px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.newGroupBtn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.newGroupForm {
+  border-style: dashed;
+}
+
+.newGroupGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.newGroupGrid .input {
+  width: 340px;
+}
+
 .badge {
   flex: none;
   font-size: 0.68rem;
@@ -291,6 +343,39 @@
   color: #111;
 }
 
+.delayTag {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #555;
+  background: #f1f1f1;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.delayFields {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.delayField {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-transform: none;
+  color: #555;
+}
+
+.delayUnit {
+  color: #8c8c8c;
+}
+
 /* ── выбор бота ── */
 .picker {
   display: flex;
@@ -415,6 +500,13 @@
 
 .inputShort {
   width: 80px;
+}
+
+/* type=time: нативная иконка часов + ЧЧ:ММ не влезают в узкое поле */
+.inputTime {
+  width: 140px;
+  min-width: 140px;
+  font-variant-numeric: tabular-nums;
 }
 
 .input:focus {
