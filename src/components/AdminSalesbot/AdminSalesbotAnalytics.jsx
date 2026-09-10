@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { formatDate } from '../AdminInvoices/invoiceShared';
 import {
-  fetchOrderTypes,
+  fetchRunTypes,
+  fetchGroups,
   fetchSalesbotAnalytics,
   fetchSalesbotLogs,
   errorMessage,
@@ -66,15 +67,16 @@ const StatCard = ({ value, label, accent }) => (
   </div>
 );
 
-// Разбивка по шагам цепочки одного типа; строка с максимумом недоставленных подсвечена.
+// Разбивка по шагам одного раздела (группа или служебный тип); строка с максимумом недоставленных подсвечена.
 const TypeTable = ({ data }) => {
   const worst = data.steps.reduce((max, s) => Math.max(max, s.blocked), 0);
   const launched = data.sent + data.blocked;
+  const code = data.groupId != null ? `группа #${data.groupId}${data.groupDeleted ? ' · удалена' : ''}` : data.type;
   return (
     <section className={styles.typeSection}>
       <div className={styles.sectionHead}>
         <h2 className={styles.sectionTitle}>
-          {data.label} <span className={styles.typeCode}>{data.type}</span>
+          {data.label} <span className={styles.typeCode}>{code}</span>
         </h2>
         <span className={styles.count}>
           ушло {launched} · не доставлено {data.blocked} · не запущено {data.failed}
@@ -146,8 +148,10 @@ const AdminSalesbotAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [orderTypes, setOrderTypes] = useState([]);
-  const [logType, setLogType] = useState('');
+  const [runTypes, setRunTypes] = useState([]);
+  const [groups, setGroups] = useState([]);
+  // Фильтр журнала: '' — всё, 'group:<id>' — группа, иначе тип записи.
+  const [logSource, setLogSource] = useState('');
   const [logStatus, setLogStatus] = useState('MESSAGE_SEND_FAILED');
   const [leadIdInput, setLeadIdInput] = useState('');
   const [leadId, setLeadId] = useState('');
@@ -157,15 +161,14 @@ const AdminSalesbotAnalytics = () => {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsError, setLogsError] = useState('');
 
-  const typeLabels = useMemo(
-    () => Object.fromEntries(orderTypes.map((t) => [t.value, t.label])),
-    [orderTypes]
-  );
+  const typeLabels = useMemo(() => Object.fromEntries(runTypes.map((t) => [t.value, t.label])), [runTypes]);
+  const groupNames = useMemo(() => Object.fromEntries(groups.map((g) => [g.id, g.name])), [groups]);
+  const logGroupId = logSource.startsWith('group:') ? logSource.slice(6) : '';
+  const logType = logSource && !logSource.startsWith('group:') ? logSource : '';
 
   useEffect(() => {
-    fetchOrderTypes()
-      .then((data) => setOrderTypes(Array.isArray(data) ? data : []))
-      .catch(() => setOrderTypes([]));
+    fetchRunTypes().then(setRunTypes).catch(() => setRunTypes([]));
+    fetchGroups().then(setGroups).catch(() => setGroups([]));
   }, []);
 
   useEffect(() => {
@@ -196,6 +199,7 @@ const AdminSalesbotAnalytics = () => {
     setLogsError('');
     fetchSalesbotLogs({
       type: logType || undefined,
+      groupId: logGroupId || undefined,
       status: logStatus || undefined,
       leadId: leadId || undefined,
       from: from || undefined,
@@ -218,7 +222,7 @@ const AdminSalesbotAnalytics = () => {
     return () => {
       cancelled = true;
     };
-  }, [logType, logStatus, leadId, from, to, page]);
+  }, [logType, logGroupId, logStatus, leadId, from, to, page]);
 
   const applyPreset = (p) => {
     const [start, end] = p.range();
@@ -319,10 +323,10 @@ const AdminSalesbotAnalytics = () => {
             <StatCard value={totals.leads} label="лидов в журнале" />
           </div>
 
-          {report.types.length === 0 ? (
+          {report.sections.length === 0 ? (
             <p className={styles.hint}>За период записей в журнале нет.</p>
           ) : (
-            report.types.map((t) => <TypeTable key={t.type} data={t} />)
+            report.sections.map((t) => <TypeTable key={t.key} data={t} />)
           )}
         </>
       )}
@@ -335,19 +339,26 @@ const AdminSalesbotAnalytics = () => {
         <div className={styles.logFilters}>
           <select
             className={styles.select}
-            value={logType}
+            value={logSource}
             onChange={(e) => {
-              setLogType(e.target.value);
+              setLogSource(e.target.value);
               setPage(0);
             }}
-            aria-label="Тип заказа"
+            aria-label="Группа или тип записи"
           >
-            <option value="">все типы</option>
-            {orderTypes.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+            <option value="">все группы и типы</option>
+            {groups.map((g) => (
+              <option key={g.id} value={`group:${g.id}`}>
+                {g.name}
               </option>
             ))}
+            {runTypes
+              .filter((t) => t.value !== 'DRIP')
+              .map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
           </select>
           <select
             className={styles.select}
@@ -395,7 +406,7 @@ const AdminSalesbotAnalytics = () => {
                 <tr>
                   <th className={styles.thLeft}>когда (мск)</th>
                   <th className={styles.thLeft}>сделка</th>
-                  <th className={styles.thLeft}>тип</th>
+                  <th className={styles.thLeft}>группа / тип</th>
                   <th className={styles.thNum}>шаг</th>
                   <th className={styles.thBot}>бот</th>
                   <th className={styles.thLeft}>статус</th>
@@ -410,7 +421,11 @@ const AdminSalesbotAnalytics = () => {
                         {row.leadId}
                       </a>
                     </td>
-                    <td>{typeLabels[row.type] || row.type}</td>
+                    <td>
+                      {row.type === 'DRIP'
+                        ? row.groupName || groupNames[row.groupId] || `группа #${row.groupId ?? '—'}`
+                        : typeLabels[row.type] || row.type}
+                    </td>
                     <td className={styles.tdNum}>{positionLabel(row.position)}</td>
                     <td className={styles.tdBot}>
                       {row.botName && <span className={styles.botName}>{row.botName}</span>}

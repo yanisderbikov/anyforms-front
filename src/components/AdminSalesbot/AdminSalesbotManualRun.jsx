@@ -46,6 +46,8 @@ const AdminSalesbotManualRun = () => {
   const [target, setTarget] = useState({ pipelineId: '', statusId: '' });
   const [botId, setBotId] = useState('');
   const [tagName, setTagName] = useState('');
+  // Тип заказа по полю сделки «Розница»: '' — любые, 'true' — розница, 'false' — не розница.
+  const [retail, setRetail] = useState('');
 
   const [preview, setPreview] = useState(null);
   const [previewKey, setPreviewKey] = useState('');
@@ -57,8 +59,13 @@ const AdminSalesbotManualRun = () => {
   const [runsError, setRunsError] = useState('');
   const [runsRefreshing, setRunsRefreshing] = useState(false);
 
-  const paramsKey = `${target.pipelineId}|${target.statusId}|${botId}|${tagName.trim()}`;
-  const previewFresh = preview !== null && previewKey === paramsKey;
+  // Превью привязано к «кому» (воронка/статус/фильтры); бот в ключ не входит — его можно
+  // выбрать уже после подсчёта, тогда «уже получали» пересчитывается автоматически.
+  const targetKey = `${target.pipelineId}|${target.statusId}|${tagName.trim()}|${retail}`;
+  const previewFresh = preview !== null && previewKey === targetKey;
+  const botValid = parsePositiveInt(botId) !== null;
+  // Для запуска превью должно быть посчитано именно с выбранным ботом (иначе не знаем пропуски).
+  const previewForBot = previewFresh && botValid && String(preview.forBotId) === String(parsePositiveInt(botId));
 
   useEffect(() => {
     fetchSalesbots()
@@ -93,7 +100,8 @@ const AdminSalesbotManualRun = () => {
     return () => clearInterval(timer);
   }, [hasRunning, loadRuns]);
 
-  const validParams = () => {
+  // requireBot=false — для подсчёта лидов бот не нужен.
+  const validParams = (requireBot) => {
     const pipeline = parsePositiveInt(target.pipelineId);
     const status = parsePositiveInt(target.statusId);
     const bot = parsePositiveInt(botId);
@@ -101,47 +109,74 @@ const AdminSalesbotManualRun = () => {
       setError('Выберите воронку и статус или введите их id.');
       return null;
     }
-    if (!bot) {
+    if (requireBot && !bot) {
       setError('Выберите бота или введите его id.');
       return null;
     }
     const tag = tagName.trim();
-    return { pipelineId: pipeline, statusId: status, botId: bot, tagName: tag || undefined };
+    return {
+      pipelineId: pipeline,
+      statusId: status,
+      botId: bot || undefined,
+      tagName: tag || undefined,
+      retail: retail === '' ? undefined : retail === 'true',
+    };
   };
 
-  const handlePreview = async () => {
-    const params = validParams();
-    if (!params) return;
+  const runPreview = useCallback(async (params, key) => {
     setPreviewing(true);
     setError('');
     try {
       const data = await previewManualRun(params);
-      setPreview(data);
-      setPreviewKey(paramsKey);
+      setPreview({ ...data, forBotId: params.botId ?? null });
+      setPreviewKey(key);
     } catch (err) {
       setPreview(null);
       setError(errorMessage(err, 'Не удалось посчитать лидов'));
     } finally {
       setPreviewing(false);
     }
+  }, []);
+
+  const handlePreview = async () => {
+    const params = validParams(false);
+    if (!params) return;
+    await runPreview(params, targetKey);
   };
 
+  // Бот выбран (или сменился) после подсчёта — тихо пересчитываем «уже получали» под него.
+  useEffect(() => {
+    if (!previewFresh || !botValid || previewForBot || previewing) return;
+    const params = validParams(true);
+    if (params) runPreview(params, targetKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [botId, previewFresh, botValid, previewForBot, previewing]);
+
   const handleStart = async () => {
-    const params = validParams();
-    if (!params || !previewFresh) return;
+    const params = validParams(true);
+    if (!params || !previewForBot) return;
     const botLabel = preview.botName || botNames[params.botId] || `id ${params.botId}`;
     const where = [preview.pipelineName || pipelineNames.pipelines[params.pipelineId] || `воронка ${params.pipelineId}`,
       preview.statusName || pipelineNames.statuses[params.statusId] || `статус ${params.statusId}`].join(' → ');
+    const filters = [
+      params.retail === true ? 'только розница' : null,
+      params.retail === false ? 'только не розница' : null,
+      params.tagName ? `тег «${params.tagName}»` : null,
+    ].filter(Boolean);
     const confirmed = window.confirm(
       `Запустить бота «${botLabel}» для ${preview.toSend} ${pluralLeads(preview.toSend)}?\n` +
-        `${where}${params.tagName ? `, тег «${params.tagName}»` : ''}.\n` +
+        `${where}${filters.length ? `, ${filters.join(', ')}` : ''}.\n` +
         `Сообщения уйдут реальным клиентам, отменить нельзя.`
     );
     if (!confirmed) return;
     setStarting(true);
     setError('');
     try {
-      const run = await startManualRun({ ...params, tagName: params.tagName || null });
+      const run = await startManualRun({
+        ...params,
+        tagName: params.tagName || null,
+        retail: params.retail === undefined ? null : params.retail,
+      });
       toast.success(`Запуск #${run.id} стартовал`);
       setPreview(null);
       await loadRuns();
@@ -159,6 +194,16 @@ const AdminSalesbotManualRun = () => {
     } finally {
       setRunsRefreshing(false);
     }
+  };
+
+  // «розница · тег «лошадка»» — отбор лидов внутри статуса; «—», если запуск был по всему статусу.
+  const runFilter = (run) => {
+    const parts = [
+      run.retail === true ? 'розница' : null,
+      run.retail === false ? 'не розница' : null,
+      run.tagName ? `тег «${run.tagName}»` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : '—';
   };
 
   const runPlace = (run) => {
@@ -197,6 +242,14 @@ const AdminSalesbotManualRun = () => {
             <BotPicker bots={bots} botsError={botsError} value={botId} onChange={setBotId} />
           </label>
           <label className={styles.label}>
+            Тип заказа (поле сделки «Розница»)
+            <select className={styles.select} value={retail} onChange={(e) => setRetail(e.target.value)}>
+              <option value="">любой</option>
+              <option value="true">только розница</option>
+              <option value="false">только не розница (под заказ)</option>
+            </select>
+          </label>
+          <label className={styles.label}>
             Только лиды с тегом (необязательно)
             <input
               className={styles.input}
@@ -207,39 +260,55 @@ const AdminSalesbotManualRun = () => {
           </label>
         </div>
         <p className={styles.hint}>
-          Лиды, которым этот бот уже уходил (по журналу), пропускаются. Сначала посчитайте лидов — кнопка запуска
-          появится после превью.
+          Посчитать лидов можно без бота. Кнопка запуска появится, когда выбран бот и есть свежий подсчёт: лиды,
+          которым этот бот уже уходил (по журналу), пропускаются.
         </p>
         <div className={styles.actions}>
           <button type="button" className={styles.ghostBtn} onClick={handlePreview} disabled={previewing || starting}>
             {previewing ? 'Считаем…' : 'Посчитать лидов'}
           </button>
-          {previewFresh && (
+          {previewForBot && (
             <button
               type="button"
               className={styles.dangerBtn}
               onClick={handleStart}
-              disabled={starting || preview.toSend === 0}
+              disabled={starting || previewing || preview.toSend === 0}
             >
               {starting ? 'Запуск…' : `Запустить для ${preview.toSend} ${pluralLeads(preview.toSend)}`}
             </button>
           )}
+          {previewFresh && !botValid && <span className={styles.hintInline}>выберите бота, чтобы запустить</span>}
         </div>
         {error && <p className={styles.error}>{error}</p>}
         {previewFresh && (
           <div className={styles.preview}>
             <div className={styles.previewStat}>
               <span className={styles.previewValue}>{preview.total}</span>
-              <span className={styles.previewLabel}>в статусе{tagName.trim() ? ' с тегом' : ''}</span>
+              <span className={styles.previewLabel}>
+                в статусе
+                {retail === 'true' ? ', розница' : retail === 'false' ? ', не розница' : ''}
+                {tagName.trim() ? ', с тегом' : ''}
+              </span>
             </div>
-            <div className={styles.previewStat}>
-              <span className={styles.previewValue}>{preview.alreadySent}</span>
-              <span className={styles.previewLabel}>уже получали бота — пропустим</span>
-            </div>
-            <div className={`${styles.previewStat} ${styles.previewStatAccent}`}>
-              <span className={styles.previewValue}>{preview.toSend}</span>
-              <span className={styles.previewLabel}>получат бота</span>
-            </div>
+            {previewForBot ? (
+              <>
+                <div className={styles.previewStat}>
+                  <span className={styles.previewValue}>{preview.alreadySent}</span>
+                  <span className={styles.previewLabel}>уже получали бота — пропустим</span>
+                </div>
+                <div className={`${styles.previewStat} ${styles.previewStatAccent}`}>
+                  <span className={styles.previewValue}>{preview.toSend}</span>
+                  <span className={styles.previewLabel}>получат бота</span>
+                </div>
+              </>
+            ) : (
+              <div className={styles.previewStat}>
+                <span className={styles.previewValue}>—</span>
+                <span className={styles.previewLabel}>
+                  {previewing ? 'считаем пропуски…' : 'выберите бота, чтобы узнать, кто его уже получал'}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -262,7 +331,7 @@ const AdminSalesbotManualRun = () => {
                   <th className={styles.thLeft}>начат (мск)</th>
                   <th className={styles.thLeft}>где</th>
                   <th className={styles.thLeft}>бот</th>
-                  <th className={styles.thLeft}>тег</th>
+                  <th className={styles.thLeft}>фильтр</th>
                   <th className={styles.thNum}>найдено</th>
                   <th className={styles.thNum}>отправлено</th>
                   <th className={styles.thNum}>пропущено</th>
@@ -292,7 +361,7 @@ const AdminSalesbotManualRun = () => {
                         run.botId
                       )}
                     </td>
-                    <td>{run.tagName || '—'}</td>
+                    <td>{runFilter(run)}</td>
                     <td className={styles.tdNum}>{run.total < 0 ? '…' : run.total}</td>
                     <td className={styles.tdNum}>{run.sent}</td>
                     <td className={styles.tdNum}>{run.skipped}</td>
