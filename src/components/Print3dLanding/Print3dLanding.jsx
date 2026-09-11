@@ -6,6 +6,7 @@ import CTAButton from '../shared/CTAButton/CTAButton';
 import LandingHeader from '../shared/LandingHeader/LandingHeader';
 import apiClient from '../../apiClient';
 import { getUtmParams, rememberUtmParams } from '../../utils/utm';
+import { trackMetrikaGoal } from '../../services/analytics';
 import styles from './Print3dLanding.module.css';
 
 const LANDING_LEAD_NAME = 'Заявка с лендинга 3D-печати';
@@ -520,9 +521,7 @@ const Print3dLanding = () => {
         return;
       }
       setFormSubmitted(true);
-      if (typeof window.ym === 'function') {
-        window.ym(106593235, 'reachGoal', 'print3d_lead');
-      }
+      trackMetrikaGoal('print3d_lead');
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'generate_lead', { form: 'print3d_calc' });
       }

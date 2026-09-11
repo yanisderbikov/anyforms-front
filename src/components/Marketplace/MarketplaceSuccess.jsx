@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
@@ -15,6 +15,24 @@ import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
 const PAYMENT_TYPE = 'online';
+const PAYMENT_RETURN_SENT_PREFIX = 'anyforms_payment_return_sent_';
+const PAYMENT_FAILED_RETURN_SENT_PREFIX = 'anyforms_payment_failed_return_sent_';
+
+const wasSent = (key) => {
+  try {
+    return localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+};
+
+const markSent = (key) => {
+  try {
+    localStorage.setItem(key, '1');
+  } catch {
+    // localStorage может быть недоступен — тогда защита остаётся на уровне страницы.
+  }
+};
 
 const formatRub = (value) => {
   const num = Number(value);
@@ -42,20 +60,38 @@ const MarketplaceSuccess = () => {
   // повторной отправки по transaction_id, так что обновление страницы покупку
   // не задвоит. При неуспешной оплате корзину и снапшот не трогаем — покупатель
   // может вернуться на чекаут и оплатить ещё раз.
-  // Возврат с платёжной страницы — шаг воронки; ref гасит повтор в StrictMode.
-  const returnTrackedRef = useRef(false);
   useEffect(() => {
-    if (!returnTrackedRef.current) {
-      returnTrackedRef.current = true;
-      trackPaymentReturn(isFail ? 'fail' : 'success', orderNumber);
-    }
-    if (isFail) {
-      trackPaymentFailed(PAYMENT_TYPE, 'provider_redirect_fail');
-      return;
-    }
     const snapshot = readCheckoutSnapshot();
     const transactionId = orderNumber || snapshot?.fallbackId;
-    if (snapshot && transactionId) {
+    if (!transactionId) {
+      const fallbackKey = `${window.location.pathname}${window.location.search}`;
+      const returnStorageKey = `${PAYMENT_RETURN_SENT_PREFIX}fail:url:${fallbackKey}`;
+      if (isFail && !wasSent(returnStorageKey)) {
+        trackPaymentReturn('fail');
+        markSent(returnStorageKey);
+      }
+      const paymentFailedKey = `${PAYMENT_FAILED_RETURN_SENT_PREFIX}url:${fallbackKey}`;
+      if (isFail && !wasSent(paymentFailedKey)) {
+        trackPaymentFailed(PAYMENT_TYPE, 'provider_redirect_fail');
+        markSent(paymentFailedKey);
+      }
+      return;
+    }
+    const status = isFail ? 'fail' : 'success';
+    const returnStorageKey = `${PAYMENT_RETURN_SENT_PREFIX}${status}:${transactionId}`;
+    if (!wasSent(returnStorageKey)) {
+      trackPaymentReturn(status, transactionId);
+      markSent(returnStorageKey);
+    }
+    if (isFail) {
+      const paymentFailedKey = `${PAYMENT_FAILED_RETURN_SENT_PREFIX}${transactionId}`;
+      if (!wasSent(paymentFailedKey)) {
+        trackPaymentFailed(PAYMENT_TYPE, 'provider_redirect_fail');
+        markSent(paymentFailedKey);
+      }
+      return;
+    }
+    if (snapshot) {
       const sent = trackPurchase({
         id: transactionId,
         value: snapshot.value,

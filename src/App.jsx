@@ -255,14 +255,15 @@ function App() {
   // Эффект стоит после SEO-эффекта, чтобы document.title был уже обновлён.
   const initialPageTrackedRef = useRef(false);
   useEffect(() => {
-    const url = `${window.location.origin}${location.pathname}${location.search}`;
+    if (location.pathname !== normalizedPathname) return;
+    const url = `${window.location.origin}${normalizedPathname}${location.search}`;
     if (!initialPageTrackedRef.current) {
       initialPageTrackedRef.current = true;
       trackPageView(url, { initial: true });
       return;
     }
     trackPageView(url);
-  }, [location.pathname, location.search]);
+  }, [location.pathname, normalizedPathname, location.search]);
   if (location.pathname !== normalizedPathname) {
     return (
       <Navigate
@@ -358,6 +359,5 @@ function App() {
 }
 
 export default App;
-
 
 

@@ -29,11 +29,14 @@
       // GTM управляется отдельно в src/services/analytics.js: та же проверка хоста
       // плюс рубильник VITE_ANALYTICS_ENABLED и тестовый контейнер VITE_GTM_ID.
       window.__ANYFORMS_PROD_HOST = /^(www\.)?anyforms\.ru$/.test(location.hostname);
+      window.__ANYFORMS_ANALYTICS_ENABLED = '%VITE_ANALYTICS_ENABLED%';
+      window.__ANYFORMS_COUNTERS_ENABLED =
+        window.__ANYFORMS_ANALYTICS_ENABLED !== 'false' && window.__ANYFORMS_PROD_HOST;
     </script>
     <!-- Google tag (gtag.js) -->
     <script>
       window.dataLayer = window.dataLayer || [];
-      if (window.__ANYFORMS_PROD_HOST) {
+      if (window.__ANYFORMS_COUNTERS_ENABLED) {
         var gtagScript = document.createElement('script');
         gtagScript.async = true;
         gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-9CVRCKCES2';
@@ -45,7 +48,7 @@
     </script>
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
-      if (window.__ANYFORMS_PROD_HOST) {
+      if (window.__ANYFORMS_COUNTERS_ENABLED) {
         (function(m,e,t,r,i,k,a){
           m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
           m[i].l=1*new Date();
@@ -58,7 +61,7 @@
     </script>
     <!-- Top.Mail.Ru counter -->
     <script type="text/javascript">
-      if (window.__ANYFORMS_PROD_HOST) {
+      if (window.__ANYFORMS_COUNTERS_ENABLED) {
         var _tmr = window._tmr || (window._tmr = []);
         _tmr.push({id: "3747979", type: "pageView", start: (new Date()).getTime()});
         (function (d, w, id) {
@@ -74,9 +77,6 @@
     <title>Силиконовые формы под заказ</title>
   </head>
   <body>
-    <noscript>
-      <img src="https://top-fwz1.mail.ru/counter?id=3747979;js=na" style="position:absolute;left:-9999px" alt="Top.Mail.Ru" />
-    </noscript>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.jsx"></script>
