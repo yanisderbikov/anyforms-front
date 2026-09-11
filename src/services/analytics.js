@@ -234,7 +234,7 @@ function reachGoal(goal, params = {}) {
 }
 
 export function trackMetrikaGoal(goal, params = {}) {
-  callYm('reachGoal', goal, params);
+  reachGoal(goal, params);
 }
 
 // Общий helper для стандартных e-commerce событий: перед событием сбрасываем
