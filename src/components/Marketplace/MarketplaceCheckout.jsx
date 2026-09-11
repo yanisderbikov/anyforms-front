@@ -141,8 +141,13 @@ const MarketplaceCheckout = () => {
   // Отправляется один раз на открытие чекаута — по первому же сигналу, поэтому
   // «ушёл» значит «хотя бы раз покинул чекаут в таком состоянии формы».
   // Редирект на оплату уходом не считается — paymentStartedRef выставляется до него.
+  const abandonCleanupTimerRef = useRef(null);
   useEffect(() => {
     abandonSentRef.current = false;
+    if (abandonCleanupTimerRef.current) {
+      clearTimeout(abandonCleanupTimerRef.current);
+      abandonCleanupTimerRef.current = null;
+    }
     const onPageHide = () => sendAbandonRef.current();
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') sendAbandonRef.current();
@@ -152,7 +157,10 @@ const MarketplaceCheckout = () => {
     return () => {
       window.removeEventListener('pagehide', onPageHide);
       document.removeEventListener('visibilitychange', onVisibilityChange);
-      sendAbandonRef.current();
+      abandonCleanupTimerRef.current = setTimeout(() => {
+        abandonCleanupTimerRef.current = null;
+        sendAbandonRef.current();
+      }, 0);
     };
   }, []);
 
