@@ -321,7 +321,6 @@ const MarketplaceCheckout = () => {
 
     setError('');
     setSubmitting(true);
-    paymentStartedRef.current = true;
     trackCheckoutSubmit(items, { promoApplied: Boolean(appliedPromo) });
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
@@ -348,13 +347,11 @@ const MarketplaceCheckout = () => {
         window.location.href = data.paymentUrl;
         return;
       }
-      paymentStartedRef.current = false;
       trackPaymentFailed(PAYMENT_TYPE, 'no_payment_url');
       setError('Произошла ошибка.');
       setPaymentError(true);
       setSubmitting(false);
     } catch (err) {
-      paymentStartedRef.current = false;
       trackPaymentFailed(PAYMENT_TYPE, err?.response?.status ?? 'network_error');
       // Показываем только осмысленные сообщения бэкенда (data.message);
       // сырые тексты вроде «Internal Server Error» до покупателя не доходят.
