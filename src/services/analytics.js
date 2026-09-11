@@ -137,6 +137,10 @@ let lastShopParamSent = null;
 // Новый магазин сразу уходит параметром визита в Метрику.
 export function setAnalyticsShop(slug) {
   currentShop = slug || null;
+  if (!currentShop) {
+    lastShopParamSent = null;
+    return;
+  }
   if (currentShop && currentShop !== lastShopParamSent) {
     lastShopParamSent = currentShop;
     callYm('params', { shop: currentShop });
