@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { LEGAL_LINKS } from '../../shared/seller';
@@ -10,6 +10,13 @@ import { normalizePromoCode, formatPromoDeadlineNote } from '../../shared/promoT
 import {
   trackAddPaymentInfo,
   trackPaymentFailed,
+  trackCheckoutOpen,
+  trackCheckoutField,
+  trackPvzSearch,
+  trackPvzSelected,
+  trackPromoCode,
+  trackCheckoutSubmit,
+  trackCheckoutAbandon,
   saveCheckoutSnapshot,
 } from '../../services/analytics';
 import PvzSelect from './PvzSelect';
@@ -77,6 +84,102 @@ const MarketplaceCheckout = () => {
   const canSubmit =
     items.length > 0 && nameValid && phoneValid && emailValid && pvzValid && acceptTerms && !submitting;
 
+  const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
+
+  // --- Аналитика воронки чекаута ---------------------------------------------
+  // Открытие чекаута — один раз на визит страницы с непустой корзиной.
+  const openTrackedRef = useRef(false);
+  useEffect(() => {
+    if (openTrackedRef.current || !checkoutEnabled || items.length === 0) return;
+    openTrackedRef.current = true;
+    trackCheckoutOpen(items, {
+      prefilledContact: Boolean(savedContact.phone || savedContact.email),
+      prefilledPvz: Boolean(savedForm.pvz),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutEnabled, items.length]);
+
+  // Состояние формы для события «ушёл с чекаута»: читаем через ref, чтобы
+  // обработчики pagehide/unmount видели актуальные значения.
+  const formStateRef = useRef(null);
+  formStateRef.current = { nameValid, phoneValid, emailValid, pvzValid, acceptTerms, items };
+  const openedAtRef = useRef(Date.now());
+  const pvzSearchedRef = useRef(false);
+  const paymentStartedRef = useRef(false);
+  const abandonSentRef = useRef(false);
+  // Одно событие на поле и результат валидации, чтобы не шуметь на каждый blur.
+  const fieldTrackedRef = useRef(new Set());
+  const pvzEmptyQueriesRef = useRef(new Set());
+  const pvzOkTrackedRef = useRef(false);
+
+  const sendAbandon = () => {
+    if (abandonSentRef.current || paymentStartedRef.current || !openTrackedRef.current) return;
+    const state = formStateRef.current;
+    if (!state || state.items.length === 0) return;
+    abandonSentRef.current = true;
+    const checks = [
+      ['name', state.nameValid],
+      ['phone', state.phoneValid],
+      ['email', state.emailValid],
+      ['pvz', state.pvzValid],
+      ['terms', state.acceptTerms],
+    ];
+    trackCheckoutAbandon({
+      filled: checks.filter(([, ok]) => ok).map(([f]) => f),
+      missing: checks.filter(([, ok]) => !ok).map(([f]) => f),
+      seconds: (Date.now() - openedAtRef.current) / 1000,
+      pvzSearched: pvzSearchedRef.current,
+      cartItems: state.items,
+    });
+  };
+  const sendAbandonRef = useRef(sendAbandon);
+  sendAbandonRef.current = sendAbandon;
+
+  // Уход со страницы: свернул браузер/переключил приложение (visibilitychange —
+  // на мобильных это самый надёжный сигнал), закрыл вкладку или ушёл по внешней
+  // ссылке (pagehide), перешёл на другую страницу внутри SPA (unmount).
+  // Отправляется один раз на открытие чекаута — по первому же сигналу, поэтому
+  // «ушёл» значит «хотя бы раз покинул чекаут в таком состоянии формы».
+  // Редирект на оплату уходом не считается — paymentStartedRef выставляется до него.
+  useEffect(() => {
+    abandonSentRef.current = false;
+    const onPageHide = () => sendAbandonRef.current();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') sendAbandonRef.current();
+    };
+    window.addEventListener('pagehide', onPageHide);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', onPageHide);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      sendAbandonRef.current();
+    };
+  }, []);
+
+  const trackFieldOnce = (field, value, valid) => {
+    if (!String(value ?? '').trim()) return;
+    const key = `${field}:${valid ? 'valid' : 'invalid'}`;
+    if (fieldTrackedRef.current.has(key)) return;
+    fieldTrackedRef.current.add(key);
+    trackCheckoutField(field, valid);
+  };
+
+  const handlePvzSearchResult = (outcome, info) => {
+    pvzSearchedRef.current = true;
+    if (outcome === 'ok') {
+      // Успешный поиск — один раз на чекаут; интересны прежде всего провалы.
+      if (pvzOkTrackedRef.current) return;
+      pvzOkTrackedRef.current = true;
+    } else if (outcome === 'empty') {
+      // Пустые результаты — по одному на каждый уникальный запрос
+      // (дебаунс уже отсеял промежуточные наборы букв).
+      if (pvzEmptyQueriesRef.current.has(info.query)) return;
+      pvzEmptyQueriesRef.current.add(info.query);
+    }
+    trackPvzSearch(outcome, info);
+  };
+  // ---------------------------------------------------------------------------
+
   const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
 
   const promoPercent = appliedPromo?.discountPercent || 0;
@@ -140,12 +243,15 @@ const MarketplaceCheckout = () => {
       if (data?.valid) {
         setAppliedPromo(data);
         setPromoInput(data.code);
+        trackPromoCode('applied', { code: data.code });
       } else {
         setAppliedPromo(null);
         setPromoError(data?.message || 'Промокод не подошёл.');
+        trackPromoCode('rejected', { code, reason: data?.message || 'invalid' });
       }
     } catch {
       setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
+      trackPromoCode('error', { code });
     } finally {
       setPromoChecking(false);
     }
@@ -156,7 +262,7 @@ const MarketplaceCheckout = () => {
   const emailError = touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
 
   // Фича-флаг: без ?tbpayment=true в URL чекаут недоступен — уводим в корзину.
-  if (!isMarketplaceCheckoutEnabled(location.search)) {
+  if (!checkoutEnabled) {
     return <Navigate to="/shop/cart" replace />;
   }
 
@@ -188,6 +294,7 @@ const MarketplaceCheckout = () => {
 
     setError('');
     setSubmitting(true);
+    trackCheckoutSubmit(items, { promoApplied: Boolean(appliedPromo) });
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
         items: items.map((i) => ({ productId: i.id, variantId: i.variantId || undefined, quantity: i.quantity })),
@@ -206,7 +313,9 @@ const MarketplaceCheckout = () => {
       if (data?.paymentUrl) {
         // Платёж создан: фиксируем выбор оплаты и сохраняем состав корзины,
         // чтобы после возврата с платёжной страницы отправить purchase.
-        trackAddPaymentInfo(items, PAYMENT_TYPE);
+        // Редирект на оплату не должен засчитаться как уход с чекаута.
+        paymentStartedRef.current = true;
+        trackAddPaymentInfo(items, PAYMENT_TYPE, { promoApplied: Boolean(appliedPromo) });
         saveCheckoutSnapshot(items);
         window.location.href = data.paymentUrl;
         return;
@@ -293,12 +402,13 @@ const MarketplaceCheckout = () => {
           </p>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+        <form className={styles.form} id="checkout-form" name="checkout" onSubmit={handleSubmit} noValidate>
           <label className={`${styles.label} ${styles.labelFirst}`} htmlFor="fullName">
             ФИО <span className={styles.req}>*</span>
           </label>
           <input
             id="fullName"
+            name="fullName"
             className={`${styles.input} ${nameError ? styles.inputError : ''}`}
             type="text"
             autoComplete="name"
@@ -308,7 +418,10 @@ const MarketplaceCheckout = () => {
               setFullName(e.target.value);
               setError('');
             }}
-            onBlur={() => markTouched('fullName')}
+            onBlur={() => {
+              markTouched('fullName');
+              trackFieldOnce('name', fullName, nameValid);
+            }}
             required
           />
           {nameError && <p className={styles.fieldError}>{nameError}</p>}
@@ -318,6 +431,7 @@ const MarketplaceCheckout = () => {
           </label>
           <input
             id="phone"
+            name="phone"
             className={`${styles.input} ${phoneError ? styles.inputError : ''}`}
             type="tel"
             inputMode="tel"
@@ -329,7 +443,10 @@ const MarketplaceCheckout = () => {
               setError('');
               resetPromo();
             }}
-            onBlur={() => markTouched('phone')}
+            onBlur={() => {
+              markTouched('phone');
+              trackFieldOnce('phone', phone, phoneValid);
+            }}
             required
           />
           {phoneError && <p className={styles.fieldError}>{phoneError}</p>}
@@ -339,6 +456,7 @@ const MarketplaceCheckout = () => {
           </label>
           <input
             id="email"
+            name="email"
             className={`${styles.input} ${emailError ? styles.inputError : ''}`}
             type="email"
             inputMode="email"
@@ -350,7 +468,10 @@ const MarketplaceCheckout = () => {
               setError('');
               resetPromo();
             }}
-            onBlur={() => markTouched('email')}
+            onBlur={() => {
+              markTouched('email');
+              trackFieldOnce('email', email, emailValid);
+            }}
             required
           />
           {emailError ? (
@@ -365,6 +486,7 @@ const MarketplaceCheckout = () => {
           <div className={styles.promoRow}>
             <input
               id="promo"
+              name="promo"
               className={`${styles.input} ${promoError ? styles.inputError : ''}`}
               type="text"
               autoComplete="off"
@@ -399,7 +521,7 @@ const MarketplaceCheckout = () => {
             </p>
           )}
 
-          <label className={styles.label}>
+          <label className={styles.label} htmlFor="pvz">
             Пункт выдачи СДЭК <span className={styles.req}>*</span>
           </label>
           <PvzSelect
@@ -407,14 +529,17 @@ const MarketplaceCheckout = () => {
             onSelect={(p) => {
               setPvz(p);
               setError('');
+              trackPvzSelected(p);
             }}
             onClear={() => setPvz(null)}
             invalid={!pvzValid}
+            onSearchResult={handlePvzSearchResult}
           />
 
           <label className={styles.checkRow}>
             <input
               type="checkbox"
+              name="marketingConsent"
               className={styles.checkbox}
               checked={marketingConsent}
               onChange={(e) => setMarketingConsent(e.target.checked)}
@@ -427,6 +552,7 @@ const MarketplaceCheckout = () => {
           <label className={styles.checkRow}>
             <input
               type="checkbox"
+              name="acceptTerms"
               className={styles.checkbox}
               checked={acceptTerms}
               onChange={(e) => {

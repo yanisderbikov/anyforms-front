@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
@@ -6,6 +6,7 @@ import { useShopSupport } from '../../hooks/useShopSupport';
 import {
   trackPurchase,
   trackPaymentFailed,
+  trackPaymentReturn,
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
@@ -41,7 +42,13 @@ const MarketplaceSuccess = () => {
   // повторной отправки по transaction_id, так что обновление страницы покупку
   // не задвоит. При неуспешной оплате корзину и снапшот не трогаем — покупатель
   // может вернуться на чекаут и оплатить ещё раз.
+  // Возврат с платёжной страницы — шаг воронки; ref гасит повтор в StrictMode.
+  const returnTrackedRef = useRef(false);
   useEffect(() => {
+    if (!returnTrackedRef.current) {
+      returnTrackedRef.current = true;
+      trackPaymentReturn(isFail ? 'fail' : 'success', orderNumber);
+    }
     if (isFail) {
       trackPaymentFailed(PAYMENT_TYPE, 'provider_redirect_fail');
       return;

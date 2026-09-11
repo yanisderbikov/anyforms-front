@@ -4,13 +4,17 @@ import styles from './checkout.module.css';
 
 // Поиск ПВЗ СДЭК: город (обязательно) + адрес/улица (необязательно, фильтрует пункты внутри города).
 // Выбор отдаёт наверх { pvzCode, pvzCity, pvzStreet }.
-const PvzSelect = ({ selected, onSelect, onClear, invalid }) => {
+// onSearchResult(outcome, { query, results }) — для аналитики: outcome = ok | empty | error.
+const PvzSelect = ({ selected, onSelect, onClear, invalid, onSearchResult }) => {
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState(false);
   const boxRef = useRef(null);
+  // Колбэк аналитики читаем через ref, чтобы не перезапускать поиск при его смене.
+  const onSearchResultRef = useRef(onSearchResult);
+  onSearchResultRef.current = onSearchResult;
 
   // Дебаунс запроса. Свободный текст: улица и/или город («Грибоедова», «грибоедова пермь»).
   useEffect(() => {
@@ -24,10 +28,13 @@ const PvzSelect = ({ selected, onSelect, onClear, invalid }) => {
     const timer = setTimeout(async () => {
       try {
         const { data } = await apiClient.instance.get('/api/cdek/pvz', { params: { query: q } });
-        setOptions(Array.isArray(data) ? data : []);
+        const found = Array.isArray(data) ? data : [];
+        setOptions(found);
         setOpen(true);
+        onSearchResultRef.current?.(found.length ? 'ok' : 'empty', { query: q, results: found.length });
       } catch {
         setOptions([]);
+        onSearchResultRef.current?.('error', { query: q, results: 0 });
       } finally {
         setLoading(false);
       }
@@ -75,6 +82,8 @@ const PvzSelect = ({ selected, onSelect, onClear, invalid }) => {
   return (
     <div className={styles.pvzWrap} ref={boxRef}>
       <input
+        id="pvz"
+        name="pvz"
         className={`${styles.input} ${invalid && touched ? styles.inputError : ''}`}
         type="text"
         placeholder="Улица или город — напр. Грибоедова"
