@@ -46,7 +46,6 @@ import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
 import { setAnalyticsShop, trackPageView } from './services/analytics';
 
-// three.js весит больше всего остального бандла — грузим его только на /stl.
 const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
 
 const KNOWN_PATHS = new Set([
