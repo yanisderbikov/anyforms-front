@@ -137,10 +137,14 @@ export function setAnalyticsShop(slug) {
 }
 
 const resolveShop = () => {
-  if (currentShop) return currentShop;
   if (!isBrowser()) return DEFAULT_SHOP;
   const pathname = window.location.pathname;
-  return shopFromPath(pathname) || (pathname.startsWith('/shop/') ? shopFromCartStorage() : null) || DEFAULT_SHOP;
+  const pathShop =
+    shopFromPath(pathname) ||
+    (/^\/shop\/product(?:\/|$)/.test(pathname) ? DEFAULT_SHOP : null);
+  if (pathShop) return pathShop;
+  if (pathname.startsWith('/shop/')) return shopFromCartStorage() || currentShop || DEFAULT_SHOP;
+  return currentShop || DEFAULT_SHOP;
 };
 
 // Параметры визита Метрики, общие для всех событий сессии.
