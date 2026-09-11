@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import CTAButton from '../shared/CTAButton/CTAButton';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './NotFound.module.css';
 
 const TELEGRAM_DEFAULT = 'https://t.me/AnyFormsBot';
@@ -21,7 +21,7 @@ const NotFound = () => {
 
   return (
     <div className={styles.page}>
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '/',
           ariaLabel: 'anyforms — на главную',

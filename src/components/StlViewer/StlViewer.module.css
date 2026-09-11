@@ -2,50 +2,6 @@
   min-height: 100vh;
 }
 
-/* Хедер как в админке: чёрная полоса с логотипом по центру. */
-.headerSafeArea {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 71;
-  height: env(safe-area-inset-top, 0px);
-  background: #000;
-  pointer-events: none;
-}
-
-.header {
-  position: fixed;
-  top: env(safe-area-inset-top, 0px);
-  left: 0;
-  right: 0;
-  z-index: 70;
-  padding: 1rem 0;
-  background: #000;
-}
-
-.headerInner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 41px;
-  padding: 0 16px;
-}
-
-.logoLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.logo {
-  width: 180px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
 .page {
   width: 100%;
   max-width: 1100px;

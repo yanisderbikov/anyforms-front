@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './GuideLanding.module.css';
 
 // Кнопки покупки ведут на страницу оформления и оплаты.
@@ -105,7 +105,7 @@ const GuideLanding = () => {
 
   return (
     <div className={styles.page}>
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '#top',
           ariaLabel: 'anyforms — гайд по контенту',

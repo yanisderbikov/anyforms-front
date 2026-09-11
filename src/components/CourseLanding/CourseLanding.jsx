@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
 import {
   getPromoFromSearch,
@@ -632,7 +632,7 @@ const CourseLanding = () => {
 
   return (
     <div className={styles.page}>
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '#top',
           ariaLabel: 'anyforms — курс по силиконовым формам',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './CourseCheckout.module.css';
 
 const LAUNCH = '1 сентября 2026';
@@ -14,7 +14,7 @@ const CourseSuccess = () => {
 
   return (
     <div className={styles.page} id="top">
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '/course',
           ariaLabel: 'anyforms — к курсу',

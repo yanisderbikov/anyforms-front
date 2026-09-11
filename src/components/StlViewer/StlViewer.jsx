@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import * as THREE from 'three';
 import StlScene from './StlScene';
 import ViewportControls from './ViewportControls';
 import { nameFromUrl, parseStl, triangleCount, volume } from './stlGeometry';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './StlViewer.module.css';
 
 const fmtMm = (v) => `${v.toFixed(v < 10 ? 2 : 1)} мм`;
@@ -28,7 +29,6 @@ const buildModel = (buffer, name) => {
 };
 
 const StlViewer = () => {
-  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const [model, setModel] = useState(null);
   const [status, setStatus] = useState(null); // 'loading' | null
@@ -161,26 +161,15 @@ const StlViewer = () => {
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.headerSafeArea} aria-hidden="true" />
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <span
-            className={styles.logoLink}
-            onClick={() => navigate('/')}
-            role="button"
-            aria-label="anyforms"
-          >
-            <img
-              className={styles.logo}
-              src="/anyforms_logo_new_white.svg"
-              alt=""
-              width={180}
-              height={41}
-              decoding="async"
-            />
-          </span>
-        </div>
-      </header>
+      <SiteHeader
+        logo={{
+          to: '/',
+          ariaLabel: 'anyforms',
+          src: '/anyforms_logo_new_white.svg',
+          width: 180,
+          height: 41,
+        }}
+      />
 
       <div className={styles.page}>
         <div className={styles.head}>

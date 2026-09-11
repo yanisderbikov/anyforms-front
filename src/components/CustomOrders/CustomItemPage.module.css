@@ -2,53 +2,18 @@
   width: 100%;
   max-width: 860px;
   margin: 0 auto;
-  padding: calc(84px + env(safe-area-inset-top, 0px)) 12px 3rem;
+  /* Сверху: зазор над плавающей шапкой (12px) + её высота (~62px) + воздух. */
+  padding: calc(90px + env(safe-area-inset-top, 0px)) 12px 3rem;
   box-sizing: border-box;
 }
 
 @media (min-width: 769px) {
   .page {
-    padding: calc(84px + env(safe-area-inset-top, 0px)) 24px 3rem;
+    padding: calc(90px + env(safe-area-inset-top, 0px)) 24px 3rem;
   }
 }
 
-.headerSafeArea {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 31;
-  height: env(safe-area-inset-top, 0px);
-  background: #000;
-}
-
-.header {
-  position: fixed;
-  top: env(safe-area-inset-top, 0px);
-  left: 0;
-  right: 0;
-  z-index: 30;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding: 1rem 0;
-  background: #000;
-}
-
-.headerInner {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 41px;
-  padding: 0 16px;
-}
-
 .back {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   border: none;
@@ -64,10 +29,6 @@
 }
 
 .amoLink {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -82,25 +43,6 @@
 
 .amoLink:hover {
   background: rgba(255, 255, 255, 0.22);
-}
-
-.logoLink {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.logo {
-  width: 180px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (max-width: 460px) {
-  .logoLink {
-    display: none;
-  }
 }
 
 .content {

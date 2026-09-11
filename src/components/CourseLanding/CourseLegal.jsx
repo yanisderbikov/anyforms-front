@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import { COURSE_OFFER, SITE_PRIVACY } from '../shared/legal/legalDocs';
 import styles from '../GuideLanding/GuideLegal.module.css';
 
@@ -9,7 +9,7 @@ import styles from '../GuideLanding/GuideLegal.module.css';
 
 const LegalLayout = ({ doc }) => (
   <div className={styles.page} id="top">
-    <LandingHeader
+    <SiteHeader
       logo={{
         href: '/course',
         ariaLabel: 'anyforms — к курсу',

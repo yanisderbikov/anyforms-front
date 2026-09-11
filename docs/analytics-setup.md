@@ -1,8 +1,17 @@
-# Настройка аналитики маркетплейса (GTM + GA4)
+# Настройка аналитики маркетплейса (GTM + GA4 + Яндекс.Метрика)
 
-Фронтенд уже отправляет все события в `window.dataLayer` через модуль
-[`src/services/analytics.js`](../src/services/analytics.js). Чтобы события попали в GA4,
-нужно один раз настроить Google Tag Manager и GA4 по этой инструкции.
+Фронтенд отправляет все события через модуль
+[`src/services/analytics.js`](../src/services/analytics.js) в два места:
+
+- `window.dataLayer` — для GTM → GA4 и e-commerce Яндекс.Метрики (разделы 1–8);
+- JS-цели Яндекс.Метрики (`reachGoal`) с параметрами — воронка по шагам,
+  магазинам и товарам (раздел 9). Цели нужно один раз создать в интерфейсе
+  Метрики с идентификаторами из таблицы.
+
+Каждое событие в обоих каналах несёт `shop` (витрина, на которой находится
+покупатель: `anyforms`, `di_gips`, …) и `in_app_browser` (встроенный браузер
+соцсети: `instagram`, `vk`, `facebook`, `threads`, `tiktok`, `telegram`,
+`webview` или `none`). Они же уходят параметрами визита Метрики.
 
 ## 1. Подключение GTM и разделение тест/прод
 
@@ -15,7 +24,7 @@ Docker-образ на проде шлёт аналитику, а на dev-ст�
 
 | Условие (по убыванию приоритета) | Что происходит |
 | --- | --- |
-| `VITE_ANALYTICS_ENABLED=false` | вся аналитика выключена, включая `VITE_GTM_ID` |
+| `VITE_ANALYTICS_ENABLED=false` | вся аналитика выключена: GTM (включая `VITE_GTM_ID`), вызовы Метрики (`hit`/`params`/`reachGoal`) и Top.Mail.Ru из кода |
 | `VITE_GTM_ID=GTM-…` задан | грузится этот (тестовый) контейнер — на любом хосте |
 | `VITE_ANALYTICS_ENABLED=true` | боевой `GTM-MBTTRF2N` — на любом хосте |
 | хост `anyforms.ru` / `www.anyforms.ru` | боевой `GTM-MBTTRF2N` автоматически |
@@ -79,7 +88,7 @@ curl -s "https://anyforms.ru/$BUNDLE" | grep -c GTM-MBTTRF2N   # должно б
 - Event name (включить «Use regex matching»):
 
 ```
-view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to_cart|remove_from_cart|view_cart|change_cart_quantity|begin_checkout|add_payment_info|payment_failed|payment_cancelled|purchase
+view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to_cart|remove_from_cart|view_cart|change_cart_quantity|begin_checkout|checkout_open|checkout_field|pvz_search|pvz_selected|promo_code|checkout_submit|add_payment_info|payment_failed|payment_cancelled|checkout_abandon|payment_return|purchase
 ```
 
 - Назвать: `CE — ecommerce events`.
@@ -103,13 +112,39 @@ view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to
 | `new_quantity`      | `{{DLV - new_quantity}}`       |
 | `quantity_delta`    | `{{DLV - quantity_delta}}`     |
 | `environment`       | `{{DLV - environment}}`        |
+| `shop`              | `{{DLV - shop}}`               |
+| `in_app_browser`    | `{{DLV - in_app_browser}}`     |
+| `field`             | `{{DLV - field}}`              |
+| `valid`             | `{{DLV - valid}}`              |
+| `outcome`           | `{{DLV - outcome}}`            |
+| `filled`            | `{{DLV - filled}}`             |
+| `missing`           | `{{DLV - missing}}`            |
+| `status`            | `{{DLV - status}}`             |
+| `prefilled_contact` | `{{DLV - prefilled_contact}}`  |
+| `prefilled_pvz`     | `{{DLV - prefilled_pvz}}`      |
+| `query`             | `{{DLV - query}}`              |
+| `results`           | `{{DLV - results}}`            |
+| `code`              | `{{DLV - code}}`               |
+| `reason`            | `{{DLV - reason}}`             |
+| `promo_applied`     | `{{DLV - promo_applied}}`      |
+| `items_count`       | `{{DLV - items_count}}`        |
+| `value`             | `{{DLV - value}}`              |
+| `product_ids`       | `{{DLV - product_ids}}`        |
+| `products`          | `{{DLV - products}}`           |
+| `seconds`           | `{{DLV - seconds}}`            |
+| `filled_count`      | `{{DLV - filled_count}}`       |
+| `pvz_searched`      | `{{DLV - pvz_searched}}`       |
+| `order_id`          | `{{DLV - order_id}}`           |
 
 - Trigger: `CE — ecommerce events`.
 
 ### 4.4. Data Layer Variables
 
 Variables → New → **Data Layer Variable**, версия Data Layer: 2. Создать по одной на каждое имя:
-`placement`, `removal_type`, `payment_type`, `error_code`, `item_id`, `previous_quantity`, `new_quantity`, `quantity_delta`, `environment`.
+`placement`, `removal_type`, `payment_type`, `error_code`, `item_id`, `previous_quantity`, `new_quantity`, `quantity_delta`, `environment`,
+`shop`, `in_app_browser`, `field`, `valid`, `outcome`, `filled`, `missing`, `status`,
+`prefilled_contact`, `prefilled_pvz`, `query`, `results`, `code`, `reason`, `promo_applied`,
+`items_count`, `value`, `product_ids`, `products`, `seconds`, `filled_count`, `pvz_searched`, `order_id`.
 
 ### 4.5. Публикация
 
@@ -125,8 +160,26 @@ Admin → Data display → **Custom definitions** → Create custom dimension (s
 | removal_type   | `removal_type`  |
 | payment_type   | `payment_type`  |
 | error_code     | `error_code`    |
+| shop           | `shop`          |
+| in_app_browser | `in_app_browser`|
+| field          | `field`         |
+| valid          | `valid`         |
+| outcome        | `outcome`       |
+| filled         | `filled`        |
+| missing        | `missing`       |
+| status         | `status`        |
+| prefilled_contact | `prefilled_contact` |
+| prefilled_pvz  | `prefilled_pvz` |
+| query          | `query`         |
+| code           | `code`          |
+| reason         | `reason`        |
+| promo_applied  | `promo_applied` |
+| product_ids    | `product_ids`   |
+| products       | `products`      |
+| pvz_searched   | `pvz_searched`  |
+| order_id       | `order_id`      |
 
-Для `previous_quantity`, `new_quantity`, `quantity_delta` — при необходимости создать **custom metrics** либо анализировать сырые события через экспорт в BigQuery.
+Для `previous_quantity`, `new_quantity`, `quantity_delta`, `results`, `items_count`, `value`, `seconds`, `filled_count` — при необходимости создать **custom metrics** либо анализировать сырые события через экспорт в BigQuery.
 
 Стандартные поля внутри `ecommerce.items` (`item_id`, `price`, `quantity`, `index`, `item_list_name`) регистрировать не нужно — GA4 обрабатывает их автоматически.
 
@@ -146,9 +199,25 @@ Admin → Data display → **Custom definitions** → Create custom dimension (s
 | «×» (удаление позиции) | `remove_from_cart` | `removal_type: "full_remove"`, `quantity` = всё количество |
 | Любое изменение количества | `change_cart_quantity` | `previous_quantity`, `new_quantity`, `quantity_delta` |
 | Кнопка «Оформить заказ» | `begin_checkout` | все позиции, `value` |
+| Открыта страница чекаута с непустой корзиной | `checkout_open` | `items_count`, `value`, `product_ids`, `prefilled_contact`, `prefilled_pvz` (`yes`/`no`) |
+| Закончил ввод в поле (blur, непустое значение) | `checkout_field` | `field: name \| phone \| email`, `valid: valid \| invalid` — по одному на поле и результат |
+| Поиск ПВЗ СДЭК | `pvz_search` | `outcome: ok \| empty \| error`, `query` (город/улица, до 40 символов), `results`; `ok` — один раз на чекаут, `empty` — на каждый уникальный запрос |
+| Выбран ПВЗ | `pvz_selected` | `city` |
+| Проверка промокода | `promo_code` | `outcome: applied \| rejected \| error`, `code`, `reason` (текст бэкенда) |
+| Нажали «Оплатить» (клиентская валидация пройдена) | `checkout_submit` | состав корзины, `promo_applied` |
 | Платёж создан, уходим на оплату | `add_payment_info` | `payment_type: "online"` |
-| Ошибка создания платежа | `payment_failed` | `payment_type`, `error_code` (HTTP-статус или `no_payment_url`/`network_error`) |
-| Возврат на `/shop/success` | `purchase` | `transaction_id` (номер заказа из `?order=`), `value`, `items` |
+| Ошибка создания платежа | `payment_failed` | `payment_type`, `error_code` (HTTP-статус или `no_payment_url`/`network_error`/`provider_redirect_fail`) |
+| Ушёл с чекаута, не дойдя до оплаты | `checkout_abandon` | `filled`, `missing` (списки через запятую из `name, phone, email, pvz, terms`), `filled_count`, `seconds`, `pvz_searched`, состав корзины |
+| Вернулся с платёжной страницы | `payment_return` | `status: success \| fail`, `order_id` |
+| Возврат на `/shop/success` (успех) | `purchase` | `transaction_id` (номер заказа из `?order=`), `value`, `items` |
+
+Как считается `checkout_abandon`: одно событие на открытие чекаута, по первому
+из сигналов — вкладка свёрнута/переключили приложение (`visibilitychange`),
+вкладка закрыта или ушли по внешней ссылке (`pagehide`), перешли на другую
+страницу внутри SPA. В момент отправки фиксируется, какие обязательные поля
+уже были валидно заполнены. Редирект на оплату уходом не считается. Покупатель
+мог свернуть браузер, вернуться и оплатить — поэтому «настоящий» отвал считайте
+как визиты с `checkout_abandon` **без** `payment_created` / `add_payment_info`.
 
 Особенности реализации `purchase`:
 
@@ -180,14 +249,87 @@ DebugView активен автоматически в GTM Preview; в dev-сб�
 11. «×» при количестве 3 → `remove_from_cart` c `quantity: 3`, `removal_type: "full_remove"`.
 
 **Checkout** (`/shop/cart?tbpayment=true`):
-12. «Оформить заказ» → `begin_checkout` со всеми позициями.
-13. Отправка формы, платёж создан → `add_payment_info` (`payment_type: "online"`) перед редиректом.
-14. Ошибка создания платежа → `payment_failed` с кодом.
-15. Тестовая оплата, возврат на `/shop/success?order=…` → одно `purchase` с `transaction_id` = номеру заказа, числовыми `value` и `price`.
-16. Обновить страницу успеха → `purchase` **не** отправляется повторно.
+12. «Оформить заказ» → `begin_checkout` со всеми позициями, затем `checkout_open` с `prefilled_*`.
+13. Заполнить телефон и уйти из поля → одно `checkout_field` (`field: "phone"`); повторный blur того же поля с тем же результатом события не даёт.
+14. Ввести в поиск ПВЗ несуществующий город → `pvz_search` с `outcome: "empty"`; реальный → `outcome: "ok"` (один раз), выбор → `pvz_selected`.
+15. Вернуться «В корзину» с наполовину заполненной формой → одно `checkout_abandon` с правильными `filled` / `missing`.
+16. Отправка формы → `checkout_submit`, платёж создан → `add_payment_info` (`payment_type: "online"`) перед редиректом; `checkout_abandon` при редиректе **не** уходит.
+17. Ошибка создания платежа → `payment_failed` с кодом.
+18. Тестовая оплата, возврат на `/shop/success?order=…` → `payment_return` (`status: "success"`) и одно `purchase` с `transaction_id` = номеру заказа, числовыми `value` и `price`.
+19. Обновить страницу успеха → `purchase` **не** отправляется повторно.
+20. У каждого события есть `shop` (на `/shop/di_gips` и в корзине, набранной с этой витрины, — `di_gips`) и `in_app_browser`.
 
 Общее: все имена событий в нижнем регистре, `items` — массив, `item_id` — непустая строка, `price`/`value`/`quantity` — числа, `currency: "RUB"`, перед каждым e-commerce событием в dataLayer уходит `{ ecommerce: null }`, StrictMode не дублирует события.
 
 ## 8. Доступные метрики по товарам
 
 После накопления данных в GA4 (Reports → Monetization → Ecommerce purchases; Explore для произвольных срезов) по каждому `item_id` доступны: показы в каталоге (`view_item_list`), клики (`select_item`), CTR (= select_item / view_item_list), просмотры товара (`view_item`), лайки/снятия (`add_to_wishlist` / `remove_from_wishlist` + разбивка по `placement`), добавленные/удалённые единицы, начатые оформления, купленные единицы и выручка (`purchase`). Различайте количество событий, единиц товара (sum of `quantity`) и пользователей (uniques) — GA4 показывает все три разреза.
+
+## 9. Яндекс.Метрика: просмотры страниц, цели и параметры
+
+Счётчик `106593235` подключён в `index.html` (только на прод-домене) с
+`ecommerce:"dataLayer"`, поэтому e-commerce события (`add_to_cart`, `purchase`, …)
+Метрика читает из того же dataLayer. Дополнительно модуль аналитики делает три вещи.
+
+### 9.1. Просмотры страниц в SPA
+
+Приложение — SPA, и без ручных вызовов Метрика видела только первую страницу
+визита (глубина просмотра ≈ 1, у `/shop/cart` и `/shop/checkout` почти нет
+просмотров). Теперь `App` при каждой смене пути вызывает `ym('hit', url)`
+(и `pageView` для Top.Mail.Ru) — см. `trackPageView`. Первая страница не
+дублируется: её счётчик считает сам при инициализации. Благодаря этому работают
+отчёты «Страницы входа/выхода», Вебвизор по страницам и воронки по URL.
+
+### 9.2. Параметры визита
+
+`ym('params', …)` отправляется при инициализации и при смене магазина:
+
+| Параметр | Значения | Зачем |
+| --- | --- | --- |
+| `shop` | `anyforms`, `di_gips`, `af_pastry`, … | сегмент «покупатели витрины X», конверсия по магазинам |
+| `in_app_browser` | `instagram`, `vk`, `facebook`, `threads`, `tiktok`, `telegram`, `webview`, `none` | сравнить конверсию во встроенном браузере соцсети и в обычном |
+
+В отчётах: Отчёты → Содержание → Параметры визитов; в сегментах: Поведение → Параметры визитов.
+
+### 9.3. JS-цели (создать в Метрике: Цели → Добавить цель → JavaScript-событие)
+
+Идентификатор цели = первый столбец. Параметры уходят вторым аргументом
+`reachGoal` и видны в отчёте «Параметры визитов» и в сегментах; к каждой цели
+автоматически добавляются `shop` и `in_app_browser`.
+
+| Идентификатор | Когда | Параметры |
+| --- | --- | --- |
+| `select_item` | клик по карточке в каталоге | `product_id`, `product_name`, `index`, `list` |
+| `product_open` | открыта страница товара | `product_id`, `product_name`, `price` |
+| `add_to_wishlist` / `remove_from_wishlist` | лайк / снятие лайка | `product_id`, `product_name`, `variant`, `price`, `placement` |
+| `add_to_cart` / `remove_from_cart` | товар добавлен / удалён | `product_id`, `product_name`, `variant`, `price`, `quantity`, `placement`, `removal_type` |
+| `view_cart` | открыта корзина | `items_count`, `value`, `product_ids`, `products` (дерево «название → штук») |
+| `begin_checkout` | кнопка «Оформить заказ» | как у `view_cart` |
+| `checkout_open` | открыт чекаут с непустой корзиной | как у `view_cart` + `prefilled_contact`, `prefilled_pvz` |
+| `checkout_field` | закончил ввод в поле | `field`, `valid` |
+| `pvz_search_ok` / `pvz_search_empty` / `pvz_search_error` | поиск ПВЗ | `query`, `results` |
+| `pvz_selected` | выбран ПВЗ | `city` |
+| `promo_applied` / `promo_rejected` / `promo_error` | проверка промокода | `code`, `reason` |
+| `checkout_submit` | нажали «Оплатить» | как у `view_cart` + `promo_applied` |
+| `payment_created` | платёж создан, редирект на оплату | как у `view_cart` + `payment_type`, `promo_applied` |
+| `payment_failed` | платёж не создан / оплата не прошла | `payment_type`, `error_code` |
+| `checkout_abandon` | ушёл с чекаута до оплаты | `filled`, `missing`, `filled_count`, `seconds`, `pvz_searched` + состав корзины |
+| `payment_return_success` / `payment_return_fail` | вернулся с платёжной страницы | `order_id` |
+| `purchase` | покупка подтверждена на `/shop/success` | `order_id`, `value`, `product_ids`, `products` |
+
+Воронка магазина по визитам (Отчёты → Конверсии, либо составная цель):
+`product_open` → `add_to_cart` → `view_cart` → `begin_checkout` → `checkout_open`
+→ `checkout_field` → `pvz_selected` → `checkout_submit` → `payment_created`
+→ `payment_return_success` → `purchase`. Разрез по магазину — сегмент по параметру
+визита `shop`; где именно отваливаются — параметры `missing` у `checkout_abandon`.
+
+Автоцели Метрики («начало оформления заказа», «заполнил контактные данные» и т.п.)
+можно оставить, но для воронки опираться на JS-цели: автоцели срабатывают по
+эвристике на клики и не знают ни магазина, ни состава корзины.
+
+### 9.4. Аналитика форм
+
+У всех полей чекаута есть `name`/`id` (`fullName`, `phone`, `email`, `promo`, `pvz`,
+`marketingConsent`, `acceptTerms`), сама форма: `id="checkout-form"` и `name="checkout"`. Штатный отчёт Метрики
+«Аналитика форм» (в настройках счётчика включить «Аналитика форм») покажет время
+и отвал по каждому полю без дополнительного кода.

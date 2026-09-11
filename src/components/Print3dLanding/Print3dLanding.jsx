@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import toast from 'react-hot-toast';
 import CTAButton from '../shared/CTAButton/CTAButton';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
 import { getUtmParams, rememberUtmParams } from '../../utils/utm';
+import { trackMetrikaGoal } from '../../services/analytics';
 import styles from './Print3dLanding.module.css';
 
 const LANDING_LEAD_NAME = 'Заявка с лендинга 3D-печати';
@@ -520,9 +521,7 @@ const Print3dLanding = () => {
         return;
       }
       setFormSubmitted(true);
-      if (typeof window.ym === 'function') {
-        window.ym(106593235, 'reachGoal', 'print3d_lead');
-      }
+      trackMetrikaGoal('print3d_lead');
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'generate_lead', { form: 'print3d_calc' });
       }
@@ -549,7 +548,7 @@ const Print3dLanding = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
       />
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '#top',
           ariaLabel: 'anyforms — 3D-печать корпусов для электроники',

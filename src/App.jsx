@@ -1,6 +1,6 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useCart } from './context/CartContext';
+import { useCart, DEFAULT_SHOP_SLUG } from './context/CartContext';
 import OrderList from './components/OrderList/OrderList';
 import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
@@ -44,8 +44,8 @@ import CustomShipList from "./components/CustomOrders/CustomShipList";
 import CustomItemPage from "./components/CustomOrders/CustomItemPage";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
+import { setAnalyticsShop, trackPageView } from './services/analytics';
 
-// three.js весит больше всего остального бандла — грузим его только на /stl.
 const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
 
 const KNOWN_PATHS = new Set([
@@ -232,6 +232,38 @@ function App() {
     upsertMetaTag('meta[name="twitter:image"]', { name: 'twitter:image', content: ogImage });
     upsertCanonical(pageUrl);
   }, [normalizedPathname, isNotFoundPage, isShopPage, shopSlugMatch]);
+
+  // Аналитика: витрина, на которой находится покупатель. На витрине и карточке
+  // товара — из пути, на страницах корзины/чекаута/успеха — та, с которой
+  // набрана корзина. Уходит параметром в каждое событие и в визит Метрики.
+  const isDefaultShopPage =
+    normalizedPathname === '/shop' || normalizedPathname.startsWith('/shop/product/');
+  useEffect(() => {
+    if (shopPathSlug) {
+      setAnalyticsShop(shopPathSlug);
+    } else if (isDefaultShopPage) {
+      setAnalyticsShop(DEFAULT_SHOP_SLUG);
+    } else if (isCartFlowPage) {
+      setAnalyticsShop(cartShopSlug);
+    } else {
+      setAnalyticsShop(null);
+    }
+  }, [shopPathSlug, isDefaultShopPage, isCartFlowPage, cartShopSlug]);
+
+  // Аналитика: просмотры страниц при SPA-переходах. Первую страницу счётчики
+  // считают сами при загрузке, дальше сообщаем о каждой смене пути вручную.
+  // Эффект стоит после SEO-эффекта, чтобы document.title был уже обновлён.
+  const initialPageTrackedRef = useRef(false);
+  useEffect(() => {
+    if (location.pathname !== normalizedPathname) return;
+    const url = `${window.location.origin}${normalizedPathname}${location.search}`;
+    if (!initialPageTrackedRef.current) {
+      initialPageTrackedRef.current = true;
+      trackPageView(url, { initial: true });
+      return;
+    }
+    trackPageView(url);
+  }, [location.pathname, normalizedPathname, location.search]);
   if (location.pathname !== normalizedPathname) {
     return (
       <Navigate
@@ -327,6 +359,5 @@ function App() {
 }
 
 export default App;
-
 
 
