@@ -245,6 +245,7 @@ const MarketplaceCheckout = () => {
     }
     const requestId = ++promoCheckRequestIdRef.current;
     const requestedCode = code;
+    setAppliedPromo(null);
     setPromoChecking(true);
     setPromoError('');
     try {

@@ -330,6 +330,6 @@ DebugView активен автоматически в GTM Preview; в dev-сб�
 ### 9.4. Аналитика форм
 
 У всех полей чекаута есть `name`/`id` (`fullName`, `phone`, `email`, `promo`, `pvz`,
-`marketingConsent`, `acceptTerms`), форма — `checkout-form`. Штатный отчёт Метрики
+`marketingConsent`, `acceptTerms`), сама форма: `id="checkout-form"` и `name="checkout"`. Штатный отчёт Метрики
 «Аналитика форм» (в настройках счётчика включить «Аналитика форм») покажет время
 и отвал по каждому полю без дополнительного кода.

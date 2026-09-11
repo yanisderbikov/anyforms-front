@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { useCart, DEFAULT_SHOP_SLUG } from '../../context/CartContext';
@@ -54,8 +54,6 @@ const MarketplaceSuccess = () => {
   const orderNumber = searchParams.get('order')?.toUpperCase() || null;
   const isFail = searchParams.get('status') === 'fail';
   const [order, setOrder] = useState(null);
-  const fallbackFailTrackedRef = useRef(false);
-  const fallbackPaymentFailedTrackedRef = useRef(false);
 
   // Успех: отправляем purchase (состав заказа — из снапшота, сохранённого перед
   // редиректом на оплату) и очищаем корзину. trackPurchase сам защищён от
@@ -66,13 +64,16 @@ const MarketplaceSuccess = () => {
     const snapshot = readCheckoutSnapshot();
     const transactionId = orderNumber || snapshot?.fallbackId;
     if (!transactionId) {
-      if (isFail && !fallbackFailTrackedRef.current) {
-        fallbackFailTrackedRef.current = true;
+      const fallbackKey = `${window.location.pathname}${window.location.search}`;
+      const returnStorageKey = `${PAYMENT_RETURN_SENT_PREFIX}fail:url:${fallbackKey}`;
+      if (isFail && !wasSent(returnStorageKey)) {
         trackPaymentReturn('fail');
+        markSent(returnStorageKey);
       }
-      if (isFail && !fallbackPaymentFailedTrackedRef.current) {
-        fallbackPaymentFailedTrackedRef.current = true;
+      const paymentFailedKey = `${PAYMENT_FAILED_RETURN_SENT_PREFIX}url:${fallbackKey}`;
+      if (isFail && !wasSent(paymentFailedKey)) {
         trackPaymentFailed(PAYMENT_TYPE, 'provider_redirect_fail');
+        markSent(paymentFailedKey);
       }
       return;
     }
