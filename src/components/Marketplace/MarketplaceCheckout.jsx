@@ -65,6 +65,12 @@ const MarketplaceCheckout = () => {
   const [appliedPromo, setAppliedPromo] = useState(savedForm.appliedPromo || null);
   const [promoError, setPromoError] = useState('');
   const [promoChecking, setPromoChecking] = useState(false);
+  const promoInputRef = useRef(promoInput);
+  const promoCheckRequestIdRef = useRef(0);
+
+  useEffect(() => {
+    promoInputRef.current = promoInput;
+  }, [promoInput]);
 
   useEffect(() => {
     saveCheckoutForm({
@@ -235,6 +241,8 @@ const MarketplaceCheckout = () => {
       setPromoError('Сначала укажите телефон и почту — промокод проверяется по ним.');
       return;
     }
+    const requestId = ++promoCheckRequestIdRef.current;
+    const requestedCode = code;
     setPromoChecking(true);
     setPromoError('');
     try {
@@ -248,6 +256,12 @@ const MarketplaceCheckout = () => {
           totalKopecks: Math.round(total * 100),
         },
       });
+      if (
+        requestId !== promoCheckRequestIdRef.current ||
+        normalizePromoCode(promoInputRef.current) !== requestedCode
+      ) {
+        return;
+      }
       if (data?.valid) {
         setAppliedPromo(data);
         setPromoInput(data.code);
@@ -258,9 +272,11 @@ const MarketplaceCheckout = () => {
         trackPromoCode('rejected', { code, reason: data?.message || 'invalid' });
       }
     } catch {
+      if (requestId !== promoCheckRequestIdRef.current) return;
       setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
       trackPromoCode('error', { code });
     } finally {
+      if (requestId !== promoCheckRequestIdRef.current) return;
       setPromoChecking(false);
     }
   };
@@ -324,7 +340,7 @@ const MarketplaceCheckout = () => {
         // Редирект на оплату не должен засчитаться как уход с чекаута.
         paymentStartedRef.current = true;
         trackAddPaymentInfo(items, PAYMENT_TYPE, { promoApplied: Boolean(appliedPromo) });
-        saveCheckoutSnapshot(items);
+        saveCheckoutSnapshot(items, discountedTotal);
         window.location.href = data.paymentUrl;
         return;
       }

@@ -120,6 +120,21 @@ view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to
 | `filled`            | `{{DLV - filled}}`             |
 | `missing`           | `{{DLV - missing}}`            |
 | `status`            | `{{DLV - status}}`             |
+| `prefilled_contact` | `{{DLV - prefilled_contact}}`  |
+| `prefilled_pvz`     | `{{DLV - prefilled_pvz}}`      |
+| `query`             | `{{DLV - query}}`              |
+| `results`           | `{{DLV - results}}`            |
+| `code`              | `{{DLV - code}}`               |
+| `reason`            | `{{DLV - reason}}`             |
+| `promo_applied`     | `{{DLV - promo_applied}}`      |
+| `items_count`       | `{{DLV - items_count}}`        |
+| `value`             | `{{DLV - value}}`              |
+| `product_ids`       | `{{DLV - product_ids}}`        |
+| `products`          | `{{DLV - products}}`           |
+| `seconds`           | `{{DLV - seconds}}`            |
+| `filled_count`      | `{{DLV - filled_count}}`       |
+| `pvz_searched`      | `{{DLV - pvz_searched}}`       |
+| `order_id`          | `{{DLV - order_id}}`           |
 
 - Trigger: `CE — ecommerce events`.
 
@@ -127,7 +142,9 @@ view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to
 
 Variables → New → **Data Layer Variable**, версия Data Layer: 2. Создать по одной на каждое имя:
 `placement`, `removal_type`, `payment_type`, `error_code`, `item_id`, `previous_quantity`, `new_quantity`, `quantity_delta`, `environment`,
-`shop`, `in_app_browser`, `field`, `valid`, `outcome`, `filled`, `missing`, `status`.
+`shop`, `in_app_browser`, `field`, `valid`, `outcome`, `filled`, `missing`, `status`,
+`prefilled_contact`, `prefilled_pvz`, `query`, `results`, `code`, `reason`, `promo_applied`,
+`items_count`, `value`, `product_ids`, `products`, `seconds`, `filled_count`, `pvz_searched`, `order_id`.
 
 ### 4.5. Публикация
 
@@ -151,8 +168,18 @@ Admin → Data display → **Custom definitions** → Create custom dimension (s
 | filled         | `filled`        |
 | missing        | `missing`       |
 | status         | `status`        |
+| prefilled_contact | `prefilled_contact` |
+| prefilled_pvz  | `prefilled_pvz` |
+| query          | `query`         |
+| code           | `code`          |
+| reason         | `reason`        |
+| promo_applied  | `promo_applied` |
+| product_ids    | `product_ids`   |
+| products       | `products`      |
+| pvz_searched   | `pvz_searched`  |
+| order_id       | `order_id`      |
 
-Для `previous_quantity`, `new_quantity`, `quantity_delta` — при необходимости создать **custom metrics** либо анализировать сырые события через экспорт в BigQuery.
+Для `previous_quantity`, `new_quantity`, `quantity_delta`, `results`, `items_count`, `value`, `seconds`, `filled_count` — при необходимости создать **custom metrics** либо анализировать сырые события через экспорт в BigQuery.
 
 Стандартные поля внутри `ecommerce.items` (`item_id`, `price`, `quantity`, `index`, `item_list_name`) регистрировать не нужно — GA4 обрабатывает их автоматически.
 

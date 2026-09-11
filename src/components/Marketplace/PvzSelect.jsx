@@ -12,6 +12,7 @@ const PvzSelect = ({ selected, onSelect, onClear, invalid, onSearchResult }) => 
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState(false);
   const boxRef = useRef(null);
+  const requestIdRef = useRef(0);
   // Колбэк аналитики читаем через ref, чтобы не перезапускать поиск при его смене.
   const onSearchResultRef = useRef(onSearchResult);
   onSearchResultRef.current = onSearchResult;
@@ -19,27 +20,35 @@ const PvzSelect = ({ selected, onSelect, onClear, invalid, onSearchResult }) => 
   // Дебаунс запроса. Свободный текст: улица и/или город («Грибоедова», «грибоедова пермь»).
   useEffect(() => {
     const q = query.trim();
+    const requestId = ++requestIdRef.current;
     if (q.length < 3) {
       setOptions([]);
       setLoading(false);
       return undefined;
     }
     setLoading(true);
+    let cancelled = false;
     const timer = setTimeout(async () => {
       try {
         const { data } = await apiClient.instance.get('/api/cdek/pvz', { params: { query: q } });
+        if (cancelled || requestId !== requestIdRef.current) return;
         const found = Array.isArray(data) ? data : [];
         setOptions(found);
         setOpen(true);
         onSearchResultRef.current?.(found.length ? 'ok' : 'empty', { query: q, results: found.length });
       } catch {
+        if (cancelled || requestId !== requestIdRef.current) return;
         setOptions([]);
         onSearchResultRef.current?.('error', { query: q, results: 0 });
       } finally {
+        if (cancelled || requestId !== requestIdRef.current) return;
         setLoading(false);
       }
     }, 300);
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query]);
 
   // Закрытие дропдауна по клику вне компонента.

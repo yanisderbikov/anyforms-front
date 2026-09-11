@@ -113,7 +113,7 @@ const inAppBrowser = () => {
 // Для служебных страниц (/shop/cart, /shop/checkout, /shop/success) витрина
 // определяется по корзине, а не по пути.
 const shopFromPath = (pathname) => {
-  const match = String(pathname || '').match(/^\/shop(?:\/([^/?#]+))?/);
+  const match = String(pathname || '').match(/^\/shop(?:\/([^/?#]+))?(?:\/|$)/);
   if (!match) return null;
   const segment = match[1];
   if (!segment) return DEFAULT_SHOP;
@@ -233,6 +233,10 @@ function reachGoal(goal, params = {}) {
   }
 }
 
+export function trackMetrikaGoal(goal, params = {}) {
+  callYm('reachGoal', goal, params);
+}
+
 // Общий helper для стандартных e-commerce событий: перед событием сбрасываем
 // предыдущий объект ecommerce, чтобы старые items не «протекали» в новое событие.
 function pushEcommerceEvent(event, ecommerce, extra = {}) {
@@ -284,9 +288,11 @@ const cartParams = (cartItems) => ({
   items_count: cartItems.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0),
   value: cartValue(cartItems),
   product_ids: cartItems.map((i) => String(i.id)).join(','),
-  products: Object.fromEntries(
-    cartItems.map((i) => [displayName(i) || String(i.id), Number(i.quantity) || 0])
-  ),
+  products: cartItems.reduce((acc, i) => {
+    const key = displayName(i) || String(i.id);
+    acc[key] = (acc[key] || 0) + (Number(i.quantity) || 0);
+    return acc;
+  }, {}),
 });
 
 const yesNo = (value) => (value ? 'yes' : 'no');
@@ -616,13 +622,13 @@ export function trackPurchase(order) {
 // localStorage (а не sessionStorage), чтобы пережить возврат в новой вкладке.
 // ---------------------------------------------------------------------------
 
-export function saveCheckoutSnapshot(cartItems) {
+export function saveCheckoutSnapshot(cartItems, value = cartValue(cartItems)) {
   if (!isBrowser()) return;
   try {
     localStorage.setItem(
       CHECKOUT_SNAPSHOT_KEY,
       JSON.stringify({
-        value: cartValue(cartItems),
+        value: toPrice(value),
         items: cartItems.map((i) => ({
           id: String(i.id),
           name: i.variantLabel ? `${i.name ?? ''} ${i.variantLabel}` : (i.name ?? ''),
