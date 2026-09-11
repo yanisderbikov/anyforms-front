@@ -16,7 +16,8 @@
 // чтобы по ним можно было строить сегменты и сравнивать конверсию.
 //
 // Отправка аналитики управляется так (по убыванию приоритета):
-// 1. VITE_ANALYTICS_ENABLED=false — жёстко выключить всё (включая VITE_GTM_ID);
+// 1. VITE_ANALYTICS_ENABLED=false — жёстко выключить всё: GTM (включая VITE_GTM_ID),
+//    вызовы Метрики (hit/params/reachGoal) и Top.Mail.Ru;
 // 2. VITE_ANALYTICS_ENABLED=true — принудительно включить (например, на стенде);
 // 3. иначе автоматика по домену: GTM грузится только на anyforms.ru/www.anyforms.ru.
 // Локальные запуски (pnpm dev/start, предпросмотр прод-сборки) и dev-стенды
@@ -50,10 +51,14 @@ const isBrowser = () => typeof window !== 'undefined';
 const isProdHost = () =>
   isBrowser() && /^(www\.)?anyforms\.ru$/.test(window.location.hostname);
 
+// Жёсткий выключатель: VITE_ANALYTICS_ENABLED=false глушит всё, включая вызовы
+// Метрики и Top.Mail.Ru (их счётчики index.html на прод-домене создаёт всегда,
+// поэтому проверять флаг нужно перед каждым вызовом, а не только при загрузке GTM).
+const analyticsHardOff = () => import.meta.env.VITE_ANALYTICS_ENABLED === 'false';
+
 const analyticsEnabled = () => {
-  const flag = import.meta.env.VITE_ANALYTICS_ENABLED;
-  if (flag === 'false') return false;
-  if (flag === 'true') return true;
+  if (analyticsHardOff()) return false;
+  if (import.meta.env.VITE_ANALYTICS_ENABLED === 'true') return true;
   return isProdHost();
 };
 
@@ -63,8 +68,10 @@ const analyticsEnabled = () => {
 const analyticsEnv = () =>
   import.meta.env.VITE_ANALYTICS_ENV || (isProdHost() ? 'production' : 'development');
 
+// Все вызовы Метрики (hit, params, reachGoal) идут через этот хелпер и
+// уважают жёсткий выключатель.
 const callYm = (...args) => {
-  if (!isBrowser() || typeof window.ym !== 'function') return;
+  if (!isBrowser() || analyticsHardOff() || typeof window.ym !== 'function') return;
   window.ym(YM_COUNTER_ID, ...args);
 };
 
@@ -153,9 +160,8 @@ function sendVisitContext() {
 }
 
 export function initAnalytics() {
-  if (!isBrowser()) return;
+  if (!isBrowser() || analyticsHardOff()) return;
   sendVisitContext();
-  if (import.meta.env.VITE_ANALYTICS_ENABLED === 'false') return;
   const gtmId = import.meta.env.VITE_GTM_ID || (analyticsEnabled() ? PROD_GTM_ID : '');
   if (!gtmId) return;
   if (document.getElementById('gtm-loader')) return;
@@ -190,7 +196,7 @@ export function trackPageView(url, { initial = false, title } = {}) {
     title: title ?? document.title,
     referer: previousUrl ?? document.referrer,
   });
-  if (Array.isArray(window._tmr)) {
+  if (!analyticsHardOff() && Array.isArray(window._tmr)) {
     window._tmr.push({ id: TMR_COUNTER_ID, type: 'pageView', start: Date.now(), url });
   }
 }

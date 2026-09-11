@@ -24,7 +24,7 @@ Docker-образ на проде шлёт аналитику, а на dev-ст�
 
 | Условие (по убыванию приоритета) | Что происходит |
 | --- | --- |
-| `VITE_ANALYTICS_ENABLED=false` | вся аналитика выключена, включая `VITE_GTM_ID` |
+| `VITE_ANALYTICS_ENABLED=false` | вся аналитика выключена: GTM (включая `VITE_GTM_ID`), вызовы Метрики (`hit`/`params`/`reachGoal`) и Top.Mail.Ru из кода |
 | `VITE_GTM_ID=GTM-…` задан | грузится этот (тестовый) контейнер — на любом хосте |
 | `VITE_ANALYTICS_ENABLED=true` | боевой `GTM-MBTTRF2N` — на любом хосте |
 | хост `anyforms.ru` / `www.anyforms.ru` | боевой `GTM-MBTTRF2N` автоматически |
