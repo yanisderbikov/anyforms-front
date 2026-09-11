@@ -1,12 +1,29 @@
+/* Шапка — плавающая «таблетка»: 12px от верха, скруглена, с тонкой обводкой
+   и полупрозрачным тёмным фоном поверх блюра, чтобы контент просвечивал при
+   прокрутке. Зазор + высота = 78px — ровно --header-h, который страницы
+   резервируют сверху, поэтому их отступы не трогаем. Без backdrop-filter
+   остаётся непрозрачный фон — та же таблетка, только без стекла. */
 .siteHeader {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 30;
-  min-height: 78px;
-  background: #000;
+  width: min(calc(100% - 24px), 1200px);
+  min-height: 66px;
   box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: #0e0e0e;
+  box-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.6);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .siteHeader {
+    background: rgba(14, 14, 14, 0.78);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
 }
 
 .siteHeaderInner {
@@ -14,10 +31,8 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   column-gap: clamp(1.25rem, 4vw, 3.5rem);
-  min-height: 78px;
-  padding: 18px clamp(14px, 2.6vw, 28px);
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 66px;
+  padding: 12px clamp(12px, 2vw, 20px);
   box-sizing: border-box;
 }
 
@@ -171,10 +186,14 @@
 }
 
 @media (max-width: 720px) {
+  .siteHeader {
+    border-radius: 16px;
+  }
+
   .siteHeaderInner {
     grid-template-columns: 1fr auto;
     column-gap: 0.75rem;
-    padding: 14px 14px;
+    padding: 12px 12px;
   }
 
   .headerNav,
@@ -186,11 +205,12 @@
     display: inline-flex;
   }
 
+  /* Выпадающее меню — вторая «таблетка» под шапкой, с теми же полями. */
   .mobileMenu {
     position: fixed;
-    top: 78px;
-    left: 0;
-    right: 0;
+    top: 86px;
+    left: 12px;
+    right: 12px;
     z-index: 29;
     display: block;
     opacity: 0;
@@ -211,9 +231,12 @@
     align-items: stretch;
     gap: 0.4rem;
     padding: 0.9rem 1rem 1rem;
-    background: rgba(12, 12, 12, 0.98);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(12, 12, 12, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
   }
 
   .mobileMenuLink {
