@@ -20,8 +20,9 @@
 }
 
 /* tint shared header to guide palette */
+/* Полупрозрачный --slate, чтобы блюр общей шапки работал. */
 .page :global(header) {
-  background: var(--slate);
+  background: rgba(58, 72, 89, 0.78);
 }
 
 .page :global(header) a[class*='navLinkPill'] {

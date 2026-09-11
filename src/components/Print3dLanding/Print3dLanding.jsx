@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import toast from 'react-hot-toast';
 import CTAButton from '../shared/CTAButton/CTAButton';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
 import { getUtmParams, rememberUtmParams } from '../../utils/utm';
 import { trackMetrikaGoal } from '../../services/analytics';
@@ -548,7 +548,7 @@ const Print3dLanding = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
       />
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '#top',
           ariaLabel: 'anyforms — 3D-печать корпусов для электроники',

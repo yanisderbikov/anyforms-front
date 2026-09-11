@@ -4,7 +4,7 @@ import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import toast from 'react-hot-toast';
 import apiClient from '../../apiClient';
 import CTAButton from '../shared/CTAButton/CTAButton';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import { getUtmParams, rememberUtmParams } from '../../utils/utm';
 import styles from './ChiefLanding.module.css';
 
@@ -258,7 +258,7 @@ const ChiefLanding = () => {
 
   return (
       <div className={styles.page} id="top">
-        <LandingHeader
+        <SiteHeader
           logo={{
             href: '#top',
             ariaLabel: 'anyforms — наверх',

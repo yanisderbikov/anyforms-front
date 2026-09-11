@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import CTAButton from '../shared/CTAButton/CTAButton';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './MainLanding.module.css';
 
 const TELEGRAM_DEFAULT = 'https://t.me/AnyFormsBot';
@@ -234,7 +234,7 @@ const MainLanding = () => {
         </div>
       )}
 
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '#top',
           ariaLabel: 'anyforms — наверх',

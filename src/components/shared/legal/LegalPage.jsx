@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LandingHeader from '../LandingHeader/LandingHeader';
+import SiteHeader from '../SiteHeader/SiteHeader';
 import { LEGAL_LINKS } from '../../../shared/seller';
 import styles from './LegalPage.module.css';
 
@@ -9,7 +9,7 @@ import styles from './LegalPage.module.css';
    (GuideLegal / CourseLegal), здесь — общий вид под главную и магазин. */
 const LegalPage = ({ doc, backTo = '/', backLabel = '← На главную', headerLabel = 'Главная' }) => (
   <div className={styles.page} id="top">
-    <LandingHeader
+    <SiteHeader
       logo={{
         href: '/',
         ariaLabel: 'anyforms — на главную',

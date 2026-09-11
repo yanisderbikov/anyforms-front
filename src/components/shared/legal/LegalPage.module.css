@@ -14,8 +14,9 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Полупрозрачный тёмный, чтобы блюр общей шапки работал на белой странице. */
 .page :global(header) {
-  background: #161616;
+  background: rgba(22, 22, 22, 0.78);
 }
 
 .main {

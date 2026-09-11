@@ -8,12 +8,30 @@ import { useLikes } from '../../hooks/useLikes';
 import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './Marketplace.module.css';
 const TG_CHANNEL = 'https://t.me/anyforms';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
 const PROMO_CODE = 'any-shop-10';
+
+// Перекраска общей шапки под палитру магазина: переменные темы (shopThemes)
+// задаются на корне страницы, шапка читает их через tint.
+const SHOP_HEADER_TINT = {
+  background: 'var(--shop-header-tint, rgba(14, 14, 14, 0.7))',
+  color: 'var(--shop-header-fg, #fff)',
+  border: 'rgba(255, 255, 255, 0.22)',
+  logoFont: 'var(--shop-title-font, inherit)',
+};
+
+const ANYFORMS_LOGO = {
+  href: '#top',
+  ariaLabel: 'anyforms — наверх',
+  src: '/anyforms_logo_new_white.svg',
+  width: 180,
+  height: 41,
+};
 
 const Marketplace = () => {
   const location = useLocation();
@@ -34,6 +52,22 @@ const Marketplace = () => {
     ? `${styles.wrap} ${styles.wrapBoutique} ${theme.className}`
     : styles.wrap;
   const shopName = shop?.name ?? shopSlug;
+  // Логотип магазина в шапке: словомарка (headerLogo), на узких экранах —
+  // знак (headerMark), если он есть; без картинок — название текстом.
+  const headerLogo = theme
+    ? {
+        href: '#top',
+        ariaLabel: `${shopName} — наверх`,
+        alt: shopName,
+        text: shopName,
+        src: theme.headerLogo?.src ?? theme.headerMark?.src,
+        width: (theme.headerLogo ?? theme.headerMark)?.width,
+        height: (theme.headerLogo ?? theme.headerMark)?.height,
+        compactSrc: theme.headerLogo && theme.headerMark ? theme.headerMark.src : undefined,
+        compactWidth: theme.headerMark?.width,
+        compactHeight: theme.headerMark?.height,
+      }
+    : ANYFORMS_LOGO;
   // Связь с менеджером/поддержкой — бот магазина; общая витрина — AnyFormsBot.
   const supportTgLink = tgLink(shop?.supportTelegram || DEFAULT_SUPPORT_TG);
   const { count } = useCart();
@@ -196,102 +230,64 @@ const Marketplace = () => {
 
   return (
     <div className={wrapClass}>
-      <div className={styles.headerSafeArea} aria-hidden="true" />
       {copied && (
         <div className={styles.globalCopyToast} role="status">
           Скопировано
         </div>
       )}
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          {theme?.headerMark && (
-            <a className={styles.brandMark} href="#top" aria-label={`${shopName} — наверх`}>
-              <img
-                src={theme.headerMark.src}
-                alt=""
-                width={theme.headerMark.width}
-                height={theme.headerMark.height}
-                decoding="async"
-              />
-            </a>
-          )}
-          {theme ? (
-            <a
-              className={`${styles.brandLink} ${theme.headerMark ? styles.brandLinkWithMark : ''}`}
-              href="#top"
-              aria-label={`${shopName} — наверх`}
+      <SiteHeader
+        logo={headerLogo}
+        logoSize={theme ? 'large' : 'default'}
+        tint={theme ? SHOP_HEADER_TINT : undefined}
+        right={(
+          <>
+            <button
+              type="button"
+              className={`${styles.likesToggle} ${showLiked ? styles.likesToggleActive : ''}`}
+              onClick={() => setShowLiked((prev) => !prev)}
+              aria-label={showLiked ? 'Показать все товары' : 'Показать избранное'}
+              aria-pressed={showLiked}
             >
-              {theme.headerLogo ? (
-                <img
-                  className={styles.brandLogo}
-                  src={theme.headerLogo.src}
-                  alt={shopName}
-                  width={theme.headerLogo.width}
-                  height={theme.headerLogo.height}
-                  decoding="async"
-                />
-              ) : (
-                <span className={styles.brandName}>{shopName}</span>
-              )}
-            </a>
-          ) : (
-            <a className={styles.logoLink} href="#top" aria-label="anyforms — наверх">
-              <img
-                className={styles.logo}
-                src="/anyforms_logo_new_white.svg"
-                alt=""
-                width={180}
-                height={41}
-                decoding="async"
-              />
-            </a>
-          )}
-          <button
-            type="button"
-            className={`${styles.likesToggle} ${showLiked ? styles.likesToggleActive : ''}`}
-            onClick={() => setShowLiked((prev) => !prev)}
-            aria-label={showLiked ? 'Показать все товары' : 'Показать избранное'}
-            aria-pressed={showLiked}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill={showLiked ? '#f0808f' : 'none'}
-              stroke={showLiked ? '#f0808f' : '#fff'}
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill={showLiked ? '#f0808f' : 'none'}
+                stroke={showLiked ? '#f0808f' : '#fff'}
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
+              </svg>
+              {likesCount > 0 && <span className={styles.cartBadge}>{likesCount}</span>}
+            </button>
+            <Link
+              className={styles.cartLink}
+              to="/shop/cart"
+              aria-label={`Корзина${count ? `, товаров: ${count}` : ''}`}
             >
-              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
-            </svg>
-            {likesCount > 0 && <span className={styles.cartBadge}>{likesCount}</span>}
-          </button>
-          <Link
-            className={styles.cartLink}
-            to="/shop/cart"
-            aria-label={`Корзина${count ? `, товаров: ${count}` : ''}`}
-          >
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-            </svg>
-            {count > 0 && <span className={styles.cartBadge}>{count}</span>}
-          </Link>
-        </div>
-      </header>
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              {count > 0 && <span className={styles.cartBadge}>{count}</span>}
+            </Link>
+          </>
+        )}
+      />
       {showHero ? (
         <section className={styles.hero}>
           <div className={styles.heroTitleBlock}>

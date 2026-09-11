@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './GuideCheckout.module.css';
 
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
@@ -13,7 +13,7 @@ const GuideSuccess = () => {
 
   return (
     <div className={styles.page} id="top">
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '/guide',
           ariaLabel: 'anyforms — к гайду',

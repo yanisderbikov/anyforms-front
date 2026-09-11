@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import { SELLER, LEGAL_LINKS } from '../../shared/seller';
 import styles from './SellerRequisites.module.css';
 
@@ -33,7 +33,7 @@ const SellerRequisites = () => {
 
   return (
     <div className={styles.page} id="top">
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '/',
           ariaLabel: 'anyforms — на главную',

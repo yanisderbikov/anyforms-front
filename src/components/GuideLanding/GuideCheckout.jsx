@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import LandingHeader from '../shared/LandingHeader/LandingHeader';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
@@ -96,7 +96,7 @@ const GuideCheckout = () => {
 
   return (
     <div className={styles.page} id="top">
-      <LandingHeader
+      <SiteHeader
         logo={{
           href: '/guide',
           ariaLabel: 'anyforms — к гайду',

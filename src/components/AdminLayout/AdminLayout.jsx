@@ -2,25 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { SECTIONS, getAllowedSections, sectionForPath } from '../../permissions';
+import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './AdminLayout.module.css';
 
 const MENU = [
   {
-    title: 'под заказ',
+    // Подразделы (в работе/клиенты/доставка, без трекера/к отправке/доставляются)
+    // живут вкладками внутри самих страниц, в меню — только вход в группу.
+    // `match` — префиксы путей, на которых пункт считается активным.
+    title: 'заказы',
     section: SECTIONS.CUSTOM_ORDERS,
     items: [
-      { to: '/admin/orders/custom', label: 'В работе' },
-      { to: '/admin/orders/custom/create', label: 'Клиенты' },
-      { to: '/admin/orders/custom/ship', label: 'Доставка' },
-    ],
-  },
-  {
-    title: 'розница',
-    section: SECTIONS.RETAIL,
-    items: [
-      { to: '/admin/orders/without-tracker', label: 'Без трекера' },
-      { to: '/admin/orders/created', label: 'К отправке' },
-      { to: '/admin/orders/delivering', label: 'Доставляются' },
+      {
+        to: '/admin/orders/custom',
+        label: 'Под заказ',
+        section: SECTIONS.CUSTOM_ORDERS,
+        match: ['/admin/orders/custom'],
+      },
+      {
+        to: '/admin/orders/without-tracker',
+        label: 'Розница',
+        section: SECTIONS.RETAIL,
+        match: ['/admin/orders/without-tracker', '/admin/orders/created', '/admin/orders/delivering'],
+      },
     ],
   },
   {
@@ -90,18 +94,21 @@ const AdminLayout = () => {
       {visibleMenu.map((section) => (
         <div key={section.title} className={styles.section}>
           <p className={styles.sectionTitle}>{section.title}</p>
-          {section.items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {section.items.map((item) => {
+            const matched = item.match?.some((prefix) => location.pathname.startsWith(prefix));
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={!item.match}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive || matched ? styles.navLinkActive : ''}`
+                }
+              >
+                {item.label}
+              </NavLink>
+            );
+          })}
         </div>
       ))}
       <button type="button" className={styles.logout} onClick={handleLogout}>
@@ -124,21 +131,30 @@ const AdminLayout = () => {
 
   return (
     <div className={styles.layout}>
-      <div className={styles.headerSafeArea} aria-hidden="true" />
-      <header className={styles.header}>
-        <div className={styles.headerInner}>
-          <div className={styles.headerLeft}>
-            <button
-              type="button"
-              className={styles.burger}
-              aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((prev) => !prev)}
-            >
-              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineTop : ''}`} />
-              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineHidden : ''}`} />
-              <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineBottom : ''}`} />
-            </button>
+      <SiteHeader
+        logo={{
+          to: '/admin',
+          ariaLabel: 'anyforms',
+          src: '/anyforms_logo_new_white.svg',
+          width: 180,
+          height: 41,
+        }}
+        logoAlign="center"
+        left={(
+          <button
+            type="button"
+            className={styles.burger}
+            aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineTop : ''}`} />
+            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineHidden : ''}`} />
+            <span className={`${styles.burgerLine} ${menuOpen ? styles.burgerLineBottom : ''}`} />
+          </button>
+        )}
+        right={(
+          <>
             <img
               className={styles.catImg}
               src="https://cataas.com/cat?width=82&height=82"
@@ -149,33 +165,21 @@ const AdminLayout = () => {
               decoding="async"
             />
             {userName && <span className={styles.userName}>{userName}</span>}
-          </div>
-          <span
-            className={styles.logoLink}
-            onClick={() => navigate('/admin')}
-            role="button"
-            aria-label="anyforms"
-          >
-            <img
-              className={styles.logo}
-              src="/anyforms_logo_new_white.svg"
-              alt=""
-              width={180}
-              height={41}
-              decoding="async"
-            />
-          </span>
-        </div>
-      </header>
+          </>
+        )}
+      />
 
       <aside className={styles.sidebar}>{nav}</aside>
 
-      {menuOpen && (
-        <>
-          <div className={styles.backdrop} onClick={() => setMenuOpen(false)} />
-          <aside className={styles.drawer}>{nav}</aside>
-        </>
-      )}
+      {/* Всегда в DOM: открытие/закрытие анимируется классом (см. .drawer в CSS). */}
+      <div
+        className={`${styles.backdrop} ${menuOpen ? styles.backdropOpen : ''}`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden="true"
+      />
+      <aside className={`${styles.drawer} ${menuOpen ? styles.drawerOpen : ''}`} aria-hidden={!menuOpen}>
+        {nav}
+      </aside>
 
       <main className={styles.content}>
         <Outlet />

@@ -8,29 +8,6 @@
   box-sizing: border-box;
 }
 
-/* Полоска под статус-баром на экранах с вырезом: шапка больше не прибита
-   к верху, поэтому полоска в цвет страницы (а не шапки), с лёгким блюром,
-   чтобы уезжающий под неё контент не спорил с часами и индикаторами. */
-.headerSafeArea {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 31;
-  height: env(safe-area-inset-top, 0px);
-  background: var(--shop-page-bg, #e5e5e5);
-  pointer-events: none;
-}
-
-@supports (color: color-mix(in srgb, #000 50%, transparent)) and
-  ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .headerSafeArea {
-    background: color-mix(in srgb, var(--shop-page-bg, #e5e5e5) 72%, transparent);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
-  }
-}
-
 .globalCopyToast {
   position: fixed;
   top: 104px;
@@ -53,50 +30,8 @@
   }
 }
 
-/* Шапка — плавающая «таблетка»: отделена от краёв экрана, скруглена, с тонкой
-   обводкой и полупрозрачным фоном в цвет темы поверх блюра, так что каталог
-   и hero просвечивают при прокрутке. Ширина повторяет контентную ширину
-   .wrap (100% − 2×12px на телефоне, до 1100px на десктопе), чтобы края шапки
-   и сетки совпадали. Браузерам без color-mix/backdrop-filter остаётся
-   непрозрачный фон темы — та же «таблетка», просто без стекла. */
-.header {
-  position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
-  width: min(calc(100% - 24px), 1100px);
-  padding: 0.65rem 0;
-  box-sizing: border-box;
-  border: 1px solid var(--shop-header-border, rgba(255, 255, 255, 0.16));
-  border-radius: 18px;
-  background: var(--shop-header-bg, #000);
-  box-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.45);
-}
-
-@supports (color: color-mix(in srgb, #000 50%, transparent)) and
-  ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .header {
-    background: color-mix(in srgb, var(--shop-header-bg, #000) 78%, transparent);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
-    backdrop-filter: blur(18px) saturate(1.4);
-  }
-}
-
-.headerInner {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 16px;
-}
-
 .cartLink {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,10 +47,7 @@
 
 /* Фильтр избранного в шапке: тот же стиль, что у корзины, левее неё */
 .likesToggle {
-  position: absolute;
-  right: 64px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -147,116 +79,6 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-}
-
-.logoLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Бренд партнёрской витрины в шапке: монограмма в круге + название серифом */
-.brandLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-decoration: none;
-}
-
-/* Знак бренда слева в шапке (headerMark): парный к иконкам справа. */
-.brandMark {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: inline-flex;
-}
-
-.brandMark img {
-  display: block;
-  height: 46px;
-  width: auto;
-}
-
-@media (max-width: 600px) {
-  /* На узких экранах центр шапки освобождаем: остаются знак слева и иконки
-     справа, словомарка по центру прячется. Знак становится потоковым —
-     иначе шапка без центрального контента схлопывается по высоте. */
-  .brandMark {
-    position: static;
-    transform: none;
-    margin-right: auto;
-  }
-
-  .brandMark img {
-    height: 40px;
-  }
-
-  .brandLinkWithMark {
-    display: none;
-  }
-}
-
-
-/* Логотип магазина в центре шапки: высота задаёт высоту «таблетки»
-   (52 + 2×0.65rem ≈ 73px — учтено в верхнем отступе .wrap), ширина — по
-   пропорциям файла. */
-.brandLogo {
-  display: block;
-  height: 52px;
-  width: auto;
-  max-width: min(220px, calc(100vw - 140px));
-  object-fit: contain;
-}
-
-@media (max-width: 480px) {
-  .brandLogo {
-    height: 44px;
-  }
-}
-
-.brandName {
-  color: var(--shop-header-fg, #fff);
-  font-family: var(--shop-title-font, inherit);
-  font-size: 1.12rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.logo {
-  width: 180px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-@media (max-width: 600px) {
-  .header {
-    border-radius: 16px;
-  }
-
-  /* Внутри узкой «таблетки» иконки прижаты к краю, а логотип по центру
-     ограничен так, чтобы не заезжать под сердечко: ширина таблетки
-     (100vw − 24px) минус отступы и две кнопки по 44px с каждой стороны. */
-  .headerInner {
-    padding: 0 12px;
-  }
-
-  .cartLink {
-    right: 8px;
-  }
-
-  .likesToggle {
-    right: 52px;
-  }
-
-  .logo {
-    max-width: calc(100vw - 232px);
-  }
-
-  .brandLogo {
-    max-width: calc(100vw - 232px);
-  }
 }
 
 .intro {

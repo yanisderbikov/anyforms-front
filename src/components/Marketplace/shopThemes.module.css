@@ -11,6 +11,8 @@
    розовый bubble-логотип, сердечки, оливковые плашки). */
 .diGips {
   --shop-header-bg: #d78da1;
+  /* Полупрозрачный тон шапки поверх блюра (общая SiteHeader). */
+  --shop-header-tint: rgba(215, 141, 161, 0.8);
   --shop-header-fg: #7c2b45;
   --shop-page-bg: #faf3e6;
   /* Акцент — не пастель: он красит текст (цену, ссылки, промо) и кнопки,
@@ -56,6 +58,8 @@
    как леттеринг LUNASVECHA на упаковке. */
 .lunasvecha {
   --shop-header-bg: #7f95a7;
+  /* Полупрозрачный тон шапки поверх блюра (общая SiteHeader). */
+  --shop-header-tint: rgba(127, 149, 167, 0.8);
   /* Шапку занимает кремовый SVG-логотип; header-fg — фолбэк на случай текста
      вместо логотипа, поэтому тёмный (крем на голубом не читается). */
   --shop-header-fg: #2e3a44;
@@ -101,6 +105,8 @@
 
 .afPastry {
   --shop-header-bg: #572631;
+  /* Полупрозрачный тон шапки поверх блюра (общая SiteHeader). */
+  --shop-header-tint: rgba(87, 38, 49, 0.78);
   --shop-header-fg: #f4eee3;
   --shop-page-bg: #f4eee3;
   --shop-accent: #6e2f3e;

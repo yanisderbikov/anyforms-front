@@ -37,9 +37,10 @@
 }
 
 /* ═══════════════ HEADER (tint shared header to course palette) ═══════════════ */
+/* Шапка общая (плавающая таблетка с блюром), здесь только подкрашиваем её
+   в палитру курса: тот же --bg, но полупрозрачный, чтобы контент просвечивал. */
 .page :global(header) {
-  background: var(--bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(21, 21, 21, 0.7);
 }
 
 .page :global(header) a[class*='navLinkPill'] {
