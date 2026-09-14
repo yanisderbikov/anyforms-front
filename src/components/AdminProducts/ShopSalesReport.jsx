@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
 import styles from './ShopSalesReport.module.css';
@@ -68,8 +69,10 @@ const pluralMolds = (n) => {
  * (заказы, молды, сумма) и разбивка по товарам. Данные — /api/orders/shop-report.
  */
 const ShopSalesReport = () => {
+  const me = useOutletContext();
+  const ownerShop = me?.role === 'SHOP_OWNER' ? me.shopSlug || '' : null;
   const [shops, setShops] = useState([]);
-  const [shopSlug, setShopSlug] = useState('');
+  const [shopSlug, setShopSlug] = useState(ownerShop || '');
   // По умолчанию — текущая неделя; отчёт запрашивается сразу, как загрузятся магазины.
   const [from, setFrom] = useState(() => toInputDate(startOfWeek()));
   const [to, setTo] = useState(() => toInputDate(new Date()));
@@ -79,16 +82,24 @@ const ShopSalesReport = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (ownerShop !== null) return undefined;
+    let cancelled = false;
     getShops()
       .then((loaded) => {
+        if (cancelled) return;
         setShops(loaded);
         // Сразу показываем отчёт по первому магазину, не дожидаясь выбора.
         if (loaded.length > 0) {
           setShopSlug((current) => current || loaded[0].slug);
         }
       })
-      .catch((err) => setError(err?.message || 'Не удалось загрузить магазины'));
-  }, []);
+      .catch((err) => {
+        if (!cancelled) setError(err?.message || 'Не удалось загрузить магазины');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ownerShop]);
 
   useEffect(() => {
     if (!shopSlug || !from || !to) return;
@@ -129,23 +140,29 @@ const ShopSalesReport = () => {
     <div className={styles.wrap}>
       <header className={styles.pageHead}>
         <h1 className={styles.title}>Аналитика</h1>
-        <p className={styles.subtitle}>Продажи магазинов-партнёров за период</p>
+        <p className={styles.subtitle}>
+          {ownerShop !== null
+            ? `Продажи магазина ${me?.shopName || ownerShop} за период`
+            : 'Продажи магазинов-партнёров за период'}
+        </p>
       </header>
 
       <div className={styles.controls}>
-        <select
-          className={styles.select}
-          value={shopSlug}
-          onChange={(e) => setShopSlug(e.target.value)}
-          aria-label="Магазин для отчёта"
-        >
-          <option value="">Выберите магазин</option>
-          {shops.map((shop) => (
-            <option key={shop.slug} value={shop.slug}>
-              {shop.name}
-            </option>
-          ))}
-        </select>
+        {ownerShop === null && (
+          <select
+            className={styles.select}
+            value={shopSlug}
+            onChange={(e) => setShopSlug(e.target.value)}
+            aria-label="Магазин для отчёта"
+          >
+            <option value="">Выберите магазин</option>
+            {shops.map((shop) => (
+              <option key={shop.slug} value={shop.slug}>
+                {shop.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className={styles.dates}>
           <input
             type="date"
@@ -187,7 +204,11 @@ const ShopSalesReport = () => {
       </div>
 
       {!shopSlug && !error && (
-        <p className={styles.hint}>Выберите магазин, чтобы увидеть продажи за период.</p>
+        <p className={styles.hint}>
+          {ownerShop !== null
+            ? 'К вашему доступу не привязан магазин. Напишите администратору.'
+            : 'Выберите магазин, чтобы увидеть продажи за период.'}
+        </p>
       )}
       {loading && <p className={styles.hint}>Загрузка отчёта…</p>}
       {error && <p className={styles.error}>{error}</p>}
@@ -215,7 +236,7 @@ const ShopSalesReport = () => {
               </span>
               <span className={styles.statLabel}>средний чек</span>
             </div>
-            {shopSlug !== OWN_SHOP_SLUG && (
+            {shopSlug !== OWN_SHOP_SLUG && ownerShop === null && (
               <div className={`${styles.statCard} ${styles.statCardCommission}`}>
                 <span className={styles.statValue}>
                   {formatRub(Math.round(report.totalKopecks * COMMISSION_RATE))} ₽

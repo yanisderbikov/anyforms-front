@@ -39,6 +39,14 @@ const Login = () => {
       setStep('code');
       setResendIn(RESEND_SECONDS);
     } catch (err) {
+      if (err.response?.status === 429) {
+        const retryAfter = Number(err.response.data?.retryAfterSeconds);
+        setEmail(normalized);
+        setStep('code');
+        setResendIn(Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : RESEND_SECONDS);
+        setError('');
+        return;
+      }
       setError(errorMessage(err, 'Не удалось отправить код. Попробуйте ещё раз.'));
     } finally {
       setLoading(false);
@@ -108,7 +116,7 @@ const Login = () => {
           ) : (
             <>
               <p className={styles.hint}>
-                Код отправлен на <strong>{email}</strong>.{' '}
+                Код уже отправлен на <strong>{email}</strong>, проверьте почту.{' '}
                 <button type="button" className={styles.linkBtn} onClick={backToEmail} disabled={loading}>
                   Другая почта
                 </button>

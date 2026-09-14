@@ -33,7 +33,7 @@ const MENU = [
     section: SECTIONS.PRODUCTS,
     items: [
       { to: '/admin/products', label: 'Товары розницы' },
-      { to: '/admin/products/analytics', label: 'Аналитика' },
+      { to: '/admin/products/analytics', label: 'Аналитика', section: SECTIONS.SHOP_ANALYTICS },
     ],
   },
   {
