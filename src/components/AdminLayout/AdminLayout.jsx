@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import apiClient from '../../apiClient';
+import { authHeaders } from '../AdminInvoices/invoiceShared';
 import { SECTIONS, getAllowedSections, sectionForPath } from '../../permissions';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './AdminLayout.module.css';
@@ -61,10 +62,29 @@ const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const jwtMeta = apiClient.getJwtMetadata();
-  const role = jwtMeta?.role;
-  const userName = jwtMeta?.name;
-  const allowedSections = getAllowedSections(role);
+  const hasLiveToken = apiClient.hasLiveToken();
+  const [me, setMe] = useState(null);
+  useEffect(() => {
+    if (!hasLiveToken) return undefined;
+    let cancelled = false;
+    apiClient.instance
+      .get('/api/auth/me', { headers: authHeaders() })
+      .then(({ data }) => {
+        if (!cancelled) setMe(data);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        const jwtMeta = apiClient.getJwtMetadata();
+        setMe({ role: jwtMeta?.role, name: jwtMeta?.name, superAdmin: Boolean(jwtMeta?.superAdmin) });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasLiveToken]);
+
+  const role = me?.role;
+  const userName = me?.name;
+  const allowedSections = getAllowedSections(role, me?.superAdmin);
   // Пункт меню может иметь свою секцию (иначе берётся секция группы); пустые группы скрываем.
   const visibleMenu = MENU.map((section) => ({
     ...section,
@@ -118,9 +138,13 @@ const AdminLayout = () => {
   );
 
   // Без живого токена в админке делать нечего — на логин с возвратом обратно.
-  if (!apiClient.hasLiveToken()) {
+  if (!hasLiveToken) {
     const from = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/admin/login?from=${from}`} replace />;
+  }
+
+  if (!me) {
+    return null;
   }
 
   // Прямая ссылка на секцию, которая роли недоступна, — уводим на домашнюю.
@@ -182,7 +206,7 @@ const AdminLayout = () => {
       </aside>
 
       <main className={styles.content}>
-        <Outlet />
+        <Outlet context={me} />
       </main>
     </div>
   );

@@ -86,6 +86,8 @@ apiClient.getJwtMetadata = () => {
         return {
             role: decoded.role || null,
             name: decoded.name || null,
+            email: decoded.sub || null,
+            superAdmin: decoded.super === true,
             tempUser: decoded.temp_user || false,
             raw: decoded, // если хочешь посмотреть полный токен
         };
@@ -127,17 +129,20 @@ apiClient.instance.interceptors.response.use(
                 window.location.href = data.url;
             }
 
-            // 403 в админке — на логин, но только если токена нет или он протух.
-            // Валидный токен без нужной роли на логин не бросаем (иначе петля логина),
+            // 401 в админке — бэк не признал токен (доступ отозван, токен выдан до смены схемы):
+            // стираем его и уводим на логин. 403 — только если токена нет или он протух;
+            // валидный токен без нужной роли на логин не бросаем (иначе петля логина),
             // такие случаи разруливает гвард секций в AdminLayout.
             // Публичные страницы (/orders/custom/item/...) на логин не бросаем.
             const path = window.location.pathname;
-            if (error.response.status === 403 && path.startsWith('/admin') && path !== '/admin/login') {
-                if (!apiClient.hasLiveToken()) {
-                    const from = encodeURIComponent(path + window.location.search);
-                    window.location.href = `/admin/login?from=${from}`;
-                    return;
-                }
+            const inAdmin = path.startsWith('/admin') && path !== '/admin/login';
+            const unauthorized = error.response.status === 401;
+            const forbiddenWithoutToken = error.response.status === 403 && !apiClient.hasLiveToken();
+            if (inAdmin && (unauthorized || forbiddenWithoutToken)) {
+                apiClient.clearToken();
+                const from = encodeURIComponent(path + window.location.search);
+                window.location.href = `/admin/login?from=${from}`;
+                return new Promise(() => {});
             }
 
             if (error.response.status === 402) {
