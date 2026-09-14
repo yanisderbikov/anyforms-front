@@ -1,5 +1,5 @@
 import React from 'react';
-import apiClient from '../../apiClient';
+import { useOutletContext } from 'react-router-dom';
 import styles from './AdminHome.module.css';
 
 const getGreeting = () => {
@@ -11,7 +11,7 @@ const getGreeting = () => {
 };
 
 const AdminHome = () => {
-  const name = apiClient.getJwtMetadata()?.name;
+  const name = useOutletContext()?.name;
   return (
   <div className={styles.wrap}>
     <h1 className={styles.greeting}>

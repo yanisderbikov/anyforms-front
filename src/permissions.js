@@ -9,6 +9,8 @@ export const SECTIONS = {
   YOOKASSA_RECEIPTS: 'YOOKASSA_RECEIPTS',
   PROMO_CODES: 'PROMO_CODES',
   SALESBOT: 'SALESBOT',
+  USERS: 'USERS',
+  SHOP_ANALYTICS: 'SHOP_ANALYTICS',
 };
 
 const ROLE_SECTIONS = {
@@ -16,6 +18,7 @@ const ROLE_SECTIONS = {
     SECTIONS.CUSTOM_ORDERS,
     SECTIONS.RETAIL,
     SECTIONS.PRODUCTS,
+    SECTIONS.SHOP_ANALYTICS,
     SECTIONS.INVOICES,
     SECTIONS.TRAINING_INVOICES,
     SECTIONS.YOOKASSA_RECEIPTS,
@@ -29,17 +32,23 @@ const ROLE_SECTIONS = {
     SECTIONS.TRAINING_INVOICES,
   ],
   PROJECT_MANAGER: [SECTIONS.CUSTOM_ORDERS, SECTIONS.RETAIL],
+  SHOP_OWNER: [SECTIONS.SHOP_ANALYTICS],
 };
 
-export const getAllowedSections = (role) => ROLE_SECTIONS[role] || [];
+export const getAllowedSections = (role, superAdmin = false) => {
+  const sections = ROLE_SECTIONS[role] || [];
+  return superAdmin ? [...sections, SECTIONS.USERS] : sections;
+};
 
 // Какой секции принадлежит путь админки. null — общая страница (/admin, /admin/login).
 export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/orders/custom')) return SECTIONS.CUSTOM_ORDERS;
   if (pathname.startsWith('/admin/orders')) return SECTIONS.RETAIL;
+  if (pathname.startsWith('/admin/products/analytics')) return SECTIONS.SHOP_ANALYTICS;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
   if (pathname.startsWith('/admin/promo-codes')) return SECTIONS.PROMO_CODES;
   if (pathname.startsWith('/admin/salesbot')) return SECTIONS.SALESBOT;
+  if (pathname.startsWith('/admin/users')) return SECTIONS.USERS;
   if (pathname.startsWith('/admin/invoices/training')) return SECTIONS.TRAINING_INVOICES;
   if (pathname.startsWith('/admin/invoices/receipts')) return SECTIONS.YOOKASSA_RECEIPTS;
   if (pathname.startsWith('/admin/invoices')) return SECTIONS.INVOICES;
