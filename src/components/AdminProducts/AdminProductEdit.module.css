@@ -291,7 +291,8 @@
 /* ---------- Поля ---------- */
 
 .row,
-.row3 {
+.row3,
+.row4 {
   display: grid;
   gap: 0.75rem;
 }
@@ -304,10 +305,18 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.row4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 @media (max-width: 560px) {
   .row,
   .row3 {
     grid-template-columns: 1fr;
+  }
+
+  .row4 {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

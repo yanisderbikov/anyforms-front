@@ -140,6 +140,7 @@
 .summaryRow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 0.95rem; color: #333; padding: 6px 0; }
 .summaryTotal { font-size: 1.1rem; font-weight: 700; color: var(--color-base-black); border-top: 1px solid #e2e2e2; margin-top: 6px; padding-top: 14px; }
 .summaryNote { font-size: 0.8rem; color: #8c8c8c; margin: 8px 0 0; }
+.deliveryQuote { font-size: 0.88rem; color: #8c8c8c; margin: 8px 0 0; }
 
 /* Напоминание, что в заказе — формы, а не готовые изделия: на фото товаров
    часто отлитое изделие, и покупатели путают. Красится в палитру магазина

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getOrdersWithoutTracker, getDeliveringOrders, getCreatedOrders, readyForPickup } from '../../services/api';
 import { isPickup } from '../../services/customProducts';
 import OrderCard from '../OrderCard/OrderCard';
 import TrackerModal from '../TrackerModal/TrackerModal';
+import DeleteOrderModal from './DeleteOrderModal';
 import styles from './OrderList.module.css';
 
 const cleanProductName = (name) =>
@@ -17,7 +18,10 @@ const cleanProductName = (name) =>
 const OrderList = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  // Удалять розничные заказы может только супер-админ (бэк дополнительно проверяет роль)
+  const canDeleteOrders = Boolean(useOutletContext()?.superAdmin);
   const [orders, setOrders] = useState([]);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -103,6 +107,11 @@ const OrderList = () => {
   const handleTrackerSet = () => {
     loadOrders();
     handleCloseModal();
+  };
+
+  const handleOrderDeleted = () => {
+    setDeleteTarget(null);
+    loadOrders();
   };
 
   const handlePickupReady = async (order) => {
@@ -238,6 +247,7 @@ const OrderList = () => {
               onAddTracker={activeMode === 'without-tracker' && !isPickup(order) ? () => handleOpenModal(order.leadId, false) : null}
               onPickupReady={activeMode === 'without-tracker' && isPickup(order) ? () => handlePickupReady(order) : null}
               onAddComment={activeMode === 'created' || activeMode === 'delivering' ? () => handleOpenModal(order.leadId, true) : null}
+              onDelete={canDeleteOrders ? () => setDeleteTarget(order) : null}
             />
           ))}
         </div>
@@ -249,6 +259,14 @@ const OrderList = () => {
           onClose={handleCloseModal}
           onSuccess={handleTrackerSet}
           commentOnly={isCommentModal}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteOrderModal
+          order={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={handleOrderDeleted}
         />
       )}
     </div>
