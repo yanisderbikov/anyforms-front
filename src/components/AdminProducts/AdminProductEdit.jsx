@@ -188,9 +188,8 @@ const AdminProductEdit = () => {
       payload.amoProductId = amoId;
       if (form.amoProductName?.trim()) payload.amoProductName = form.amoProductName.trim();
     }
-    for (const key of DIMENSION_FIELDS) {
-      const value = parseInt(String(form[key]).trim(), 10);
-      payload[key] = Number.isNaN(value) || value < 0 ? 0 : value;
+    const value = parseInt(String(form[key]).trim(), 10);
+    payload[key] = Number.isNaN(value) ? (key === 'weightGrams' ? 300 : 15) : Math.max(0, value);
     }
     return payload;
   };
