@@ -30,6 +30,23 @@ const PAYMENT_TYPE = 'online';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
 
+const DELIVERY_QUOTE_DEBOUNCE_MS = 300;
+
+const pluralDays = (n) => {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'день';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'дня';
+  return 'дней';
+};
+
+const formatDeliveryPeriod = (min, max) => {
+  if (min == null && max == null) return '';
+  if (min == null) return `до ${max} ${pluralDays(max)}`;
+  if (max == null || min === max) return `${min} ${pluralDays(min)}`;
+  return `${min}–${max} ${pluralDays(max)}`;
+};
+
 const MarketplaceCheckout = () => {
   const { items, total, count, shopSlug } = useCart();
   // Возврат «к товарам» — на витрину, с которой набрана корзина.
@@ -53,6 +70,8 @@ const MarketplaceCheckout = () => {
   const [phone, setPhone] = useState(savedContact.phone || savedForm.phone || '');
   const [email, setEmail] = useState(savedContact.email || savedForm.email || '');
   const [pvz, setPvz] = useState(savedForm.pvz || null);
+  const [deliveryQuote, setDeliveryQuote] = useState(null);
+  const [deliveryQuoteState, setDeliveryQuoteState] = useState('idle');
   const [marketingConsent, setMarketingConsent] = useState(Boolean(savedForm.marketingConsent));
   const [acceptTerms, setAcceptTerms] = useState(Boolean(savedForm.acceptTerms));
   const [touched, setTouched] = useState({ fullName: false, phone: false, email: false });
@@ -197,6 +216,43 @@ const MarketplaceCheckout = () => {
   // ---------------------------------------------------------------------------
 
   const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
+
+  const cartItemsKey = items
+    .map((i) => `${i.id}:${i.variantId || ''}:${i.quantity}`)
+    .join('|');
+  const pvzCode = pvz?.pvzCode || '';
+  useEffect(() => {
+    if (!pvzCode || !cartItemsKey) {
+      setDeliveryQuote(null);
+      setDeliveryQuoteState('idle');
+      return undefined;
+    }
+    let cancelled = false;
+    setDeliveryQuoteState('loading');
+    const timer = setTimeout(async () => {
+      try {
+        const { data } = await apiClient.instance.post('/api/cdek/delivery-cost', {
+          items: formStateRef.current.items.map((i) => ({
+            productId: i.id,
+            variantId: i.variantId || undefined,
+            quantity: i.quantity,
+          })),
+          pvzCode,
+        });
+        if (cancelled) return;
+        setDeliveryQuote(data);
+        setDeliveryQuoteState('ready');
+      } catch {
+        if (cancelled) return;
+        setDeliveryQuote(null);
+        setDeliveryQuoteState('error');
+      }
+    }, DELIVERY_QUOTE_DEBOUNCE_MS);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [pvzCode, cartItemsKey]);
 
   const promoPercent = appliedPromo?.discountPercent || 0;
   const promoAmountRub = (appliedPromo?.discountAmountKopecks || 0) / 100;
@@ -427,6 +483,10 @@ const MarketplaceCheckout = () => {
             <strong>Обратите внимание:</strong> вы покупаете силиконовые формы (молды)
             для изготовления изделий, а не готовые изделия с фотографий.
           </p>
+          <p className={styles.moldNote}>
+            <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
+            Стоимость доставки не входит в сумму заказа и оплачивается вами при получении по тарифам СДЭК.
+          </p>
         </div>
 
         <form className={styles.form} id="checkout-form" name="checkout" onSubmit={handleSubmit} noValidate>
@@ -562,6 +622,17 @@ const MarketplaceCheckout = () => {
             invalid={!pvzValid}
             onSearchResult={handlePvzSearchResult}
           />
+          {deliveryQuoteState === 'loading' && (
+            <p className={styles.deliveryQuote}>Рассчитываем доставку…</p>
+          )}
+          {deliveryQuoteState === 'ready' && deliveryQuote?.cost != null && (
+            <p className={styles.deliveryQuote}>
+              ~{formatPrice(Math.round(Number(deliveryQuote.cost)))}
+              {formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)
+                ? ` · ~${formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)}`
+                : ''}
+            </p>
+          )}
 
           <label className={styles.checkRow}>
             <input

@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { isPickup, PICKUP_BADGE_STYLE } from '../../services/customProducts';
 import styles from './OrderCard.module.css';
 
-const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady }) => {
+const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady, onDelete }) => {
   const copyToClipboard = (text, message) => {
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
@@ -97,6 +97,22 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady }) => {
                 <path d="M6.5 3.5H3.5C2.67157 3.5 2 4.17157 2 5V12.5C2 13.3284 2.67157 14 3.5 14H11C11.8284 14 12.5 13.3284 12.5 12.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M10 2H14V6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M7 9L14 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+          {onDelete && (
+            <button
+              className={styles.deleteIcon}
+              onClick={onDelete}
+              title="Удалить заказ (только супер-админ)"
+              aria-label="Удалить заказ"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 4H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M6 4V2.75C6 2.33579 6.33579 2 6.75 2H9.25C9.66421 2 10 2.33579 10 2.75V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M3.75 4L4.4 12.6C4.45 13.39 5.1 14 5.9 14H10.1C10.9 14 11.55 13.39 11.6 12.6L12.25 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.5 7V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M9.5 7V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </button>
           )}

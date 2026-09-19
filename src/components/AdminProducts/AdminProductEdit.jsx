@@ -11,6 +11,8 @@ import styles from './AdminProductEdit.module.css';
 const DEFAULT_SHOP_SLUG = 'anyforms';
 const NEW_ID = 'new';
 
+const DIMENSION_FIELDS = ['weightGrams', 'lengthCm', 'widthCm', 'heightCm'];
+
 const emptyForm = {
   name: '',
   description: '',
@@ -22,6 +24,10 @@ const emptyForm = {
   orderNumber: '',
   amoProductId: '',
   amoProductName: '',
+  weightGrams: '',
+  lengthCm: '',
+  widthCm: '',
+  heightCm: '',
   active: true,
   preorder: false,
   shopSlugs: [DEFAULT_SHOP_SLUG],
@@ -48,6 +54,10 @@ const formFromProduct = (p) => ({
   orderNumber: p.orderNumber ?? '',
   amoProductId: p.amoProductId ?? '',
   amoProductName: p.amoProductName ?? '',
+  weightGrams: p.weightGrams ?? '',
+  lengthCm: p.lengthCm ?? '',
+  widthCm: p.widthCm ?? '',
+  heightCm: p.heightCm ?? '',
   active: p.active !== false,
   preorder: Boolean(p.preorder),
   shopSlugs: Array.isArray(p.shops) ? p.shops.map((s) => s.slug) : [],
@@ -177,6 +187,10 @@ const AdminProductEdit = () => {
     if (!Number.isNaN(amoId)) {
       payload.amoProductId = amoId;
       if (form.amoProductName?.trim()) payload.amoProductName = form.amoProductName.trim();
+    }
+    for (const key of DIMENSION_FIELDS) {
+      const value = parseInt(String(form[key]).trim(), 10);
+      payload[key] = Number.isNaN(value) ? (key === 'weightGrams' ? 300 : 15) : Math.max(0, value);
     }
     return payload;
   };
@@ -500,6 +514,66 @@ const AdminProductEdit = () => {
                 onChange={setField}
                 className={styles.input}
                 placeholder="26"
+              />
+            </label>
+          </div>
+        </Section>
+
+        <Section
+          title="Вес и габариты для доставки"
+          hint="Используются для расчёта доставки СДЭК. Пустое поле — по умолчанию 300 г и 15×15×15 см за единицу товара."
+        >
+          <div className={styles.row4}>
+            <label className={styles.label}>
+              Вес, г
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="weightGrams"
+                value={form.weightGrams}
+                onChange={setField}
+                className={styles.input}
+                placeholder="300"
+              />
+            </label>
+            <label className={styles.label}>
+              Длина, см
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="lengthCm"
+                value={form.lengthCm}
+                onChange={setField}
+                className={styles.input}
+                placeholder="15"
+              />
+            </label>
+            <label className={styles.label}>
+              Ширина, см
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="widthCm"
+                value={form.widthCm}
+                onChange={setField}
+                className={styles.input}
+                placeholder="15"
+              />
+            </label>
+            <label className={styles.label}>
+              Высота, см
+              <input
+                type="number"
+                min="0"
+                step="1"
+                name="heightCm"
+                value={form.heightCm}
+                onChange={setField}
+                className={styles.input}
+                placeholder="15"
               />
             </label>
           </div>

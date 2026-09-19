@@ -113,3 +113,28 @@ export const getCreatedOrders = async () => {
     throw error;
   }
 };
+
+/**
+ * Super admin only: permanently delete a retail order (with its items and related records)
+ * @param {number} orderId - Our order id (order.id, not leadId)
+ * @returns {Promise<void>}
+ */
+export const deleteRetailOrder = async (orderId) => {
+  try {
+    const token = apiClient.getToken ? apiClient.getToken() : null;
+    await apiClient.instance.delete(
+      `/api/orders/${orderId}`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    if (error.response) {
+      const status = error.response.status;
+      const serverMessage = error.response.data?.message || error.response.data?.error;
+      if (status === 403) throw new Error('Удалять заказы может только супер-админ');
+      if (status === 404) throw new Error('Заказ не найден — возможно, уже удалён');
+      throw new Error(serverMessage || 'Не удалось удалить заказ');
+    }
+    throw error;
+  }
+};
