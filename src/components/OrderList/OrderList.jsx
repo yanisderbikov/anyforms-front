@@ -222,7 +222,14 @@ const OrderList = () => {
                   title={isActive ? 'Снять фильтр' : 'Показать только заказы с этим товаром'}
                 >
                   <span className={styles.summaryProductName}>{name}</span>
-                  <span className={styles.summaryCount}>{quantity}</span>
+                  <span className={styles.summaryRight}>
+                    <span className={styles.summaryCount}>{quantity}</span>
+                    {isActive && (
+                      <span className={styles.summaryClear} aria-hidden="true">
+                        ×
+                      </span>
+                    )}
+                  </span>
                 </button>
               );
             })}
