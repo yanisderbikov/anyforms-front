@@ -168,16 +168,23 @@ export function initAnalytics() {
   sendVisitContext();
   const gtmId = import.meta.env.VITE_GTM_ID || (analyticsEnabled() ? PROD_GTM_ID : '');
   if (!gtmId) return;
-  if (document.getElementById('gtm-loader')) return;
 
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  // Контейнер (≈120 KB) подключаем после window.load и в простое главного
+  // потока — хелпер объявлен в index.html рядом с gtag. События, отправленные
+  // до этого, лежат в dataLayer и обработаются контейнером при загрузке.
+  const whenIdle = window.__ANYFORMS_WHEN_IDLE || ((fn) => fn());
+  whenIdle(() => {
+    if (document.getElementById('gtm-loader')) return;
 
-  const script = document.createElement('script');
-  script.id = 'gtm-loader';
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;
-  document.head.appendChild(script);
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+
+    const script = document.createElement('script');
+    script.id = 'gtm-loader';
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`;
+    document.head.appendChild(script);
+  });
 }
 
 // ---------------------------------------------------------------------------

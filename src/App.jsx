@@ -1,53 +1,74 @@
 import React, { Suspense, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useCart, DEFAULT_SHOP_SLUG } from './context/CartContext';
-import OrderList from './components/OrderList/OrderList';
-import PDFViewer from './components/PDFViewer/PDFViewer';
 import styles from './App.module.css';
 import Marketplace from "./components/Marketplace/Marketplace";
 import MarketplaceProduct from "./components/Marketplace/MarketplaceProduct";
-import MarketplaceCart from "./components/Marketplace/MarketplaceCart";
-import MarketplaceCheckout from "./components/Marketplace/MarketplaceCheckout";
-import MarketplaceSuccess from "./components/Marketplace/MarketplaceSuccess";
-import Login from "./components/Login/Login";
-import AdminProducts from "./components/AdminProducts/AdminProducts";
-import AdminProductEdit from "./components/AdminProducts/AdminProductEdit";
-import ShopSalesReport from "./components/AdminProducts/ShopSalesReport";
-import AdminInvoices from "./components/AdminInvoices/AdminInvoices";
-import AdminPromoCodes from "./components/AdminPromoCodes/AdminPromoCodes";
-import AdminTrainingInvoices from "./components/AdminInvoices/AdminTrainingInvoices";
-import AdminYookassaReceipts from "./components/AdminInvoices/AdminYookassaReceipts";
-import AdminLayout from "./components/AdminLayout/AdminLayout";
-import AdminHome from "./components/AdminHome/AdminHome";
-import AdminSalesbot from "./components/AdminSalesbot/AdminSalesbot";
-import AdminSalesbotAnalytics from "./components/AdminSalesbot/AdminSalesbotAnalytics";
-import AdminSalesbotManualRun from "./components/AdminSalesbot/AdminSalesbotManualRun";
-import AdminUsers from "./components/AdminUsers/AdminUsers";
-import ChiefLanding from "./components/ChiefLanding/ChiefLanding";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
-import GuideLanding from "./components/GuideLanding/GuideLanding";
-import CourseLanding from "./components/CourseLanding/CourseLanding";
-import { CourseOffer, CoursePrivacy } from "./components/CourseLanding/CourseLegal";
-import CourseCheckout from "./components/CourseLanding/CourseCheckout";
-import CourseSuccess from "./components/CourseLanding/CourseSuccess";
-import SellerRequisites from "./components/Founders/SellerRequisites";
-import { GuideOffer, GuidePrivacy } from "./components/GuideLanding/GuideLegal";
-import LegalPage from "./components/shared/legal/LegalPage";
-import { SITE_PRIVACY, SHOP_OFFER } from "./components/shared/legal/legalDocs";
-import GuideCheckout from "./components/GuideLanding/GuideCheckout";
-import GuideSuccess from "./components/GuideLanding/GuideSuccess";
 import NotFound from "./components/NotFound/NotFound";
-import CustomOrders from "./components/CustomOrders/CustomOrders";
-import CustomOrdersList from "./components/CustomOrders/CustomOrdersList";
-import CustomOrderFill from "./components/CustomOrders/CustomOrderFill";
-import CustomShipList from "./components/CustomOrders/CustomShipList";
-import CustomItemPage from "./components/CustomOrders/CustomItemPage";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
 import { setAnalyticsShop, trackPageView } from './services/analytics';
 
+// Код-сплиттинг по роутам. В основном бандле остаются только:
+// - витрина и карточка товара (/shop, /shop/<slug>, …/product/:id) — ~65% просмотров;
+// - главная и /3d-print — они пререндерятся (scripts/prerender.mjs), а клиент
+//   монтируется через createRoot().render(), который очищает #root: ленивый
+//   компонент показал бы пустой fallback поверх уже готовой разметки;
+// - NotFound — крошечный и нужен для любого опечатанного адреса.
+// Остальное (админка, курс, гайд, чекаут, юр-тексты) грузится при заходе на
+// страницу. Переходы внутри SPA обёрнуты в startTransition (index.jsx), поэтому
+// на время загрузки чанка остаётся текущая страница, а не пустой fallback.
+const lazyNamed = (loader, name) =>
+  React.lazy(() => loader().then((module) => ({ default: module[name] })));
+
 const StlViewer = React.lazy(() => import('./components/StlViewer/StlViewer'));
+const PDFViewer = React.lazy(() => import('./components/PDFViewer/PDFViewer'));
+const Login = React.lazy(() => import('./components/Login/Login'));
+const ChiefLanding = React.lazy(() => import('./components/ChiefLanding/ChiefLanding'));
+const GuideLanding = React.lazy(() => import('./components/GuideLanding/GuideLanding'));
+const GuideCheckout = React.lazy(() => import('./components/GuideLanding/GuideCheckout'));
+const GuideSuccess = React.lazy(() => import('./components/GuideLanding/GuideSuccess'));
+const loadGuideLegal = () => import('./components/GuideLanding/GuideLegal');
+const GuideOffer = lazyNamed(loadGuideLegal, 'GuideOffer');
+const GuidePrivacy = lazyNamed(loadGuideLegal, 'GuidePrivacy');
+const CourseLanding = React.lazy(() => import('./components/CourseLanding/CourseLanding'));
+const CourseCheckout = React.lazy(() => import('./components/CourseLanding/CourseCheckout'));
+const CourseSuccess = React.lazy(() => import('./components/CourseLanding/CourseSuccess'));
+const loadCourseLegal = () => import('./components/CourseLanding/CourseLegal');
+const CourseOffer = lazyNamed(loadCourseLegal, 'CourseOffer');
+const CoursePrivacy = lazyNamed(loadCourseLegal, 'CoursePrivacy');
+const SellerRequisites = React.lazy(() => import('./components/Founders/SellerRequisites'));
+const loadSiteLegal = () => import('./components/shared/legal/SiteLegalPages');
+const SitePrivacyPage = lazyNamed(loadSiteLegal, 'SitePrivacyPage');
+const ShopOfferPage = lazyNamed(loadSiteLegal, 'ShopOfferPage');
+// Корзина и чекаут — продолжение витрины: их чанки догружаем заранее в простое,
+// как только покупатель оказался на витрине (см. эффект ниже).
+const loadMarketplaceCart = () => import('./components/Marketplace/MarketplaceCart');
+const loadMarketplaceCheckout = () => import('./components/Marketplace/MarketplaceCheckout');
+const MarketplaceCart = React.lazy(loadMarketplaceCart);
+const MarketplaceCheckout = React.lazy(loadMarketplaceCheckout);
+const MarketplaceSuccess = React.lazy(() => import('./components/Marketplace/MarketplaceSuccess'));
+const CustomItemPage = React.lazy(() => import('./components/CustomOrders/CustomItemPage'));
+const AdminLayout = React.lazy(() => import('./components/AdminLayout/AdminLayout'));
+const AdminHome = React.lazy(() => import('./components/AdminHome/AdminHome'));
+const OrderList = React.lazy(() => import('./components/OrderList/OrderList'));
+const CustomOrders = React.lazy(() => import('./components/CustomOrders/CustomOrders'));
+const CustomOrdersList = React.lazy(() => import('./components/CustomOrders/CustomOrdersList'));
+const CustomShipList = React.lazy(() => import('./components/CustomOrders/CustomShipList'));
+const CustomOrderFill = React.lazy(() => import('./components/CustomOrders/CustomOrderFill'));
+const AdminProducts = React.lazy(() => import('./components/AdminProducts/AdminProducts'));
+const AdminProductEdit = React.lazy(() => import('./components/AdminProducts/AdminProductEdit'));
+const ShopSalesReport = React.lazy(() => import('./components/AdminProducts/ShopSalesReport'));
+const AdminPromoCodes = React.lazy(() => import('./components/AdminPromoCodes/AdminPromoCodes'));
+const AdminInvoices = React.lazy(() => import('./components/AdminInvoices/AdminInvoices'));
+const AdminTrainingInvoices = React.lazy(() => import('./components/AdminInvoices/AdminTrainingInvoices'));
+const AdminYookassaReceipts = React.lazy(() => import('./components/AdminInvoices/AdminYookassaReceipts'));
+const AdminSalesbot = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbot'));
+const AdminSalesbotManualRun = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbotManualRun'));
+const AdminSalesbotAnalytics = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbotAnalytics'));
+const AdminUsers = React.lazy(() => import('./components/AdminUsers/AdminUsers'));
 
 const KNOWN_PATHS = new Set([
   '/',
@@ -252,6 +273,23 @@ function App() {
     }
   }, [shopPathSlug, isDefaultShopPage, isCartFlowPage, cartShopSlug]);
 
+  // Корзина и чекаут лежат в отдельных чанках; покупателю на витрине они
+  // понадобятся следующим шагом — догружаем их в простое, чтобы переход был мгновенным.
+  const isStorefrontPage = isShopPage || isShopProductPage || normalizedPathname === '/shop';
+  useEffect(() => {
+    if (!isStorefrontPage) return undefined;
+    const prefetch = () => {
+      loadMarketplaceCart();
+      loadMarketplaceCheckout();
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(prefetch, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(prefetch, 1500);
+    return () => window.clearTimeout(id);
+  }, [isStorefrontPage]);
+
   // Аналитика: просмотры страниц при SPA-переходах. Первую страницу счётчики
   // считают сами при загрузке, дальше сообщаем о каждой смене пути вручную.
   // Эффект стоит после SEO-эффекта, чтобы document.title был уже обновлён.
@@ -277,86 +315,78 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <Routes>
-        <Route path="/login" element={<Navigate to="/admin/login" replace />} />
-        <Route path="/admin/login" element={<Login />} />
-        <Route path="/chief" element={<ChiefLanding />} />
-        {/* Единая политика и реквизиты для всего сайта; старые адреса ведут туда же */}
-        <Route path="/privacy" element={<LegalPage doc={SITE_PRIVACY} />} />
-        <Route path="/chief/privacy" element={<Navigate to="/privacy" replace />} />
-        <Route path="/requisites" element={<SellerRequisites />} />
-        <Route path="/3d-print" element={<Print3dLanding />} />
-        <Route path="/guide" element={<GuideLanding />} />
-        <Route path="/course" element={<CourseLanding />} />
-        <Route path="/course/offer" element={<CourseOffer />} />
-        <Route path="/course/privacy" element={<CoursePrivacy />} />
-        <Route path="/course/checkout" element={<CourseCheckout />} />
-        <Route path="/course/success" element={<CourseSuccess />} />
-        <Route path="/guide/offer" element={<GuideOffer />} />
-        <Route path="/guide/privacy" element={<GuidePrivacy />} />
-        <Route path="/guide/checkout" element={<GuideCheckout />} />
-        <Route path="/guide/success" element={<GuideSuccess />} />
-        <Route path="/founders/dmitry" element={<SellerRequisites />} />
-        {/* Старый адрес реквизитов (продавцом был Суворов Ю. И.) — ведёт на те же реквизиты. */}
-        <Route path="/founders/yuri" element={<SellerRequisites />} />
-        <Route path="/" element={<MainLanding />} />
-        <Route path="/pdf" element={<PDFViewer />} />
-        <Route
-          path="/stl"
-          element={
-            <Suspense fallback={null}>
-              <StlViewer />
-            </Suspense>
-          }
-        />
-        <Route path="/shop" element={<Marketplace />} />
-        <Route path="/shop/product/:id" element={<MarketplaceProduct />} />
-        <Route path="/shop/cart" element={<MarketplaceCart />} />
-        <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
-        <Route path="/shop/success" element={<MarketplaceSuccess />} />
-        <Route
-          path="/shop/offer"
-          element={<LegalPage doc={SHOP_OFFER} backTo="/shop" backLabel="← В магазин" headerLabel="Магазин" />}
-        />
-        {/* Витрина отдельного магазина: /shop/af_pastry и его карточки товаров.
-            Статические пути выше (/shop/cart и др.) матчатся раньше. */}
-        <Route path="/shop/:shopSlug" element={<Marketplace />} />
-        <Route path="/shop/:shopSlug/product/:id" element={<MarketplaceProduct />} />
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<AdminHome />} />
-          <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
-          <Route path="/admin/orders/without-tracker" element={<OrderList />} />
-          <Route path="/admin/orders/created" element={<OrderList />} />
-          <Route path="/admin/orders/delivering" element={<OrderList />} />
-          <Route path="/admin/orders/custom" element={<CustomOrders />} />
-          <Route path="/admin/orders/custom/create" element={<CustomOrdersList />} />
-          <Route path="/admin/orders/custom/ship" element={<CustomShipList />} />
-          <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/products/analytics" element={<ShopSalesReport />} />
-          {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
-          <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
-          <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
-          <Route path="/admin/invoices" element={<AdminInvoices />} />
-          <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
-          <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
-          <Route path="/admin/salesbot" element={<AdminSalesbot />} />
-          <Route path="/admin/salesbot/manual" element={<AdminSalesbotManualRun />} />
-          <Route path="/admin/salesbot/analytics" element={<AdminSalesbotAnalytics />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-        </Route>
-        {/* Старые адреса админки → новые под /admin */}
-        <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />
-        <Route path="/orders/without-tracker" element={<Navigate to="/admin/orders/without-tracker" replace />} />
-        <Route path="/orders/created" element={<Navigate to="/admin/orders/created" replace />} />
-        <Route path="/orders/delivering" element={<Navigate to="/admin/orders/delivering" replace />} />
-        <Route path="/orders/custom" element={<Navigate to="/admin/orders/custom" replace />} />
-        <Route path="/orders/custom/create" element={<Navigate to="/admin/orders/custom/create" replace />} />
-        <Route path="/orders/custom/ship" element={<Navigate to="/admin/orders/custom/ship" replace />} />
-        {/* Страница позиции доступна без логина (публичная ссылка для клиента) — вне админского layout и вне /admin. */}
-        <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/login" element={<Navigate to="/admin/login" replace />} />
+          <Route path="/admin/login" element={<Login />} />
+          <Route path="/chief" element={<ChiefLanding />} />
+          {/* Единая политика и реквизиты для всего сайта; старые адреса ведут туда же */}
+          <Route path="/privacy" element={<SitePrivacyPage />} />
+          <Route path="/chief/privacy" element={<Navigate to="/privacy" replace />} />
+          <Route path="/requisites" element={<SellerRequisites />} />
+          <Route path="/3d-print" element={<Print3dLanding />} />
+          <Route path="/guide" element={<GuideLanding />} />
+          <Route path="/course" element={<CourseLanding />} />
+          <Route path="/course/offer" element={<CourseOffer />} />
+          <Route path="/course/privacy" element={<CoursePrivacy />} />
+          <Route path="/course/checkout" element={<CourseCheckout />} />
+          <Route path="/course/success" element={<CourseSuccess />} />
+          <Route path="/guide/offer" element={<GuideOffer />} />
+          <Route path="/guide/privacy" element={<GuidePrivacy />} />
+          <Route path="/guide/checkout" element={<GuideCheckout />} />
+          <Route path="/guide/success" element={<GuideSuccess />} />
+          <Route path="/founders/dmitry" element={<SellerRequisites />} />
+          {/* Старый адрес реквизитов (продавцом был Суворов Ю. И.) — ведёт на те же реквизиты. */}
+          <Route path="/founders/yuri" element={<SellerRequisites />} />
+          <Route path="/" element={<MainLanding />} />
+          <Route path="/pdf" element={<PDFViewer />} />
+          <Route path="/stl" element={<StlViewer />} />
+          <Route path="/shop" element={<Marketplace />} />
+          <Route path="/shop/product/:id" element={<MarketplaceProduct />} />
+          <Route path="/shop/cart" element={<MarketplaceCart />} />
+          <Route path="/shop/checkout" element={<MarketplaceCheckout />} />
+          <Route path="/shop/success" element={<MarketplaceSuccess />} />
+          <Route path="/shop/offer" element={<ShopOfferPage />} />
+          {/* Витрина отдельного магазина: /shop/af_pastry и его карточки товаров.
+              Статические пути выше (/shop/cart и др.) матчатся раньше. */}
+          <Route path="/shop/:shopSlug" element={<Marketplace />} />
+          <Route path="/shop/:shopSlug/product/:id" element={<MarketplaceProduct />} />
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminHome />} />
+            <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
+            <Route path="/admin/orders/without-tracker" element={<OrderList />} />
+            <Route path="/admin/orders/created" element={<OrderList />} />
+            <Route path="/admin/orders/delivering" element={<OrderList />} />
+            <Route path="/admin/orders/custom" element={<CustomOrders />} />
+            <Route path="/admin/orders/custom/create" element={<CustomOrdersList />} />
+            <Route path="/admin/orders/custom/ship" element={<CustomShipList />} />
+            <Route path="/admin/orders/custom/order/:orderId" element={<CustomOrderFill />} />
+            <Route path="/admin/products" element={<AdminProducts />} />
+            <Route path="/admin/products/analytics" element={<ShopSalesReport />} />
+            {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
+            <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
+            <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
+            <Route path="/admin/invoices" element={<AdminInvoices />} />
+            <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
+            <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
+            <Route path="/admin/salesbot" element={<AdminSalesbot />} />
+            <Route path="/admin/salesbot/manual" element={<AdminSalesbotManualRun />} />
+            <Route path="/admin/salesbot/analytics" element={<AdminSalesbotAnalytics />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+          </Route>
+          {/* Старые адреса админки → новые под /admin */}
+          <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />
+          <Route path="/orders/without-tracker" element={<Navigate to="/admin/orders/without-tracker" replace />} />
+          <Route path="/orders/created" element={<Navigate to="/admin/orders/created" replace />} />
+          <Route path="/orders/delivering" element={<Navigate to="/admin/orders/delivering" replace />} />
+          <Route path="/orders/custom" element={<Navigate to="/admin/orders/custom" replace />} />
+          <Route path="/orders/custom/create" element={<Navigate to="/admin/orders/custom/create" replace />} />
+          <Route path="/orders/custom/ship" element={<Navigate to="/admin/orders/custom/ship" replace />} />
+          {/* Страница позиции доступна без логина (публичная ссылка для клиента) — вне админского layout и вне /admin. */}
+          <Route path="/orders/custom/item/:itemId" element={<CustomItemPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }

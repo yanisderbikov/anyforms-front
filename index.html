@@ -32,18 +32,41 @@
       window.__ANYFORMS_ANALYTICS_ENABLED = '%VITE_ANALYTICS_ENABLED%';
       window.__ANYFORMS_COUNTERS_ENABLED =
         window.__ANYFORMS_ANALYTICS_ENABLED !== 'false' && window.__ANYFORMS_PROD_HOST;
+      // Тяжёлые Google-скрипты (gtag ≈175 KB, GTM ≈120 KB) подключаем после
+      // window.load и в простое главного потока: 88% трафика — смартфоны, и они
+      // не должны конкурировать с бандлом, CSS и hero-картинкой за канал.
+      // Вызовы gtag()/dataLayer.push до этого момента копятся в dataLayer и
+      // уходят пачкой, когда скрипт загрузится. Этим же хелпером GTM
+      // подключает initAnalytics() в src/services/analytics.js.
+      window.__ANYFORMS_WHEN_IDLE = function (fn) {
+        var done = false;
+        var run = function () { if (done) return; done = true; fn(); };
+        var schedule = function () {
+          if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(run, { timeout: 2000 });
+          } else {
+            setTimeout(run, 1000);
+          }
+        };
+        if (document.readyState === 'complete') schedule();
+        else window.addEventListener('load', schedule, { once: true });
+        // Страховка: если load не наступает (зависший запрос картинки), всё равно грузим.
+        setTimeout(run, 8000);
+      };
     </script>
     <!-- Google tag (gtag.js) -->
     <script>
       window.dataLayer = window.dataLayer || [];
       if (window.__ANYFORMS_COUNTERS_ENABLED) {
-        var gtagScript = document.createElement('script');
-        gtagScript.async = true;
-        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-9CVRCKCES2';
-        document.head.appendChild(gtagScript);
         window.gtag = function(){dataLayer.push(arguments);};
         gtag('js', new Date());
         gtag('config', 'G-9CVRCKCES2');
+        window.__ANYFORMS_WHEN_IDLE(function () {
+          var gtagScript = document.createElement('script');
+          gtagScript.async = true;
+          gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-9CVRCKCES2';
+          document.head.appendChild(gtagScript);
+        });
       }
     </script>
     <!-- Yandex.Metrika counter -->

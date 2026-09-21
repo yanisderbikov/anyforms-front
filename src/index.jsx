@@ -24,7 +24,10 @@ const routerBasename =
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename={routerBasename}>
+    {/* v7_startTransition: переходы между роутами идут как transition — при
+        навигации на ленивый роут (App.jsx) React держит текущую страницу, пока
+        грузится чанк, вместо того чтобы показать пустой Suspense-fallback. */}
+    <BrowserRouter basename={routerBasename} future={{ v7_startTransition: true }}>
       <CartProvider>
         <App />
         <Toaster position="top-right" />
