@@ -66,6 +66,8 @@ const CustomItemCard = ({ item, onOpen, hideStatus, showModeler }) => {
             {staleDays} {daysWord(staleDays)} без смены статуса
           </span>
         )}
+
+        {item.nda && <span className={styles.ndaBadge}>NDA</span>}
       </div>
 
       <div className={styles.body}>

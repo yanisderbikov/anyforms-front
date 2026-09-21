@@ -112,6 +112,17 @@
   text-transform: lowercase;
 }
 
+.nda {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+
 .modeler {
   font-size: 0.9rem;
   color: #3a41c8;

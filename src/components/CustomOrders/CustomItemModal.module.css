@@ -100,6 +100,24 @@
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkRow input {
+  width: 18px;
+  height: 18px;
+  accent-color: #111;
+  cursor: pointer;
+}
+
 .files {
   display: flex;
   flex-wrap: wrap;

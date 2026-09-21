@@ -17,7 +17,7 @@ import AutoTextarea from './AutoTextarea';
 import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomOrderFill.module.css';
 
-const EMPTY = { productName: '', description: '', quantity: 1, status: 'MODELING' };
+const EMPTY = { productName: '', description: '', quantity: 1, status: 'MODELING', nda: false };
 
 const CustomOrderFill = () => {
   const { orderId } = useParams();
@@ -88,6 +88,7 @@ const CustomOrderFill = () => {
         description: form.description.trim(),
         quantity: Number(form.quantity),
         status: form.status,
+        nda: form.nda,
       });
       let result = created;
       const files = drafts.map((d) => d.file);
@@ -172,6 +173,11 @@ const CustomOrderFill = () => {
             </option>
           ))}
         </select>
+
+        <label className={styles.checkRow}>
+          <input type="checkbox" checked={form.nda} onChange={(e) => setF('nda', e.target.checked)} />
+          <span>NDA</span>
+        </label>
 
         <span className={styles.label}>файлы (любые: фото, чертёж, zip…)</span>
         <div className={styles.drafts}>
