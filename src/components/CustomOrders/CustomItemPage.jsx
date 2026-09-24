@@ -155,6 +155,7 @@ const CustomItemPage = () => {
               </span>
             )}
             <span className={styles.qty}>{item.quantity} шт</span>
+            {item.nda && <span className={styles.nda}>NDA</span>}
             {item.modeler && <span className={styles.modeler}>моделирует: {item.modeler}</span>}
             {createdLabel && <span className={styles.created}>создан: {createdLabel}</span>}
           </div>

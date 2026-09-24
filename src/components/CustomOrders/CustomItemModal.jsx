@@ -24,6 +24,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
     quantity: item.quantity ?? 1,
     status: item.status || 'MODELING',
     modeler: item.modeler || '',
+    nda: !!item.nda,
   });
   const [modelers, setModelers] = useState([]);
   const [existing, setExisting] = useState(item.files || []);
@@ -90,6 +91,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         description: form.description.trim(),
         quantity: Number(form.quantity),
         modeler: form.modeler ? form.modeler.trim() : null,
+        nda: form.nda,
       });
       if (!hideStatus && form.status !== item.status) {
         latest = await updateItemStatus(item.id, form.status);
@@ -170,6 +172,11 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         <label className={styles.field}>
           <span className={styles.label}>описание</span>
           <AutoTextarea className={styles.textarea} minRows={3} value={form.description} onChange={(e) => setF('description', e.target.value)} />
+        </label>
+
+        <label className={styles.checkRow}>
+          <input type="checkbox" checked={form.nda} onChange={(e) => setF('nda', e.target.checked)} />
+          <span>NDA</span>
         </label>
 
         <span className={styles.label}>файлы</span>

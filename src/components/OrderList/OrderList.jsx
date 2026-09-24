@@ -128,19 +128,25 @@ const OrderList = () => {
   };
 
   const filteredOrders = orders.filter((order) => {
-    const query = searchQuery.toLowerCase();
-    const matchesBasicInfo = 
+    const query = cleanProductName(searchQuery).toLowerCase();
+    const matchesBasicInfo =
       order.contactName?.toLowerCase().includes(query) ||
       order.contactPhone?.includes(query) ||
       order.leadId?.toString().includes(query) ||
       order.publicId?.toLowerCase().includes(query);
-    
+
+    // Название нормализуем так же, как в саммари, чтобы клик по строке саммари находил товар
     const matchesProductType = order.items.some((item) =>
-      item.productName.toLowerCase().includes(query)
+      cleanProductName(item.productName || '').toLowerCase().includes(query)
     );
-    
+
     return matchesBasicInfo || matchesProductType;
   });
+
+  // Клик по строке саммари подставляет название товара в поиск; повторный клик снимает фильтр
+  const handleSummaryClick = (name) => {
+    setSearchQuery((prev) => (cleanProductName(prev).toLowerCase() === name.toLowerCase() ? '' : name));
+  };
 
   // Подсчет количества товаров по типам
   const getProductCounts = () => {
@@ -205,12 +211,28 @@ const OrderList = () => {
         <div className={styles.summaryBox}>
           <h2 className={styles.summaryTitle}>Саммари: {getModeTitle()}</h2>
           <div className={styles.summaryContent}>
-            {Object.entries(productCounts).map(([key, { name, quantity }]) => (
-              <div key={key} className={styles.summaryItem}>
-                <span className={styles.summaryProductName}>{name}</span>
-                <span className={styles.summaryCount}>{quantity}</span>
-              </div>
-            ))}
+            {Object.entries(productCounts).map(([key, { name, quantity }]) => {
+              const isActive = cleanProductName(searchQuery).toLowerCase() === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={`${styles.summaryItem} ${isActive ? styles.summaryItemActive : ''}`}
+                  onClick={() => handleSummaryClick(name)}
+                  title={isActive ? 'Снять фильтр' : 'Показать только заказы с этим товаром'}
+                >
+                  <span className={styles.summaryProductName}>{name}</span>
+                  <span className={styles.summaryRight}>
+                    <span className={styles.summaryCount}>{quantity}</span>
+                    {isActive && (
+                      <span className={styles.summaryClear} aria-hidden="true">
+                        ×
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
