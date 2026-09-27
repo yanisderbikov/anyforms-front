@@ -149,6 +149,30 @@
   overflow-wrap: anywhere;
 }
 
+/* Ячейка хранения (где мастер-модель и материалы) — только для админки. */
+.storageCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+}
+
+.storageLabel {
+  font-size: 0.8rem;
+  color: #555;
+  text-transform: lowercase;
+}
+
+.storageText {
+  color: #111;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .filesBlock {
   margin-top: 0.25rem;
 }

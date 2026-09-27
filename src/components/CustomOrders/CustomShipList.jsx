@@ -5,6 +5,7 @@ import {
   getInDeliveryGroups,
   shipOrder,
   completeOrder,
+  updateItemStorageCell,
   isImageFile,
   isPickup,
   PICKUP_BADGE_STYLE,
@@ -12,6 +13,7 @@ import {
   CUSTOM_STATUS_LABELS,
 } from '../../services/customProducts';
 import CustomTabs from './CustomTabs';
+import AutoTextarea from './AutoTextarea';
 import styles from './CustomShipList.module.css';
 
 const copyText = (text, msg) => {
@@ -42,11 +44,11 @@ const formatDate = (v) => {
 
 const firstImage = (item) => (item.files || []).find(isImageFile) || null;
 
-const Field = ({ label, value, onCopy, comment }) => (
+const Field = ({ label, value, onCopy, comment, multiline }) => (
   <div className={`${styles.contactItem} ${comment ? styles.commentItem : ''}`}>
     <span className={styles.fieldLabel}>{label}:</span>
     <span
-      className={`${styles.fieldValue} ${onCopy ? styles.clickable : ''}`}
+      className={`${styles.fieldValue} ${onCopy ? styles.clickable : ''} ${multiline ? styles.multiline : ''}`}
       onClick={onCopy}
       title={onCopy ? 'Нажмите для копирования' : undefined}
     >
@@ -62,6 +64,10 @@ const CustomShipList = () => {
   const [shipping, setShipping] = useState(null);
   const [tracker, setTracker] = useState('');
   const [saving, setSaving] = useState(false);
+  // Ячейки хранения проектов заказа (где мастер-модель и материалы): группа + черновики по id позиции.
+  const [cellGroup, setCellGroup] = useState(null);
+  const [cellDrafts, setCellDrafts] = useState({});
+  const [cellSaving, setCellSaving] = useState(false);
 
   const load = async (m) => {
     try {
@@ -122,6 +128,51 @@ const CustomShipList = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const openCells = (g) => {
+    setCellGroup(g);
+    setCellDrafts(Object.fromEntries(g.items.map((it) => [it.id, it.storageCell || ''])));
+  };
+  const closeCells = () => {
+    if (!cellSaving) {
+      setCellGroup(null);
+      setCellDrafts({});
+    }
+  };
+
+  // Сохраняем только изменённые проекты; при частичной ошибке модалка остаётся открытой.
+  const handleCells = async (e) => {
+    e.preventDefault();
+    const changed = cellGroup.items.filter((it) => (cellDrafts[it.id] || '').trim() !== (it.storageCell || ''));
+    if (changed.length === 0) {
+      closeCells();
+      return;
+    }
+    setCellSaving(true);
+    const results = await Promise.allSettled(
+      changed.map((it) => updateItemStorageCell(it.id, (cellDrafts[it.id] || '').trim()))
+    );
+    const saved = {};
+    const failed = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') saved[changed[i].id] = r.value?.storageCell ?? null;
+      else failed.push(changed[i].productName);
+    });
+    const applySaved = (items) =>
+      items.map((it) => (it.id in saved ? { ...it, storageCell: saved[it.id] } : it));
+    setGroups((prev) =>
+      prev.map((g) => (g.order.id === cellGroup.order.id ? { ...g, items: applySaved(g.items) } : g))
+    );
+    setCellSaving(false);
+    if (failed.length) {
+      setCellGroup((g) => ({ ...g, items: applySaved(g.items) }));
+      toast.error(`Не удалось сохранить: ${failed.join(', ')}`);
+      return;
+    }
+    toast.success('Ячейки сохранены');
+    setCellGroup(null);
+    setCellDrafts({});
   };
 
   const title = (o = {}) => o.contactName || (o.publicId ? `#${o.publicId}` : `заказ #${o.id}`);
@@ -213,18 +264,33 @@ const CustomShipList = () => {
                     {mode === 'delivery' && o.deliveryStatus && (
                       <Field label="Статус доставки" value={o.deliveryStatus} />
                     )}
+                    {g.items
+                      .filter((it) => it.storageCell)
+                      .map((it) => (
+                        <Field
+                          key={`cell-${it.id}`}
+                          label={g.items.length > 1 ? `Ячейка · ${it.productName}` : 'Ячейка'}
+                          value={it.storageCell}
+                          multiline
+                        />
+                      ))}
                     {o.comment && <Field label="Комментарий" value={o.comment} comment />}
                   </div>
 
-                  {mode === 'ship' ? (
-                    <button className={styles.shipBtn} onClick={() => openShip(g)}>
-                      {isPickup(o) ? 'готов к выдаче' : 'добавить трекер'}
+                  <div className={styles.cardActions}>
+                    {mode === 'ship' ? (
+                      <button className={styles.shipBtn} onClick={() => openShip(g)}>
+                        {isPickup(o) ? 'готов к выдаче' : 'добавить трекер'}
+                      </button>
+                    ) : (
+                      <button className={styles.completeBtn} onClick={() => openShip(g)}>
+                        изменить
+                      </button>
+                    )}
+                    <button className={styles.cellBtn} onClick={() => openCells(g)}>
+                      {g.items.some((it) => it.storageCell) ? 'изменить ячейку' : 'добавить ячейку'}
                     </button>
-                  ) : (
-                    <button className={styles.completeBtn} onClick={() => openShip(g)}>
-                      изменить
-                    </button>
-                  )}
+                  </div>
                 </div>
               </div>
             );
@@ -286,6 +352,7 @@ const CustomShipList = () => {
                     )}
                     <span className={styles.posQty}>{it.quantity} шт</span>
                   </div>
+                  {it.storageCell && <div className={styles.posCell}>ячейка: {it.storageCell}</div>}
                 </div>
               ))}
             </div>
@@ -318,6 +385,41 @@ const CustomShipList = () => {
                         : 'отправить'}
                 </button>
               )}
+            </div>
+          </form>
+        </div>
+      )}
+
+      {cellGroup && (
+        <div className={styles.overlay} onClick={closeCells}>
+          <form className={styles.modal} onClick={(e) => e.stopPropagation()} onSubmit={handleCells}>
+            <div className={styles.modalTitle}>{title(cellGroup.order)}</div>
+            <div className={styles.modalHint}>где хранятся мастер-модель и материалы каждого проекта</div>
+            <div className={styles.cellList}>
+              {cellGroup.items.map((it, i) => (
+                <div key={it.id} className={styles.cellRow}>
+                  <div className={styles.cellHead}>
+                    <span className={styles.posName}>{it.productName}</span>
+                    <span className={styles.posQty}>{it.quantity} шт</span>
+                  </div>
+                  <AutoTextarea
+                    className={styles.cellInput}
+                    placeholder="стеллаж, полка, коробка…"
+                    value={cellDrafts[it.id] ?? ''}
+                    onChange={(e) => setCellDrafts((prev) => ({ ...prev, [it.id]: e.target.value }))}
+                    minRows={2}
+                    autoFocus={i === 0}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.cancel} onClick={closeCells} disabled={cellSaving}>
+                отмена
+              </button>
+              <button type="submit" className={styles.save} disabled={cellSaving}>
+                {cellSaving ? 'сохраняю…' : 'сохранить'}
+              </button>
             </div>
           </form>
         </div>

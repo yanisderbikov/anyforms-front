@@ -60,6 +60,9 @@ export const updateItem = (id, body) =>
   http.put(`/api/custom-product-items/${id}`, body, cfg()).then((r) => r.data);
 export const updateItemStatus = (id, status) =>
   http.patch(`/api/custom-product-items/${id}/status`, { status }, cfg()).then((r) => r.data);
+// Ячейка хранения позиции: где лежат мастер-модель и материалы. Пустая строка очищает.
+export const updateItemStorageCell = (id, storageCell) =>
+  http.patch(`/api/custom-product-items/${id}/storage-cell`, { storageCell }, cfg()).then((r) => r.data);
 export const deleteItem = (id) =>
   http.delete(`/api/custom-product-items/${id}`, cfg()).then((r) => r.data);
 

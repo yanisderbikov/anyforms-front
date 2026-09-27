@@ -348,3 +348,53 @@
   border-radius: 6px;
   box-shadow: none;
 }
+
+/* ── Скелетон карточки (ProductCardSkeleton) ──────────────────────────────
+   Пока грузится каталог: рамка карточки та же, вместо фото — подложка, вместо
+   текста — полоски цвета текста на 14% (в теме витрины они получают её
+   оттенок). По всем блокам проходит мягкий блик. */
+.skeleton {
+  pointer-events: none;
+}
+
+.skeleton .photoWrap {
+  background: var(--shop-photo-bg, #eee);
+}
+
+.skeletonLine {
+  position: relative;
+  display: inline-block;
+  height: 0.8em;
+  max-width: 100%;
+  vertical-align: middle;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(17, 17, 17, 0.1);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    display: none;
+  }
+}

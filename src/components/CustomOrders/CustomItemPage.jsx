@@ -134,6 +134,13 @@ const CustomItemPage = () => {
 
           {item.description && <LinkText className={styles.description} text={item.description} />}
 
+          {isAuthed && item.storageCell && (
+            <div className={styles.storageCell}>
+              <span className={styles.storageLabel}>ячейка хранения</span>
+              <span className={styles.storageText}>{item.storageCell}</span>
+            </div>
+          )}
+
           {others.length > 0 && (
             <div className={styles.filesBlock}>
               <span className={styles.filesLabel}>файлы</span>
