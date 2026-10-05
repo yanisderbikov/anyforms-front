@@ -19,9 +19,12 @@ import {
   trackCheckoutAbandon,
   saveCheckoutSnapshot,
 } from '../../services/analytics';
+import { useFreeDelivery } from '../../hooks/useFreeDelivery';
 import PvzSelect from './PvzSelect';
+import FreeDeliveryHint, { DeliverySummaryValue } from './FreeDeliveryHint';
 import { readCheckoutForm, saveCheckoutForm } from './checkoutFormStorage';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
+import { getDeviceId } from '../../shared/deviceId';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
@@ -269,6 +272,8 @@ const MarketplaceCheckout = () => {
     ? Math.max(afterPercentTotal - promoAmountRub, Math.min(afterPercentTotal, 1))
     : afterPercentTotal;
   const promoDeadlineNote = formatPromoDeadlineNote(appliedPromo?.validUntil);
+  const freeDelivery = useFreeDelivery();
+  const deliveryFree = freeDelivery.qualifies(discountedTotal);
 
   // Промокод закреплён за контактами: сменили почту или телефон — проверяем заново.
   const resetPromo = () => {
@@ -313,6 +318,8 @@ const MarketplaceCheckout = () => {
           // Сумма корзины — для ранней проверки минимального порога промокода;
           // при оформлении сервер пересчитает её по своим ценам.
           totalKopecks: Math.round(total * 100),
+          shopSlug: shopSlug || DEFAULT_SHOP_SLUG,
+          deviceId: getDeviceId(),
         },
       });
       if (
@@ -338,6 +345,22 @@ const MarketplaceCheckout = () => {
       if (requestId !== promoCheckRequestIdRef.current) return;
       setPromoChecking(false);
     }
+  };
+
+  const checkPromoRef = useRef(checkPromo);
+  checkPromoRef.current = checkPromo;
+  const autoPromoReadyRef = useRef(false);
+  autoPromoReadyRef.current = Boolean(normalizePromoCode(promoInput)) && !appliedPromo && emailValid && phoneValid;
+  const autoPromoCheckedRef = useRef(false);
+  const hasItems = items.length > 0;
+  useEffect(() => {
+    if (autoPromoCheckedRef.current || !hasItems) return;
+    autoPromoCheckedRef.current = true;
+    if (autoPromoReadyRef.current) checkPromoRef.current();
+  }, [hasItems]);
+
+  const autoApplyPromo = () => {
+    if (autoPromoReadyRef.current && !promoChecking && !promoError) checkPromoRef.current();
   };
 
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
@@ -392,6 +415,7 @@ const MarketplaceCheckout = () => {
         returnUrl: `${window.location.origin}/shop/success`,
         // Витрина, с которой набрана корзина: ей засчитывается продажа.
         shopSlug,
+        deviceId: getDeviceId(),
       });
       if (data?.paymentUrl) {
         // Платёж создан: фиксируем выбор оплаты и сохраняем состав корзины,
@@ -457,7 +481,7 @@ const MarketplaceCheckout = () => {
           <hr className={styles.summaryDivider} />
           <div className={styles.summaryRow}>
             <span>Доставка СДЭК</span>
-            <span>на ПВЗ при получении</span>
+            <DeliverySummaryValue free={deliveryFree} />
           </div>
           {appliedPromo && (
             <div className={styles.summaryRow}>
@@ -479,14 +503,32 @@ const MarketplaceCheckout = () => {
               {formatPrice(discountedTotal)}
             </span>
           </div>
+          <FreeDeliveryHint
+            freeDelivery={freeDelivery}
+            amountRub={discountedTotal}
+            amountBeforeDiscountRub={appliedPromo ? total : null}
+            shopLink={shopBase}
+          />
           <p className={styles.moldNote}>
             <strong>Обратите внимание:</strong> вы покупаете силиконовые формы (молды)
             для изготовления изделий, а не готовые изделия с фотографий.
           </p>
-          <p className={styles.moldNote}>
-            <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
-            Стоимость доставки не входит в сумму заказа и оплачивается вами при получении по тарифам СДЭК.
-          </p>
+          <div className={`${styles.moldNote} ${styles.swap}`}>
+            <p
+              className={`${styles.swapLayer} ${styles.moldNoteText} ${deliveryFree ? styles.swapHidden : ''}`}
+              aria-hidden={deliveryFree}
+            >
+              <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
+              Стоимость доставки не входит в сумму заказа и оплачивается вами при получении по тарифам СДЭК.
+            </p>
+            <p
+              className={`${styles.swapLayer} ${styles.moldNoteText} ${deliveryFree ? '' : styles.swapHidden}`}
+              aria-hidden={!deliveryFree}
+            >
+              <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
+              Для вас доставка бесплатная — её стоимость оплачиваем мы, при получении платить не нужно.
+            </p>
+          </div>
         </div>
 
         <form className={styles.form} id="checkout-form" name="checkout" onSubmit={handleSubmit} noValidate>
@@ -533,6 +575,7 @@ const MarketplaceCheckout = () => {
             onBlur={() => {
               markTouched('phone');
               trackFieldOnce('phone', phone, phoneValid);
+              autoApplyPromo();
             }}
             required
           />
@@ -558,6 +601,7 @@ const MarketplaceCheckout = () => {
             onBlur={() => {
               markTouched('email');
               trackFieldOnce('email', email, emailValid);
+              autoApplyPromo();
             }}
             required
           />
@@ -627,7 +671,14 @@ const MarketplaceCheckout = () => {
           )}
           {deliveryQuoteState === 'ready' && deliveryQuote?.cost != null && (
             <p className={styles.deliveryQuote}>
-              ~{formatPrice(Math.round(Number(deliveryQuote.cost)))}
+              {deliveryFree ? (
+                <>
+                  <span className={styles.oldTotal}>~{formatPrice(Math.round(Number(deliveryQuote.cost)))}</span>
+                  <span className={styles.deliveryQuoteFree}>бесплатно</span>
+                </>
+              ) : (
+                `~${formatPrice(Math.round(Number(deliveryQuote.cost)))}`
+              )}
               {formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)
                 ? ` · ~${formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)}`
                 : ''}

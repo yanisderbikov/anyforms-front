@@ -8,22 +8,6 @@
   box-sizing: border-box;
 }
 
-.globalCopyToast {
-  position: fixed;
-  top: 104px;
-  right: 16px;
-  z-index: 60;
-  background: #2f9e44;
-  color: #fff;
-  border-radius: 999px;
-  padding: 0.6rem 0.95rem;
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: 0 8px 22px rgba(47, 158, 68, 0.35);
-  animation: globalToastSlideOut 1.8s ease forwards;
-}
-
 @media (min-width: 769px) {
   .wrap {
     padding: calc(104px + env(safe-area-inset-top, 0px)) 50px 0;
@@ -313,27 +297,6 @@
   display: flex;
 }
 
-.promoNote {
-  margin: 0.75rem 0 2rem;
-  text-align: center;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: #666;
-}
-
-.promoCodeButton {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  color: #111;
-  font: inherit;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-}
-
 .promoLink {
   color: var(--shop-page-fg, #111);
   text-underline-offset: 2px;
@@ -569,25 +532,6 @@
 
 .popupBtnDetails:hover {
   opacity: 0.9;
-}
-
-@keyframes globalToastSlideOut {
-  0% {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  15% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  70% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(44px);
-  }
 }
 
 .siteFooter {

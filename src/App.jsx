@@ -10,6 +10,7 @@ import NotFound from "./components/NotFound/NotFound";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
 import { setAnalyticsShop, trackPageView } from './services/analytics';
+import PromoPopupHost from './components/PromoPopup/PromoPopupHost';
 
 // Код-сплиттинг по роутам. В основном бандле остаются только:
 // - витрина и карточка товара (/shop, /shop/<slug>, …/product/:id) — ~65% просмотров;
@@ -43,6 +44,8 @@ const SellerRequisites = React.lazy(() => import('./components/Founders/SellerRe
 const loadSiteLegal = () => import('./components/shared/legal/SiteLegalPages');
 const SitePrivacyPage = lazyNamed(loadSiteLegal, 'SitePrivacyPage');
 const ShopOfferPage = lazyNamed(loadSiteLegal, 'ShopOfferPage');
+const SitePdConsentPage = lazyNamed(loadSiteLegal, 'SitePdConsentPage');
+const SiteAdConsentPage = lazyNamed(loadSiteLegal, 'SiteAdConsentPage');
 // Корзина и чекаут — продолжение витрины: их чанки догружаем заранее в простое,
 // как только покупатель оказался на витрине (см. эффект ниже).
 const loadMarketplaceCart = () => import('./components/Marketplace/MarketplaceCart');
@@ -62,6 +65,8 @@ const AdminProducts = React.lazy(() => import('./components/AdminProducts/AdminP
 const AdminProductEdit = React.lazy(() => import('./components/AdminProducts/AdminProductEdit'));
 const ShopSalesReport = React.lazy(() => import('./components/AdminProducts/ShopSalesReport'));
 const AdminPromoCodes = React.lazy(() => import('./components/AdminPromoCodes/AdminPromoCodes'));
+const AdminPromoPopups = React.lazy(() => import('./components/AdminPromoPopups/AdminPromoPopups'));
+const AdminFreeDelivery = React.lazy(() => import('./components/AdminFreeDelivery/AdminFreeDelivery'));
 const AdminInvoices = React.lazy(() => import('./components/AdminInvoices/AdminInvoices'));
 const AdminTrainingInvoices = React.lazy(() => import('./components/AdminInvoices/AdminTrainingInvoices'));
 const AdminYookassaReceipts = React.lazy(() => import('./components/AdminInvoices/AdminYookassaReceipts'));
@@ -76,6 +81,8 @@ const KNOWN_PATHS = new Set([
   '/chief',
   '/chief/privacy',
   '/privacy',
+  '/consent',
+  '/ad-consent',
   '/requisites',
   '/shop/offer',
   '/3d-print',
@@ -113,6 +120,8 @@ const KNOWN_PATHS = new Set([
   '/admin/products',
   '/admin/products/analytics',
   '/admin/promo-codes',
+  '/admin/promo-popups',
+  '/admin/free-delivery',
   '/admin/invoices',
   '/admin/invoices/training',
   '/admin/invoices/receipts',
@@ -163,7 +172,7 @@ function App() {
       : pathnameWithoutEncodedHash;
   const isHomePage = normalizedPathname === '/';
   // Общие юр-страницы сайта: нейтральная белая раскладка (LegalPage)
-  const isLegalPage = normalizedPathname === '/privacy' || normalizedPathname === '/shop/offer';
+  const isLegalPage = ['/privacy', '/consent', '/ad-consent', '/shop/offer'].includes(normalizedPathname);
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
@@ -322,6 +331,8 @@ function App() {
           <Route path="/chief" element={<ChiefLanding />} />
           {/* Единая политика и реквизиты для всего сайта; старые адреса ведут туда же */}
           <Route path="/privacy" element={<SitePrivacyPage />} />
+          <Route path="/consent" element={<SitePdConsentPage />} />
+          <Route path="/ad-consent" element={<SiteAdConsentPage />} />
           <Route path="/chief/privacy" element={<Navigate to="/privacy" replace />} />
           <Route path="/requisites" element={<SellerRequisites />} />
           <Route path="/3d-print" element={<Print3dLanding />} />
@@ -366,6 +377,8 @@ function App() {
             {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
             <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
             <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
+            <Route path="/admin/promo-popups" element={<AdminPromoPopups />} />
+            <Route path="/admin/free-delivery" element={<AdminFreeDelivery />} />
             <Route path="/admin/invoices" element={<AdminInvoices />} />
             <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
             <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
@@ -387,6 +400,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      <PromoPopupHost pathname={normalizedPathname} search={location.search} />
     </div>
   );
 }

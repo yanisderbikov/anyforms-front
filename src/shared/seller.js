@@ -19,6 +19,8 @@ export const SELLER = {
 // Ссылки на юр-страницы — чтобы футеры и формы не расходились в адресах.
 export const LEGAL_LINKS = {
   privacy: '/privacy',
+  consent: '/consent',
+  adConsent: '/ad-consent',
   requisites: '/requisites',
   shopOffer: '/shop/offer',
   guideOffer: '/guide/offer',

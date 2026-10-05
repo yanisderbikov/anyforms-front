@@ -32,6 +32,12 @@ export const PICKUP_BADGE_STYLE = {
   border: '1px solid rgba(138, 109, 0, 0.35)',
 };
 
+export const FREE_DELIVERY_BADGE_STYLE = {
+  background: '#e3f4e8',
+  color: '#1d7a3d',
+  border: '1px solid rgba(29, 122, 61, 0.35)',
+};
+
 // ---- Позиции ----
 export const getAllCustomItems = (status) =>
   http.get('/api/custom-product-items', cfg(status ? { params: { status } } : {})).then((r) => r.data);

@@ -15,7 +15,6 @@ import styles from './Marketplace.module.css';
 const TG_CHANNEL = 'https://t.me/anyforms';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
-const PROMO_CODE = 'any-shop-10';
 // Карточек в скелетоне: ровные ряды при 2 и 4 колонках, на экран хватает.
 const SKELETON_CARDS = 8;
 
@@ -81,7 +80,6 @@ const Marketplace = () => {
   const [error, setError] = useState(null);
   // Возврат из карточки товара — на то же место каталога, а не в начало.
   useListScrollMemory(`shop-scroll:${shopBase}`, !loading);
-  const [copied, setCopied] = useState(false);
   const [showLiked, setShowLiked] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
 
@@ -140,16 +138,6 @@ const Marketplace = () => {
   const openProduct = (item, index) => {
     trackSelectItem(item, index ?? undefined, 'catalog');
     navigate(`${shopBase}/product/${item.id}`);
-  };
-
-  const handlePromoCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(PROMO_CODE);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch (e) {
-      setCopied(false);
-    }
   };
 
   useEffect(() => {
@@ -224,11 +212,6 @@ const Marketplace = () => {
 
   return (
     <div className={wrapClass}>
-      {copied && (
-        <div className={styles.globalCopyToast} role="status">
-          Скопировано
-        </div>
-      )}
       <SiteHeader
         logo={headerLogo}
         logoSize={theme ? 'large' : 'default'}
@@ -368,22 +351,6 @@ const Marketplace = () => {
           ))}
         </ul>
       )}
-      {/* Промо и подвал стоят под каталогом — до загрузки товаров их не
-          показываем, иначе они уедут вниз, когда вырастет сетка. */}
-      {!loading && !shopSlug && (
-      <p className={styles.promoNote}>
-        По промокоду{' '}
-        <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
-          {PROMO_CODE}
-        </button>{' '}
-        скидка 10% на первый заказ. Отправьте это сообщение{' '}
-        <a href={supportTgLink} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
-          менеджеру в телеграм
-        </a>
-        .
-      </p>
-      )}
-
       {!loading && (
         <footer className={styles.siteFooter}>
           <div className={styles.footerGrid}>

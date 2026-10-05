@@ -47,6 +47,8 @@ export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/products/analytics')) return SECTIONS.SHOP_ANALYTICS;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
   if (pathname.startsWith('/admin/promo-codes')) return SECTIONS.PROMO_CODES;
+  if (pathname.startsWith('/admin/promo-popups')) return SECTIONS.PROMO_CODES;
+  if (pathname.startsWith('/admin/free-delivery')) return SECTIONS.PROMO_CODES;
   if (pathname.startsWith('/admin/salesbot')) return SECTIONS.SALESBOT;
   if (pathname.startsWith('/admin/users')) return SECTIONS.USERS;
   if (pathname.startsWith('/admin/invoices/training')) return SECTIONS.TRAINING_INVOICES;

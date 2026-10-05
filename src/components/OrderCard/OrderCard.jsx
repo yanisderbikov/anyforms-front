@@ -1,6 +1,6 @@
 import React from 'react';
 import { toast } from 'react-hot-toast';
-import { isPickup, PICKUP_BADGE_STYLE } from '../../services/customProducts';
+import { isPickup, PICKUP_BADGE_STYLE, FREE_DELIVERY_BADGE_STYLE } from '../../services/customProducts';
 import styles from './OrderCard.module.css';
 
 const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady, onDelete }) => {
@@ -83,6 +83,15 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady, onDelete 
         {isPickup(order) && (
           <span className={styles.pickupBadge} style={PICKUP_BADGE_STYLE}>
             самовывоз
+          </span>
+        )}
+        {order.freeDelivery && (
+          <span
+            className={styles.pickupBadge}
+            style={FREE_DELIVERY_BADGE_STYLE}
+            title="Заказ прошёл порог бесплатной доставки: доставку СДЭК оплачиваем мы"
+          >
+            бесплатная доставка
           </span>
         )}
         <div className={styles.headerButtons}>
