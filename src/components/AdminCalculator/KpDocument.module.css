@@ -1,0 +1,566 @@
+.doc {
+  --ink: #111;
+  --muted: #6b6b6b;
+  --soft: #8a8a8a;
+  --card: #e9e9e9;
+  --line: rgba(17, 17, 17, 0.1);
+  --font-body: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', 'Roboto', sans-serif;
+  --font-display: BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  width: 210mm;
+  box-sizing: border-box;
+  padding: 0 12mm;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.doc *,
+.doc *::before,
+.doc *::after {
+  box-sizing: border-box;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #0b0b0b;
+  border-radius: 16px;
+  padding: 14px 20px;
+}
+
+.logo {
+  display: block;
+  height: 19px;
+  width: auto;
+}
+
+.topbarMeta {
+  display: flex;
+  gap: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 58mm;
+  gap: 3mm;
+  margin-top: 3mm;
+  break-inside: avoid;
+}
+
+.heroCard {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 8mm 8mm 7mm;
+}
+
+.kicker {
+  display: inline-block;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 6mm 0 0;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.heroTitle span {
+  display: block;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.heroFor {
+  margin: 5mm 0 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.heroMeta {
+  margin: 1.5mm 0 0;
+  font-size: 11.5px;
+  color: #4a4a4a;
+}
+
+.stats {
+  display: flex;
+  gap: 2.5mm;
+  margin-top: 6mm;
+}
+
+.stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 3mm 4mm;
+  min-width: 32mm;
+}
+
+.stat b {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.stat span {
+  display: block;
+  margin-top: 0.5mm;
+  font-size: 9.5px;
+  color: var(--muted);
+}
+
+.heroPhoto {
+  border-radius: 22px;
+  overflow: hidden;
+  background: #1a1a1a;
+  min-height: 70mm;
+}
+
+.heroPhoto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notice {
+  margin-top: 3mm;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 18px;
+  padding: 5mm 6mm;
+  break-inside: avoid;
+}
+
+.noticeLabel {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.notice p {
+  margin: 1.5mm 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.position {
+  margin-top: 9mm;
+}
+
+.positionHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 5mm;
+  break-inside: avoid;
+  break-after: avoid;
+}
+
+.positionHeadText {
+  min-width: 0;
+}
+
+.overline {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+
+.positionTitle {
+  margin: 1mm 0 0;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5mm;
+  margin-top: 3mm;
+}
+
+.chip {
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.positionPhoto {
+  flex: none;
+  width: 30mm;
+  height: 30mm;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--card);
+}
+
+.card {
+  margin-top: 3mm;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 6mm;
+  break-inside: avoid;
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4mm;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.cardNote {
+  font-size: 10.5px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.dots {
+  margin: 0;
+  padding-left: 4.5mm;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.dots li::marker {
+  color: var(--soft);
+}
+
+.works {
+  margin-top: 3mm;
+  columns: 2;
+  column-gap: 8mm;
+}
+
+.works li {
+  break-inside: avoid;
+}
+
+.offers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3mm;
+  margin-top: 3mm;
+}
+
+.offersSingle {
+  margin-top: 3mm;
+}
+
+.offer {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 6mm;
+  break-inside: avoid;
+}
+
+.offerHead {
+  margin-bottom: 1mm;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.offerHead span {
+  display: block;
+  margin-top: 1mm;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.offerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4mm;
+  padding: 3mm 0;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.offerRow span {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3a3a3a;
+}
+
+.offerRow b {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.offerTotal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4mm;
+  margin-top: auto;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  padding: 4mm 5mm;
+}
+
+.offerRow + .offerTotal {
+  margin-top: 4mm;
+}
+
+.offerTotal span {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.offerTotal b {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.offersSingle .offerRow b {
+  font-size: 26px;
+}
+
+.offersSingle .offerRow span {
+  font-size: 14px;
+}
+
+.offersSingle .offerTotal {
+  padding: 5mm 6mm;
+}
+
+.offersSingle .offerTotal b {
+  font-size: 32px;
+}
+
+.bonus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5mm;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 6mm;
+  break-inside: avoid;
+}
+
+.bonusTitle {
+  margin: 1mm 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.bonusParams {
+  margin: 1.5mm 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.giftPill {
+  flex: none;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.grand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+  margin-top: 9mm;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 22px;
+  padding: 6mm 7mm;
+  break-inside: avoid;
+}
+
+.grand span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.grand b {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.discount {
+  margin: 3mm 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ending {
+  margin-top: 9mm;
+  break-inside: avoid;
+}
+
+.closing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 3mm;
+}
+
+.closing > :only-child {
+  grid-column: 1 / -1;
+}
+
+.closingCard {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 6mm;
+}
+
+.closingCard .dots {
+  margin-top: 2.5mm;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.footer {
+  margin-top: 3mm;
+  background: #000;
+  color: rgba(255, 255, 255, 0.72);
+  border-radius: 22px;
+  padding: 7mm 7mm 5mm;
+  break-inside: avoid;
+}
+
+.footerLogo {
+  display: block;
+  height: 15px;
+  width: auto;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6mm;
+  margin-top: 5mm;
+}
+
+.footerHeading {
+  margin: 0 0 2mm;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.footerText {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.footerText a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.copyright {
+  margin: 5mm 0 0;
+  text-align: center;
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.topbarMeta,
+.kicker,
+.heroTitle,
+.noticeLabel,
+.overline,
+.positionTitle,
+.cardTitle,
+.offerHead,
+.offerRow,
+.offerTotal,
+.stat b,
+.bonusTitle,
+.giftPill,
+.grand,
+.footerHeading {
+  font-family: var(--font-display);
+}
+
+.offerHead span,
+.grand span {
+  font-family: var(--font-body);
+}
