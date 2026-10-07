@@ -11,12 +11,16 @@ export const SECTIONS = {
   SALESBOT: 'SALESBOT',
   USERS: 'USERS',
   SHOP_ANALYTICS: 'SHOP_ANALYTICS',
+  ORDER_CALCULATOR: 'ORDER_CALCULATOR',
+  CALCULATOR_RATES: 'CALCULATOR_RATES',
 };
 
 const ROLE_SECTIONS = {
   ADMIN: [
     SECTIONS.CUSTOM_ORDERS,
     SECTIONS.RETAIL,
+    SECTIONS.ORDER_CALCULATOR,
+    SECTIONS.CALCULATOR_RATES,
     SECTIONS.PRODUCTS,
     SECTIONS.SHOP_ANALYTICS,
     SECTIONS.INVOICES,
@@ -28,6 +32,7 @@ const ROLE_SECTIONS = {
   SALES_MANAGER: [
     SECTIONS.CUSTOM_ORDERS,
     SECTIONS.RETAIL,
+    SECTIONS.ORDER_CALCULATOR,
     SECTIONS.INVOICES,
     SECTIONS.TRAINING_INVOICES,
   ],
@@ -44,6 +49,8 @@ export const getAllowedSections = (role, superAdmin = false) => {
 export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/orders/custom')) return SECTIONS.CUSTOM_ORDERS;
   if (pathname.startsWith('/admin/orders')) return SECTIONS.RETAIL;
+  if (pathname.startsWith('/admin/calculator/rates')) return SECTIONS.CALCULATOR_RATES;
+  if (pathname.startsWith('/admin/calculator')) return SECTIONS.ORDER_CALCULATOR;
   if (pathname.startsWith('/admin/products/analytics')) return SECTIONS.SHOP_ANALYTICS;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
   if (pathname.startsWith('/admin/promo-codes')) return SECTIONS.PROMO_CODES;

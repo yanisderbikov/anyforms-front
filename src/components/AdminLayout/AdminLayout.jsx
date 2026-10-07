@@ -29,6 +29,15 @@ const MENU = [
     ],
   },
   {
+    title: 'расчёт цены',
+    section: SECTIONS.ORDER_CALCULATOR,
+    items: [
+      { to: '/admin/calculator', label: 'Калькулятор заказа' },
+      { to: '/admin/calculator/journal', label: 'Журнал расчётов' },
+      { to: '/admin/calculator/rates', label: 'Ставки', section: SECTIONS.CALCULATOR_RATES },
+    ],
+  },
+  {
     title: 'управление товарами',
     section: SECTIONS.PRODUCTS,
     items: [

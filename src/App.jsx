@@ -67,6 +67,10 @@ const ShopSalesReport = React.lazy(() => import('./components/AdminProducts/Shop
 const AdminPromoCodes = React.lazy(() => import('./components/AdminPromoCodes/AdminPromoCodes'));
 const AdminPromoPopups = React.lazy(() => import('./components/AdminPromoPopups/AdminPromoPopups'));
 const AdminFreeDelivery = React.lazy(() => import('./components/AdminFreeDelivery/AdminFreeDelivery'));
+const AdminCalculator = React.lazy(() => import('./components/AdminCalculator/AdminCalculator'));
+const CalculatorJournal = React.lazy(() => import('./components/AdminCalculator/CalculatorJournal'));
+const CalculatorRatesPage = React.lazy(() => import('./components/AdminCalculator/CalculatorRatesPage'));
+const KpPrintPage = React.lazy(() => import('./components/AdminCalculator/KpPrintPage'));
 const AdminInvoices = React.lazy(() => import('./components/AdminInvoices/AdminInvoices'));
 const AdminTrainingInvoices = React.lazy(() => import('./components/AdminInvoices/AdminTrainingInvoices'));
 const AdminYookassaReceipts = React.lazy(() => import('./components/AdminInvoices/AdminYookassaReceipts'));
@@ -122,6 +126,10 @@ const KNOWN_PATHS = new Set([
   '/admin/promo-codes',
   '/admin/promo-popups',
   '/admin/free-delivery',
+  '/admin/calculator',
+  '/admin/calculator/journal',
+  '/admin/calculator/rates',
+  '/admin/calculator/kp',
   '/admin/invoices',
   '/admin/invoices/training',
   '/admin/invoices/receipts',
@@ -362,6 +370,7 @@ function App() {
               Статические пути выше (/shop/cart и др.) матчатся раньше. */}
           <Route path="/shop/:shopSlug" element={<Marketplace />} />
           <Route path="/shop/:shopSlug/product/:id" element={<MarketplaceProduct />} />
+          <Route path="/admin/calculator/kp" element={<KpPrintPage />} />
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminHome />} />
             <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
@@ -379,6 +388,9 @@ function App() {
             <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
             <Route path="/admin/promo-popups" element={<AdminPromoPopups />} />
             <Route path="/admin/free-delivery" element={<AdminFreeDelivery />} />
+            <Route path="/admin/calculator" element={<AdminCalculator />} />
+            <Route path="/admin/calculator/journal" element={<CalculatorJournal />} />
+            <Route path="/admin/calculator/rates" element={<CalculatorRatesPage />} />
             <Route path="/admin/invoices" element={<AdminInvoices />} />
             <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
             <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
