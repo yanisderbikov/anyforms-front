@@ -59,7 +59,6 @@ export const TRI_STATE_FIELDS = [
 export const SOURCE_LABELS = {
   ESTIMATE: 'оценка',
   DEFAULT: 'по умолч.',
-  AI: 'AI',
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -74,7 +73,6 @@ export const emptyVariant = (formType = 'STOCKING') => ({
   shellUnstable: false,
   needsIntermediate: null,
   hasCut: null,
-  aiFields: [],
   ...Object.fromEntries(TECH_FIELDS.map((f) => [f.key, ''])),
   ...Object.fromEntries(EXCEPTION_FIELDS.map((f) => [f.key, ''])),
 });
@@ -165,7 +163,6 @@ const buildVariant = (variant) => ({
   shellUnstable: variant.shellUnstable,
   needsIntermediate: variant.needsIntermediate,
   hasCut: variant.hasCut,
-  aiFields: variant.aiFields.filter((key) => parseNumber(variant[key]) != null || variant[key] === true || variant[key] === false),
   ...Object.fromEntries(TECH_FIELDS.map((f) => [f.key, fieldToApi(f, variant[f.key])])),
   ...Object.fromEntries(EXCEPTION_FIELDS.map((f) => [f.key, fieldToApi(f, variant[f.key])])),
 });
@@ -216,7 +213,6 @@ const variantFromRequest = (variant) => ({
   shellUnstable: Boolean(variant.shellUnstable),
   needsIntermediate: variant.needsIntermediate ?? null,
   hasCut: variant.hasCut ?? null,
-  aiFields: variant.aiFields || [],
   ...Object.fromEntries(TECH_FIELDS.map((f) => [f.key, fieldFromApi(f, variant[f.key])])),
   ...Object.fromEntries(EXCEPTION_FIELDS.map((f) => [f.key, fieldFromApi(f, variant[f.key])])),
 });

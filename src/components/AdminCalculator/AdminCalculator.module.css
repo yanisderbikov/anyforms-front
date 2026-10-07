@@ -146,11 +146,6 @@
   opacity: 1;
 }
 
-.inputAi {
-  border-color: rgba(108, 63, 196, 0.55);
-  background: #f7f2ff;
-}
-
 .inputWithUnit {
   position: relative;
   display: flex;
@@ -416,7 +411,7 @@
   color: #6b6b6b;
 }
 
-.badgeAi {
+.badgeExceptions {
   background: #ede4ff;
   color: #5a2fb0;
 }

@@ -242,7 +242,6 @@ const AdminCalculator = () => {
           catalog={catalog}
           founder={founder}
           summary={result?.summary}
-          description={order.comment}
           referenceUrls={referenceUrls}
           onReferenceUrls={(urls) => setReferenceUrls((prev) => ({ ...prev, ...urls }))}
           onChange={(patch) => updatePosition(index, patch)}

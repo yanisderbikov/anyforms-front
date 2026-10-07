@@ -98,7 +98,7 @@ const CalculatorJournal = () => {
                 <span className={styles.badges}>
                   {item.preliminary && <span className={`${styles.badge} ${styles.badgeWarn}`}>предварительная оценка</span>}
                   {item.hasEstimates && <span className={`${styles.badge} ${styles.badgeEstimate}`}>есть оценки</span>}
-                  {item.hasExceptions && <span className={`${styles.badge} ${styles.badgeAi}`}>исключения</span>}
+                  {item.hasExceptions && <span className={`${styles.badge} ${styles.badgeExceptions}`}>исключения</span>}
                 </span>
               </div>
               <div className={styles.listSide}>

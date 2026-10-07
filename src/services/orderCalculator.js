@@ -36,8 +36,6 @@ export const saveCalculation = (request) => http.post(`${BASE}/calculations`, re
 
 export const deleteCalculation = (id) => http.delete(`${BASE}/calculations/${id}`, cfg());
 
-export const requestAiSuggestion = (body) => http.post(`${BASE}/ai-suggestion`, body, cfg()).then((r) => r.data);
-
 export const getReferenceUrls = (keys) =>
   keys.length ? http.post(`${BASE}/references/urls`, keys, cfg()).then((r) => r.data) : Promise.resolve({});
 

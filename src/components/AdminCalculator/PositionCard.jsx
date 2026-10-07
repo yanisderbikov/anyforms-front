@@ -2,10 +2,6 @@ import React, { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
   EXCEPTION_FIELDS,
-  TECH_FIELDS,
-  TRI_STATE_FIELDS,
-  acceptValue,
-  buildRequest,
   emptyVariant,
   isModelPriceMissing,
   labelOf,
@@ -17,62 +13,10 @@ import { HintList, NumberField, Section } from './CalculatorParts';
 import VariantEditor from './VariantEditor';
 import OptionsTable from './OptionsTable';
 import Breakdown from './Breakdown';
-import { errorMessage, requestAiSuggestion, uploadReference } from '../../services/orderCalculator';
+import { errorMessage, uploadReference } from '../../services/orderCalculator';
 import styles from './AdminCalculator.module.css';
 
 const REFERENCE_ACCEPT = 'image/*,.pdf,.stl,.obj,.3mf,.step,.stp,.zip';
-
-const AI_NOTE_LABELS = {
-  widthMm: 'Ширина',
-  depthMm: 'Глубина',
-  heightMm: 'Высота',
-  formType: 'Тип формы',
-  cellsCount: 'Ячеек в матрице',
-  setFormsCount: 'Форм в комплекте',
-  shellUnstable: 'Узкое или круглое сечение',
-};
-
-const mergeAiSuggestion = (position, active, suggestion) => {
-  const current = position.variants[active];
-  if (!current) return { patch: {}, applied: 0 };
-  const suggested = suggestion.variant || {};
-  const aiFields = new Set(current.aiFields);
-  const free = (key) => current[key] === '' || current[key] == null || aiFields.has(key);
-  const patch = {};
-  TECH_FIELDS.forEach((field) => {
-    const value = suggested[field.key];
-    if (value == null || !free(field.key)) return;
-    patch[field.key] = acceptValue(field, value);
-    aiFields.add(field.key);
-  });
-  TRI_STATE_FIELDS.forEach((field) => {
-    const value = suggested[field.key];
-    if (value == null || !free(field.key)) return;
-    patch[field.key] = value;
-    aiFields.add(field.key);
-  });
-  if (suggested.shellUnstable === true && !current.shellUnstable) {
-    patch.shellUnstable = true;
-  }
-  const sameType = !suggested.formType || suggested.formType === current.formType;
-  if (sameType && suggested.cellsCount != null && current.cellsCount === '' && current.formType.startsWith('FLAT_MATRIX')) {
-    patch.cellsCount = String(suggested.cellsCount);
-  }
-  if (sameType && suggested.setFormsCount != null && current.setFormsCount === '' && current.formType === 'SET') {
-    patch.setFormsCount = String(suggested.setFormsCount);
-  }
-  const dims = {};
-  ['widthMm', 'depthMm', 'heightMm'].forEach((key) => {
-    if (!position[key] && suggestion[key] != null) dims[key] = String(suggestion[key]);
-  });
-  return {
-    applied: Object.keys(patch).length + Object.keys(dims).length,
-    patch: {
-      ...dims,
-      variants: position.variants.map((v, i) => (i === active ? { ...v, ...patch, aiFields: [...aiFields] } : v)),
-    },
-  };
-};
 
 const PositionCard = ({
   position,
@@ -82,7 +26,6 @@ const PositionCard = ({
   catalog,
   founder,
   summary,
-  description,
   referenceUrls,
   onReferenceUrls,
   onChange,
@@ -91,8 +34,6 @@ const PositionCard = ({
 }) => {
   const fileInput = useRef(null);
   const [uploading, setUploading] = useState(false);
-  const [aiBusy, setAiBusy] = useState(false);
-  const [aiResult, setAiResult] = useState(null);
 
   const active = Math.min(position.activeVariant, position.variants.length - 1);
   const variant = position.variants[active];
@@ -172,35 +113,6 @@ const PositionCard = ({
 
   const removeReference = (key) => {
     onChange((prev) => ({ references: prev.references.filter((ref) => ref.key !== key) }));
-  };
-
-  const askAi = async () => {
-    setAiBusy(true);
-    setAiResult(null);
-    try {
-      const request = buildRequest({ client: '', comment: '', positions: [position], discount: {} });
-      const suggestion = await requestAiSuggestion({
-        position: request.positions[0],
-        variantIndex: active,
-        description: description || null,
-      });
-      const suggested = suggestion.variant || {};
-      onChange((prev) => mergeAiSuggestion(prev, active, suggestion).patch);
-      const labels = Object.fromEntries([...TECH_FIELDS, ...TRI_STATE_FIELDS].map((f) => [f.key, f.label]));
-      setAiResult({
-        summary: suggestion.summary || 'AI посмотрел референсы.',
-        formType: suggested.formType && suggested.formType !== variant.formType
-          ? labelOf(catalog?.formTypes, suggested.formType)
-          : null,
-        notes: Object.entries(suggestion.notes || {}).map(([key, note]) => [AI_NOTE_LABELS[key] || labels[key] || key, note]),
-        provider: suggestion.provider,
-        applied: mergeAiSuggestion(position, active, suggestion).applied,
-      });
-    } catch (err) {
-      toast.error(errorMessage(err, 'AI-подсказка не получилась'));
-    } finally {
-      setAiBusy(false);
-    }
   };
 
   const tirages = parseTirages(position.tirages);
@@ -365,38 +277,7 @@ const PositionCard = ({
         <button type="button" className={styles.btnGhost} disabled={uploading} onClick={() => fileInput.current?.click()}>
           {uploading ? 'загрузка…' : '+ файл'}
         </button>
-        {catalog?.aiAvailable && (
-          <button type="button" className={styles.btnGhost} disabled={aiBusy} onClick={askAi}>
-            {aiBusy ? 'AI думает…' : 'AI-оценка параметров'}
-          </button>
-        )}
       </div>
-      {aiResult && (
-        <div className={styles.notice} style={{ marginTop: 10, display: 'block' }}>
-          <p style={{ margin: 0 }}>
-            {aiResult.summary}
-            {aiResult.formType ? ` Предлагаемый тип формы: ${aiResult.formType}.` : ''}
-          </p>
-          {aiResult.notes.length > 0 && (
-            <ul style={{ margin: '8px 0 0', paddingLeft: 18 }}>
-              {aiResult.notes.map(([label, note]) => (
-                <li key={label}>
-                  <b>{label}:</b> {note}
-                </li>
-              ))}
-            </ul>
-          )}
-          <p className={styles.hint} style={{ margin: '8px 0 0' }}>
-            {aiResult.applied > 0
-              ? `Заполнено полей: ${aiResult.applied}. Значения AI подсвечены — проверьте и подтвердите ✓.`
-              : 'Новых значений нет: AI не трогает поля, которые уже заполнены вручную.'}
-            {aiResult.provider ? ` · ${aiResult.provider}` : ''}
-          </p>
-          <button type="button" className={styles.btnSmall} style={{ marginTop: 8 }} onClick={() => setAiResult(null)}>
-            скрыть
-          </button>
-        </div>
-      )}
 
       <div className={styles.variantTabs}>
         {position.variants.map((v, i) => (

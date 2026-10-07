@@ -19,7 +19,7 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
   const formType = catalog?.formTypes?.find((t) => t.code === variant.formType);
 
   const setField = (key, value) => {
-    onChange({ [key]: value, aiFields: variant.aiFields.filter((k) => k !== key) });
+    onChange({ [key]: value });
   };
 
   const groups = TECH_GROUPS.map((group) => ({
@@ -29,7 +29,6 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
 
   const visibleFields = groups.flatMap((g) => g.fields);
   const estimated = visibleFields.filter((f) => !variant[f.key] && sources[f.key] === 'ESTIMATE');
-  const aiUnconfirmed = visibleFields.filter((f) => variant[f.key] && sources[f.key] === 'AI');
   const filled = visibleFields.filter((f) => variant[f.key]).length;
 
   const acceptAll = () => {
@@ -37,7 +36,7 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
     estimated.forEach((f) => {
       patch[f.key] = acceptValue(f, resolved[f.key]);
     });
-    onChange({ ...patch, aiFields: [] });
+    onChange(patch);
   };
 
   const toggleModifier = (code) => {
@@ -150,9 +149,6 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
             {estimated.length > 0 && (
               <span className={`${styles.badge} ${styles.badgeEstimate}`}>оценок: {estimated.length}</span>
             )}
-            {aiUnconfirmed.length > 0 && (
-              <span className={`${styles.badge} ${styles.badgeAi}`}>AI: {aiUnconfirmed.length}</span>
-            )}
             {filled > 0 && <span>заполнено {filled}</span>}
           </>
         )}
@@ -161,7 +157,7 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
           Пустое поле — калькулятор подставит оценку по габаритам и типу формы. Оценки нужно подтвердить
           (✓ — принять значение как проверенное).
         </p>
-        {(estimated.length > 0 || aiUnconfirmed.length > 0) && (
+        {estimated.length > 0 && (
           <button type="button" className={styles.btnGhost} onClick={acceptAll} style={{ marginBottom: 6 }}>
             принять все оценки
           </button>
@@ -178,12 +174,9 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
                   const placeholder = !value && (source === 'ESTIMATE' || source === 'DEFAULT') && resolvedValue != null
                     ? `${source === 'ESTIMATE' ? '≈ ' : ''}${displayResolved(field, resolvedValue)}`
                     : '';
-                  let onAccept = null;
-                  if (!value && source === 'ESTIMATE') {
-                    onAccept = () => setField(field.key, acceptValue(field, resolvedValue));
-                  } else if (value && source === 'AI') {
-                    onAccept = () => onChange({ aiFields: variant.aiFields.filter((k) => k !== field.key) });
-                  }
+                  const onAccept = !value && source === 'ESTIMATE'
+                    ? () => setField(field.key, acceptValue(field, resolvedValue))
+                    : null;
                   return (
                     <NumberField
                       key={field.key}
@@ -212,7 +205,6 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
                     label={field.label}
                     hint={field.hint}
                     value={variant[field.key]}
-                    source={sources[field.key]}
                     autoValue={field.key === 'shellRequired'
                       ? (option ? (option.input.shellGrams > 0) : null)
                       : option ? option.input[field.key] : null}

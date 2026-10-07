@@ -35,7 +35,6 @@ export const SourceBadge = ({ source }) => {
   const className = {
     ESTIMATE: styles.badgeEstimate,
     DEFAULT: styles.badgeDefault,
-    AI: styles.badgeAi,
   }[source];
   return <span className={`${styles.badge} ${className}`}>{SOURCE_LABELS[source]}</span>;
 };
@@ -58,14 +57,13 @@ export const NumberField = ({
     invalid ? styles.inputInvalid : '',
     !value && source === 'ESTIMATE' ? styles.inputEstimate : '',
     !value && source === 'DEFAULT' ? styles.inputDefault : '',
-    value && source === 'AI' ? styles.inputAi : '',
   ].join(' ');
   return (
     <label className={styles.label}>
       <span className={styles.labelHead}>
         <span>{label}</span>
         <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
-          <SourceBadge source={value && source !== 'AI' ? null : source} />
+          <SourceBadge source={value ? null : source} />
           {onAccept && (
             <button
               type="button"
@@ -74,7 +72,7 @@ export const NumberField = ({
                 e.preventDefault();
                 onAccept();
               }}
-              title={source === 'AI' ? 'Подтвердить значение AI' : 'Принять оценку как подтверждённое значение'}
+              title="Принять оценку как подтверждённое значение"
               disabled={disabled}
             >
               ✓
@@ -100,14 +98,13 @@ export const NumberField = ({
   );
 };
 
-export const TriStateSelect = ({ label, hint, value, autoValue, onChange, disabled, source }) => {
+export const TriStateSelect = ({ label, hint, value, autoValue, onChange, disabled }) => {
   const current = value == null ? 'auto' : value ? 'yes' : 'no';
   const autoLabel = autoValue == null ? 'авто' : `авто: ${autoValue ? 'да' : 'нет'}`;
   return (
     <label className={styles.label}>
       <span className={styles.labelHead}>
         <span>{label}</span>
-        <SourceBadge source={value == null ? null : source === 'AI' ? 'AI' : null} />
       </span>
       <select
         className={styles.select}
