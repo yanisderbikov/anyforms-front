@@ -416,7 +416,7 @@
 }
 .detailsLink:hover { color: var(--color-base-black); }
 
-/* Состояния загрузки / ошибки */
+/* Состояния ошибки и загрузки */
 .centered { text-align: center; padding: 60px 0; }
 .centeredText { font-size: 1rem; color: #444; margin: 0 0 24px; line-height: 1.6; }
 .primaryLink {
@@ -434,13 +434,75 @@
 }
 .primaryLink:hover { background: var(--color-base-gray); color: var(--color-base-black); }
 
-.loader { display: flex; align-items: center; justify-content: center; min-height: 50vh; }
-.spinner {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 4px solid rgba(17, 17, 17, 0.12);
-  border-top-color: #111;
-  animation: productSpin 0.8s linear infinite;
+.skeleton {
+  pointer-events: none;
 }
-@keyframes productSpin { to { transform: rotate(360deg); } }
+
+.skeleton .thumb {
+  display: block;
+  opacity: 1;
+  cursor: default;
+}
+
+.skeletonLine {
+  display: block;
+  max-width: 100%;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.1);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.skeletonTitle {
+  width: 72%;
+  height: 1.7rem;
+  margin: 0 0 18px;
+}
+
+.skeletonText {
+  height: 0.85rem;
+  margin: 0 0 11px;
+}
+
+.skeletonPrice {
+  width: 5.5rem;
+  height: 1.6rem;
+  margin: 22px 0 26px;
+}
+
+.skeletonButton {
+  width: 100%;
+  height: 3.6rem;
+  background: rgba(17, 17, 17, 0.14);
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    display: none;
+  }
+}
