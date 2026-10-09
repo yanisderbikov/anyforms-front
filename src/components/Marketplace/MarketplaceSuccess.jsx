@@ -207,6 +207,8 @@ const MarketplaceSuccess = () => {
             )}
           </p>
 
+          {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
+
           {order?.items?.length > 0 && (
             <div className={styles.receipt}>
               <p className={styles.receiptTitle}>
@@ -235,8 +237,6 @@ const MarketplaceSuccess = () => {
               )}
             </div>
           )}
-
-          {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
 
           <Link className={styles.primaryLink} to={isFail ? '/shop/checkout' : shopBase}>
             <span>{isFail ? 'Попробовать ещё раз' : 'Вернуться в магазин'}</span>

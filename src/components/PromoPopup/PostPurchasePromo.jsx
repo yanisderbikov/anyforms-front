@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { discountLabel, fillTemplate, formatValidUntil, minOrderLabel } from './promoPopupText';
+import { fillTemplate, formatValidUntil, minOrderLabel } from './promoPopupText';
 import styles from './PostPurchasePromo.module.css';
 
 const PostPurchasePromo = ({ promo, onCopy }) => {
@@ -7,14 +7,14 @@ const PostPurchasePromo = ({ promo, onCopy }) => {
   if (!promo?.code) return null;
 
   const template = { ...promo, codeValidUntil: promo.validUntil };
-  const discount = discountLabel(promo);
   const until = formatValidUntil(promo.validUntil);
-  const conditions = [
+  const note = [
+    'Код одноразовый',
+    until ? `действует по ${until} включительно` : null,
     promo.minOrderKopecks ? `для заказов от ${minOrderLabel(promo.minOrderKopecks)}` : null,
-    'работает только с телефоном или почтой из этого заказа',
   ]
     .filter(Boolean)
-    .join(' · ');
+    .join(', ');
 
   const copyCode = async () => {
     onCopy?.(promo.code);
@@ -29,21 +29,13 @@ const PostPurchasePromo = ({ promo, onCopy }) => {
   return (
     <section className={styles.card} aria-label="Промокод на следующий заказ">
       <p className={styles.eyebrow}>Промокод на следующий заказ</p>
-      {discount && <div className={styles.badge}>−{discount}</div>}
       <h2 className={styles.title}>{fillTemplate(promo.title, template)}</h2>
       {promo.description && <p className={styles.text}>{fillTemplate(promo.description, template)}</p>}
       <button type="button" className={styles.codeBox} onClick={copyCode} aria-label="Скопировать промокод">
         <span className={styles.code}>{promo.code}</span>
-        <span className={styles.codeHint}>{copied ? 'скопировано' : 'нажмите, чтобы скопировать'}</span>
+        <span className={styles.copy}>{copied ? 'скопировано' : promo.buttonText || 'скопировать'}</span>
       </button>
-      <p className={styles.note}>
-        Код одноразовый{until ? ` и действует по ${until} включительно` : ''}. Введите его в поле «Промокод» при
-        следующем оформлении заказа.
-      </p>
-      <button type="button" className={styles.button} onClick={copyCode}>
-        {copied ? 'Скопировано' : promo.buttonText || 'Скопировать промокод'}
-      </button>
-      <p className={styles.fine}>Скидка {conditions}</p>
+      <p className={styles.note}>{note}. Введите его в поле «Промокод» при следующем оформлении заказа.</p>
     </section>
   );
 };
