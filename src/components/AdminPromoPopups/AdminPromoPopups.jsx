@@ -41,6 +41,7 @@ const TEXT_DEFAULTS = {
     successTitle: 'ваш промокод готов',
     successText: 'Скидка закреплена за вашим телефоном и почтой.',
     hideForKnownContacts: true,
+    maxShows: '3',
   },
   [UNIQUE_CODE]: {
     name: 'Одноразовый код',
@@ -48,6 +49,7 @@ const TEXT_DEFAULTS = {
     description: 'Мы сгенерировали его специально для вас — он действует {days}.',
     buttonText: 'Продолжить покупки',
     hideForKnownContacts: true,
+    maxShows: '3',
   },
   [PUBLIC_CODE]: {
     name: 'Промокод для всех',
@@ -55,6 +57,7 @@ const TEXT_DEFAULTS = {
     description: 'Нажмите на код — он скопируется. Введите его в поле «Промокод» при оформлении заказа.',
     buttonText: 'Скопировать промокод',
     hideForKnownContacts: false,
+    maxShows: '3',
   },
   [AFTER_PURCHASE]: {
     name: 'Промокод на следующий заказ',
@@ -62,6 +65,7 @@ const TEXT_DEFAULTS = {
     description: 'Промокод действует {days} — вернитесь за новой фигуркой, пока он не сгорел.',
     buttonText: 'Скопировать промокод',
     hideForKnownContacts: false,
+    maxShows: '',
   },
 };
 
@@ -493,7 +497,7 @@ const AdminPromoPopups = () => {
     e.preventDefault();
     const delaySeconds = isAfterPurchase ? 0 : Number(form.delaySeconds);
     const repeatAfterHours = isAfterPurchase ? 0 : Number(form.repeatAfterHours);
-    const maxShows = isAfterPurchase || form.maxShows.trim() === '' ? null : Number(form.maxShows);
+    const maxShows = form.maxShows.trim() === '' ? null : Number(form.maxShows);
 
     if (!form.name.trim()) return setError('Укажите название попапа.');
     if (!form.title.trim() || !form.buttonText.trim()) return setError('Заполните заголовок и текст кнопки.');
@@ -575,7 +579,13 @@ const AdminPromoPopups = () => {
 
   const popupMeta = (p) => {
     if (p.popupType === AFTER_PURCHASE) {
-      return ['после покупки', promoTerms(p), `код на ${daysLabel(p.codeTtlDays)}`, periodLabel(p.validFrom, p.validUntil)]
+      return [
+        'после покупки',
+        promoTerms(p),
+        `код на ${daysLabel(p.codeTtlDays)}`,
+        p.maxShows != null ? `не больше ${p.maxShows} кодов одному клиенту` : null,
+        periodLabel(p.validFrom, p.validUntil),
+      ]
         .filter(Boolean)
         .join(' · ');
     }
@@ -734,11 +744,11 @@ const AdminPromoPopups = () => {
           </fieldset>
 
           <fieldset className={styles.group}>
-            <legend className={styles.legend}>{isAfterPurchase ? 'Когда показывать' : 'Когда и сколько раз показывать'}</legend>
+            <legend className={styles.legend}>Когда и сколько раз показывать</legend>
             {isAfterPurchase && (
               <p className={shared.hint}>
                 Блок появляется на странице успешной оплаты сразу после подтверждения платежа — задержки и частота
-                показов здесь не нужны.
+                показов здесь не нужны. Можно ограничить, сколько кодов получит один покупатель.
               </p>
             )}
             <div className={styles.grid}>
@@ -754,19 +764,20 @@ const AdminPromoPopups = () => {
                 <input type="number" name="repeatAfterHours" value={form.repeatAfterHours} onChange={setField} className={shared.input} min="0" max="8760" step="1" />
                 <span className={shared.hint}>0 — в каждый визит, 24 — раз в сутки. За один визит — не больше одного раза.</span>
               </label>
+              </>
+              )}
               <label className={shared.label}>
-                Максимум показов одному посетителю
+                {isAfterPurchase ? 'Максимум кодов одному покупателю' : 'Максимум показов одному посетителю'}
                 <input type="number" name="maxShows" value={form.maxShows} onChange={setField} className={shared.input} min="1" max="1000" step="1" placeholder="Без ограничений" />
                 <span className={shared.hint}>
                   {{
                     [CONTACT]: 'Тем, кто уже получил код, больше не показываем.',
                     [UNIQUE_CODE]: 'Каждый раз показываем тот же код, пока им не воспользовались.',
                     [PUBLIC_CODE]: 'Тем, кто уже скопировал код, больше не показываем.',
+                    [AFTER_PURCHASE]: 'Покупателя узнаём по почте, телефону или устройству из заказа. Когда лимит исчерпан, после оплаты код больше не показываем.',
                   }[form.popupType]}
                 </span>
               </label>
-              </>
-              )}
               <label className={shared.label}>
                 Показывать с (МСК)
                 <input type="datetime-local" name="validFrom" value={form.validFrom} onChange={setField} className={shared.input} />
