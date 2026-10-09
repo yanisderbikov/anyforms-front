@@ -4,7 +4,7 @@ import { DEFAULT_SHOP_SLUG } from '../../context/CartContext';
 import { normalizePromoCode } from '../../shared/promoTracking';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
 import { getDeviceId } from '../../shared/deviceId';
-import { readCheckoutForm, saveCheckoutForm } from '../Marketplace/checkoutFormStorage';
+import { readCheckoutForm } from '../Marketplace/checkoutFormStorage';
 import { pushAnalyticsEvent, trackMetrikaGoal } from '../../services/analytics';
 import PromoPopup from './PromoPopup';
 import {
@@ -35,6 +35,15 @@ const knownContact = () => {
   return { phone: phone || undefined, email: email || undefined };
 };
 
+const saveContactForCheckout = (contact) => {
+  const saved = readCheckoutContact() || {};
+  saveCheckoutContact({
+    fullName: saved.fullName || '',
+    phone: saved.phone || contact.phone,
+    email: saved.email || contact.email,
+  });
+};
+
 const hasKnownContact = () => {
   const { phone, email } = knownContact();
   return Boolean(phone || email);
@@ -56,20 +65,6 @@ const errorMessage = (err) =>
   (err?.response?.status === 429 ? 'Слишком много попыток. Попробуйте через несколько минут.' : '') ||
   'Не удалось получить промокод. Попробуйте ещё раз.';
 
-const savePromoForCheckout = (code, contact, { overwrite = true } = {}) => {
-  const form = readCheckoutForm() || {};
-  const current = normalizePromoCode(form.promoInput || '');
-  if (!overwrite && current && current !== code) return;
-  saveCheckoutForm({ ...form, promoInput: code, appliedPromo: current === code ? form.appliedPromo ?? null : null });
-  if (!contact) return;
-  const saved = readCheckoutContact() || {};
-  saveCheckoutContact({
-    fullName: saved.fullName || '',
-    phone: saved.phone || contact.phone,
-    email: saved.email || contact.email,
-  });
-};
-
 const issueCode = async (popup, search) => {
   try {
     const { data } = await apiClient.instance.post(`/api/public/promo-popup/${popup.id}/issue`, {
@@ -78,7 +73,6 @@ const issueCode = async (popup, search) => {
       deviceId: getDeviceId(),
       pageUrl: window.location.href,
     });
-    savePromoForCheckout(data.code, null, { overwrite: false });
     trackMetrikaGoal('promo_popup_issued', { popup: popup.id, repeated: Boolean(data.repeated) });
     pushAnalyticsEvent('promo_popup', { action: 'issued', popup: popup.id });
     return data;
@@ -113,12 +107,6 @@ const PromoPopupHost = ({ pathname, search }) => {
       cancelled = true;
     };
   }, [shopSlug, popupsByShop]);
-
-  useEffect(() => {
-    if (!shopSlug) return;
-    const code = normalizePromoCode(new URLSearchParams(search).get('promo') || '');
-    if (code) savePromoForCheckout(code, null);
-  }, [shopSlug, search]);
 
   useEffect(() => {
     if (!popup || open || shownRef.current || isSuppressed(popup)) return undefined;
@@ -166,7 +154,6 @@ const PromoPopupHost = ({ pathname, search }) => {
     (code) => {
       if (!popup) return;
       writePopupState(popup.id, { takenAt: Date.now() });
-      savePromoForCheckout(code, null);
       trackMetrikaGoal('promo_popup_code_taken', { popup: popup.id, code });
       pushAnalyticsEvent('promo_popup', { action: 'code_taken', popup: popup.id });
     },
@@ -185,7 +172,7 @@ const PromoPopupHost = ({ pathname, search }) => {
           pageUrl: window.location.href,
         });
         writePopupState(popup.id, { claimedAt: Date.now() });
-        savePromoForCheckout(data.code, { phone: form.phone, email: form.email });
+        saveContactForCheckout({ phone: form.phone, email: form.email });
         trackMetrikaGoal('promo_popup_claimed', { popup: popup.id, repeated: Boolean(data.repeated) });
         pushAnalyticsEvent('promo_popup', { action: 'claimed', popup: popup.id });
         return data;

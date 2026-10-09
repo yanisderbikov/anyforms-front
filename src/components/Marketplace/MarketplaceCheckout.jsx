@@ -347,22 +347,6 @@ const MarketplaceCheckout = () => {
     }
   };
 
-  const checkPromoRef = useRef(checkPromo);
-  checkPromoRef.current = checkPromo;
-  const autoPromoReadyRef = useRef(false);
-  autoPromoReadyRef.current = Boolean(normalizePromoCode(promoInput)) && !appliedPromo && emailValid && phoneValid;
-  const autoPromoCheckedRef = useRef(false);
-  const hasItems = items.length > 0;
-  useEffect(() => {
-    if (autoPromoCheckedRef.current || !hasItems) return;
-    autoPromoCheckedRef.current = true;
-    if (autoPromoReadyRef.current) checkPromoRef.current();
-  }, [hasItems]);
-
-  const autoApplyPromo = () => {
-    if (autoPromoReadyRef.current && !promoChecking && !promoError) checkPromoRef.current();
-  };
-
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
   const phoneError = touched.phone && !phoneValid ? 'Проверьте номер: в нём должно быть от 8 до 15 цифр.' : '';
   const emailError = touched.email && !emailValid ? 'Введите корректный адрес, например you@example.com.' : '';
@@ -575,7 +559,6 @@ const MarketplaceCheckout = () => {
             onBlur={() => {
               markTouched('phone');
               trackFieldOnce('phone', phone, phoneValid);
-              autoApplyPromo();
             }}
             required
           />
@@ -601,7 +584,6 @@ const MarketplaceCheckout = () => {
             onBlur={() => {
               markTouched('email');
               trackFieldOnce('email', email, emailValid);
-              autoApplyPromo();
             }}
             required
           />

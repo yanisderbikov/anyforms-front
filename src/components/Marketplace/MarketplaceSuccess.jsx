@@ -7,16 +7,23 @@ import {
   trackPurchase,
   trackPaymentFailed,
   trackPaymentReturn,
+  trackMetrikaGoal,
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
 import { clearCheckoutFormPromo } from './checkoutFormStorage';
 import { SHOP_THEMES } from './shopThemes';
+import { getDeviceId } from '../../shared/deviceId';
+import PostPurchasePromo from '../PromoPopup/PostPurchasePromo';
 import styles from './checkout.module.css';
 
 const PAYMENT_TYPE = 'online';
 const PAYMENT_RETURN_SENT_PREFIX = 'anyforms_payment_return_sent_';
 const PAYMENT_FAILED_RETURN_SENT_PREFIX = 'anyforms_payment_failed_return_sent_';
+// Вебхук об оплате может прийти на пару секунд позже возврата с платёжной
+// страницы: пока бэк отвечает 202, переспрашиваем промокод ещё несколько раз.
+const AFTER_PURCHASE_RETRY_MS = 3000;
+const AFTER_PURCHASE_MAX_ATTEMPTS = 8;
 
 const wasSent = (key) => {
   try {
@@ -54,6 +61,7 @@ const MarketplaceSuccess = () => {
   const orderNumber = searchParams.get('order')?.toUpperCase() || null;
   const isFail = searchParams.get('status') === 'fail';
   const [order, setOrder] = useState(null);
+  const [afterPromo, setAfterPromo] = useState(null);
 
   // Успех: отправляем purchase (состав заказа — из снапшота, сохранённого перед
   // редиректом на оплату) и очищаем корзину. trackPurchase сам защищён от
@@ -120,6 +128,43 @@ const MarketplaceSuccess = () => {
       cancelled = true;
     };
   }, [orderNumber]);
+
+  // Промокод на следующий заказ: бэк выдаёт его только по оплаченному заказу,
+  // один код на заказ, поэтому обновление страницы покажет тот же код.
+  useEffect(() => {
+    if (!orderNumber || isFail) return undefined;
+    let cancelled = false;
+    let attempts = 0;
+    let timer = null;
+    const load = () => {
+      apiClient.instance
+        .post('/api/public/promo-popup/after-purchase', { orderNumber, deviceId: getDeviceId() })
+        .then(({ status, data }) => {
+          if (cancelled) return;
+          if (status === 202) {
+            attempts += 1;
+            if (attempts < AFTER_PURCHASE_MAX_ATTEMPTS) timer = window.setTimeout(load, AFTER_PURCHASE_RETRY_MS);
+            return;
+          }
+          if (status !== 200 || !data?.code) return;
+          setAfterPromo(data);
+          trackMetrikaGoal('promo_after_purchase_shown', { popup: data.popupId, repeated: Boolean(data.repeated) });
+        })
+        .catch(() => {
+          // Промокод — бонус: без него страница успеха работает как раньше.
+        });
+    };
+    load();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [orderNumber, isFail]);
+
+  const handlePromoCopy = () => {
+    if (!afterPromo) return;
+    trackMetrikaGoal('promo_after_purchase_copied', { popup: afterPromo.popupId });
+  };
 
   const deliveryAddress = [order?.pvzCity, order?.pvzStreet].filter(Boolean).join(', ');
   const deliveryLabel = order?.deliveryMethod === 'PICKUP' ? 'Самовывоз' : 'Пункт выдачи СДЭК';
@@ -190,6 +235,8 @@ const MarketplaceSuccess = () => {
               )}
             </div>
           )}
+
+          {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
 
           <Link className={styles.primaryLink} to={isFail ? '/shop/checkout' : shopBase}>
             <span>{isFail ? 'Попробовать ещё раз' : 'Вернуться в магазин'}</span>
