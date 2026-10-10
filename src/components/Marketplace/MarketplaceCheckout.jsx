@@ -130,7 +130,7 @@ const MarketplaceCheckout = () => {
   // Состояние формы для события «ушёл с чекаута»: читаем через ref, чтобы
   // обработчики pagehide/unmount видели актуальные значения.
   const formStateRef = useRef(null);
-  formStateRef.current = { nameValid, phoneValid, emailValid, pvzValid, acceptTerms, items };
+  formStateRef.current = { nameValid, phoneValid, emailValid, pvzValid, acceptTerms, items, appliedPromo };
   const openedAtRef = useRef(Date.now());
   const pvzSearchedRef = useRef(false);
   const paymentStartedRef = useRef(false);
@@ -158,6 +158,7 @@ const MarketplaceCheckout = () => {
       seconds: (Date.now() - openedAtRef.current) / 1000,
       pvzSearched: pvzSearchedRef.current,
       cartItems: state.items,
+      promo: state.appliedPromo,
     });
   };
   const sendAbandonRef = useRef(sendAbandon);
@@ -331,7 +332,7 @@ const MarketplaceCheckout = () => {
       if (data?.valid) {
         setAppliedPromo(data);
         setPromoInput(data.code);
-        trackPromoCode('applied', { code: data.code });
+        trackPromoCode('applied', { code: data.code, promo: data });
       } else {
         setAppliedPromo(null);
         setPromoError(data?.message || 'Промокод не подошёл.');
@@ -384,7 +385,7 @@ const MarketplaceCheckout = () => {
 
     setError('');
     setSubmitting(true);
-    trackCheckoutSubmit(items, { promoApplied: Boolean(appliedPromo) });
+    trackCheckoutSubmit(items, { promo: appliedPromo });
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
         items: items.map((i) => ({ productId: i.id, variantId: i.variantId || undefined, quantity: i.quantity })),
@@ -406,8 +407,8 @@ const MarketplaceCheckout = () => {
         // чтобы после возврата с платёжной страницы отправить purchase.
         // Редирект на оплату не должен засчитаться как уход с чекаута.
         paymentStartedRef.current = true;
-        trackAddPaymentInfo(items, PAYMENT_TYPE, { promoApplied: Boolean(appliedPromo) });
-        saveCheckoutSnapshot(items, discountedTotal);
+        trackAddPaymentInfo(items, PAYMENT_TYPE, { promo: appliedPromo });
+        saveCheckoutSnapshot(items, discountedTotal, { promo: appliedPromo });
         window.location.href = data.paymentUrl;
         return;
       }

@@ -5,7 +5,7 @@ import { normalizePromoCode } from '../../shared/promoTracking';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
 import { getDeviceId } from '../../shared/deviceId';
 import { readCheckoutForm } from '../Marketplace/checkoutFormStorage';
-import { pushAnalyticsEvent, trackMetrikaGoal } from '../../services/analytics';
+import { trackPromoPopup } from '../../services/analytics';
 import PromoPopup from './PromoPopup';
 import {
   isPopupSuppressed,
@@ -73,11 +73,10 @@ const issueCode = async (popup, search) => {
       deviceId: getDeviceId(),
       pageUrl: window.location.href,
     });
-    trackMetrikaGoal('promo_popup_issued', { popup: popup.id, repeated: Boolean(data.repeated) });
-    pushAnalyticsEvent('promo_popup', { action: 'issued', popup: popup.id });
+    trackPromoPopup('issued', popup, { code: data.code, repeated: Boolean(data.repeated) });
     return data;
   } catch (err) {
-    trackMetrikaGoal('promo_popup_error', { popup: popup.id, reason: errorMessage(err).slice(0, 80) });
+    trackPromoPopup('error', popup, { reason: errorMessage(err) });
     return null;
   }
 };
@@ -127,8 +126,7 @@ const PromoPopupHost = ({ pathname, search }) => {
       apiClient.instance
         .post(`/api/public/promo-popup/${popup.id}/view`, { deviceId: getDeviceId() })
         .catch(() => undefined);
-      trackMetrikaGoal('promo_popup_shown', { popup: popup.id });
-      pushAnalyticsEvent('promo_popup', { action: 'shown', popup: popup.id });
+      trackPromoPopup('shown', popup, { code: popup.code });
     }, Math.max(0, delayMs - elapsedBefore));
     return () => {
       cancelled = true;
@@ -146,23 +144,30 @@ const PromoPopupHost = ({ pathname, search }) => {
     setOpen(false);
     const state = readPopupState(popup.id);
     if (!state.claimedAt && !state.takenAt) {
-      trackMetrikaGoal('promo_popup_closed', { popup: popup.id });
+      trackPromoPopup('closed', popup, { code: popup.code || issued?.code });
     }
-  }, [popup]);
+  }, [popup, issued]);
 
   const handleTakeCode = useCallback(
     (code) => {
       if (!popup) return;
       writePopupState(popup.id, { takenAt: Date.now() });
-      trackMetrikaGoal('promo_popup_code_taken', { popup: popup.id, code });
-      pushAnalyticsEvent('promo_popup', { action: 'code_taken', popup: popup.id });
+      trackPromoPopup('code_taken', popup, { code });
+    },
+    [popup],
+  );
+
+  const handleCopy = useCallback(
+    (code) => {
+      if (!popup) return;
+      trackPromoPopup('copied', popup, { code });
     },
     [popup],
   );
 
   const handleSubmit = useCallback(
     async (form) => {
-      trackMetrikaGoal('promo_popup_submit', { popup: popup.id });
+      trackPromoPopup('submit', popup);
       try {
         const { data } = await apiClient.instance.post(`/api/public/promo-popup/${popup.id}/claim`, {
           ...form,
@@ -173,12 +178,11 @@ const PromoPopupHost = ({ pathname, search }) => {
         });
         writePopupState(popup.id, { claimedAt: Date.now() });
         saveContactForCheckout({ phone: form.phone, email: form.email });
-        trackMetrikaGoal('promo_popup_claimed', { popup: popup.id, repeated: Boolean(data.repeated) });
-        pushAnalyticsEvent('promo_popup', { action: 'claimed', popup: popup.id });
+        trackPromoPopup('claimed', popup, { code: data.code, repeated: Boolean(data.repeated) });
         return data;
       } catch (err) {
         const message = errorMessage(err);
-        trackMetrikaGoal('promo_popup_error', { popup: popup.id, reason: message.slice(0, 80) });
+        trackPromoPopup('error', popup, { reason: message });
         throw new Error(message);
       }
     },
@@ -193,6 +197,7 @@ const PromoPopupHost = ({ pathname, search }) => {
       onSubmit={handleSubmit}
       onClose={handleClose}
       onTakeCode={handleTakeCode}
+      onCopy={handleCopy}
       issued={issued}
     />
   );

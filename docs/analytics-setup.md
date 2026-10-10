@@ -95,7 +95,7 @@ curl -s "https://anyforms.ru/$BUNDLE" | grep -c GTM-MBTTRF2N   # должно б
 - Event name (включить «Use regex matching»):
 
 ```
-view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to_cart|remove_from_cart|view_cart|change_cart_quantity|begin_checkout|checkout_open|checkout_field|pvz_search|pvz_selected|promo_code|checkout_submit|add_payment_info|payment_failed|payment_cancelled|checkout_abandon|payment_return|purchase
+view_item_list|select_item|view_item|add_to_wishlist|remove_from_wishlist|add_to_cart|remove_from_cart|view_cart|change_cart_quantity|begin_checkout|checkout_open|checkout_field|pvz_search|pvz_selected|promo_code|promo_popup|promo_after_purchase|promo_link|checkout_submit|add_payment_info|payment_failed|payment_cancelled|checkout_abandon|payment_return|purchase
 ```
 
 - Назвать: `CE — ecommerce events`.
@@ -316,13 +316,25 @@ DebugView активен автоматически в GTM Preview; в dev-сб�
 | `checkout_field` | закончил ввод в поле | `field`, `valid` |
 | `pvz_search_ok` / `pvz_search_empty` / `pvz_search_error` | поиск ПВЗ | `query`, `results` |
 | `pvz_selected` | выбран ПВЗ | `city` |
-| `promo_applied` / `promo_rejected` / `promo_error` | проверка промокода | `code`, `reason` |
-| `checkout_submit` | нажали «Оплатить» | как у `view_cart` + `promo_applied` |
-| `payment_created` | платёж создан, редирект на оплату | как у `view_cart` + `payment_type`, `promo_applied` |
+| `promo_applied` / `promo_rejected` / `promo_error` | проверка промокода в чекауте | `code`, `source`, `popup`, `popup_name`, `popup_type`, `discount_percent`, `discount_amount`, `reason` |
+| `checkout_submit` | нажали «Оплатить» | как у `view_cart` + `promo_*` (см. 9.5) |
+| `payment_created` | платёж создан, редирект на оплату | как у `view_cart` + `payment_type`, `promo_*` |
 | `payment_failed` | платёж не создан / оплата не прошла | `payment_type`, `error_code` |
-| `checkout_abandon` | ушёл с чекаута до оплаты | `filled`, `missing`, `filled_count`, `seconds`, `pvz_searched` + состав корзины |
+| `checkout_abandon` | ушёл с чекаута до оплаты | `filled`, `missing`, `filled_count`, `seconds`, `pvz_searched`, `promo_*` + состав корзины |
 | `payment_return_success` / `payment_return_fail` | вернулся с платёжной страницы | `order_id` |
-| `purchase` | покупка подтверждена на `/shop/success` | `order_id`, `value`, `product_ids`, `products` |
+| `purchase` | покупка подтверждена на `/shop/success` | `order_id`, `value`, `product_ids`, `products`, `promo_*` |
+| `purchase_with_promo` | та же покупка, но только если применён промокод | `order_id`, `value`, `promo_*` |
+| `promo_link_visit` | пришёл на `/shop…` по ссылке с `?promo=КОД` (раз за сессию на код) | `code`, `source=link` |
+| `promo_popup_shown` | попап с промокодом показан | `popup`, `popup_name`, `popup_type`, `source`, `code` (для PUBLIC_CODE) |
+| `promo_popup_closed` | закрыл попап (CONTACT/PUBLIC — не забрав код; UNIQUE — после показа кода) | как у `promo_popup_shown` |
+| `promo_popup_submit` | попап CONTACT: отправил телефон и почту | `popup`, `popup_name`, `popup_type`, `source` |
+| `promo_popup_claimed` | попап CONTACT: код выдан | + `code`, `repeated` |
+| `promo_popup_issued` | попап UNIQUE_CODE: код выдан устройству при показе | + `code`, `repeated` |
+| `promo_popup_code_taken` | попап PUBLIC_CODE: нажал на код / кнопку | + `code` |
+| `promo_popup_copied` | попап CONTACT / UNIQUE_CODE: нажал на код (скопировал) | + `code` |
+| `promo_popup_error` | не удалось выдать код | + `reason` |
+| `promo_after_purchase_shown` | на `/shop/success` показан код на следующий заказ | `popup`, `popup_name`, `code`, `repeated`, `discount_*`, `source=after_purchase` |
+| `promo_after_purchase_copied` | скопировал код на следующий заказ | то же |
 
 Воронка магазина по визитам (Отчёты → Конверсии, либо составная цель):
 `product_open` → `add_to_cart` → `view_cart` → `begin_checkout` → `checkout_open`
@@ -340,3 +352,45 @@ DebugView активен автоматически в GTM Preview; в dev-сб�
 `marketingConsent`, `acceptTerms`), сама форма: `id="checkout-form"` и `name="checkout"`. Штатный отчёт Метрики
 «Аналитика форм» (в настройках счётчика включить «Аналитика форм») покажет время
 и отвал по каждому полю без дополнительного кода.
+
+### 9.5. Промокоды: какие коды мотивируют
+
+Код может появиться у покупателя четырьмя путями, и каждый помечается своим
+`source`; при выдаче код запоминается в `localStorage` (`anyforms_promo_offers`,
+90 дней), и дальше все события с этим кодом несут его источник:
+
+| `source` | Откуда код | Событие выдачи |
+| --- | --- | --- |
+| `popup_contact` | попап за телефон и почту | `promo_popup_claimed` |
+| `popup_unique` | попап с готовым одноразовым кодом | `promo_popup_issued` |
+| `popup_public` | попап с общим кодом акции | `promo_popup_code_taken` |
+| `after_purchase` | блок «промокод на следующий заказ» на `/shop/success` | `promo_after_purchase_shown` |
+| `link` | ссылка на магазин с `?promo=КОД` (рассылка, сторис, блогер) | `promo_link_visit` |
+| `manual` | ввёл сам, на сайте мы этот код не выдавали (офлайн, чужое устройство) | — |
+
+Параметры `promo_*` у `checkout_submit`, `payment_created`, `checkout_abandon`,
+`purchase`, `purchase_with_promo`: `promo_applied` (yes/no), `promo_code`,
+`promo_source`, `promo_popup_name`, `promo_discount_percent`, `promo_discount_amount` (₽).
+Источник фиксируется в снапшоте заказа в момент оплаты, поэтому `purchase`
+на `/shop/success` не зависит от localStorage.
+
+Воронка одного промокода: `promo_popup_shown` → `promo_popup_claimed` /
+`promo_popup_issued` / `promo_popup_code_taken` → `promo_applied` → `purchase_with_promo`.
+Отчёт «какие коды доводят до покупки»: Отчёты → Конверсии → `purchase_with_promo`,
+группировка по параметру `promo_code` или `promo_source` (Параметры визитов).
+Сколько кодов «сгорает»: `promo_rejected` с группировкой по `reason` и `source`.
+
+Цели Метрики (все JS-цели из таблицы 9.3) создаёт скрипт, который берёт список из
+`scripts/metrika-goals.mjs` и заводит недостающие через Management API:
+
+```
+YANDEX_METRIKA_TOKEN=y0_… node scripts/metrika-goals.mjs --dry-run   # показать, каких целей нет
+YANDEX_METRIKA_TOKEN=y0_… node scripts/metrika-goals.mjs             # создать недостающие
+```
+
+Токен — OAuth с правом «Яндекс.Метрика: управление счётчиками»
+(https://yandex.ru/dev/metrika/ru/intro/authorization). Скрипт необязателен:
+параметры из `reachGoal` Метрика сохраняет в «Параметрах визитов» и без цели,
+и их можно сводить с ecommerce-выручкой (группировка `ym:s:paramsLevel1/2`,
+метрики `ym:s:ecommercePurchases`, `ym:s:ecommerceRevenue`). Цели нужны только
+для отчёта «Конверсии», числа достижений и оптимизации рекламы в Директе.

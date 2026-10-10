@@ -7,7 +7,7 @@ import {
   trackPurchase,
   trackPaymentFailed,
   trackPaymentReturn,
-  trackMetrikaGoal,
+  trackPromoAfterPurchase,
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
@@ -104,6 +104,7 @@ const MarketplaceSuccess = () => {
         id: transactionId,
         value: snapshot.value,
         items: snapshot.items,
+        promo: snapshot.promo,
       });
       if (sent) clearCheckoutSnapshot();
     }
@@ -148,7 +149,7 @@ const MarketplaceSuccess = () => {
           }
           if (status !== 200 || !data?.code) return;
           setAfterPromo(data);
-          trackMetrikaGoal('promo_after_purchase_shown', { popup: data.popupId, repeated: Boolean(data.repeated) });
+          trackPromoAfterPurchase('shown', data, { repeated: Boolean(data.repeated) });
         })
         .catch(() => {
           // Промокод — бонус: без него страница успеха работает как раньше.
@@ -163,7 +164,7 @@ const MarketplaceSuccess = () => {
 
   const handlePromoCopy = () => {
     if (!afterPromo) return;
-    trackMetrikaGoal('promo_after_purchase_copied', { popup: afterPromo.popupId });
+    trackPromoAfterPurchase('copied', afterPromo);
   };
 
   const deliveryAddress = [order?.pvzCity, order?.pvzStreet].filter(Boolean).join(', ');

@@ -9,7 +9,8 @@ import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import NotFound from "./components/NotFound/NotFound";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
-import { setAnalyticsShop, trackPageView } from './services/analytics';
+import { setAnalyticsShop, trackPageView, trackPromoLink } from './services/analytics';
+import { getPromoFromSearch } from './shared/promoTracking';
 import PromoPopupHost from './components/PromoPopup/PromoPopupHost';
 
 // Код-сплиттинг по роутам. В основном бандле остаются только:
@@ -314,6 +315,7 @@ function App() {
   useEffect(() => {
     if (location.pathname !== normalizedPathname) return;
     const url = `${window.location.origin}${normalizedPathname}${location.search}`;
+    if (normalizedPathname.startsWith('/shop')) trackPromoLink(getPromoFromSearch(location.search));
     if (!initialPageTrackedRef.current) {
       initialPageTrackedRef.current = true;
       trackPageView(url, { initial: true });
