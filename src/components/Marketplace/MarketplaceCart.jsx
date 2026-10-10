@@ -9,6 +9,8 @@ import {
   trackChangeCartQuantity,
   trackBeginCheckout,
 } from '../../services/analytics';
+import { useFreeDelivery } from '../../hooks/useFreeDelivery';
+import FreeDeliveryHint, { DeliverySummaryValue } from './FreeDeliveryHint';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
@@ -24,6 +26,8 @@ const MarketplaceCart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
+  const freeDelivery = useFreeDelivery();
+  const deliveryFree = freeDelivery.qualifies(total);
 
   // view_cart — один раз на открытие страницы корзины (в том числе пустой);
   // ref гасит повторный запуск эффекта в StrictMode.
@@ -143,12 +147,13 @@ const MarketplaceCart = () => {
               </div>
               <div className={styles.summaryRow}>
                 <span>Доставка СДЭК</span>
-                <span>на ПВЗ при получении</span>
+                <DeliverySummaryValue free={deliveryFree} />
               </div>
               <div className={`${styles.summaryRow} ${styles.summaryTotal}`}>
                 <span>К оплате сейчас</span>
                 <span>{formatPrice(total)}</span>
               </div>
+              <FreeDeliveryHint freeDelivery={freeDelivery} amountRub={total} shopLink={shopBase} />
             </div>
 
             {checkoutEnabled ? (

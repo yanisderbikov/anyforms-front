@@ -19,9 +19,12 @@ import {
   trackCheckoutAbandon,
   saveCheckoutSnapshot,
 } from '../../services/analytics';
+import { useFreeDelivery } from '../../hooks/useFreeDelivery';
 import PvzSelect from './PvzSelect';
+import FreeDeliveryHint, { DeliverySummaryValue } from './FreeDeliveryHint';
 import { readCheckoutForm, saveCheckoutForm } from './checkoutFormStorage';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
+import { getDeviceId } from '../../shared/deviceId';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './checkout.module.css';
 
@@ -127,7 +130,7 @@ const MarketplaceCheckout = () => {
   // Состояние формы для события «ушёл с чекаута»: читаем через ref, чтобы
   // обработчики pagehide/unmount видели актуальные значения.
   const formStateRef = useRef(null);
-  formStateRef.current = { nameValid, phoneValid, emailValid, pvzValid, acceptTerms, items };
+  formStateRef.current = { nameValid, phoneValid, emailValid, pvzValid, acceptTerms, items, appliedPromo };
   const openedAtRef = useRef(Date.now());
   const pvzSearchedRef = useRef(false);
   const paymentStartedRef = useRef(false);
@@ -155,6 +158,7 @@ const MarketplaceCheckout = () => {
       seconds: (Date.now() - openedAtRef.current) / 1000,
       pvzSearched: pvzSearchedRef.current,
       cartItems: state.items,
+      promo: state.appliedPromo,
     });
   };
   const sendAbandonRef = useRef(sendAbandon);
@@ -269,6 +273,8 @@ const MarketplaceCheckout = () => {
     ? Math.max(afterPercentTotal - promoAmountRub, Math.min(afterPercentTotal, 1))
     : afterPercentTotal;
   const promoDeadlineNote = formatPromoDeadlineNote(appliedPromo?.validUntil);
+  const freeDelivery = useFreeDelivery();
+  const deliveryFree = freeDelivery.qualifies(discountedTotal);
 
   // Промокод закреплён за контактами: сменили почту или телефон — проверяем заново.
   const resetPromo = () => {
@@ -313,6 +319,8 @@ const MarketplaceCheckout = () => {
           // Сумма корзины — для ранней проверки минимального порога промокода;
           // при оформлении сервер пересчитает её по своим ценам.
           totalKopecks: Math.round(total * 100),
+          shopSlug: shopSlug || DEFAULT_SHOP_SLUG,
+          deviceId: getDeviceId(),
         },
       });
       if (
@@ -324,7 +332,7 @@ const MarketplaceCheckout = () => {
       if (data?.valid) {
         setAppliedPromo(data);
         setPromoInput(data.code);
-        trackPromoCode('applied', { code: data.code });
+        trackPromoCode('applied', { code: data.code, promo: data });
       } else {
         setAppliedPromo(null);
         setPromoError(data?.message || 'Промокод не подошёл.');
@@ -377,7 +385,7 @@ const MarketplaceCheckout = () => {
 
     setError('');
     setSubmitting(true);
-    trackCheckoutSubmit(items, { promoApplied: Boolean(appliedPromo) });
+    trackCheckoutSubmit(items, { promo: appliedPromo });
     try {
       const { data } = await apiClient.instance.post('/api/payment/cart-purchase', {
         items: items.map((i) => ({ productId: i.id, variantId: i.variantId || undefined, quantity: i.quantity })),
@@ -392,14 +400,15 @@ const MarketplaceCheckout = () => {
         returnUrl: `${window.location.origin}/shop/success`,
         // Витрина, с которой набрана корзина: ей засчитывается продажа.
         shopSlug,
+        deviceId: getDeviceId(),
       });
       if (data?.paymentUrl) {
         // Платёж создан: фиксируем выбор оплаты и сохраняем состав корзины,
         // чтобы после возврата с платёжной страницы отправить purchase.
         // Редирект на оплату не должен засчитаться как уход с чекаута.
         paymentStartedRef.current = true;
-        trackAddPaymentInfo(items, PAYMENT_TYPE, { promoApplied: Boolean(appliedPromo) });
-        saveCheckoutSnapshot(items, discountedTotal);
+        trackAddPaymentInfo(items, PAYMENT_TYPE, { promo: appliedPromo });
+        saveCheckoutSnapshot(items, discountedTotal, { promo: appliedPromo });
         window.location.href = data.paymentUrl;
         return;
       }
@@ -457,7 +466,7 @@ const MarketplaceCheckout = () => {
           <hr className={styles.summaryDivider} />
           <div className={styles.summaryRow}>
             <span>Доставка СДЭК</span>
-            <span>на ПВЗ при получении</span>
+            <DeliverySummaryValue free={deliveryFree} />
           </div>
           {appliedPromo && (
             <div className={styles.summaryRow}>
@@ -479,14 +488,32 @@ const MarketplaceCheckout = () => {
               {formatPrice(discountedTotal)}
             </span>
           </div>
+          <FreeDeliveryHint
+            freeDelivery={freeDelivery}
+            amountRub={discountedTotal}
+            amountBeforeDiscountRub={appliedPromo ? total : null}
+            shopLink={shopBase}
+          />
           <p className={styles.moldNote}>
             <strong>Обратите внимание:</strong> вы покупаете силиконовые формы (молды)
             для изготовления изделий, а не готовые изделия с фотографий.
           </p>
-          <p className={styles.moldNote}>
-            <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
-            Стоимость доставки не входит в сумму заказа и оплачивается вами при получении по тарифам СДЭК.
-          </p>
+          <div className={`${styles.moldNote} ${styles.swap}`}>
+            <p
+              className={`${styles.swapLayer} ${styles.moldNoteText} ${deliveryFree ? styles.swapHidden : ''}`}
+              aria-hidden={deliveryFree}
+            >
+              <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
+              Стоимость доставки не входит в сумму заказа и оплачивается вами при получении по тарифам СДЭК.
+            </p>
+            <p
+              className={`${styles.swapLayer} ${styles.moldNoteText} ${deliveryFree ? '' : styles.swapHidden}`}
+              aria-hidden={!deliveryFree}
+            >
+              <strong>Доставка:</strong> заказ доставляет компания СДЭК до выбранного пункта выдачи.
+              Для вас доставка бесплатная — её стоимость оплачиваем мы, при получении платить не нужно.
+            </p>
+          </div>
         </div>
 
         <form className={styles.form} id="checkout-form" name="checkout" onSubmit={handleSubmit} noValidate>
@@ -627,7 +654,14 @@ const MarketplaceCheckout = () => {
           )}
           {deliveryQuoteState === 'ready' && deliveryQuote?.cost != null && (
             <p className={styles.deliveryQuote}>
-              ~{formatPrice(Math.round(Number(deliveryQuote.cost)))}
+              {deliveryFree ? (
+                <>
+                  <span className={styles.oldTotal}>~{formatPrice(Math.round(Number(deliveryQuote.cost)))}</span>
+                  <span className={styles.deliveryQuoteFree}>бесплатно</span>
+                </>
+              ) : (
+                `~${formatPrice(Math.round(Number(deliveryQuote.cost)))}`
+              )}
               {formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)
                 ? ` · ~${formatDeliveryPeriod(deliveryQuote.periodMin, deliveryQuote.periodMax)}`
                 : ''}

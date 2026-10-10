@@ -32,6 +32,12 @@ export const PICKUP_BADGE_STYLE = {
   border: '1px solid rgba(138, 109, 0, 0.35)',
 };
 
+export const FREE_DELIVERY_BADGE_STYLE = {
+  background: '#e3f4e8',
+  color: '#1d7a3d',
+  border: '1px solid rgba(29, 122, 61, 0.35)',
+};
+
 // ---- Позиции ----
 export const getAllCustomItems = (status) =>
   http.get('/api/custom-product-items', cfg(status ? { params: { status } } : {})).then((r) => r.data);
@@ -60,6 +66,9 @@ export const updateItem = (id, body) =>
   http.put(`/api/custom-product-items/${id}`, body, cfg()).then((r) => r.data);
 export const updateItemStatus = (id, status) =>
   http.patch(`/api/custom-product-items/${id}/status`, { status }, cfg()).then((r) => r.data);
+// Ячейка хранения позиции: где лежат мастер-модель и материалы. Пустая строка очищает.
+export const updateItemStorageCell = (id, storageCell) =>
+  http.patch(`/api/custom-product-items/${id}/storage-cell`, { storageCell }, cfg()).then((r) => r.data);
 export const deleteItem = (id) =>
   http.delete(`/api/custom-product-items/${id}`, cfg()).then((r) => r.data);
 

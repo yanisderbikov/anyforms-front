@@ -1,0 +1,288 @@
+.overlay,
+.frame {
+  container-type: inline-size;
+  font-family: inherit;
+  color: #111;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+  animation: fadeIn 0.25s ease both;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 26px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  padding: 30px 26px 24px;
+  outline: none;
+  animation: popIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 999px;
+  background: #f2f2f2;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.close:hover {
+  background: #e4e4e4;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 2.6rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #111;
+  margin: 0 0 14px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.title {
+  margin: 0;
+  padding-right: 34px;
+  font-size: 1.45rem;
+  line-height: 1.15;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #444;
+  white-space: pre-line;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.input {
+  font-family: inherit;
+  font-size: 1rem;
+  color: #111;
+  padding: 13px 16px;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 16px;
+  background: #fff;
+  min-width: 0;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.inputError {
+  border-color: #c62828;
+}
+
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #555;
+  cursor: pointer;
+}
+
+.check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #111;
+}
+
+.check a {
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #c62828;
+}
+
+.submit {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: #fff;
+  background: #111;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 22px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: #333;
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.fine {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #8c8c8c;
+}
+
+.codeBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 18px 16px;
+  border: 2px dashed #111;
+  border-radius: 18px;
+  background: #fafafa;
+  font-family: inherit;
+  color: #111;
+  cursor: pointer;
+}
+
+.code {
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.codeHint {
+  font-size: 0.72rem;
+  color: #8c8c8c;
+  text-transform: lowercase;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #555;
+}
+
+@container (max-width: 520px) {
+  .stage {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .card {
+    max-width: none;
+    border-radius: 26px 26px 0 0;
+    padding: 26px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    animation-name: slideUp;
+  }
+
+  .badge {
+    font-size: 2.2rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card {
+    animation: none;
+  }
+}

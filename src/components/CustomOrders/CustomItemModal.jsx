@@ -25,6 +25,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
     status: item.status || 'MODELING',
     modeler: item.modeler || '',
     nda: !!item.nda,
+    storageCell: item.storageCell || '',
   });
   const [modelers, setModelers] = useState([]);
   const [existing, setExisting] = useState(item.files || []);
@@ -92,6 +93,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         quantity: Number(form.quantity),
         modeler: form.modeler ? form.modeler.trim() : null,
         nda: form.nda,
+        storageCell: form.storageCell.trim(),
       });
       if (!hideStatus && form.status !== item.status) {
         latest = await updateItemStatus(item.id, form.status);
@@ -172,6 +174,17 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         <label className={styles.field}>
           <span className={styles.label}>описание</span>
           <AutoTextarea className={styles.textarea} minRows={3} value={form.description} onChange={(e) => setF('description', e.target.value)} />
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.label}>ячейка хранения</span>
+          <AutoTextarea
+            className={styles.textarea}
+            minRows={2}
+            placeholder="где лежат мастер-модель и материалы: стеллаж, полка, коробка…"
+            value={form.storageCell}
+            onChange={(e) => setF('storageCell', e.target.value)}
+          />
         </label>
 
         <label className={styles.checkRow}>

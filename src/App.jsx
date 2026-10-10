@@ -9,7 +9,9 @@ import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import NotFound from "./components/NotFound/NotFound";
 import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
-import { setAnalyticsShop, trackPageView } from './services/analytics';
+import { setAnalyticsShop, trackPageView, trackPromoLink } from './services/analytics';
+import { getPromoFromSearch } from './shared/promoTracking';
+import PromoPopupHost from './components/PromoPopup/PromoPopupHost';
 
 // Код-сплиттинг по роутам. В основном бандле остаются только:
 // - витрина и карточка товара (/shop, /shop/<slug>, …/product/:id) — ~65% просмотров;
@@ -43,6 +45,8 @@ const SellerRequisites = React.lazy(() => import('./components/Founders/SellerRe
 const loadSiteLegal = () => import('./components/shared/legal/SiteLegalPages');
 const SitePrivacyPage = lazyNamed(loadSiteLegal, 'SitePrivacyPage');
 const ShopOfferPage = lazyNamed(loadSiteLegal, 'ShopOfferPage');
+const SitePdConsentPage = lazyNamed(loadSiteLegal, 'SitePdConsentPage');
+const SiteAdConsentPage = lazyNamed(loadSiteLegal, 'SiteAdConsentPage');
 // Корзина и чекаут — продолжение витрины: их чанки догружаем заранее в простое,
 // как только покупатель оказался на витрине (см. эффект ниже).
 const loadMarketplaceCart = () => import('./components/Marketplace/MarketplaceCart');
@@ -62,6 +66,12 @@ const AdminProducts = React.lazy(() => import('./components/AdminProducts/AdminP
 const AdminProductEdit = React.lazy(() => import('./components/AdminProducts/AdminProductEdit'));
 const ShopSalesReport = React.lazy(() => import('./components/AdminProducts/ShopSalesReport'));
 const AdminPromoCodes = React.lazy(() => import('./components/AdminPromoCodes/AdminPromoCodes'));
+const AdminPromoPopups = React.lazy(() => import('./components/AdminPromoPopups/AdminPromoPopups'));
+const AdminFreeDelivery = React.lazy(() => import('./components/AdminFreeDelivery/AdminFreeDelivery'));
+const AdminCalculator = React.lazy(() => import('./components/AdminCalculator/AdminCalculator'));
+const CalculatorJournal = React.lazy(() => import('./components/AdminCalculator/CalculatorJournal'));
+const CalculatorRatesPage = React.lazy(() => import('./components/AdminCalculator/CalculatorRatesPage'));
+const KpPrintPage = React.lazy(() => import('./components/AdminCalculator/KpPrintPage'));
 const AdminInvoices = React.lazy(() => import('./components/AdminInvoices/AdminInvoices'));
 const AdminTrainingInvoices = React.lazy(() => import('./components/AdminInvoices/AdminTrainingInvoices'));
 const AdminYookassaReceipts = React.lazy(() => import('./components/AdminInvoices/AdminYookassaReceipts'));
@@ -76,6 +86,8 @@ const KNOWN_PATHS = new Set([
   '/chief',
   '/chief/privacy',
   '/privacy',
+  '/consent',
+  '/ad-consent',
   '/requisites',
   '/shop/offer',
   '/3d-print',
@@ -113,6 +125,12 @@ const KNOWN_PATHS = new Set([
   '/admin/products',
   '/admin/products/analytics',
   '/admin/promo-codes',
+  '/admin/promo-popups',
+  '/admin/free-delivery',
+  '/admin/calculator',
+  '/admin/calculator/journal',
+  '/admin/calculator/rates',
+  '/admin/calculator/kp',
   '/admin/invoices',
   '/admin/invoices/training',
   '/admin/invoices/receipts',
@@ -163,7 +181,7 @@ function App() {
       : pathnameWithoutEncodedHash;
   const isHomePage = normalizedPathname === '/';
   // Общие юр-страницы сайта: нейтральная белая раскладка (LegalPage)
-  const isLegalPage = normalizedPathname === '/privacy' || normalizedPathname === '/shop/offer';
+  const isLegalPage = ['/privacy', '/consent', '/ad-consent', '/shop/offer'].includes(normalizedPathname);
   const isChiefPage = normalizedPathname === '/chief';
   const is3dPrintPage = normalizedPathname === '/3d-print';
   const isGuidePage = normalizedPathname === '/guide' || normalizedPathname.startsWith('/guide/');
@@ -297,6 +315,7 @@ function App() {
   useEffect(() => {
     if (location.pathname !== normalizedPathname) return;
     const url = `${window.location.origin}${normalizedPathname}${location.search}`;
+    if (normalizedPathname.startsWith('/shop')) trackPromoLink(getPromoFromSearch(location.search));
     if (!initialPageTrackedRef.current) {
       initialPageTrackedRef.current = true;
       trackPageView(url, { initial: true });
@@ -322,6 +341,8 @@ function App() {
           <Route path="/chief" element={<ChiefLanding />} />
           {/* Единая политика и реквизиты для всего сайта; старые адреса ведут туда же */}
           <Route path="/privacy" element={<SitePrivacyPage />} />
+          <Route path="/consent" element={<SitePdConsentPage />} />
+          <Route path="/ad-consent" element={<SiteAdConsentPage />} />
           <Route path="/chief/privacy" element={<Navigate to="/privacy" replace />} />
           <Route path="/requisites" element={<SellerRequisites />} />
           <Route path="/3d-print" element={<Print3dLanding />} />
@@ -351,6 +372,7 @@ function App() {
               Статические пути выше (/shop/cart и др.) матчатся раньше. */}
           <Route path="/shop/:shopSlug" element={<Marketplace />} />
           <Route path="/shop/:shopSlug/product/:id" element={<MarketplaceProduct />} />
+          <Route path="/admin/calculator/kp" element={<KpPrintPage />} />
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminHome />} />
             <Route path="/admin/orders" element={<Navigate to="/admin/orders/custom" replace />} />
@@ -366,6 +388,11 @@ function App() {
             {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
             <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
             <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
+            <Route path="/admin/promo-popups" element={<AdminPromoPopups />} />
+            <Route path="/admin/free-delivery" element={<AdminFreeDelivery />} />
+            <Route path="/admin/calculator" element={<AdminCalculator />} />
+            <Route path="/admin/calculator/journal" element={<CalculatorJournal />} />
+            <Route path="/admin/calculator/rates" element={<CalculatorRatesPage />} />
             <Route path="/admin/invoices" element={<AdminInvoices />} />
             <Route path="/admin/invoices/training" element={<AdminTrainingInvoices />} />
             <Route path="/admin/invoices/receipts" element={<AdminYookassaReceipts />} />
@@ -387,6 +414,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
+      <PromoPopupHost pathname={normalizedPathname} search={location.search} />
     </div>
   );
 }

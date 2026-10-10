@@ -29,6 +29,15 @@ const MENU = [
     ],
   },
   {
+    title: 'расчёт цены',
+    section: SECTIONS.ORDER_CALCULATOR,
+    items: [
+      { to: '/admin/calculator', label: 'Калькулятор заказа' },
+      { to: '/admin/calculator/journal', label: 'Журнал расчётов' },
+      { to: '/admin/calculator/rates', label: 'Ставки', section: SECTIONS.CALCULATOR_RATES },
+    ],
+  },
+  {
     title: 'управление товарами',
     section: SECTIONS.PRODUCTS,
     items: [
@@ -42,8 +51,15 @@ const MENU = [
     items: [
       { to: '/admin/invoices', label: 'Обычный счёт', section: SECTIONS.INVOICES },
       { to: '/admin/invoices/training', label: 'Счета на обучение', section: SECTIONS.TRAINING_INVOICES },
-      { to: '/admin/invoices/receipts', label: 'Чеки Юра', section: SECTIONS.YOOKASSA_RECEIPTS },
-      { to: '/admin/promo-codes', label: 'Промокоды', section: SECTIONS.PROMO_CODES },
+    ],
+  },
+  {
+    title: 'акции',
+    section: SECTIONS.PROMO_CODES,
+    items: [
+      { to: '/admin/promo-codes', label: 'Промокоды' },
+      { to: '/admin/promo-popups', label: 'Попапы' },
+      { to: '/admin/free-delivery', label: 'Бесплатная доставка' },
     ],
   },
   {

@@ -9,6 +9,9 @@ import AspectPhoto from '../shared/AspectPhoto/AspectPhoto';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './MarketplaceProduct.module.css';
 
+const SKELETON_THUMBS = [0, 1, 2];
+const SKELETON_TEXT_WIDTHS = ['96%', '88%', '58%'];
+
 const formatPrice = (value) => `${Number(value ?? 0).toLocaleString('ru-RU')} ₽`;
 
 const ChevronLeft = () => (
@@ -114,8 +117,35 @@ const MarketplaceProduct = () => {
     return (
       <div className={pageClass} id="top">
         <div className={styles.inner}>
-          <div className={styles.loader} role="status" aria-label="Загрузка товара">
-            <span className={styles.spinner} />
+          <div className={styles.topBar}>
+            <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
+            {cartLink}
+          </div>
+          <div className={`${styles.split} ${styles.skeleton}`} role="status" aria-label="Загрузка товара">
+            <div className={styles.gallery}>
+              <div className={styles.thumbsCol}>
+                <div className={styles.thumbs}>
+                  {SKELETON_THUMBS.map((key) => (
+                    <span key={key} className={`${styles.thumb} ${styles.shimmer}`} />
+                  ))}
+                </div>
+              </div>
+              <div className={styles.main}>
+                <div className={`${styles.mainPlaceholder} ${styles.shimmer}`} />
+              </div>
+            </div>
+            <div className={styles.info}>
+              <span className={`${styles.skeletonLine} ${styles.skeletonTitle} ${styles.shimmer}`} />
+              {SKELETON_TEXT_WIDTHS.map((width) => (
+                <span
+                  key={width}
+                  className={`${styles.skeletonLine} ${styles.skeletonText} ${styles.shimmer}`}
+                  style={{ width }}
+                />
+              ))}
+              <span className={`${styles.skeletonLine} ${styles.skeletonPrice} ${styles.shimmer}`} />
+              <span className={`${styles.skeletonLine} ${styles.skeletonButton} ${styles.shimmer}`} />
+            </div>
           </div>
         </div>
       </div>

@@ -8,13 +8,15 @@ import { useLikes } from '../../hooks/useLikes';
 import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
+import ProductCardSkeleton from '../ProductCard/ProductCardSkeleton';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import { SHOP_THEMES } from './shopThemes';
 import styles from './Marketplace.module.css';
 const TG_CHANNEL = 'https://t.me/anyforms';
 const PHONE_E164 = '+79810403953';
 const CONTACT_EMAIL = 'suvorov@anyforms.ru';
-const PROMO_CODE = 'any-shop-10';
+// Карточек в скелетоне: ровные ряды при 2 и 4 колонках, на экран хватает.
+const SKELETON_CARDS = 8;
 
 // Перекраска общей шапки под палитру магазина: переменные темы (shopThemes)
 // задаются на корне страницы, шапка читает их через tint.
@@ -51,6 +53,7 @@ const Marketplace = () => {
   const wrapClass = theme
     ? `${styles.wrap} ${styles.wrapBoutique} ${theme.className}`
     : styles.wrap;
+  const gridClass = boutique ? `${styles.grid} ${styles.gridBoutique}` : styles.grid;
   const shopName = shop?.name ?? shopSlug;
   // Логотип магазина в шапке: словомарка (headerLogo), на узких экранах —
   // знак (headerMark), если он есть; без картинок — название текстом.
@@ -77,7 +80,6 @@ const Marketplace = () => {
   const [error, setError] = useState(null);
   // Возврат из карточки товара — на то же место каталога, а не в начало.
   useListScrollMemory(`shop-scroll:${shopBase}`, !loading);
-  const [copied, setCopied] = useState(false);
   const [showLiked, setShowLiked] = useState(false);
   const [heroVideoFailed, setHeroVideoFailed] = useState(false);
 
@@ -138,16 +140,6 @@ const Marketplace = () => {
     navigate(`${shopBase}/product/${item.id}`);
   };
 
-  const handlePromoCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(PROMO_CODE);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1800);
-    } catch (e) {
-      setCopied(false);
-    }
-  };
-
   useEffect(() => {
     setLoading(true);
     getItems(shopSlug)
@@ -191,16 +183,6 @@ const Marketplace = () => {
     navigate(`${shopBase}/product/${matchingItem.id}`, { replace: true });
   }, [items, location.search, navigate, shopBase]);
 
-  if (loading) {
-    return (
-      <div className={wrapClass}>
-        <div className={styles.loader} role="status" aria-label="Загрузка товаров">
-          <span className={styles.spinner} />
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className={wrapClass}>
@@ -220,7 +202,7 @@ const Marketplace = () => {
     );
   }
 
-  if (!items.length) {
+  if (!loading && !items.length) {
     return (
       <div className={wrapClass}>
         <p className={styles.message}>Товаров пока нет.</p>
@@ -230,11 +212,6 @@ const Marketplace = () => {
 
   return (
     <div className={wrapClass}>
-      {copied && (
-        <div className={styles.globalCopyToast} role="status">
-          Скопировано
-        </div>
-      )}
       <SiteHeader
         logo={headerLogo}
         logoSize={theme ? 'large' : 'default'}
@@ -349,15 +326,24 @@ const Marketplace = () => {
           <span className={styles.shopDivider} aria-hidden="true" />
         </div>
       )}
-      {showLiked && visibleItems.length === 0 ? (
+      {loading ? (
+        // Шапка и первый экран не зависят от товаров и видны сразу, а вместо
+        // сетки — скелетон в той же раскладке.
+        <div role="status" aria-label="Загрузка товаров">
+          <ul className={gridClass} aria-hidden="true">
+            {Array.from({ length: SKELETON_CARDS }, (_, index) => (
+              <li key={index} className={styles.gridItem}>
+                <ProductCardSkeleton index={index} boutique={boutique} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : showLiked && visibleItems.length === 0 ? (
         <p id={showHeroVideo ? undefined : 'catalog'} className={styles.message}>
           Пока ничего не выбрано — нажмите на сердечко у товара, чтобы сохранить его здесь.
         </p>
       ) : (
-        <ul
-          id={showHeroVideo ? undefined : 'catalog'}
-          className={boutique ? `${styles.grid} ${styles.gridBoutique}` : styles.grid}
-        >
+        <ul id={showHeroVideo ? undefined : 'catalog'} className={gridClass}>
           {visibleItems.map((item, index) => (
             <li key={item.name} className={styles.gridItem}>
               <ProductCard item={item} index={index} onSelect={openProduct} boutique={boutique} />
@@ -365,80 +351,68 @@ const Marketplace = () => {
           ))}
         </ul>
       )}
-      {!shopSlug && (
-      <p className={styles.promoNote}>
-        По промокоду{' '}
-        <button type="button" className={styles.promoCodeButton} onClick={handlePromoCopy}>
-          {PROMO_CODE}
-        </button>{' '}
-        скидка 10% на первый заказ. Отправьте это сообщение{' '}
-        <a href={supportTgLink} target="_blank" rel="noopener noreferrer" className={styles.promoLink}>
-          менеджеру в телеграм
-        </a>
-        .
-      </p>
+      {!loading && (
+        <footer className={styles.siteFooter}>
+          <div className={styles.footerGrid}>
+            <div className={styles.footerBlock}>
+              <h2 className={styles.footerHeading}>О компании</h2>
+              <p className={styles.footerText}>
+                {SELLER.shortName}
+                <br />
+                ИНН {SELLER.inn}
+                <br />
+                ОГРНИП {SELLER.ogrnip}
+                <br />
+                Юридический адрес: {SELLER.address}
+              </p>
+            </div>
+            <div className={styles.footerBlock}>
+              <h2 className={styles.footerHeading}>Контакты</h2>
+              <p className={styles.footerText}>
+                <a className={styles.footerLink} href={`tel:${PHONE_E164.replace(/\D/g, '')}`}>
+                  +7&nbsp;981&nbsp;040-39-53
+                </a>
+                <br />
+                <a className={styles.footerLink} href={`mailto:${CONTACT_EMAIL}`}>
+                  {CONTACT_EMAIL}
+                </a>
+                <br />
+                <a
+                  className={styles.footerLink}
+                  href={TG_CHANNEL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Telegram — канал
+                </a>
+                <br />
+                <a
+                  className={styles.footerLink}
+                  href={supportTgLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Связаться с менеджером
+                </a>
+              </p>
+            </div>
+          </div>
+          <p className={styles.footerLegal}>
+            <Link to={LEGAL_LINKS.shopOffer} className={styles.footerLegalLink}>
+              Публичная оферта магазина
+            </Link>
+            {' · '}
+            <Link to={LEGAL_LINKS.privacy} className={styles.footerLegalLink}>
+              Политика конфиденциальности
+            </Link>
+            {' · '}
+            <Link to={LEGAL_LINKS.requisites} className={styles.footerLegalLink}>
+              Реквизиты
+            </Link>
+          </p>
+          <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>
+        </footer>
       )}
-
-      <footer className={styles.siteFooter}>
-        <div className={styles.footerGrid}>
-          <div className={styles.footerBlock}>
-            <h2 className={styles.footerHeading}>О компании</h2>
-            <p className={styles.footerText}>
-              {SELLER.shortName}
-              <br />
-              ИНН {SELLER.inn}
-              <br />
-              ОГРНИП {SELLER.ogrnip}
-              <br />
-              Юридический адрес: {SELLER.address}
-            </p>
-          </div>
-          <div className={styles.footerBlock}>
-            <h2 className={styles.footerHeading}>Контакты</h2>
-            <p className={styles.footerText}>
-              <a className={styles.footerLink} href={`tel:${PHONE_E164.replace(/\D/g, '')}`}>
-                +7&nbsp;981&nbsp;040-39-53
-              </a>
-              <br />
-              <a className={styles.footerLink} href={`mailto:${CONTACT_EMAIL}`}>
-                {CONTACT_EMAIL}
-              </a>
-              <br />
-              <a
-                className={styles.footerLink}
-                href={TG_CHANNEL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Telegram — канал
-              </a>
-              <br />
-              <a
-                className={styles.footerLink}
-                href={supportTgLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Связаться с менеджером
-              </a>
-            </p>
-          </div>
-        </div>
-        <p className={styles.footerLegal}>
-          <Link to={LEGAL_LINKS.shopOffer} className={styles.footerLegalLink}>
-            Публичная оферта магазина
-          </Link>
-          {' · '}
-          <Link to={LEGAL_LINKS.privacy} className={styles.footerLegalLink}>
-            Политика конфиденциальности
-          </Link>
-          {' · '}
-          <Link to={LEGAL_LINKS.requisites} className={styles.footerLegalLink}>
-            Реквизиты
-          </Link>
-        </p>
-        <p className={styles.footerCopyright}>© anyforms, 2026. Все права защищены</p>
-      </footer>
     </div>
   );
 };

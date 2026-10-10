@@ -27,6 +27,18 @@ const emptyForm = {
   active: true,
   validFrom: '',
   validUntil: '',
+  firstOrderOnly: false,
+  maxUses: '',
+};
+
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+const generateCode = (prefix = 'ANY') => {
+  const bytes = new Uint8Array(6);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(bytes);
+  else bytes.forEach((_, i) => { bytes[i] = Math.floor(Math.random() * 256); });
+  const tail = Array.from(bytes, (b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('');
+  return `${prefix}-${tail}`;
 };
 
 // «50% + 5 000 ₽» — размер скидки промокода одной строкой.
@@ -40,6 +52,7 @@ const discountLabel = (p) =>
 
 const promoStatus = (p) => {
   if (!p.active) return { label: 'выключен', className: styles.statusOff };
+  if (p.maxUses && (p.usesCount ?? 0) >= p.maxUses) return { label: 'израсходован', className: styles.statusOff };
   if (p.validFrom && Date.parse(p.validFrom) > Date.now()) {
     return { label: 'ждёт старта', className: styles.statusWait };
   }
@@ -104,6 +117,8 @@ const AdminPromoCodes = () => {
       active: Boolean(p.active),
       validFrom: isoToMskInput(p.validFrom),
       validUntil: isoToMskInput(p.validUntil),
+      firstOrderOnly: Boolean(p.firstOrderOnly),
+      maxUses: p.maxUses != null ? String(p.maxUses) : '',
     });
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -122,6 +137,7 @@ const AdminPromoCodes = () => {
     const percent = form.discountPercent === '' ? 0 : Number(form.discountPercent);
     const amountKopecks = rubToKopecks(form.discountAmountRub);
     const minOrderKopecks = rubToKopecks(form.minOrderRub);
+    const maxUses = String(form.maxUses).trim() === '' ? null : Number(form.maxUses);
 
     if (!code) return setError('Укажите код промокода.');
     if (!Number.isInteger(percent) || percent < 0 || percent > 100) {
@@ -132,6 +148,9 @@ const AdminPromoCodes = () => {
     }
     if (minOrderKopecks != null && (!Number.isFinite(minOrderKopecks) || minOrderKopecks <= 0)) {
       return setError('Минимальная сумма заказа — сумма в рублях больше нуля.');
+    }
+    if (maxUses != null && (!Number.isInteger(maxUses) || maxUses < 1)) {
+      return setError('Лимит использований — целое число от 1 или пусто, если без ограничений.');
     }
     if (percent === 0 && amountKopecks == null) {
       return setError('Скидка пустая: укажите процент или сумму.');
@@ -148,6 +167,8 @@ const AdminPromoCodes = () => {
       active: form.active,
       validFrom: mskInputToIso(form.validFrom),
       validUntil: mskInputToIso(form.validUntil),
+      firstOrderOnly: form.firstOrderOnly,
+      maxUses,
     };
 
     setSaving(true);
@@ -200,16 +221,42 @@ const AdminPromoCodes = () => {
         <div className={styles.formGrid}>
           <label className={styles.label}>
             Код *
+            <span className={styles.codeRow}>
+              <input
+                type="text"
+                name="code"
+                value={form.code}
+                onChange={setField}
+                className={styles.input}
+                placeholder="DI_GIPS"
+                autoComplete="off"
+                required
+              />
+              <button
+                type="button"
+                className={styles.generateBtn}
+                onClick={() => {
+                  setForm((prev) => ({ ...prev, code: generateCode(), maxUses: prev.maxUses || '1' }));
+                  setError('');
+                }}
+              >
+                Сгенерировать
+              </button>
+            </span>
+          </label>
+          <label className={styles.label}>
+            Сколько раз можно использовать
             <input
-              type="text"
-              name="code"
-              value={form.code}
+              type="number"
+              name="maxUses"
+              value={form.maxUses}
               onChange={setField}
               className={styles.input}
-              placeholder="DI_GIPS"
-              autoComplete="off"
-              required
+              placeholder="Без ограничений"
+              min="1"
+              step="1"
             />
+            <span className={styles.hint}>1 — одноразовый код: после первой оплаты он больше не сработает.</span>
           </label>
           <label className={styles.label}>
             Скидка, %
@@ -277,6 +324,10 @@ const AdminPromoCodes = () => {
           <input type="checkbox" name="active" checked={form.active} onChange={setField} />
           Активен
         </label>
+        <label className={styles.checkRow}>
+          <input type="checkbox" name="firstOrderOnly" checked={form.firstOrderOnly} onChange={setField} />
+          Только на первый заказ в магазине
+        </label>
         {error && <p className={styles.error}>{error}</p>}
         <div className={styles.formActions}>
           <button type="submit" className={styles.submit} disabled={saving}>
@@ -313,7 +364,9 @@ const AdminPromoCodes = () => {
                     </div>
                     <p className={styles.meta}>
                       скидка {discountLabel(p) || '—'}
+                      {p.firstOrderOnly ? ' на первый заказ' : ''}
                       {p.minOrderKopecks ? ` · от ${formatAmount(p.minOrderKopecks)}` : ''}
+                      {` · оплат с кодом: ${p.usesCount ?? 0}${p.maxUses ? ` из ${p.maxUses}` : ''}`}
                       {' · '}
                       {periodLabel(p)}
                       {(p.validFrom || p.validUntil) ? ' МСК' : ''}

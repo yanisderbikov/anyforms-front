@@ -264,6 +264,89 @@
   border-color: #111;
 }
 
+/* Кнопки карточки: блок прижат к низу, внутри — основная и «ячейка» под ней. */
+.cardActions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Прозрачная с рамкой — вторичная к «добавить трекер». */
+.cellBtn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: lowercase;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.cellBtn:hover {
+  border-color: #111;
+  background: rgba(17, 17, 17, 0.04);
+}
+
+.modalHint {
+  margin-top: -0.4rem;
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: lowercase;
+}
+
+.cellList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.cellRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cellHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Ячейка под строкой позиции в модалке отправки — на всю ширину строки. */
+.posCell {
+  flex: 1 0 100%;
+  font-size: 0.85rem;
+  color: #555;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.cellInput {
+  width: 100%;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #111;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cellInput:focus {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
 .completeModalBtn {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -319,6 +402,12 @@
   font-weight: 500;
   text-align: right;
   word-break: break-word;
+}
+
+/* Многострочный текст (ячейка): сохраняем переносы, выравниваем влево. */
+.multiline {
+  white-space: pre-line;
+  text-align: left;
 }
 
 .clickable {

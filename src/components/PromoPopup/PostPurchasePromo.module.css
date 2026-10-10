@@ -1,0 +1,85 @@
+.card {
+  max-width: 440px;
+  margin: 0 auto 16px;
+  padding: 14px 18px 14px;
+  background: #fff;
+  border: 2px dashed var(--shop-accent, #111);
+  border-radius: 14px;
+  text-align: left;
+  color: #111;
+  box-sizing: border-box;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8c8c8c;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  font-weight: 800;
+  font-family: var(--shop-title-font, inherit);
+  color: var(--shop-heading, inherit);
+  text-transform: var(--shop-title-transform, lowercase);
+}
+
+.text {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #555;
+  white-space: pre-line;
+}
+
+.codeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  background: #fafafa;
+  font-family: inherit;
+  color: #111;
+  cursor: pointer;
+  text-align: left;
+}
+
+.code {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  font-variant-numeric: lining-nums;
+}
+
+.copy {
+  flex: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: lowercase;
+  color: var(--shop-cta-fg, #fff);
+  background: var(--shop-cta-bg, #111);
+  transition: background 0.15s ease;
+}
+
+.codeBox:hover .copy {
+  background: var(--shop-cta-hover-bg, #333);
+  color: var(--shop-cta-hover-fg, #fff);
+}
+
+.note {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #8c8c8c;
+}

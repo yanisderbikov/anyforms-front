@@ -43,6 +43,15 @@ const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success'
 
 const CHECKOUT_SNAPSHOT_KEY = 'anyforms_checkout_snapshot';
 const PURCHASE_SENT_PREFIX = 'ga4_purchase_sent_';
+const PROMO_OFFERS_KEY = 'anyforms_promo_offers';
+const PROMO_LINK_SENT_KEY = 'anyforms_promo_link_sent';
+const PROMO_OFFER_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+const POPUP_SOURCE_BY_TYPE = {
+  CONTACT: 'popup_contact',
+  UNIQUE_CODE: 'popup_unique',
+  PUBLIC_CODE: 'popup_public',
+};
 
 const isBrowser = () => typeof window !== 'undefined';
 
@@ -308,6 +317,164 @@ const cartParams = (cartItems) => ({
 
 const yesNo = (value) => (value ? 'yes' : 'no');
 
+const normalizeCode = (code) => String(code ?? '').trim().toUpperCase().slice(0, 40);
+
+const readPromoOffers = () => {
+  if (!isBrowser()) return {};
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PROMO_OFFERS_KEY) || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const writePromoOffers = (offers) => {
+  try {
+    localStorage.setItem(PROMO_OFFERS_KEY, JSON.stringify(offers));
+  } catch {
+    return;
+  }
+};
+
+const compactString = (value, max = 80) => {
+  const str = String(value ?? '').trim();
+  return str ? str.slice(0, max) : '';
+};
+
+export function rememberPromoOffer(code, { source, popup, popupName, popupType } = {}) {
+  const key = normalizeCode(code);
+  if (!key || !source) return;
+  const now = Date.now();
+  const offers = Object.fromEntries(
+    Object.entries(readPromoOffers()).filter(([, offer]) => now - (Number(offer?.at) || 0) < PROMO_OFFER_TTL_MS)
+  );
+  offers[key] = {
+    source,
+    popup: popup ? String(popup) : '',
+    popup_name: compactString(popupName),
+    popup_type: popupType ? String(popupType) : '',
+    at: now,
+  };
+  writePromoOffers(offers);
+}
+
+export function readPromoOffer(code) {
+  const key = normalizeCode(code);
+  return key ? readPromoOffers()[key] || null : null;
+}
+
+const promoParams = (code) => {
+  const key = normalizeCode(code);
+  if (!key) return {};
+  const offer = readPromoOffer(key);
+  return {
+    code: key,
+    source: offer?.source || 'manual',
+    ...(offer?.popup ? { popup: offer.popup } : {}),
+    ...(offer?.popup_name ? { popup_name: offer.popup_name } : {}),
+    ...(offer?.popup_type ? { popup_type: offer.popup_type } : {}),
+  };
+};
+
+const discountParams = (promo) => ({
+  ...(promo?.discountPercent ? { discount_percent: Number(promo.discountPercent) } : {}),
+  ...(promo?.discountAmountKopecks ? { discount_amount: Math.round(Number(promo.discountAmountKopecks) / 100) } : {}),
+});
+
+const promoSnapshot = (promo) => {
+  if (!promo?.code) return null;
+  const base = promoParams(promo.code);
+  return {
+    code: base.code,
+    source: base.source,
+    popup_name: base.popup_name || '',
+    ...discountParams(promo),
+  };
+};
+
+const appliedPromoParams = (promo) => {
+  if (!promo?.code) return { promo_applied: 'no', promo_source: 'none' };
+  const snap = promo.source ? promo : promoSnapshot(promo);
+  return {
+    promo_applied: 'yes',
+    promo_code: snap.code,
+    promo_source: snap.source,
+    ...(snap.popup_name ? { promo_popup_name: snap.popup_name } : {}),
+    ...(snap.discount_percent ? { promo_discount_percent: snap.discount_percent } : {}),
+    ...(snap.discount_amount ? { promo_discount_amount: snap.discount_amount } : {}),
+  };
+};
+
+const popupParams = (popup, extra = {}) => ({
+  popup: String(popup?.id ?? ''),
+  popup_name: compactString(popup?.name),
+  popup_type: String(popup?.popupType ?? ''),
+  source: POPUP_SOURCE_BY_TYPE[popup?.popupType] || 'popup',
+  ...(extra.code ? { code: normalizeCode(extra.code) } : {}),
+  ...(extra.repeated != null ? { repeated: yesNo(extra.repeated) } : {}),
+  ...(extra.reason ? { reason: compactString(extra.reason) } : {}),
+});
+
+export function trackPromoPopup(action, popup, extra = {}) {
+  if (!popup) return;
+  if (extra.code && ['claimed', 'issued', 'code_taken', 'copied'].includes(action)) {
+    rememberPromoOffer(extra.code, {
+      source: POPUP_SOURCE_BY_TYPE[popup.popupType] || 'popup',
+      popup: popup.id,
+      popupName: popup.name,
+      popupType: popup.popupType,
+    });
+  }
+  const params = popupParams(popup, extra);
+  pushAnalyticsEvent('promo_popup', { action, ...params });
+  reachGoal(`promo_popup_${action}`, params);
+}
+
+export function trackPromoAfterPurchase(action, promo, extra = {}) {
+  if (!promo?.code) return;
+  if (action === 'shown') {
+    rememberPromoOffer(promo.code, {
+      source: 'after_purchase',
+      popup: promo.popupId,
+      popupName: promo.popupName,
+      popupType: 'AFTER_PURCHASE',
+    });
+  }
+  const params = {
+    popup: String(promo.popupId ?? ''),
+    popup_name: compactString(promo.popupName),
+    popup_type: 'AFTER_PURCHASE',
+    source: 'after_purchase',
+    code: normalizeCode(promo.code),
+    ...(extra.repeated != null ? { repeated: yesNo(extra.repeated) } : {}),
+    ...discountParams(promo),
+  };
+  pushAnalyticsEvent('promo_after_purchase', { action, ...params });
+  reachGoal(`promo_after_purchase_${action}`, params);
+}
+
+export function trackPromoLink(code) {
+  const key = normalizeCode(code);
+  if (!key || !isBrowser()) return;
+  let sent = {};
+  try {
+    sent = JSON.parse(sessionStorage.getItem(PROMO_LINK_SENT_KEY) || '{}') || {};
+  } catch {
+    sent = {};
+  }
+  if (sent[key]) return;
+  rememberPromoOffer(key, { source: 'link' });
+  const params = { code: key, source: 'link' };
+  pushAnalyticsEvent('promo_link', params);
+  reachGoal('promo_link_visit', params);
+  try {
+    sessionStorage.setItem(PROMO_LINK_SENT_KEY, JSON.stringify({ ...sent, [key]: 1 }));
+  } catch {
+    return;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Каталог
 // ---------------------------------------------------------------------------
@@ -512,31 +679,33 @@ export function trackPvzSelected(pvz) {
 }
 
 // Промокод: applied — применён, rejected — не подошёл (reason — текст бэкенда), error — не проверился.
-export function trackPromoCode(outcome, { code = '', reason = '' } = {}) {
+export function trackPromoCode(outcome, { code = '', reason = '', promo = null } = {}) {
   const params = {
     outcome,
-    code: String(code).slice(0, 40),
-    ...(reason ? { reason: String(reason).slice(0, 80) } : {}),
+    ...promoParams(code),
+    ...discountParams(promo),
+    ...(reason ? { reason: compactString(reason) } : {}),
   };
   pushAnalyticsEvent('promo_code', params);
   reachGoal(`promo_${outcome}`, params);
 }
 
 // Нажали «Оплатить» (форма прошла клиентскую валидацию, уходит запрос на создание платежа).
-export function trackCheckoutSubmit(cartItems, { promoApplied = false } = {}) {
-  const params = { ...cartParams(cartItems), promo_applied: yesNo(promoApplied) };
+export function trackCheckoutSubmit(cartItems, { promo = null } = {}) {
+  const params = { ...cartParams(cartItems), ...appliedPromoParams(promo) };
   pushAnalyticsEvent('checkout_submit', params);
   reachGoal('checkout_submit', params);
 }
 
 // Платёж создан, уходим на платёжную страницу.
-export function trackAddPaymentInfo(cartItems, paymentType, { promoApplied = false } = {}) {
+export function trackAddPaymentInfo(cartItems, paymentType, { promo = null } = {}) {
   pushEcommerceEvent(
     'add_payment_info',
     {
       currency: CURRENCY,
       value: cartValue(cartItems),
       payment_type: paymentType,
+      ...(promo?.code ? { coupon: normalizeCode(promo.code) } : {}),
       items: buildCartItems(cartItems),
     },
     { payment_type: paymentType }
@@ -544,7 +713,7 @@ export function trackAddPaymentInfo(cartItems, paymentType, { promoApplied = fal
   reachGoal('payment_created', {
     ...cartParams(cartItems),
     payment_type: paymentType,
-    promo_applied: yesNo(promoApplied),
+    ...appliedPromoParams(promo),
   });
 }
 
@@ -565,7 +734,14 @@ export function trackPaymentCancelled(paymentType) {
 // Ушёл с чекаута, не дойдя до платёжной страницы: закрыл вкладку, вернулся
 // в корзину, перешёл на другую страницу. filled/missing — какие обязательные
 // поля были заполнены (валидно) и каких не хватало: name, phone, email, pvz, terms.
-export function trackCheckoutAbandon({ filled = [], missing = [], seconds = 0, pvzSearched = false, cartItems = [] } = {}) {
+export function trackCheckoutAbandon({
+  filled = [],
+  missing = [],
+  seconds = 0,
+  pvzSearched = false,
+  cartItems = [],
+  promo = null,
+} = {}) {
   const params = {
     ...cartParams(cartItems),
     filled: filled.join(',') || 'none',
@@ -573,6 +749,7 @@ export function trackCheckoutAbandon({ filled = [], missing = [], seconds = 0, p
     filled_count: filled.length,
     seconds: Math.round(seconds),
     pvz_searched: yesNo(pvzSearched),
+    ...appliedPromoParams(promo),
   };
   pushAnalyticsEvent('checkout_abandon', params);
   reachGoal('checkout_abandon', params);
@@ -602,10 +779,12 @@ export function trackPurchase(order) {
   }
 
   const items = order.items ?? [];
+  const promo = order.promo ?? null;
   pushEcommerceEvent('purchase', {
     transaction_id: String(order.id),
     currency: CURRENCY,
     value: toPrice(order.value),
+    ...(promo?.code ? { coupon: promo.code } : {}),
     items: items.map((item) => buildItem(item, { quantity: Number(item.quantity) || 1 })),
   });
   // Ecommerce-покупку Метрика берёт из dataLayer; JS-цель добавляет к ней
@@ -614,7 +793,15 @@ export function trackPurchase(order) {
     ...cartParams(items),
     order_id: String(order.id),
     value: toPrice(order.value),
+    ...appliedPromoParams(promo),
   });
+  if (promo?.code) {
+    reachGoal('purchase_with_promo', {
+      order_id: String(order.id),
+      value: toPrice(order.value),
+      ...appliedPromoParams(promo),
+    });
+  }
 
   try {
     localStorage.setItem(storageKey, '1');
@@ -633,13 +820,14 @@ export function trackPurchase(order) {
 // localStorage (а не sessionStorage), чтобы пережить возврат в новой вкладке.
 // ---------------------------------------------------------------------------
 
-export function saveCheckoutSnapshot(cartItems, value = cartValue(cartItems)) {
+export function saveCheckoutSnapshot(cartItems, value = cartValue(cartItems), { promo = null } = {}) {
   if (!isBrowser()) return;
   try {
     localStorage.setItem(
       CHECKOUT_SNAPSHOT_KEY,
       JSON.stringify({
         value: toPrice(value),
+        promo: promoSnapshot(promo),
         items: cartItems.map((i) => ({
           id: String(i.id),
           name: i.variantLabel ? `${i.name ?? ''} ${i.variantLabel}` : (i.name ?? ''),
