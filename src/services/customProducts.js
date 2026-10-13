@@ -69,6 +69,11 @@ export const updateItemStatus = (id, status) =>
 // Ячейка хранения позиции: где лежат мастер-модель и материалы. Пустая строка очищает.
 export const updateItemStorageCell = (id, storageCell) =>
   http.patch(`/api/custom-product-items/${id}/storage-cell`, { storageCell }, cfg()).then((r) => r.data);
+// Лог производства позиции: записи «что сделали», время ставит сервер.
+export const getItemLogs = (id) =>
+  http.get(`/api/custom-product-items/${id}/logs`, cfg()).then((r) => r.data);
+export const addItemLog = (id, text) =>
+  http.post(`/api/custom-product-items/${id}/logs`, { text }, cfg()).then((r) => r.data);
 export const deleteItem = (id) =>
   http.delete(`/api/custom-product-items/${id}`, cfg()).then((r) => r.data);
 

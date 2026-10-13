@@ -11,6 +11,7 @@ import {
 import CustomItemModal from './CustomItemModal';
 import LinkText from './LinkText';
 import OrderGallery from './OrderGallery';
+import ProductionLog from './ProductionLog';
 import apiClient from '../../apiClient';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import styles from './CustomItemPage.module.css';
@@ -154,6 +155,8 @@ const CustomItemPage = () => {
               </div>
             </div>
           )}
+
+          {isAuthed && item.id && <ProductionLog item={item} />}
 
           <div className={styles.bottomInfo}>
             {item.status && (

@@ -128,13 +128,22 @@
 }
 
 .body {
+  flex: 1;
   padding: 0.9rem 1.1rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
 }
 
+.headRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .name {
+  min-width: 0;
   font-size: 1.05rem;
   font-weight: 700;
   color: #111;
@@ -166,6 +175,24 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+}
+
+.logBtn {
+  width: 100%;
+  margin-top: auto;
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logBtn:hover {
+  background: #8a8a8a;
+  color: #111;
 }
 
 .qty {
