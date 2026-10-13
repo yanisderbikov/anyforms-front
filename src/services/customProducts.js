@@ -147,7 +147,7 @@ export const CUSTOM_EDIT_STATUSES = [
   { value: 'COMPLETED', label: 'Завершен' },
 ];
 
-const IMAGE_RE = /\.(png|jpe?g|gif|webp|bmp|svg|heic|heif|avif)(\?|$)/i;
+const IMAGE_RE = /\.(png|jpe?g|jpe|jfif|gif|webp|bmp|svg|heic|heif|avif)(\?|$)/i;
 
 export const isImageFile = (file) => {
   if (!file) return false;
