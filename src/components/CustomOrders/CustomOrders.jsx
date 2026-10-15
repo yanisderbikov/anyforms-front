@@ -6,6 +6,7 @@ import CustomTabs from './CustomTabs';
 import CustomItemCard from './CustomItemCard';
 import CustomItemViewModal from './CustomItemViewModal';
 import CustomItemModal from './CustomItemModal';
+import LogQuickAddModal from './LogQuickAddModal';
 import StatusFilter from './StatusFilter';
 import styles from './CustomOrders.module.css';
 
@@ -45,6 +46,7 @@ const CustomOrders = () => {
   const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
   const [editing, setEditing] = useState(null);
+  const [logging, setLogging] = useState(null);
   const [search, setSearch] = useState('');
   const statusFilter = stageParamToStatus(searchParams.get('stage'));
 
@@ -134,6 +136,7 @@ const CustomOrders = () => {
               item={it}
               showModeler={statusFilter === 'MODELING'}
               onOpen={() => setViewing(it)}
+              onAddLog={() => setLogging(it)}
             />
           ))}
         </div>
@@ -149,6 +152,8 @@ const CustomOrders = () => {
           }}
         />
       )}
+
+      {logging && <LogQuickAddModal item={logging} onClose={() => setLogging(null)} />}
 
       {editing && (
         <CustomItemModal

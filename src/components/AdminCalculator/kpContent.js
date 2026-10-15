@@ -12,7 +12,7 @@ export const KP_WORKS = [
   ['extraKits', 'дополнительные производственные комплекты для параллельного литья'],
 ];
 
-const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'jpe', 'jfif', 'png', 'webp', 'gif'];
 
 export const kpDate = (date = new Date()) =>
   date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });

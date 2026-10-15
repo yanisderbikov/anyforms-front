@@ -34,7 +34,7 @@ const daysWord = (n) => {
   return 'дней';
 };
 
-const CustomItemCard = ({ item, onOpen, hideStatus, showModeler }) => {
+const CustomItemCard = ({ item, onOpen, onAddLog, hideStatus, showModeler }) => {
   const files = item.files || [];
   const first = files[0];
 
@@ -71,21 +71,34 @@ const CustomItemCard = ({ item, onOpen, hideStatus, showModeler }) => {
       </div>
 
       <div className={styles.body}>
-        <span className={styles.name} title={item.productName}>{item.productName || 'без названия'}</span>
+        <div className={styles.headRow}>
+          <span className={styles.name} title={item.productName}>{item.productName || 'без названия'}</span>
+          <span className={styles.qty}>{item.quantity} шт</span>
+        </div>
         {item.clientName && <span className={styles.client}>{item.clientName}</span>}
         {showModeler && (
           <span className={styles.modeler}>
             моделит: {item.modeler || '—'}
           </span>
         )}
-        <div className={styles.metaRow}>
-          {!hideStatus && item.status && (
+        {!hideStatus && item.status && (
+          <div className={styles.metaRow}>
             <span className={styles.status} style={CUSTOM_STATUS_STYLE[item.status]}>
               {CUSTOM_STATUS_LABELS[item.status] || item.status}
             </span>
-          )}
-          <span className={styles.qty}>{item.quantity} шт</span>
-        </div>
+          </div>
+        )}
+        {onAddLog && item.status === 'IN_PRODUCTION' && (
+          <button
+            className={styles.logBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddLog();
+            }}
+          >
+            добавить лог
+          </button>
+        )}
       </div>
     </div>
   );

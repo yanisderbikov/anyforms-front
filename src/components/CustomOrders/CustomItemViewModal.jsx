@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { CUSTOM_STATUS_LABELS, CUSTOM_STATUS_STYLE, isImageFile, fileExt } from '../../services/customProducts';
 import LinkText from './LinkText';
 import OrderGallery from './OrderGallery';
+import ProductionLog from './ProductionLog';
 import styles from './CustomItemViewModal.module.css';
 
 // Скачивание файла: пробуем blob (форсит сохранение), при CORS — открываем в новой вкладке.
@@ -113,6 +114,8 @@ const CustomItemViewModal = ({ item, onClose, onEdit }) => {
         )}
 
         {files.length === 0 && <p className={styles.emptyFiles}>файлов нет</p>}
+
+        <ProductionLog item={item} />
 
         <div className={styles.bottomInfo}>
           {item.status && (
