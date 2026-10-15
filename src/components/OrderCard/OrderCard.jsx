@@ -208,6 +208,16 @@ const OrderCard = ({ order, onAddTracker, onAddComment, onPickupReady, onDelete 
           )}
         </div>
 
+        {order.promoCode && (
+          <div
+            className={`${styles.promoNote} ${styles.clickable}`}
+            onClick={() => copyToClipboard(order.promoCode, 'Промокод скопирован')}
+            title="Заказ оплачен с этим промокодом. Нажмите, чтобы скопировать"
+          >
+            промокод <span className={styles.promoCode}>{order.promoCode}</span>
+          </div>
+        )}
+
         <div className={styles.itemsSection}>
           <h4 className={styles.itemsTitle}>Товары:</h4>
           <ul className={styles.itemsList}>

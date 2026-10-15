@@ -172,6 +172,19 @@
   opacity: 0.4;
 }
 
+.promoNote {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #999;
+  text-align: right;
+}
+
+.promoCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+  color: #777;
+}
+
 .itemsSection {
   margin-top: 1rem;
 }
