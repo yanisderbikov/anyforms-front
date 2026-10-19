@@ -10,6 +10,7 @@ export const SECTIONS = {
   PROMO_CODES: 'PROMO_CODES',
   SALESBOT: 'SALESBOT',
   USERS: 'USERS',
+  SHOPS: 'SHOPS',
   SHOP_ANALYTICS: 'SHOP_ANALYTICS',
   ORDER_CALCULATOR: 'ORDER_CALCULATOR',
   CALCULATOR_RATES: 'CALCULATOR_RATES',
@@ -22,6 +23,7 @@ const ROLE_SECTIONS = {
     SECTIONS.ORDER_CALCULATOR,
     SECTIONS.CALCULATOR_RATES,
     SECTIONS.PRODUCTS,
+    SECTIONS.SHOPS,
     SECTIONS.SHOP_ANALYTICS,
     SECTIONS.INVOICES,
     SECTIONS.TRAINING_INVOICES,
@@ -53,6 +55,7 @@ export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/calculator')) return SECTIONS.ORDER_CALCULATOR;
   if (pathname.startsWith('/admin/products/analytics')) return SECTIONS.SHOP_ANALYTICS;
   if (pathname.startsWith('/admin/products')) return SECTIONS.PRODUCTS;
+  if (pathname.startsWith('/admin/shops')) return SECTIONS.SHOPS;
   if (pathname.startsWith('/admin/promo-codes')) return SECTIONS.PROMO_CODES;
   if (pathname.startsWith('/admin/promo-popups')) return SECTIONS.PROMO_CODES;
   if (pathname.startsWith('/admin/free-delivery')) return SECTIONS.PROMO_CODES;

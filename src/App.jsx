@@ -79,6 +79,7 @@ const AdminSalesbot = React.lazy(() => import('./components/AdminSalesbot/AdminS
 const AdminSalesbotManualRun = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbotManualRun'));
 const AdminSalesbotAnalytics = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbotAnalytics'));
 const AdminUsers = React.lazy(() => import('./components/AdminUsers/AdminUsers'));
+const AdminShops = React.lazy(() => import('./components/AdminShops/AdminShops'));
 
 const KNOWN_PATHS = new Set([
   '/',
@@ -124,6 +125,7 @@ const KNOWN_PATHS = new Set([
   '/admin/orders/custom/ship',
   '/admin/products',
   '/admin/products/analytics',
+  '/admin/shops',
   '/admin/promo-codes',
   '/admin/promo-popups',
   '/admin/free-delivery',
@@ -387,6 +389,7 @@ function App() {
             <Route path="/admin/products/analytics" element={<ShopSalesReport />} />
             {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
             <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
+            <Route path="/admin/shops" element={<AdminShops />} />
             <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
             <Route path="/admin/promo-popups" element={<AdminPromoPopups />} />
             <Route path="/admin/free-delivery" element={<AdminFreeDelivery />} />
