@@ -7,11 +7,12 @@ import MarketplaceProduct from "./components/Marketplace/MarketplaceProduct";
 import MainLanding from "./components/MainLanding/MainLanding";
 import Print3dLanding from "./components/Print3dLanding/Print3dLanding";
 import NotFound from "./components/NotFound/NotFound";
-import { SHOP_THEMES } from "./components/Marketplace/shopThemes";
+import { useShopTheme } from "./components/Marketplace/shopThemes";
 import { SITE_URL, PAGE_SEO, DEFAULT_OG_IMAGE } from './shared/pageSeo.mjs';
 import { setAnalyticsShop, trackPageView, trackPromoLink } from './services/analytics';
 import { getPromoFromSearch } from './shared/promoTracking';
 import PromoPopupHost from './components/PromoPopup/PromoPopupHost';
+import { useShopFavicon } from './hooks/useShopFavicon';
 
 // Код-сплиттинг по роутам. В основном бандле остаются только:
 // - витрина и карточка товара (/shop, /shop/<slug>, …/product/:id) — ~65% просмотров;
@@ -80,6 +81,7 @@ const AdminSalesbotManualRun = React.lazy(() => import('./components/AdminSalesb
 const AdminSalesbotAnalytics = React.lazy(() => import('./components/AdminSalesbot/AdminSalesbotAnalytics'));
 const AdminUsers = React.lazy(() => import('./components/AdminUsers/AdminUsers'));
 const AdminShops = React.lazy(() => import('./components/AdminShops/AdminShops'));
+const AdminShopEdit = React.lazy(() => import('./components/AdminShops/AdminShopEdit'));
 
 const KNOWN_PATHS = new Set([
   '/',
@@ -197,9 +199,10 @@ function App() {
   const shopPathSlug = isShopPage
     ? shopSlugMatch[1]
     : normalizedPathname.match(/^\/shop\/([^/]+)\/product\//)?.[1] ?? null;
-  const shopThemeBg = shopPathSlug ? SHOP_THEMES[shopPathSlug]?.pageBackground ?? null : null;
+  const shopThemeBg = useShopTheme(shopPathSlug)?.pageBackground ?? null;
   const isCartFlowPage = ['/shop/cart', '/shop/checkout', '/shop/success'].includes(normalizedPathname);
-  const cartThemeBg = isCartFlowPage ? SHOP_THEMES[cartShopSlug]?.pageBackground ?? null : null;
+  const cartThemeBg = useShopTheme(isCartFlowPage ? cartShopSlug : null)?.pageBackground ?? null;
+  useShopFavicon(shopPathSlug ?? (isCartFlowPage ? cartShopSlug : null));
   const isNotFoundPage = !KNOWN_PATHS.has(normalizedPathname) && !isShopProductPage && !isShopPage;
 
   useEffect(() => {
@@ -390,6 +393,7 @@ function App() {
             {/* Карточка товара: productId = "new" — создание, uuid — редактирование. */}
             <Route path="/admin/products/:productId" element={<AdminProductEdit />} />
             <Route path="/admin/shops" element={<AdminShops />} />
+            <Route path="/admin/shops/:shopId" element={<AdminShopEdit />} />
             <Route path="/admin/promo-codes" element={<AdminPromoCodes />} />
             <Route path="/admin/promo-popups" element={<AdminPromoPopups />} />
             <Route path="/admin/free-delivery" element={<AdminFreeDelivery />} />

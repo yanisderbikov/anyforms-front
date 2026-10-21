@@ -6,7 +6,7 @@ import { useCart, isPurchasable, DEFAULT_SHOP_SLUG } from '../../context/CartCon
 import { useShopSupport } from '../../hooks/useShopSupport';
 import LikeButton from '../shared/LikeButton/LikeButton';
 import AspectPhoto from '../shared/AspectPhoto/AspectPhoto';
-import { SHOP_THEMES } from './shopThemes';
+import { useShopTheme } from './shopThemes';
 import styles from './MarketplaceProduct.module.css';
 
 const SKELETON_THUMBS = [0, 1, 2];
@@ -32,8 +32,8 @@ const MarketplaceProduct = () => {
   const currentShop = shopSlug || DEFAULT_SHOP_SLUG;
   const shopBase = shopSlug ? `/shop/${shopSlug}` : '/shop';
   // Тема партнёрской витрины: карточка товара оформляется в её стиле.
-  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
-  const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
+  const theme = useShopTheme(shopSlug);
+  const pageClass = theme?.className ? `${styles.page} ${theme.className}` : styles.page;
   // Поддержка ведёт в бот магазина, а не в общий AnyFormsBot.
   const { handle: supportTg, link: supportTgLink } = useShopSupport(shopSlug);
 
@@ -115,7 +115,7 @@ const MarketplaceProduct = () => {
 
   if (loading) {
     return (
-      <div className={pageClass} id="top">
+      <div className={pageClass} style={theme?.style} id="top">
         <div className={styles.inner}>
           <div className={styles.topBar}>
             <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
@@ -154,7 +154,7 @@ const MarketplaceProduct = () => {
 
   if (!product) {
     return (
-      <div className={pageClass} id="top">
+      <div className={pageClass} style={theme?.style} id="top">
         <div className={styles.inner}>
           <div className={styles.topBar}>
             <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
@@ -188,7 +188,7 @@ const MarketplaceProduct = () => {
   )?.quantity ?? 0;
 
   return (
-    <div className={pageClass} id="top">
+    <div className={pageClass} style={theme?.style} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
           <Link className={styles.back} to={shopBase} state={{ backToList: true }}>← В магазин</Link>
