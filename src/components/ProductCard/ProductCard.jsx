@@ -55,10 +55,11 @@ const ProductCard = ({ item, index = null, onSelect, boutique = false }) => {
             decoding="async"
           />
         ) : null}
-        {item.discountPercent > 0 && (
+        {item.discountPercent > 0 && !item.novelty && (
           <span className={styles.discountBadge}>−{item.discountPercent}%</span>
         )}
         {item.preorder && <span className={styles.preorderBadge}>Предзаказ</span>}
+        {item.novelty && <span className={styles.noveltyBadge}>Новинка</span>}
       </div>
       <div className={styles.body}>
         <h2 className={styles.name}>{item.name}</h2>

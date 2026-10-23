@@ -243,6 +243,9 @@ const AdminProducts = () => {
                     {p.preorder && (
                       <span className={`${styles.badge} ${styles.badgePreorder}`}>предзаказ</span>
                     )}
+                    {p.novelty && (
+                      <span className={`${styles.badge} ${styles.badgeNovelty}`}>новинка</span>
+                    )}
                   </span>
                   {variants.length > 0 && (
                     <span className={styles.itemMeta}>

@@ -294,6 +294,10 @@
   background: #4a6fa5;
 }
 
+.badgeNovelty {
+  background: #2f7d4f;
+}
+
 /* Магазины товара: партнёрские — фиолетовые, anyforms — чёрный */
 .badgeShop {
   background: #6b4aa5;

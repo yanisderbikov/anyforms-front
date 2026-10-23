@@ -217,10 +217,11 @@ const MarketplaceProduct = () => {
             )}
             <div className={styles.main}>
               <LikeButton productId={product.id} product={product} placement="product_page" overlay />
-              {product.discountPercent > 0 && (
+              {product.discountPercent > 0 && !product.novelty && (
                 <span className={styles.discountBadge}>−{product.discountPercent}%</span>
               )}
               {product.preorder && <span className={styles.preorderBadge}>Предзаказ</span>}
+              {product.novelty && <span className={styles.noveltyBadge}>Новинка</span>}
               {image ? (
                 <AspectPhoto src={image} alt={product.name} />
               ) : (
