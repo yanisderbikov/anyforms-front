@@ -12,7 +12,7 @@ import {
   clearCheckoutSnapshot,
 } from '../../services/analytics';
 import { clearCheckoutFormPromo } from './checkoutFormStorage';
-import { SHOP_THEMES } from './shopThemes';
+import { useShopTheme } from './shopThemes';
 import { getDeviceId } from '../../shared/deviceId';
 import PostPurchasePromo from '../PromoPopup/PostPurchasePromo';
 import styles from './checkout.module.css';
@@ -55,8 +55,8 @@ const MarketplaceSuccess = () => {
   // Поддержка ведёт в бот магазина, в котором оформлен заказ.
   const { handle: supportTg, link: supportTgLink } = useShopSupport(shopSlug);
   // Страница результата оплаты — в теме магазина заказа; anyforms — без изменений.
-  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
-  const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
+  const theme = useShopTheme(shopSlug);
+  const pageClass = theme?.className ? `${styles.page} ${theme.className}` : styles.page;
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get('order')?.toUpperCase() || null;
   const isFail = searchParams.get('status') === 'fail';
@@ -172,7 +172,7 @@ const MarketplaceSuccess = () => {
   const totalFormatted = order?.totalRub ? formatRub(order.totalRub) : null;
 
   return (
-    <div className={pageClass} id="top">
+    <div className={pageClass} style={theme?.style} id="top">
       <div className={styles.inner}>
         <div className={styles.centered}>
           <div className={isFail ? styles.failIcon : styles.successIcon}>{isFail ? '✕' : '✓'}</div>

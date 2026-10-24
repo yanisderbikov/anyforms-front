@@ -10,7 +10,9 @@ import { DEFAULT_SUPPORT_TG, tgLink } from '../../hooks/useShopSupport';
 import ProductCard from '../ProductCard/ProductCard';
 import ProductCardSkeleton from '../ProductCard/ProductCardSkeleton';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
-import { SHOP_THEMES } from './shopThemes';
+import { useShopTheme } from './shopThemes';
+import { isShopPreview, sendPreviewFocus, useShopPreviewDraft } from './shopPreview';
+import PreviewText from './PreviewText';
 import styles from './Marketplace.module.css';
 const TG_CHANNEL = 'https://t.me/anyforms';
 const PHONE_E164 = '+79810403953';
@@ -40,37 +42,44 @@ const Marketplace = () => {
   const navigate = useNavigate();
   // /shop — витрина anyforms, /shop/:shopSlug — витрина магазина. Товар виден там, где он отмечен.
   const { shopSlug } = useParams();
-  const [shop, setShop] = useState(null);
-  const [shopMissing, setShopMissing] = useState(false);
+  const [loadedShop, setShop] = useState(null);
+  const [loadedShopMissing, setShopMissing] = useState(false);
+  const previewDraft = useShopPreviewDraft();
+  const shop = isShopPreview ? previewDraft ?? loadedShop : loadedShop;
+  const shopMissing = isShopPreview ? false : loadedShopMissing;
   // Базовый путь витрины: с него строятся ссылки на товары, чтобы покупка
   // засчиталась магазину, с витрины которого пришёл покупатель.
   const shopBase = shopSlug ? `/shop/${shopSlug}` : '/shop';
   // Тема партнёрской витрины (цвета/типографика); без темы — стиль anyforms.
   // Витрина с темой получает «бутиковую» подачу каталога: крупные фото без
   // рамок-карточек, только название и цена (описание живёт на странице товара).
-  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
+  const theme = useShopTheme(shopSlug);
+  const branding = shopSlug ? shop : null;
   const boutique = Boolean(theme);
-  const wrapClass = theme
-    ? `${styles.wrap} ${styles.wrapBoutique} ${theme.className}`
-    : styles.wrap;
+  const wrapClass = [
+    styles.wrap,
+    theme && styles.wrapBoutique,
+    theme?.className,
+    isShopPreview && styles.previewMode,
+  ].filter(Boolean).join(' ');
+  const wrapStyle = theme?.style;
   const gridClass = boutique ? `${styles.grid} ${styles.gridBoutique}` : styles.grid;
   const shopName = shop?.name ?? shopSlug;
-  // Логотип магазина в шапке: словомарка (headerLogo), на узких экранах —
-  // знак (headerMark), если он есть; без картинок — название текстом.
-  const headerLogo = theme
+  // Логотип магазина в шапке: логотип из настроек магазина, на узких экранах —
+  // знак, если он есть; без картинок — название текстом.
+  const shopLogo = branding?.logoUrl || branding?.logoMarkUrl || null;
+  const headerLogo = theme || shopLogo
     ? {
         href: '#top',
         ariaLabel: `${shopName} — наверх`,
         alt: shopName,
-        text: shopName,
-        src: theme.headerLogo?.src ?? theme.headerMark?.src,
-        width: (theme.headerLogo ?? theme.headerMark)?.width,
-        height: (theme.headerLogo ?? theme.headerMark)?.height,
-        compactSrc: theme.headerLogo && theme.headerMark ? theme.headerMark.src : undefined,
-        compactWidth: theme.headerMark?.width,
-        compactHeight: theme.headerMark?.height,
+        text: shop ? shopName : '',
+        src: shopLogo ?? undefined,
+        compactSrc: branding?.logoUrl && branding?.logoMarkUrl ? branding.logoMarkUrl : undefined,
       }
     : ANYFORMS_LOGO;
+  const tagline = branding?.tagline || shopName;
+  const description = branding?.description || null;
   // Связь с менеджером/поддержкой — бот магазина; общая витрина — AnyFormsBot.
   const supportTgLink = tgLink(shop?.supportTelegram || DEFAULT_SUPPORT_TG);
   const { count } = useCart();
@@ -88,25 +97,55 @@ const Marketplace = () => {
     []
   );
 
-  // Ролик-приветствие витрины: берём первый формат из темы, который умеет
-  // играть браузер. Если подходящего нет (старый iPhone без webm) или файл
-  // не загрузился — показываем обычный текстовый заголовок вместо видео.
+  // Ролик-приветствие витрины: показываем, только если браузер умеет его
+  // играть. Если формат не поддерживается (старый iPhone без webm) или файл
+  // не загрузился — показываем фото или обычный текстовый заголовок.
+  const heroVideoUrl = branding?.heroVideoUrl || null;
   const heroVideoSrc = useMemo(() => {
-    if (!theme?.heroVideo) return null;
-    const probe = document.createElement('video');
-    const sources = [
-      { src: theme.heroVideo.webm, type: 'video/webm' },
-      { src: theme.heroVideo.mp4, type: 'video/mp4' },
-    ];
-    return sources.find((s) => s.src && probe.canPlayType(s.type))?.src ?? null;
-  }, [theme]);
+    if (!heroVideoUrl) return null;
+    const type = /\.webm(\?|$)/i.test(heroVideoUrl) ? 'video/webm' : 'video/mp4';
+    return document.createElement('video').canPlayType(type) ? heroVideoUrl : null;
+  }, [heroVideoUrl]);
   const showHeroVideo = Boolean(heroVideoSrc) && !heroVideoFailed;
 
   // Фото-приветствие — как видео, но статичное: если в теме есть и видео,
   // и фото, видео важнее, а фото остаётся запасным вариантом при ошибке.
   const [heroImageFailed, setHeroImageFailed] = useState(false);
-  const heroImage = !heroImageFailed ? theme?.heroImage ?? null : null;
+  const heroImage = !heroImageFailed && branding?.heroImageUrl
+    ? { src: branding.heroImageUrl, alt: branding.heroImageAlt }
+    : null;
   const showHero = showHeroVideo || Boolean(heroImage);
+
+  const focusInEditor = (field) => (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    sendPreviewFocus(field);
+  };
+
+  const titleNode = isShopPreview ? (
+    <PreviewText
+      as="h1"
+      field="tagline"
+      value={tagline}
+      placeholder="Заголовок витрины"
+      className={styles.shopTitle}
+    />
+  ) : (
+    <h1 className={styles.shopTitle}>{tagline}</h1>
+  );
+
+  const descriptionNode = isShopPreview ? (
+    <PreviewText
+      as="p"
+      field="description"
+      value={description || ''}
+      placeholder="Нажмите, чтобы добавить описание магазина"
+      className={styles.heroDescription}
+      multiline
+    />
+  ) : (
+    description && <p className={styles.heroDescription}>{description}</p>
+  );
 
   // Плавный скролл к каталогу; ссылка с #catalog остаётся рабочей и без JS.
   const scrollToCatalog = (e) => {
@@ -143,6 +182,7 @@ const Marketplace = () => {
   useEffect(() => {
     setLoading(true);
     getItems(shopSlug)
+      .then((list) => (isShopPreview && !list.length ? getItems() : list))
       .then(setItems)
       .catch((err) => setError(err?.message || 'Не удалось загрузить товары'))
       .finally(() => setLoading(false));
@@ -185,7 +225,7 @@ const Marketplace = () => {
 
   if (error) {
     return (
-      <div className={wrapClass}>
+      <div className={wrapClass} style={wrapStyle}>
         <p className={styles.error}>{error}</p>
       </div>
     );
@@ -193,7 +233,7 @@ const Marketplace = () => {
 
   if (shopMissing) {
     return (
-      <div className={wrapClass}>
+      <div className={wrapClass} style={wrapStyle}>
         <p className={styles.message}>Такого магазина нет.</p>
         <p className={styles.message}>
           <Link to="/shop" className={styles.promoLink}>Перейти в общий магазин</Link>
@@ -204,14 +244,15 @@ const Marketplace = () => {
 
   if (!loading && !items.length) {
     return (
-      <div className={wrapClass}>
+      <div className={wrapClass} style={wrapStyle}>
         <p className={styles.message}>Товаров пока нет.</p>
       </div>
     );
   }
 
   return (
-    <div className={wrapClass}>
+    <div className={wrapClass} style={wrapStyle}>
+      <div onClickCapture={isShopPreview ? focusInEditor('logoUrl') : undefined}>
       <SiteHeader
         logo={headerLogo}
         logoSize={theme ? 'large' : 'default'}
@@ -265,16 +306,18 @@ const Marketplace = () => {
           </>
         )}
       />
+      </div>
       {showHero ? (
         <section className={styles.hero}>
           <div className={styles.heroTitleBlock}>
-            <h1 className={styles.shopTitle}>{theme.tagline ?? shopName}</h1>
+            {titleNode}
             <span className={styles.shopDivider} aria-hidden="true" />
-            {theme.description && (
-              <p className={styles.heroDescription}>{theme.description}</p>
-            )}
+            {descriptionNode}
           </div>
-          <div className={styles.heroMedia}>
+          <div
+            className={styles.heroMedia}
+            onClickCapture={isShopPreview ? focusInEditor(showHeroVideo ? 'heroVideoUrl' : 'heroImageUrl') : undefined}
+          >
             {showHeroVideo ? (
               <video
                 className={styles.heroVideo}
@@ -302,10 +345,11 @@ const Marketplace = () => {
         </section>
       ) : (
         <div className={styles.intro}>
-          {theme ? (
+          {theme || branding?.tagline || isShopPreview ? (
             <>
-              <h1 className={styles.shopTitle}>{theme.tagline ?? shopName}</h1>
+              {titleNode}
               <span className={styles.shopDivider} aria-hidden="true" />
+              {descriptionNode}
             </>
           ) : (
             <>

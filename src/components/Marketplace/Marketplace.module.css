@@ -623,3 +623,33 @@
   }
 }
 
+
+.previewEditable {
+  outline: 2px dashed transparent;
+  outline-offset: 6px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline-color 0.15s ease;
+}
+
+.previewEditable:hover {
+  outline-color: color-mix(in srgb, var(--shop-accent, #111) 45%, transparent);
+}
+
+.previewEditable:focus {
+  outline-color: var(--shop-accent, #111);
+}
+
+.previewEditable:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.45;
+}
+
+.previewMode .heroMedia {
+  cursor: pointer;
+}
+
+.previewMode .heroMedia:hover {
+  outline: 2px dashed var(--shop-accent, #111);
+  outline-offset: 4px;
+}
