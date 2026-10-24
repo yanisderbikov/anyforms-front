@@ -21,7 +21,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
   const [form, setForm] = useState({
     productName: item.productName || '',
     description: item.description || '',
-    quantity: item.quantity ?? 1,
+    quantity: item.quantity != null ? String(item.quantity) : '',
     status: item.status || 'MODELING',
     modeler: item.modeler || '',
     nda: !!item.nda,
@@ -145,7 +145,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
         <div className={styles.row}>
           <label className={styles.field}>
             <span className={styles.label}>кол-во</span>
-            <input className={styles.input} type="number" min={1} value={form.quantity} onChange={(e) => setF('quantity', e.target.value)} />
+            <input className={styles.input} type="text" inputMode="numeric" placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value.replace(/\D/g, ''))} />
           </label>
           {!hideStatus && (
             <label className={styles.field}>

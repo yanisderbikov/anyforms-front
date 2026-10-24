@@ -11,7 +11,7 @@ import {
 } from '../../services/analytics';
 import { useFreeDelivery } from '../../hooks/useFreeDelivery';
 import FreeDeliveryHint, { DeliverySummaryValue } from './FreeDeliveryHint';
-import { SHOP_THEMES } from './shopThemes';
+import { useShopTheme } from './shopThemes';
 import styles from './checkout.module.css';
 
 const formatPrice = (value) => `${value.toLocaleString('ru-RU')} ₽`;
@@ -21,8 +21,8 @@ const MarketplaceCart = () => {
   // Возврат на ту витрину, с которой набрана корзина.
   const shopBase = shopSlug && shopSlug !== DEFAULT_SHOP_SLUG ? `/shop/${shopSlug}` : '/shop';
   // Корзина партнёрской витрины оформляется в её теме; anyforms — без изменений.
-  const theme = shopSlug ? SHOP_THEMES[shopSlug] : null;
-  const pageClass = theme ? `${styles.page} ${theme.className}` : styles.page;
+  const theme = useShopTheme(shopSlug);
+  const pageClass = theme?.className ? `${styles.page} ${theme.className}` : styles.page;
   const navigate = useNavigate();
   const location = useLocation();
   const checkoutEnabled = isMarketplaceCheckoutEnabled(location.search);
@@ -71,7 +71,7 @@ const MarketplaceCart = () => {
   };
 
   return (
-    <div className={pageClass} id="top">
+    <div className={pageClass} style={theme?.style} id="top">
       <div className={styles.inner}>
         <div className={styles.topBar}>
           <Link className={styles.back} to={shopBase}>

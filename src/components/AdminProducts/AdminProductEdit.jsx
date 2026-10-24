@@ -30,6 +30,7 @@ const emptyForm = {
   heightCm: '',
   active: true,
   preorder: false,
+  novelty: false,
   shopSlugs: [DEFAULT_SHOP_SLUG],
   variants: [],
 };
@@ -60,6 +61,7 @@ const formFromProduct = (p) => ({
   heightCm: p.heightCm ?? '',
   active: p.active !== false,
   preorder: Boolean(p.preorder),
+  novelty: Boolean(p.novelty),
   shopSlugs: Array.isArray(p.shops) ? p.shops.map((s) => s.slug) : [],
   variants: (p.variants ?? []).map((v) => ({ id: v.id ?? '', label: v.label ?? '', price: v.price ?? '' })),
 });
@@ -172,6 +174,7 @@ const AdminProductEdit = () => {
       tgLink: form.tgLink.trim(),
       active: Boolean(form.active),
       preorder: Boolean(form.preorder),
+      novelty: Boolean(form.novelty),
       shopSlugs: form.shopSlugs,
       variants: form.variants
         .filter((v) => v.label.trim() || v.price.trim())
@@ -356,6 +359,7 @@ const AdminProductEdit = () => {
               )}
               {!form.active && <span className={`${styles.badge} ${styles.badgeOff}`}>выключен</span>}
               {form.preorder && <span className={`${styles.badge} ${styles.badgePreorder}`}>предзаказ</span>}
+              {form.novelty && <span className={`${styles.badge} ${styles.badgeNovelty}`}>новинка</span>}
             </div>
           </div>
           <button type="submit" className={styles.saveBtn} disabled={saving}>
@@ -637,6 +641,10 @@ const AdminProductEdit = () => {
           <label className={styles.checkLabel}>
             <input type="checkbox" name="preorder" checked={form.preorder} onChange={setField} />
             Предзаказ (плашка и пояснение на витрине)
+          </label>
+          <label className={styles.checkLabel}>
+            <input type="checkbox" name="novelty" checked={form.novelty} onChange={setField} />
+            Новинка (плашка на витрине)
           </label>
         </Section>
 

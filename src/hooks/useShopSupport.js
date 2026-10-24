@@ -8,7 +8,7 @@ export const tgLink = (handle) => `https://t.me/${handle}`;
 
 // Один запрос списка магазинов на всё приложение; при ошибке — повтор при следующем вызове.
 let shopsPromise = null;
-const loadShops = () => {
+export const loadShops = () => {
   if (!shopsPromise) {
     shopsPromise = getShops().catch((err) => {
       shopsPromise = null;

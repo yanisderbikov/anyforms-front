@@ -60,6 +60,11 @@ const utmFromSearch = (search) => {
   );
 };
 
+const MAX_PAGE_URL_LENGTH = 1024;
+
+// В Telegram Mini App в hash лежит длинный tgWebAppData, на бэк он не нужен.
+export const promoPageUrl = (href = window.location.href) => href.split('#')[0].slice(0, MAX_PAGE_URL_LENGTH);
+
 const errorMessage = (err) =>
   err?.response?.data?.message ||
   (err?.response?.status === 429 ? 'Слишком много попыток. Попробуйте через несколько минут.' : '') ||
@@ -71,7 +76,7 @@ const issueCode = async (popup, search) => {
       ...knownContact(),
       ...utmFromSearch(search),
       deviceId: getDeviceId(),
-      pageUrl: window.location.href,
+      pageUrl: promoPageUrl(),
     });
     trackPromoPopup('issued', popup, { code: data.code, repeated: Boolean(data.repeated) });
     return data;
@@ -174,7 +179,7 @@ const PromoPopupHost = ({ pathname, search }) => {
           ...utmFromSearch(search),
           deviceId: getDeviceId(),
           consentVersion: popup.consentVersion,
-          pageUrl: window.location.href,
+          pageUrl: promoPageUrl(),
         });
         writePopupState(popup.id, { claimedAt: Date.now() });
         saveContactForCheckout({ phone: form.phone, email: form.email });

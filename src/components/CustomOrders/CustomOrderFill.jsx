@@ -17,7 +17,7 @@ import AutoTextarea from './AutoTextarea';
 import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomOrderFill.module.css';
 
-const EMPTY = { productName: '', description: '', quantity: 1, status: 'MODELING', nda: false };
+const EMPTY = { productName: '', description: '', quantity: '', status: 'MODELING', nda: false };
 
 const CustomOrderFill = () => {
   const { orderId } = useParams();
@@ -163,7 +163,7 @@ const CustomOrderFill = () => {
         <div className={styles.formTitle}>новая позиция</div>
         <input className={styles.input} placeholder="название продукта" value={form.productName} onChange={(e) => setF('productName', e.target.value)} />
         <AutoTextarea className={styles.textarea} placeholder="описание" value={form.description} onChange={(e) => setF('description', e.target.value)} />
-        <input className={styles.inputNarrow} type="number" min={1} placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value)} />
+        <input className={styles.inputNarrow} type="text" inputMode="numeric" placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value.replace(/\D/g, ''))} />
 
         <span className={styles.label}>статус</span>
         <select className={styles.statusSelect} value={form.status} onChange={(e) => setF('status', e.target.value)}>
