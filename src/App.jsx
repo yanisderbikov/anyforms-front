@@ -69,6 +69,7 @@ const ShopSalesReport = React.lazy(() => import('./components/AdminProducts/Shop
 const AdminPromoCodes = React.lazy(() => import('./components/AdminPromoCodes/AdminPromoCodes'));
 const AdminPromoPopups = React.lazy(() => import('./components/AdminPromoPopups/AdminPromoPopups'));
 const AdminFreeDelivery = React.lazy(() => import('./components/AdminFreeDelivery/AdminFreeDelivery'));
+const AdminMcp = React.lazy(() => import('./components/AdminMcp/AdminMcp'));
 const AdminCalculator = React.lazy(() => import('./components/AdminCalculator/AdminCalculator'));
 const CalculatorJournal = React.lazy(() => import('./components/AdminCalculator/CalculatorJournal'));
 const CalculatorRatesPage = React.lazy(() => import('./components/AdminCalculator/CalculatorRatesPage'));
@@ -142,6 +143,7 @@ const KNOWN_PATHS = new Set([
   '/admin/salesbot/manual',
   '/admin/salesbot/analytics',
   '/admin/users',
+  '/admin/mcp',
 ]);
 
 const SHOP_RESERVED_SEGMENTS = new Set(['product', 'cart', 'checkout', 'success', 'offer']);
@@ -407,6 +409,7 @@ function App() {
             <Route path="/admin/salesbot/manual" element={<AdminSalesbotManualRun />} />
             <Route path="/admin/salesbot/analytics" element={<AdminSalesbotAnalytics />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/mcp" element={<AdminMcp />} />
           </Route>
           {/* Старые адреса админки → новые под /admin */}
           <Route path="/orders" element={<Navigate to="/admin/orders/custom" replace />} />
