@@ -9,6 +9,7 @@ const PRODUCT_LABELS = {
   GUIDE: 'Гайд',
   COURSE: 'Курс — самостоятельное изучение',
   COURSE_PERSONAL: 'Курс — личное ведение',
+  COURSE_STREAM_2: 'Курс — второй поток',
 };
 
 const TASK_STATUS = {

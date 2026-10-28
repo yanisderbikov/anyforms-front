@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
+import { getSaleLeft } from './courseSale';
 import styles from './CourseCheckout.module.css';
 
-const LAUNCH = '1 сентября 2026';
+const LAUNCH = '10 ноября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 const CourseSuccess = () => {
@@ -51,10 +52,12 @@ const CourseSuccess = () => {
               <div className={styles.successMark} aria-hidden>
                 ✓
               </div>
-              <h1 className={styles.title}>Вы записаны на курс</h1>
+              <h1 className={styles.title}>Вы записаны на второй поток</h1>
               <p className={styles.successLead}>
-                Спасибо за оплату! Доступ к курсу откроется {LAUNCH} — мы пришлём ссылку на
-                указанную почту. На неё уже отправлено письмо-подтверждение: проверьте
+                Спасибо за оплату!{' '}
+                {getSaleLeft().closed
+                  ? 'Ссылку на материалы курса пришлём на указанную почту.'
+                  : `Второй поток стартует ${LAUNCH} — в этот день пришлём ссылку на материалы на указанную почту.`} На неё уже отправлено письмо-подтверждение: проверьте
                 входящие, а если письма нет в течение нескольких минут — папку «Спам» или
                 «Промоакции».
               </p>

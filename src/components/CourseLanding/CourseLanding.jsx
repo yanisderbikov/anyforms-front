@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
@@ -7,15 +7,13 @@ import {
   buildPassThroughQuery,
   formatPromoDeadlineNote,
 } from '../../shared/promoTracking';
-import { COURSE_PLANS } from './CourseCheckout';
-import { useSaleCountdown, daysLabel, PERSONAL_CLOSED } from './courseSale';
+import { COURSE_PRODUCT, coursePrice } from './CourseCheckout';
+import { useSaleCountdown, daysLabel } from './courseSale';
 import styles from './CourseLanding.module.css';
 
-const LAUNCH = '1 сентября 2026';
-const LAUNCH_SHORT = '1 сентября';
+const LAUNCH = '10 ноября 2026';
+const LAUNCH_SHORT = '10 ноября';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
-// Канал, куда уводим опоздавших: расскажем о следующем наборе.
-const TG_CHANNEL = 'https://t.me/anyforms';
 // Промокод гайда — по нему в попапе показывается заголовок-благодарность.
 const GUIDE_PROMO_CODE = 'ГАЙД';
 // Флаг «попап уже показывали» — чтобы не всплывал заново при возврате с чекаута.
@@ -54,57 +52,16 @@ const VideoIcon = ({ size = 20 }) => (
   </svg>
 );
 
-const PersonIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.8" />
-  </svg>
-);
-
-// Экран 11 — два тарифа участия.
-const TARIFFS = [
-  {
-    key: 'self',
-    name: COURSE_PLANS.self.label,
-    desc: 'Изучаете курс в записи в своём темпе.',
-    icon: <VideoIcon size={26} />,
-    features: [
-      '4 видео-модуля: от идеи до рабочей формы',
-      'Доступ к материалам — навсегда',
-      '10 готовых моделей для практики',
-      'Закрытый чат мастеров (2000+)',
-      'Поставщики, материалы и скидки на закупки',
-      'Пак с оснастками',
-
-    ],
-  },
-  {
-    key: 'personal',
-    name: COURSE_PLANS.personal.label,
-    desc: 'Месяц работы вместе с командой anyforms.',
-    icon: <PersonIcon size={26} />,
-    features: [
-      '4 видео-модуля: от идеи до рабочей формы',
-      'Доступ к материалам — навсегда',
-      '10 готовых моделей для практики',
-      'Закрытый чат мастеров (2000+)',
-      'Поставщики, материалы и скидки на закупки',
-      'Пак с оснастками',
-      'Еженедельные видео-созвоны с ответами на ваши вопросы',
-      'Разбор работ с конкретными правками',
-      'Личная поддержка на каждом этапе',
-    ],
-  },
+// Экран 11 — что входит в курс.
+const COURSE_FEATURES = [
+  '4 видео-модуля: от идеи до рабочей формы',
+  'Доступ к материалам — навсегда',
+  '10 готовых моделей для практики',
+  'Закрытый чат мастеров (2000+)',
+  'Поставщики, материалы и скидки на закупки',
+  'Пак с оснастками',
 ];
 
-// Фичи «Личного ведения», совпадающие с базовым тарифом, показываем приглушённо.
-const SELF_FEATURES = new Set(TARIFFS[0].features);
 const HERO_VIDEO = 'https://storage.yandexcloud.net/anyforms/course/landing_course.webm';
 const OFFER_IMAGE = 'https://storage.yandexcloud.net/anyforms/course/printer.jpeg';
 
@@ -137,7 +94,20 @@ const HERO_FEATURES = [
       </svg>
     ),
   },
-  { label: 'Два формата участия', icon: <PersonIcon /> },
+  {
+    label: 'Второй поток',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M3.5 10h17M8 3v4M16 3v4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 // Цифры-доказательства — реальное производство anyforms.
@@ -362,7 +332,7 @@ const FAQ = [
   },
   {
     q: 'Когда откроется доступ к курсу?',
-    a: `Сейчас открыт набор. Доступ ко всем материалам откроется ${LAUNCH} — сразу после старта.`,
+    a: `Курс стартует ${LAUNCH} — в этот день откроем доступ ко всем материалам. До старта действует цена предзаказа. Если запишетесь после запуска, ссылку на материалы пришлём на почту после оплаты.`,
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
@@ -464,19 +434,9 @@ const NAV_LINKS = [
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
-// Обратный отсчёт до закрытия набора: «время заканчивается — успевайте».
+// Обратный отсчёт до конца цены предзаказа: «время заканчивается — успевайте».
 const Countdown = ({ left, className = '' }) => {
-  if (left.closed) {
-    return (
-      <div className={`${styles.countdown} ${styles.countdownClosed} ${className}`}>
-        <span className={styles.countdownLabel}>Набор закрыт</span>
-        <p className={styles.countdownNote}>
-          Курс стартовал {LAUNCH_SHORT} — набор закрыт. Напишите нам в
-          Telegram — подскажем, когда откроется следующий набор.
-        </p>
-      </div>
-    );
-  }
+  if (left.closed) return null;
   const cells = [
     [String(left.days), daysLabel(left.days)],
     [left.hours, 'ч'],
@@ -487,7 +447,7 @@ const Countdown = ({ left, className = '' }) => {
     <div className={`${styles.countdown} ${className}`} role="timer">
       <span className={styles.countdownLabel}>
         <span className={styles.countdownPulse} aria-hidden />
-        Набор скоро закроется! Успей записаться
+        Цена предзаказа скоро закончится! Успей записаться
       </span>
       <div className={styles.countdownDigits}>
         {cells.map(([value, label], i) => (
@@ -505,7 +465,8 @@ const Countdown = ({ left, className = '' }) => {
         ))}
       </div>
       <p className={styles.countdownNote}>
-        Набор закрывается {LAUNCH_SHORT} в 00:00 по Москве.
+        Цена предзаказа {COURSE_PRODUCT.preorderPrice} действует до {LAUNCH_SHORT} 00:00
+        по Москве, после старта — {COURSE_PRODUCT.price}.
       </p>
     </div>
   );
@@ -513,9 +474,7 @@ const Countdown = ({ left, className = '' }) => {
 
 // Компактный отсчёт внутри карточки цены в hero — «времени осталось мало».
 const HeroTimer = ({ left }) => {
-  if (left.closed) {
-    return <span className={styles.heroTimer}>Курс стартовал {LAUNCH_SHORT}</span>;
-  }
+  if (left.closed) return null;
   return (
     <span className={styles.heroTimer} role="timer">
       <span className={styles.heroTimerDot} aria-hidden />
@@ -539,34 +498,28 @@ const CourseLanding = () => {
   const location = useLocation();
   const promoFromUrl = getPromoFromSearch(location.search);
 
-  // На чекаут уходим с plan и сквозными promo/utm из текущего URL.
-  const goToCheckout = (planKey) =>
-    navigate(`${CHECKOUT_PATH}${buildPassThroughQuery(location.search, { plan: planKey })}`);
+  // На чекаут уходим со сквозными promo/utm из текущего URL.
+  const goToCheckout = () => navigate(`${CHECKOUT_PATH}${buildPassThroughQuery(location.search)}`);
 
-  // Промокод из ссылки (?promo=...): проверяем на бэке по обоим тарифам и,
-  // если валиден, зачёркиваем цены и показываем скидочные.
+  // Промокод из ссылки (?promo=...): проверяем на бэке и, если валиден,
+  // зачёркиваем цену и показываем скидочную.
   const saleLeft = useSaleCountdown();
-  const saleClosed = saleLeft.closed;
-  const [promoByPlan, setPromoByPlan] = useState(null);
+  const preorder = !saleLeft.closed;
+  const [promo, setPromo] = useState(null);
   const [promoPopupOpen, setPromoPopupOpen] = useState(false);
   useEffect(() => {
     if (!promoFromUrl) {
-      setPromoByPlan(null);
+      setPromo(null);
       return undefined;
     }
     let cancelled = false;
     (async () => {
       try {
-        const entries = await Promise.all(
-          Object.entries(COURSE_PLANS).map(async ([key, p]) => {
-            const { data } = await apiClient.instance.get('/api/payment/promo-check', {
-              params: { code: promoFromUrl, productCode: p.code },
-            });
-            return [key, data];
-          })
-        );
-        if (!cancelled && entries.every(([, d]) => d?.valid)) {
-          setPromoByPlan(Object.fromEntries(entries));
+        const { data } = await apiClient.instance.get('/api/payment/promo-check', {
+          params: { code: promoFromUrl, productCode: COURSE_PRODUCT.code },
+        });
+        if (!cancelled && data?.valid) {
+          setPromo(data);
           let seen = false;
           try {
             seen = sessionStorage.getItem(PROMO_POPUP_SEEN_KEY) === '1';
@@ -593,42 +546,10 @@ const CourseLanding = () => {
     }
   };
 
-  // Попап «запись закрыта»: при открытии страницы, при долистывании до конца
-  // и при клике на любую CTA. Задача — увести опоздавших в телеграм-канал.
-  const [closedPopupOpen, setClosedPopupOpen] = useState(false);
-  const bottomShownRef = useRef(false);
-  useEffect(() => {
-    if (!saleClosed) return undefined;
-    const id = setTimeout(() => setClosedPopupOpen(true), 800);
-    const onScroll = () => {
-      if (bottomShownRef.current) return;
-      const scrolledToEnd =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 200;
-      if (scrolledToEnd) {
-        bottomShownRef.current = true;
-        setClosedPopupOpen(true);
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      clearTimeout(id);
-      window.removeEventListener('scroll', onScroll);
-    };
-  }, [saleClosed]);
-
-  // Все CTA: пока набор открыт — скроллим к тарифам, после закрытия — попап.
-  const onCtaClick = () => {
-    if (saleClosed) {
-      setClosedPopupOpen(true);
-      return;
-    }
-    scrollToBuy();
-  };
-
-  const heroSelfPromo = promoByPlan?.self;
-  const isGuidePromo = heroSelfPromo?.code === GUIDE_PROMO_CODE;
-  const promoDeadline = formatPromoDeadlineNote(heroSelfPromo?.validUntil);
+  const isGuidePromo = promo?.code === GUIDE_PROMO_CODE;
+  const promoDeadline = formatPromoDeadlineNote(promo?.validUntil);
+  const shownPrice = promo ? formatKopecks(promo.discountedPriceKopecks) : coursePrice(preorder);
+  const shownOldPrice = promo ? formatKopecks(promo.priceKopecks) : preorder && COURSE_PRODUCT.price;
 
   return (
     <div className={styles.page}>
@@ -664,7 +585,7 @@ const CourseLanding = () => {
             variant: 'pill',
             onClick: (e) => {
               e.preventDefault();
-              onCtaClick();
+              scrollToBuy();
             },
           },
         ]}
@@ -678,7 +599,7 @@ const CourseLanding = () => {
             variant: 'primary',
             onClick: (e) => {
               e.preventDefault();
-              onCtaClick();
+              scrollToBuy();
             },
           },
         ]}
@@ -694,7 +615,7 @@ const CourseLanding = () => {
         }))}
       />
 
-      {promoPopupOpen && heroSelfPromo && (
+      {promoPopupOpen && promo && (
         <div
           className={styles.promoModalOverlay}
           role="dialog"
@@ -715,8 +636,8 @@ const CourseLanding = () => {
               {isGuidePromo ? 'Спасибо, что прошли гайд!' : 'Промокод применён'}
             </h2>
             <p className={styles.promoModalText}>
-              По промокоду {heroSelfPromo.code} вам доступна скидка{' '}
-              {promoDiscountLabel(heroSelfPromo)} — она уже применилась к ценам курса.
+              По промокоду {promo.code} вам доступна скидка{' '}
+              {promoDiscountLabel(promo)} — она уже применилась к ценам курса.
               {promoDeadline && <> Скидка действует {promoDeadline}.</>}
             </p>
             <button
@@ -726,55 +647,6 @@ const CourseLanding = () => {
             >
               Понятно
             </button>
-          </div>
-        </div>
-      )}
-
-      {closedPopupOpen && (
-        <div
-          className={styles.promoModalOverlay}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="closed-popup-title"
-          onClick={() => setClosedPopupOpen(false)}
-        >
-          <div className={styles.promoModal} onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className={styles.promoModalClose}
-              onClick={() => setClosedPopupOpen(false)}
-              aria-label="Закрыть"
-            >
-              ×
-            </button>
-            <h2 className={styles.promoModalTitle} id="closed-popup-title">
-              Запись закрыта
-            </h2>
-            <p className={styles.promoModalText}>
-              Курс стартовал {LAUNCH_SHORT}, и набор этого потока завершён. Подпишитесь
-              на наш телеграм-канал — там мы первыми сообщим о следующем наборе и
-              делимся закулисьем производства.
-            </p>
-            <div className={styles.closedModalBtns}>
-              <a
-                className={`${styles.cta} ${styles.closedModalTg}`}
-                href={TG_CHANNEL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Перейти в Telegram
-                <span className={styles.ctaArrow} aria-hidden>
-                  <ArrowIcon />
-                </span>
-              </a>
-              <button
-                type="button"
-                className={styles.closedModalDismiss}
-                onClick={() => setClosedPopupOpen(false)}
-              >
-                Закрыть
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -808,49 +680,34 @@ const CourseLanding = () => {
 
               <div className={styles.heroPriceCard}>
                 <div className={styles.heroPriceCol}>
-                  <span className={styles.heroPrice}>
-                    от{' '}
-                    {heroSelfPromo
-                      ? formatKopecks(heroSelfPromo.discountedPriceKopecks)
-                      : COURSE_PLANS.self.price}
-                  </span>
-                  {heroSelfPromo && (
-                    <span className={styles.heroPriceOld}>
-                      от {formatKopecks(heroSelfPromo.priceKopecks)}
-                    </span>
-                  )}
+                  <span className={styles.heroPrice}>{shownPrice}</span>
+                  {shownOldPrice && <span className={styles.heroPriceOld}>{shownOldPrice}</span>}
                 </div>
-                {saleClosed ? (
-                  <button
-                    type="button"
-                    className={`${styles.cta} ${styles.ctaDisabled}`}
-                    onClick={() => setClosedPopupOpen(true)}
-                  >
-                    Набор закрыт
-                  </button>
-                ) : (
-                  <button type="button" className={styles.cta} onClick={onCtaClick}>
-                    Записаться на курс
-                    <span className={styles.ctaArrow} aria-hidden>
-                      <ArrowIcon />
-                    </span>
-                  </button>
-                )}
+                <button type="button" className={styles.cta} onClick={scrollToBuy}>
+                  Записаться на курс
+                  <span className={styles.ctaArrow} aria-hidden>
+                    <ArrowIcon />
+                  </span>
+                </button>
                 <HeroTimer left={saleLeft} />
                 <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
-                  Запуск — {LAUNCH}. Успейте записаться до старта.
+                  {preorder
+                    ? `Запуск — ${LAUNCH}. Успейте записаться по цене предзаказа.`
+                    : `Курс стартовал ${LAUNCH}.`}
                 </p>
               </div>
             </div>
 
-            {heroSelfPromo && (
+            {promo && (
               <p className={styles.promoStrip}>
-                Промокод {heroSelfPromo.code} применён — скидка {promoDiscountLabel(heroSelfPromo)}
+                Промокод {promo.code} применён — скидка {promoDiscountLabel(promo)}
                 {promoDeadline ? `. Ваша скидка действует ${promoDeadline}.` : '.'}
               </p>
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
-              Запуск — {LAUNCH}. Успейте записаться до старта: после запуска набор закрывается.
+              {preorder
+                ? `Запуск — ${LAUNCH}. До старта действует цена предзаказа, после — ${COURSE_PRODUCT.price}.`
+                : `Курс стартовал ${LAUNCH}. После оплаты пришлём ссылку на материалы на почту.`}
             </p>
 
             <div className={styles.heroProof}>
@@ -867,7 +724,7 @@ const CourseLanding = () => {
           </div>
 
           <div className={styles.heroMedia}>
-            <span className={styles.heroBadge}>старт {LAUNCH}</span>
+            <span className={styles.heroBadge}>второй поток · старт {LAUNCH}</span>
             <video
               className={styles.heroImg}
               src={HERO_VIDEO}
@@ -1157,7 +1014,7 @@ const CourseLanding = () => {
                 принтер в комплекте с системой многоцветной печати AMS&nbsp;2.
                 А также два комплекта силикона от ХимСнаб Композит — по
                 5&nbsp;кг твёрдостью 10 и 20&nbsp;Shore&nbsp;A. Запишитесь
-                на любой тариф — и вы автоматически участвуете.
+                на курс — и вы автоматически участвуете.
               </p>
               <p className={styles.raffleSub}>
                 Розыгрыш пройдёт {LAUNCH} в Telegram — победителя открыто
@@ -1166,7 +1023,7 @@ const CourseLanding = () => {
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline} ${styles.raffleCta}`}
-                onClick={onCtaClick}
+                onClick={scrollToBuy}
               >
                 Участвовать в розыгрыше
                 <span className={styles.ctaArrow} aria-hidden>
@@ -1212,113 +1069,60 @@ const CourseLanding = () => {
       <section id="buy" className={styles.buySection} aria-labelledby="buy-title">
         <div className={styles.sectionInner}>
           <div className={styles.buyInner}>
-            <span className={styles.pillBadge}>Запуск — {LAUNCH_SHORT}</span>
+            <span className={styles.pillBadge}>Второй поток · запуск {LAUNCH_SHORT}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="buy-title">
-              <em className={styles.hAccent}>Два</em> формата участия
+              Запишитесь на <em className={styles.hAccent}>второй поток</em>
             </h2>
             <Countdown left={saleLeft} className={styles.countdownBuy} />
             <div className={styles.tariffGrid} id="buy-tariffs">
-              {TARIFFS.map((tariff) => {
-                const promo = promoByPlan?.[tariff.key];
-                const isPersonal = tariff.key === 'personal';
-                // «Личное ведение» больше не продаём; после дедлайна закрыты оба тарифа.
-                const personalClosed = isPersonal && PERSONAL_CLOSED;
-                const closed = saleClosed || personalClosed;
-                return (
-                  <article
-                    key={tariff.key}
-                    className={`${styles.tariffCard} ${
-                      isPersonal && !personalClosed ? styles.tariffCardFeatured : ''
-                    } ${closed ? styles.tariffCardClosed : ''}`}
-                  >
-                    {isPersonal && (
-                      <span
-                        className={`${styles.tariffBadge} ${
-                          personalClosed ? styles.tariffBadgeClosed : ''
-                        }`}
-                      >
-                        {personalClosed ? 'Набор закрыт' : 'Рекомендуем'}
+              <article className={`${styles.tariffCard} ${styles.tariffCardFeatured}`}>
+                <span className={styles.tariffBadge}>{preorder ? 'Предзаказ' : 'Второй поток'}</span>
+                <span className={styles.tariffIcon} aria-hidden>
+                  <VideoIcon size={26} />
+                </span>
+                <h3 className={styles.tariffName}>Курс по производству силиконовых форм</h3>
+                <p className={styles.tariffDesc}>Изучаете курс в записи в своём темпе.</p>
+                <ul className={styles.tariffList}>
+                  {COURSE_FEATURES.map((item) => (
+                    <li className={styles.buyIncludedItem} key={item}>
+                      <span className={styles.buyCheck} aria-hidden>
+                        ✓
                       </span>
-                    )}
-                    <span className={styles.tariffIcon} aria-hidden>
-                      {tariff.icon}
-                    </span>
-                    <h3 className={styles.tariffName}>{tariff.name}</h3>
-                    <p className={styles.tariffDesc}>{tariff.desc}</p>
-                    <ul className={styles.tariffList}>
-                      {tariff.features.map((item) => {
-                        const isShared = isPersonal && SELF_FEATURES.has(item);
-                        return (
-                          <li
-                            className={`${styles.buyIncludedItem} ${
-                              isShared ? styles.buyIncludedMuted : ''
-                            }`}
-                            key={item}
-                          >
-                            <span className={styles.buyCheck} aria-hidden>
-                              ✓
-                            </span>
-                            <span>{item}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <div className={styles.tariffPriceWrap}>
-                      {promo && (
-                        <span className={styles.tariffPriceOld}>
-                          {formatKopecks(promo.priceKopecks)}
-                        </span>
-                      )}
-                      <span className={styles.tariffPrice}>
-                        {promo
-                          ? formatKopecks(promo.discountedPriceKopecks)
-                          : COURSE_PLANS[tariff.key].price}
-                      </span>
-                    </div>
-                    {promo && (
-                      <p className={styles.tariffPromoNote}>
-                        Промокод {promo.code}: скидка {promoDiscountLabel(promo)}
-                        {formatPromoDeadlineNote(promo.validUntil)
-                          ? `, действует ${formatPromoDeadlineNote(promo.validUntil)}`
-                          : ''}
-                        . Применится на оплате.
-                      </p>
-                    )}
-                    {closed ? (
-                      <>
-                        <button
-                          type="button"
-                          className={`${styles.cta} ${styles.tariffCta} ${styles.ctaDisabled}`}
-                          disabled={!saleClosed}
-                          onClick={saleClosed ? () => setClosedPopupOpen(true) : undefined}
-                        >
-                          Набор закрыт
-                        </button>
-                        <p className={styles.tariffClosedNote}>
-                          {personalClosed
-                            ? 'Мест на личное ведение больше нет. Остался тариф «Самостоятельное изучение».'
-                            : 'Курс стартовал — набор завершён.'}
-                        </p>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        className={`${styles.cta} ${styles.tariffCta}`}
-                        onClick={() => goToCheckout(tariff.key)}
-                      >
-                        Записаться на курс
-                        <span className={styles.ctaArrow} aria-hidden>
-                          <ArrowIcon />
-                        </span>
-                      </button>
-                    )}
-                  </article>
-                );
-              })}
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className={styles.tariffPriceWrap}>
+                  {shownOldPrice && <span className={styles.tariffPriceOld}>{shownOldPrice}</span>}
+                  <span className={styles.tariffPrice}>{shownPrice}</span>
+                </div>
+                {promo && (
+                  <p className={styles.tariffPromoNote}>
+                    Промокод {promo.code}: скидка {promoDiscountLabel(promo)}
+                    {promoDeadline ? `, действует ${promoDeadline}` : ''}. Применится на оплате.
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className={`${styles.cta} ${styles.tariffCta}`}
+                  onClick={goToCheckout}
+                >
+                  Записаться на курс
+                  <span className={styles.ctaArrow} aria-hidden>
+                    <ArrowIcon />
+                  </span>
+                </button>
+              </article>
             </div>
             <span className={styles.buyMeta}>
-              <span>Цена до старта</span>
-              <span>Доступ откроется {LAUNCH}</span>
+              {preorder ? (
+                <>
+                  <span>Цена предзаказа — до {LAUNCH_SHORT}</span>
+                  <span>Доступ откроется {LAUNCH}</span>
+                </>
+              ) : (
+                <span>Курс стартовал {LAUNCH}</span>
+              )}
               <span>Материалы — навсегда</span>
             </span>
           </div>
@@ -1396,7 +1200,7 @@ const CourseLanding = () => {
       <section className={styles.darkSection} aria-labelledby="final-title">
         <div className={styles.sectionInner}>
           <div className={styles.finalInner}>
-            <span className={styles.eyebrowAccent}>Старт {LAUNCH}</span>
+            <span className={styles.eyebrowAccent}>Второй поток · старт {LAUNCH}</span>
             <h2 className={`${styles.sectionTitle} ${styles.sectionTitleHuge}`} id="final-title">
               Начните делать формы с&nbsp;<span className={styles.textAccent}>предсказуемым</span> результатом
             </h2>
@@ -1404,7 +1208,7 @@ const CourseLanding = () => {
               <button
                 type="button"
                 className={`${styles.cta} ${styles.ctaInline}`}
-                onClick={onCtaClick}
+                onClick={scrollToBuy}
               >
                 Начать учиться
                 <span className={styles.ctaArrow} aria-hidden>
@@ -1461,10 +1265,8 @@ const CourseLanding = () => {
 
           <div className={styles.footerOffer}>
             <p className={styles.footerOfferText}>
-              Курс — цифровой информационный продукт. Доступ
-              к материалам откроется {LAUNCH}. Материалы остаются бессрочно, ведение
-              специалистов на тарифе «Личное ведение» — 1 месяц. Оформляя покупку, вы
-              принимаете условия{' '}
+              Курс — цифровой информационный продукт. Старт второго потока — {LAUNCH}.
+              Материалы остаются бессрочно. Оформляя покупку, вы принимаете условия{' '}
               <a className={styles.footerLink} href="/course/offer">
                 оферты
               </a>{' '}

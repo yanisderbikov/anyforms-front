@@ -14,11 +14,14 @@ import styles from './AdminInvoices.module.css';
 
 const PRODUCT_OPTIONS = [
   { code: 'GUIDE', label: 'Гайд' },
-  { code: 'COURSE', label: 'Курс — самостоятельное изучение' },
-  { code: 'COURSE_PERSONAL', label: 'Курс — личное ведение' },
+  { code: 'COURSE_STREAM_2', label: 'Курс — второй поток' },
 ];
 
-const PRODUCT_LABELS = Object.fromEntries(PRODUCT_OPTIONS.map((p) => [p.code, p.label]));
+const PRODUCT_LABELS = {
+  ...Object.fromEntries(PRODUCT_OPTIONS.map((p) => [p.code, p.label])),
+  COURSE: 'Курс — самостоятельное изучение',
+  COURSE_PERSONAL: 'Курс — личное ведение',
+};
 
 const initialForm = {
   fullName: '',

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SiteHeader from '../shared/SiteHeader/SiteHeader';
 import apiClient from '../../apiClient';
 import {
@@ -10,40 +10,28 @@ import {
 } from '../../shared/promoTracking';
 import { EMAIL_RE, sanitizePhoneInput, isPhoneValid, toSubmitPhone } from '../../utils/phone';
 import { readCheckoutContact, saveCheckoutContact } from '../../shared/checkoutContactStorage';
-import { useSaleCountdown, daysLabel, PERSONAL_CLOSED } from './courseSale';
+import { useSaleCountdown, daysLabel } from './courseSale';
 import styles from './CourseCheckout.module.css';
 
-// Тарифы курса; code — продукт из payment_product на бэке.
-export const COURSE_PLANS = {
-  self: {
-    code: 'COURSE',
-    label: 'Самостоятельное изучение',
-    price: '14 900 ₽',
-    note: 'Записи курса и все материалы — навсегда',
-  },
-  personal: {
-    code: 'COURSE_PERSONAL',
-    label: 'Личное ведение',
-    price: '69 000 ₽',
-    note: 'Записи + ведение в течение месяца: разбор ошибок и обратная связь',
-  },
+// Курс, второй поток; code — продукт из payment_product на бэке.
+export const COURSE_PRODUCT = {
+  code: 'COURSE_STREAM_2',
+  price: '29 000 ₽',
+  preorderPrice: '19 000 ₽',
 };
+
+export const coursePrice = (preorder) =>
+  preorder ? COURSE_PRODUCT.preorderPrice : COURSE_PRODUCT.price;
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
-const LAUNCH = '1 сентября 2026';
-const LAUNCH_SHORT = '1 сентября';
+const LAUNCH = '10 ноября 2026';
 const SUPPORT_TG = 'https://t.me/AnyFormsBot';
 
 const CourseCheckout = () => {
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   // Обратные ссылки на лендинг сохраняют promo/utm из текущего URL.
   const backToCourse = `/course${buildPassThroughQuery(location.search)}`;
-  // «Личное ведение» закрыто: ссылку ?plan=personal молча переводим на базовый тариф.
-  const [plan, setPlan] = useState(
-    !PERSONAL_CLOSED && searchParams.get('plan') === 'personal' ? 'personal' : 'self'
-  );
   const saleLeft = useSaleCountdown();
   // Контакты общие для всех чекаутов: заполнял магазин или гайд — подставятся и здесь.
   const savedContact = useMemo(() => readCheckoutContact() || {}, []);
@@ -56,16 +44,9 @@ const CourseCheckout = () => {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [promoInput, setPromoInput] = useState('');
-  // Промокод проверяем сразу для обоих тарифов: {self: data, personal: data}.
-  const [appliedPromos, setAppliedPromos] = useState({});
-  // Причины отказа по тарифам: код может подойти одному тарифу и не подойти
-  // другому (например, не дотянул до минимальной суммы заказа).
-  const [planPromoMessages, setPlanPromoMessages] = useState({});
+  const [appliedPromo, setAppliedPromo] = useState(null);
   const [promoError, setPromoError] = useState('');
   const [promoChecking, setPromoChecking] = useState(false);
-
-  const appliedPromo = appliedPromos[plan] || null;
-  const shownPromoError = promoError || (!appliedPromo && planPromoMessages[plan]) || '';
 
   useEffect(() => {
     saveCheckoutContact({ fullName, phone, email });
@@ -77,41 +58,19 @@ const CourseCheckout = () => {
     setPromoChecking(true);
     setPromoError('');
     try {
-      const entries = await Promise.all(
-        Object.entries(COURSE_PLANS).map(async ([key, p]) => {
-          try {
-            const { data } = await apiClient.instance.get('/api/payment/promo-check', {
-              params: { code, productCode: p.code },
-            });
-            return [key, data];
-          } catch {
-            return [key, undefined];
-          }
-        })
-      );
-      const valid = Object.fromEntries(
-        entries.filter(([, data]) => data?.valid)
-      );
-      setPlanPromoMessages(
-        Object.fromEntries(
-          entries
-            .filter(([, data]) => data && !data.valid && data.message)
-            .map(([key, data]) => [key, data.message])
-        )
-      );
-      if (Object.keys(valid).length > 0) {
-        setAppliedPromos(valid);
-        setPromoInput((valid[plan] || Object.values(valid)[0]).code);
+      const { data } = await apiClient.instance.get('/api/payment/promo-check', {
+        params: { code, productCode: COURSE_PRODUCT.code },
+      });
+      if (data?.valid) {
+        setAppliedPromo(data);
+        setPromoInput(data.code);
       } else {
-        setAppliedPromos({});
-        const allFailed = entries.every(([, data]) => data === undefined);
-        const activeData = entries.find(([key]) => key === plan)?.[1];
-        setPromoError(
-          allFailed
-            ? 'Не удалось проверить промокод. Попробуйте ещё раз.'
-            : activeData?.message || 'Промокод не подошёл.'
-        );
+        setAppliedPromo(null);
+        setPromoError(data?.message || 'Промокод не подошёл.');
       }
+    } catch {
+      setAppliedPromo(null);
+      setPromoError('Не удалось проверить промокод. Попробуйте ещё раз.');
     } finally {
       setPromoChecking(false);
     }
@@ -127,17 +86,13 @@ const CourseCheckout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Скидки для обоих тарифов уже загружены — при смене тарифа перепроверять не нужно.
-  const selectPlan = (planKey) => {
-    if (planKey === plan) return;
-    if (planKey === 'personal' && PERSONAL_CLOSED) return;
-    setPlan(planKey);
-  };
-
-  const activePlan = COURSE_PLANS[plan];
+  const preorder = !saleLeft.closed;
   const displayPrice = appliedPromo
     ? formatKopecks(appliedPromo.discountedPriceKopecks)
-    : activePlan.price;
+    : coursePrice(preorder);
+  const oldPrice = appliedPromo
+    ? formatKopecks(appliedPromo.priceKopecks)
+    : preorder && COURSE_PRODUCT.price;
 
   const nameValid = fullName.trim().length >= 2;
   const phoneValid = isPhoneValid(phone);
@@ -180,7 +135,7 @@ const CourseCheckout = () => {
     setSubmitting(true);
     try {
       const { data } = await apiClient.instance.post('/api/payment/purchase', {
-        productCode: activePlan.code,
+        productCode: COURSE_PRODUCT.code,
         fullName: fullName.trim(),
         phone: toSubmitPhone(phone),
         email: email.trim(),
@@ -233,94 +188,37 @@ const CourseCheckout = () => {
           <span className={styles.eyebrow}>Оформление</span>
           <h1 className={styles.title}>Покупка курса</h1>
 
-          {saleLeft.closed ? (
-            <div className={styles.closedBox}>
-              <p className={styles.closedTitle}>Набор закрыт</p>
-              <p className={styles.closedNote}>
-                Курс стартовал {LAUNCH_SHORT} — набор закрыт. Напишите нам в
-                Telegram{' '}
-                <a
-                  className={styles.inlineLink}
-                  href={SUPPORT_TG}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  @AnyFormsBot
-                </a>{' '}
-                — расскажем про следующий набор.
-              </p>
-              <p className={styles.backWrap}>
-                <Link className={styles.back} to={backToCourse}>
-                  ← Назад к курсу
-                </Link>
-              </p>
-            </div>
-          ) : (
-          <>
-
-          <div className={styles.planPicker} role="radiogroup" aria-label="Тариф курса">
-            {Object.entries(COURSE_PLANS).map(([key, p]) => {
-              const planPromo = appliedPromos[key];
-              const planClosed = key === 'personal' && PERSONAL_CLOSED;
-              return (
-                <button
-                  type="button"
-                  key={key}
-                  role="radio"
-                  aria-checked={plan === key}
-                  disabled={planClosed}
-                  className={`${styles.planCard} ${plan === key ? styles.planCardActive : ''} ${
-                    planClosed ? styles.planCardClosed : ''
-                  }`}
-                  onClick={() => selectPlan(key)}
-                >
-                  <span className={styles.planName}>
-                    {p.label}
-                    {planClosed && <span className={styles.planClosedTag}>Набор закрыт</span>}
-                  </span>
-                  {planPromo ? (
-                    <span className={styles.planPriceRow}>
-                      <span className={styles.planPriceOld}>
-                        {formatKopecks(planPromo.priceKopecks)}
-                      </span>
-                      <span className={styles.planPrice}>
-                        {formatKopecks(planPromo.discountedPriceKopecks)}
-                      </span>
-                    </span>
-                  ) : (
-                    <span className={styles.planPrice}>{p.price}</span>
-                  )}
-                  <span className={styles.planNote}>{p.note}</span>
-                </button>
-              );
-            })}
-          </div>
-
           <div className={styles.summary}>
             <div className={styles.summaryRow}>
               <span className={styles.summaryName}>
-                Курс по производству силиконовых форм · {activePlan.label}
+                Курс по производству силиконовых форм · второй поток
               </span>
               <span className={styles.summaryPriceCol}>
-                {appliedPromo && (
-                  <span className={styles.summaryPriceOld}>
-                    {formatKopecks(appliedPromo.priceKopecks)}
-                  </span>
-                )}
+                {oldPrice && <span className={styles.summaryPriceOld}>{oldPrice}</span>}
                 <span className={styles.summaryPrice}>{displayPrice}</span>
               </span>
             </div>
-            <p className={styles.saleTimer}>
-              До закрытия набора:{' '}
-              <strong>
-                {saleLeft.days} {daysLabel(saleLeft.days)} {saleLeft.hours}:{saleLeft.minutes}:
-                {saleLeft.seconds}
-              </strong>
-            </p>
-            <p className={styles.summaryNote}>
-              Запуск курса — {LAUNCH}. Доступ откроется сразу после старта — ссылку
-              пришлём на указанную почту. После оплаты отправим письмо-подтверждение.
-            </p>
+            {preorder ? (
+              <>
+                <p className={styles.saleTimer}>
+                  До конца предзаказа:{' '}
+                  <strong>
+                    {saleLeft.days} {daysLabel(saleLeft.days)} {saleLeft.hours}:{saleLeft.minutes}:
+                    {saleLeft.seconds}
+                  </strong>
+                </p>
+                <p className={styles.summaryNote}>
+                  Запуск курса — {LAUNCH}. До старта действует цена предзаказа, доступ
+                  откроется в день запуска — ссылку пришлём на указанную почту. После оплаты
+                  отправим письмо-подтверждение.
+                </p>
+              </>
+            ) : (
+              <p className={styles.summaryNote}>
+                Курс стартовал {LAUNCH}. После оплаты пришлём на указанную почту
+                письмо-подтверждение и ссылку на материалы курса.
+              </p>
+            )}
           </div>
 
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
@@ -393,18 +291,17 @@ const CourseCheckout = () => {
             <div className={styles.promoRow}>
               <input
                 id="promo"
-                className={`${styles.input} ${shownPromoError ? styles.inputError : ''}`}
+                className={`${styles.input} ${promoError ? styles.inputError : ''}`}
                 type="text"
                 autoComplete="off"
                 placeholder="Введите промокод, если есть"
                 value={promoInput}
                 onChange={(e) => {
                   setPromoInput(e.target.value);
-                  setAppliedPromos({});
-                  setPlanPromoMessages({});
+                  setAppliedPromo(null);
                   setPromoError('');
                 }}
-                aria-invalid={Boolean(shownPromoError)}
+                aria-invalid={Boolean(promoError)}
               />
               <button
                 type="button"
@@ -415,7 +312,7 @@ const CourseCheckout = () => {
                 {promoChecking ? 'Проверяем…' : appliedPromo ? 'Применён' : 'Применить'}
               </button>
             </div>
-            {shownPromoError && <p className={styles.fieldError}>{shownPromoError}</p>}
+            {promoError && <p className={styles.fieldError}>{promoError}</p>}
             {appliedPromo && (
               <p className={styles.promoOk}>
                 Промокод {appliedPromo.code} применён: скидка{' '}
@@ -494,8 +391,6 @@ const CourseCheckout = () => {
               ← Назад к курсу
             </Link>
           </p>
-          </>
-          )}
         </div>
       </main>
     </div>
