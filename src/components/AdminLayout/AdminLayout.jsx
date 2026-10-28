@@ -72,6 +72,11 @@ const MENU = [
       { to: '/admin/salesbot/analytics', label: 'Аналитика' },
     ],
   },
+  {
+    title: 'интеграции',
+    section: SECTIONS.MCP,
+    items: [{ to: '/admin/mcp', label: 'Claude (MCP)' }],
+  },
 ];
 
 const AdminLayout = () => {

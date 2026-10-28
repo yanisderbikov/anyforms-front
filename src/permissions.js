@@ -14,6 +14,7 @@ export const SECTIONS = {
   SHOP_ANALYTICS: 'SHOP_ANALYTICS',
   ORDER_CALCULATOR: 'ORDER_CALCULATOR',
   CALCULATOR_RATES: 'CALCULATOR_RATES',
+  MCP: 'MCP',
 };
 
 const ROLE_SECTIONS = {
@@ -28,6 +29,7 @@ const ROLE_SECTIONS = {
     SECTIONS.YOOKASSA_RECEIPTS,
     SECTIONS.PROMO_CODES,
     SECTIONS.SALESBOT,
+    SECTIONS.MCP,
   ],
   SALES_MANAGER: [
     SECTIONS.CUSTOM_ORDERS,
@@ -58,6 +60,7 @@ export const sectionForPath = (pathname) => {
   if (pathname.startsWith('/admin/free-delivery')) return SECTIONS.PROMO_CODES;
   if (pathname.startsWith('/admin/salesbot')) return SECTIONS.SALESBOT;
   if (pathname.startsWith('/admin/users')) return SECTIONS.USERS;
+  if (pathname.startsWith('/admin/mcp')) return SECTIONS.MCP;
   if (pathname.startsWith('/admin/invoices/training')) return SECTIONS.TRAINING_INVOICES;
   if (pathname.startsWith('/admin/invoices/receipts')) return SECTIONS.YOOKASSA_RECEIPTS;
   if (pathname.startsWith('/admin/invoices')) return SECTIONS.INVOICES;
