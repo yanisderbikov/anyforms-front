@@ -820,16 +820,6 @@
   }
 }
 
-.textLink {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.textLink:hover {
-  color: var(--accent-hover);
-}
-
 /* ═══════════════ ЭКРАН 4 · МОДУЛИ ═══════════════ */
 .modulesSection {
   padding: 72px 0;

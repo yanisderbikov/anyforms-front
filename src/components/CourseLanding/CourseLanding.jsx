@@ -30,7 +30,6 @@ const FIRST_STREAM_REVIEWS = [
 
 const CALCULATOR_MEDIA = [];
 const CONSTRUCTOR_MEDIA = [];
-const SHAPE_STUDIO_URL = '';
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
@@ -57,15 +56,6 @@ const ArrowIcon = () => (
   </svg>
 );
 
-
-const ShapeStudioLink = () =>
-  SHAPE_STUDIO_URL ? (
-    <a className={styles.textLink} href={SHAPE_STUDIO_URL} target="_blank" rel="noreferrer">
-      Shape.studio
-    </a>
-  ) : (
-    'Shape.studio'
-  );
 
 const isVideoSrc = (src) => /\.(mp4|webm|mov)(\?|$)/i.test(src);
 
@@ -104,7 +94,7 @@ const COURSE_FEATURES = [
   'Закрытый чат мастеров (2000+)',
   'Поставщики, материалы и скидки на закупки',
   'Ранний доступ к «Конструктору оснасток» и «Калькулятору проектов»',
-  'Курс по гипсу от Shape.studio',
+  'Курс по гипсу Shape.studio от 24 Grams',
 ];
 
 const HERO_VIDEO = 'https://storage.yandexcloud.net/anyforms/course/landing_course.webm';
@@ -232,9 +222,7 @@ const MODULES = [
       'Подбор оборудования и расходников',
       'Как и чем обработать изделие',
       'Разберёмся в технологии заливки свечи',
-      <>
-        Бонус: курс по гипсу от <ShapeStudioLink />
-      </>,
+      'Бонус: курс по гипсу Shape.studio от наших партнёров 24 Grams',
     ],
   },
 ];
@@ -345,14 +333,7 @@ const BONUSES = [
   { key: 'discounts', text: 'Скидки на стартовые закупки' },
   { key: 'chat', text: 'Доступ в закрытый чат мастеров (2000+ участников)' },
   { key: 'models', text: '10 готовых моделей для отработки навыков' },
-  {
-    key: 'gypsum',
-    text: (
-      <>
-        Курс по гипсу <ShapeStudioLink /> от нашего партнёра
-      </>
-    ),
-  },
+  { key: 'gypsum', text: 'Курс по гипсу Shape.studio от наших партнёров 24 Grams' },
 ];
 
 // Экран 9 — что нужно, чтобы пройти.
