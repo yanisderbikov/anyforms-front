@@ -7,7 +7,7 @@ import {
   buildPassThroughQuery,
   formatPromoDeadlineNote,
 } from '../../shared/promoTracking';
-import { COURSE_PRODUCT, coursePrice } from './CourseCheckout';
+import { COURSE_PRODUCT } from './CourseCheckout';
 import { useSaleCountdown, daysLabel } from './courseSale';
 import styles from './CourseLanding.module.css';
 
@@ -405,7 +405,7 @@ const FAQ = [
   },
   {
     q: 'Когда откроется доступ к курсу?',
-    a: `Курс стартует ${LAUNCH} — в этот день откроем доступ ко всем материалам. До старта действует цена предзаказа. Если запишетесь после запуска, ссылку на материалы пришлём на почту после оплаты.`,
+    a: `Курс стартует ${LAUNCH} — в этот день откроем доступ ко всем материалам. Если запишетесь после запуска, ссылку на материалы пришлём на почту после оплаты.`,
   },
   {
     q: 'Нужен ли свой 3D-принтер?',
@@ -507,7 +507,7 @@ const NAV_LINKS = [
   { key: 'faq', label: 'Вопросы', id: 'faq' },
 ];
 
-// Обратный отсчёт до конца цены предзаказа: «время заканчивается — успевайте».
+// Обратный отсчёт до старта второго потока: «время заканчивается — успевайте».
 const Countdown = ({ left, className = '' }) => {
   if (left.closed) return null;
   const cells = [
@@ -520,7 +520,7 @@ const Countdown = ({ left, className = '' }) => {
     <div className={`${styles.countdown} ${className}`} role="timer">
       <span className={styles.countdownLabel}>
         <span className={styles.countdownPulse} aria-hidden />
-        Цена предзаказа скоро закончится! Успей записаться
+        Старт второго потока совсем скоро! Успей записаться
       </span>
       <div className={styles.countdownDigits}>
         {cells.map(([value, label], i) => (
@@ -538,8 +538,7 @@ const Countdown = ({ left, className = '' }) => {
         ))}
       </div>
       <p className={styles.countdownNote}>
-        Цена предзаказа {COURSE_PRODUCT.preorderPrice} действует до {LAUNCH_SHORT} 00:00
-        по Москве, после старта — {COURSE_PRODUCT.price}.
+        Старт второго потока — {LAUNCH}. В этот день откроем доступ ко всем материалам.
       </p>
     </div>
   );
@@ -663,8 +662,8 @@ const CourseLanding = () => {
   const reviews = FIRST_STREAM_REVIEWS.filter((review) => review.image);
   const isGuidePromo = promo?.code === GUIDE_PROMO_CODE;
   const promoDeadline = formatPromoDeadlineNote(promo?.validUntil);
-  const shownPrice = promo ? formatKopecks(promo.discountedPriceKopecks) : coursePrice(preorder);
-  const shownOldPrice = promo ? formatKopecks(promo.priceKopecks) : preorder && COURSE_PRODUCT.price;
+  const shownPrice = promo ? formatKopecks(promo.discountedPriceKopecks) : COURSE_PRODUCT.price;
+  const shownOldPrice = promo && formatKopecks(promo.priceKopecks);
 
   return (
     <div className={styles.page}>
@@ -807,7 +806,7 @@ const CourseLanding = () => {
                 <HeroTimer left={saleLeft} />
                 <p className={`${styles.preorderNote} ${styles.preorderNoteMobile}`}>
                   {preorder
-                    ? `Запуск — ${LAUNCH}. Успейте записаться по цене предзаказа.`
+                    ? `Запуск — ${LAUNCH}. Успейте записаться до старта.`
                     : `Курс стартовал ${LAUNCH}.`}
                 </p>
               </div>
@@ -821,7 +820,7 @@ const CourseLanding = () => {
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>
               {preorder
-                ? `Запуск — ${LAUNCH}. До старта действует цена предзаказа, после — ${COURSE_PRODUCT.price}.`
+                ? `Запуск — ${LAUNCH}. Доступ ко всем материалам откроется в день старта.`
                 : `Курс стартовал ${LAUNCH}. После оплаты пришлём ссылку на материалы на почту.`}
             </p>
 
@@ -1233,10 +1232,7 @@ const CourseLanding = () => {
             </div>
             <span className={styles.buyMeta}>
               {preorder ? (
-                <>
-                  <span>Цена предзаказа — до {LAUNCH_SHORT}</span>
-                  <span>Доступ откроется {LAUNCH}</span>
-                </>
+                <span>Доступ откроется {LAUNCH}</span>
               ) : (
                 <span>Курс стартовал {LAUNCH}</span>
               )}

@@ -16,12 +16,8 @@ import styles from './CourseCheckout.module.css';
 // Курс, второй поток; code — продукт из payment_product на бэке.
 export const COURSE_PRODUCT = {
   code: 'COURSE_STREAM_2',
-  price: '29 000 ₽',
-  preorderPrice: '19 000 ₽',
+  price: '16 900 ₽',
 };
-
-export const coursePrice = (preorder) =>
-  preorder ? COURSE_PRODUCT.preorderPrice : COURSE_PRODUCT.price;
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
@@ -89,10 +85,8 @@ const CourseCheckout = () => {
   const preorder = !saleLeft.closed;
   const displayPrice = appliedPromo
     ? formatKopecks(appliedPromo.discountedPriceKopecks)
-    : coursePrice(preorder);
-  const oldPrice = appliedPromo
-    ? formatKopecks(appliedPromo.priceKopecks)
-    : preorder && COURSE_PRODUCT.price;
+    : COURSE_PRODUCT.price;
+  const oldPrice = appliedPromo && formatKopecks(appliedPromo.priceKopecks);
 
   const nameValid = fullName.trim().length >= 2;
   const phoneValid = isPhoneValid(phone);
@@ -201,16 +195,15 @@ const CourseCheckout = () => {
             {preorder ? (
               <>
                 <p className={styles.saleTimer}>
-                  До конца предзаказа:{' '}
+                  До старта курса:{' '}
                   <strong>
                     {saleLeft.days} {daysLabel(saleLeft.days)} {saleLeft.hours}:{saleLeft.minutes}:
                     {saleLeft.seconds}
                   </strong>
                 </p>
                 <p className={styles.summaryNote}>
-                  Запуск курса — {LAUNCH}. До старта действует цена предзаказа, доступ
-                  откроется в день запуска — ссылку пришлём на указанную почту. После оплаты
-                  отправим письмо-подтверждение.
+                  Запуск курса — {LAUNCH}. Доступ откроется в день запуска — ссылку пришлём
+                  на указанную почту. После оплаты отправим письмо-подтверждение.
                 </p>
               </>
             ) : (
