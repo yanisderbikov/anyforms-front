@@ -958,15 +958,6 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
-.getCardText strong {
-  color: var(--white);
-  font-weight: 600;
-}
-
-.getCardWide {
-  grid-column: 1 / -1;
-}
-
 @media (min-width: 720px) {
   .getGrid {
     grid-template-columns: 1fr 1fr;
