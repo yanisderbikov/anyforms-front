@@ -19,14 +19,21 @@ const GUIDE_PROMO_CODE = 'ГАЙД';
 // Флаг «попап уже показывали» — чтобы не всплывал заново при возврате с чекаута.
 const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen';
 
+const REVIEWS_BASE = 'https://storage.yandexcloud.net/anyforms/course/reviews/';
+const REVIEW_FALLBACK_IMAGE = `${REVIEWS_BASE}review1.jpeg`;
+
 const FIRST_STREAM_REVIEWS = [
-  { name: 'Елена', role: 'дизайнер', image: '' },
-  { name: 'Евгения', role: 'свечевар', image: '' },
-  { name: 'Станислав', role: 'программист', image: '' },
-  { name: 'Валерия', role: 'свечевар', image: '' },
-  { name: 'Елена', role: 'кондитер', image: '' },
-  { name: 'Ольга', role: 'технолог акрилового гипса', image: '' },
-];
+  { name: 'Елена', role: 'дизайнер' },
+  { name: 'Евгения', role: 'свечевар' },
+  { name: 'Станислав', role: 'программист' },
+  { name: 'Валерия', role: 'свечевар' },
+  { name: 'Елена', role: 'кондитер' },
+  { name: 'Ольга', role: 'технолог акрилового гипса' },
+].map((review, i) => ({ ...review, image: `${REVIEWS_BASE}review${i + 1}.jpeg` }));
+
+const showReviewFallback = (e) => {
+  if (e.currentTarget.src !== REVIEW_FALLBACK_IMAGE) e.currentTarget.src = REVIEW_FALLBACK_IMAGE;
+};
 
 const PROPOSALS_MEDIA = [];
 const CONSTRUCTOR_MEDIA = [];
@@ -659,7 +666,6 @@ const CourseLanding = () => {
     }
   };
 
-  const reviews = FIRST_STREAM_REVIEWS.filter((review) => review.image);
   const isGuidePromo = promo?.code === GUIDE_PROMO_CODE;
   const promoDeadline = formatPromoDeadlineNote(promo?.validUntil);
   const shownPrice = promo ? formatKopecks(promo.discountedPriceKopecks) : COURSE_PRODUCT.price;
@@ -932,40 +938,6 @@ const CourseLanding = () => {
         </div>
       </section>
 
-      {/* ═══════════════ ЭКРАН 3.5 · ОТЗЫВЫ ПЕРВОГО ПОТОКА ═══════════════ */}
-      {reviews.length > 0 && (
-        <section id="reviews" className={styles.reviewsSection} aria-labelledby="reviews-title">
-          <div className={styles.sectionInner}>
-            <div className={styles.sectionHead}>
-              <span className={styles.eyebrow}>Отзывы</span>
-              <h2 className={styles.sectionTitle} id="reviews-title">
-                Отзывы участников первого потока
-              </h2>
-              <p className={styles.sectionLead}>
-                Курс проходят люди из самых разных ниш — нырнуть в обучение можно с любым
-                опытом.
-              </p>
-            </div>
-            <p className={styles.swipeHint}>← Листайте, чтобы посмотреть отзывы →</p>
-          </div>
-          <div className={styles.casesScroller}>
-            {reviews.map((review) => (
-              <figure className={styles.reviewItem} key={review.image}>
-                <img
-                  className={styles.reviewImg}
-                  src={review.image}
-                  alt={`Отзыв: ${review.name}, ${review.role}`}
-                  loading="lazy"
-                />
-                <figcaption className={styles.reviewCaption}>
-                  <strong>{review.name}</strong>, {review.role}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* ═══════════════ ЭКРАН 4 · МОДУЛИ ═══════════════ */}
       <section id="modules" className={styles.modulesSection} aria-labelledby="modules-title">
         <div className={styles.sectionInner}>
@@ -1025,6 +997,39 @@ const CourseLanding = () => {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ ЭКРАН 5.5 · ОТЗЫВЫ ПЕРВОГО ПОТОКА ═══════════════ */}
+      <section id="reviews" className={styles.reviewsSection} aria-labelledby="reviews-title">
+        <div className={styles.sectionInner}>
+          <div className={styles.sectionHead}>
+            <span className={styles.eyebrow}>Отзывы</span>
+            <h2 className={styles.sectionTitle} id="reviews-title">
+              Отзывы участников первого потока
+            </h2>
+            <p className={styles.sectionLead}>
+              Курс проходят люди из самых разных ниш — нырнуть в обучение можно с любым
+              опытом.
+            </p>
+          </div>
+          <p className={styles.swipeHint}>← Листайте, чтобы посмотреть отзывы →</p>
+        </div>
+        <div className={styles.casesScroller}>
+          {FIRST_STREAM_REVIEWS.map((review) => (
+            <figure className={styles.reviewItem} key={review.image}>
+              <img
+                className={styles.reviewImg}
+                src={review.image}
+                onError={showReviewFallback}
+                alt={`Отзыв: ${review.name}, ${review.role}`}
+                loading="lazy"
+              />
+              <figcaption className={styles.reviewCaption}>
+                <strong>{review.name}</strong>, {review.role}
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </section>
 
