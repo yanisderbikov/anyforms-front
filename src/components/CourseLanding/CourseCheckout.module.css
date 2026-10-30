@@ -117,83 +117,9 @@
   margin: 14px 0 0;
 }
 
-/* ── plan picker ── */
-.planPicker {
-  margin: 28px 0 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 560px) {
-  .planPicker {
-    grid-template-columns: 1fr;
-  }
-}
-
-.planCard {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  text-align: left;
-  padding: 18px;
-  border: 1.5px solid rgba(21, 21, 21, 0.12);
-  border-radius: 16px;
-  background: var(--panel);
-  color: var(--ink);
-  cursor: pointer;
-  font-family: var(--font);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.planCard:hover {
-  border-color: var(--accent);
-}
-
-.planCardActive {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(108, 134, 189, 0.25);
-}
-
-.planName {
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.planPrice {
-  font-weight: 600;
-  font-size: 21px;
-  letter-spacing: -0.5px;
-  color: var(--accent);
-}
-
-.planNote {
-  font-size: 12.5px;
-  line-height: 1.35;
-  color: rgba(21, 21, 21, 0.6);
-}
-
-/* Цена со скидкой на карточке тарифа: зачёркнутая старая сверху, новая под ней */
-.planPriceRow {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.planPriceOld {
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: -0.3px;
-  color: rgba(21, 21, 21, 0.45);
-  text-decoration: line-through;
-}
-
 /* ── order summary ── */
 .summary {
-  margin: 20px 0 0;
+  margin: 28px 0 0;
   background: var(--ink);
   color: var(--white);
   border-radius: 18px;
@@ -503,28 +429,7 @@
   }
 }
 
-/* ── закрытый тариф и обратный отсчёт ── */
-.planCardClosed,
-.planCardClosed:hover {
-  cursor: not-allowed;
-  border-color: rgba(21, 21, 21, 0.12);
-  opacity: 0.55;
-}
-
-.planClosedTag {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(21, 21, 21, 0.12);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: rgba(21, 21, 21, 0.7);
-  vertical-align: middle;
-}
-
+/* ── обратный отсчёт ── */
 .saleTimer {
   margin: 14px 0 0;
   font-size: 13.5px;
@@ -535,25 +440,4 @@
 .saleTimer strong {
   font-variant-numeric: tabular-nums;
   color: var(--white);
-}
-
-.closedBox {
-  margin: 28px 0 0;
-  padding: 26px 24px;
-  border-radius: 18px;
-  background: var(--panel);
-}
-
-.closedTitle {
-  margin: 0;
-  font-weight: 600;
-  font-size: 20px;
-  letter-spacing: -0.4px;
-}
-
-.closedNote {
-  margin: 10px 0 0;
-  font-size: 14px;
-  line-height: 1.45;
-  color: rgba(21, 21, 21, 0.7);
 }

@@ -13,6 +13,8 @@
 соцсети: `instagram`, `vk`, `facebook`, `threads`, `tiktok`, `telegram`,
 `webview` или `none`). Они же уходят параметрами визита Метрики.
 
+Откуда пришёл покупатель (реклама в Telegram, пост, Instagram, поиск…) — раздел 10.
+
 ## 1. Подключение GTM и разделение тест/прод
 
 Боевой контейнер **`GTM-MBTTRF2N` захардкожен** в
@@ -394,3 +396,73 @@ YANDEX_METRIKA_TOKEN=y0_… node scripts/metrika-goals.mjs             # соз�
 и их можно сводить с ecommerce-выручкой (группировка `ym:s:paramsLevel1/2`,
 метрики `ym:s:ecommercePurchases`, `ym:s:ecommerceRevenue`). Цели нужны только
 для отчёта «Конверсии», числа достижений и оптимизации рекламы в Директе.
+
+## 10. Источник трафика: откуда приходят покупки
+
+Модуль [`src/services/attribution.js`](../src/services/attribution.js) при каждой
+загрузке приложения определяет источник визита (касание) и запоминает на устройстве
+(`localStorage`) два касания:
+
+- **первое** (`anyforms_first_touch`, год) — откуда человек впервые пришёл в магазин;
+- **последнее непрямое** (`anyforms_last_touch`, 30 дней) — ему засчитывается заказ.
+  Прямой заход и повторный запуск Mini App без метки (кнопка меню бота, закреп)
+  его не перетирают: человек, пришедший с рекламы и купивший через неделю из меню
+  бота, остаётся покупателем с рекламы. Возврат с оплаты на `/shop/success`
+  касаний не меняет.
+
+Касание — это `source / medium / campaign` (+ `content`, `term`, `start_param`, страница входа, реферер).
+
+### 10.1. Как определяется источник (по убыванию приоритета)
+
+| Признак | source / medium / campaign |
+| --- | --- |
+| Mini App со start-параметром `ad-af41` (`t.me/AnyFormsBot/shop?startapp=ad-af41`) | `telegram_ads / cpc / af41` |
+| `startapp=post-2126` | `telegram / channel_post / 2126` |
+| `startapp=bot-…`, `chat-…`, `blog-…` | `telegram / bot`, `telegram / chat`, `blogger / referral` |
+| `startapp=<любое>-<кампания>` | `<любое> / startapp / <кампания>` |
+| `startapp=<без дефиса>` | `telegram / startapp / <значение>` |
+| `utm_source` (+ medium, campaign, content, term) | как в метках, в нижнем регистре |
+| `yclid` / `gclid` / `vkclid` | `yandex / cpc`, `google / cpc`, `vk / cpc` |
+| `fbclid` | `instagram / social` во встроенном браузере Instagram, иначе `facebook / social` |
+| Mini App без метки | `telegram / miniapp` |
+| Реферер — поисковик | `yandex / organic`, `google / organic`, … |
+| Реферер — соцсеть (t.me, vk.com, instagram.com, …) | `telegram / social`, `vk / social`, … |
+| Реферер — другой сайт | `<хост> / referral` |
+| Встроенный браузер соцсети без реферера | `instagram / social`, `vk / social`, … |
+| Ничего из этого | `(direct) / (none)` |
+
+Telegram передаёт start-параметр Mini App в `?tgWebAppStartParam=` и в `start_param`
+внутри `#tgWebAppData`; модуль читает оба. Допустимые символы — `A-Z a-z 0-9 _ -`,
+до 64 символов, разделитель частей — дефис.
+
+**Метки для Telegram.** Каждое объявление Telegram Ads ведёт на
+`t.me/AnyFormsBot/shop?startapp=ad-<код объявления>` (например `ad-af41`), пост в
+канале — на `t.me/AnyFormsBot/shop?startapp=post-<номер поста>`. Для внешних
+ссылок на сайт (рассылки, блогеры, VK) — обычные `utm_*`.
+
+### 10.2. Куда уходит источник
+
+| Куда | Что |
+| --- | --- |
+| Метрика, параметры визита | `traffic_source`, `traffic_medium`, `traffic_campaign`, `traffic_content`, `tg_start_param` — источник этого визита |
+| Метрика, параметры посетителя (`userParams`) | `first_source`, `first_medium`, `first_campaign` |
+| Цели `checkout_submit`, `payment_created`, `purchase`, `purchase_with_promo` и события dataLayer `add_payment_info`, `purchase` | `traffic_*` — источник заказа (последнее касание), `first_*` — первое касание |
+
+Источник заказа фиксируется в снапшоте перед оплатой, поэтому `purchase` на
+`/shop/success` несёт тот источник, с которым человек оформлял заказ. Источник
+хранится только в Метрике: заказы, которые Метрика не видит (блокировщики, оплата
+в другом браузере — около 15%), остаются без источника.
+
+### 10.3. Отчёты в Метрике
+
+- Отчёты → Содержание → **Параметры визитов** → `traffic_source` → `traffic_medium`
+  → `traffic_campaign`; метрики «Визиты», «Покупки», «Доход» (ecommerce).
+- Отчёты → Конверсии → цель `purchase`, группировка по параметрам визита
+  `traffic_source` / `traffic_campaign` — покупки и выручка по источникам.
+- Через API: группировка `ym:s:paramsLevel1`/`ym:s:paramsLevel2` с фильтром
+  `ym:s:paramsLevel1=='traffic_campaign'`, метрики `ym:s:ecommercePurchases`,
+  `ym:s:ecommerceRevenue`.
+
+В GA4 (через GTM) добавьте Data Layer Variables и custom dimensions `traffic_source`,
+`traffic_medium`, `traffic_campaign`, `first_source`, `first_medium`, `first_campaign`
+по образцу п. 4.4 и 5.

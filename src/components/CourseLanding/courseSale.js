@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 
-// Предзаказ курса закрывается в 00:00 1 сентября 2026 по Москве (UTC+3).
-export const SALE_END_MS = Date.parse('2026-09-01T00:00:00+03:00');
-
-// Набор на «Личное ведение» закрыт: тариф остаётся на витрине, но не продаётся.
-export const PERSONAL_CLOSED = true;
+// Старт второго потока — 00:00 10 ноября 2026 по Москве (UTC+3).
+export const SALE_END_MS = Date.parse('2026-11-10T00:00:00+03:00');
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -17,7 +14,7 @@ const plural = (n, one, few, many) => {
   return many;
 };
 
-// Остаток до закрытия предзаказа; closed — время вышло.
+// Остаток до старта; closed — курс стартовал.
 export const getSaleLeft = (nowMs = Date.now()) => {
   const diff = Math.max(0, SALE_END_MS - nowMs);
   const total = Math.floor(diff / 1000);
@@ -32,7 +29,7 @@ export const getSaleLeft = (nowMs = Date.now()) => {
 
 export const daysLabel = (n) => plural(n, 'день', 'дня', 'дней');
 
-// Тикает раз в секунду и останавливается, когда предзаказ закрылся.
+// Тикает раз в секунду и останавливается, когда курс стартовал.
 export const useSaleCountdown = () => {
   const [left, setLeft] = useState(() => getSaleLeft());
   useEffect(() => {

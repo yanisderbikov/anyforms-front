@@ -15,6 +15,11 @@
 // Отдельно они же отправляются как параметры визита Метрики (ym 'params'),
 // чтобы по ним можно было строить сегменты и сравнивать конверсию.
 //
+// Источник трафика (реклама Telegram, пост, Instagram, поиск…) определяет
+// services/attribution.js: источник визита уходит параметрами визита,
+// первое касание — параметрами посетителя, а источник заказа (traffic_*) и первое
+// касание (first_*) — в цели checkout_submit, payment_created и purchase.
+//
 // Отправка аналитики управляется так (по убыванию приоритета):
 // 1. VITE_ANALYTICS_ENABLED=false — жёстко выключить всё: GTM (включая VITE_GTM_ID),
 //    вызовы Метрики (hit/params/reachGoal) и Top.Mail.Ru;
@@ -26,6 +31,8 @@
 // (window.ym) инициализируется в index.html тоже только на прод-домене, поэтому
 // вне прода reachGoal/hit — no-op.
 // Для отладки задайте ТЕСТОВЫЙ контейнер в VITE_GTM_ID — он грузится и вне прода.
+
+import { attributionParams, captureAttribution } from './attribution';
 
 const YM_COUNTER_ID = 106593235;
 // Top.Mail.Ru: счётчик из index.html, ему тоже сообщаем о SPA-переходах.
@@ -167,9 +174,29 @@ const resolveShop = () => {
   return currentShop || DEFAULT_SHOP;
 };
 
-// Параметры визита Метрики, общие для всех событий сессии.
+// Параметры визита Метрики, общие для всех событий сессии: браузер и источник
+// этого визита; первое касание — параметрами посетителя (userParams).
 function sendVisitContext() {
-  callYm('params', { in_app_browser: inAppBrowser() });
+  const { session, first } = captureAttribution(inAppBrowser());
+  callYm('params', {
+    in_app_browser: inAppBrowser(),
+    ...(session
+      ? {
+          traffic_source: session.source,
+          traffic_medium: session.medium,
+          ...(session.campaign ? { traffic_campaign: session.campaign } : {}),
+          ...(session.content ? { traffic_content: session.content } : {}),
+          ...(session.start_param ? { tg_start_param: session.start_param } : {}),
+        }
+      : {}),
+  });
+  if (first) {
+    callYm('userParams', {
+      first_source: first.source,
+      first_medium: first.medium,
+      ...(first.campaign ? { first_campaign: first.campaign } : {}),
+    });
+  }
 }
 
 export function initAnalytics() {
@@ -692,7 +719,7 @@ export function trackPromoCode(outcome, { code = '', reason = '', promo = null }
 
 // Нажали «Оплатить» (форма прошла клиентскую валидацию, уходит запрос на создание платежа).
 export function trackCheckoutSubmit(cartItems, { promo = null } = {}) {
-  const params = { ...cartParams(cartItems), ...appliedPromoParams(promo) };
+  const params = { ...cartParams(cartItems), ...appliedPromoParams(promo), ...attributionParams() };
   pushAnalyticsEvent('checkout_submit', params);
   reachGoal('checkout_submit', params);
 }
@@ -708,12 +735,13 @@ export function trackAddPaymentInfo(cartItems, paymentType, { promo = null } = {
       ...(promo?.code ? { coupon: normalizeCode(promo.code) } : {}),
       items: buildCartItems(cartItems),
     },
-    { payment_type: paymentType }
+    { payment_type: paymentType, ...attributionParams() }
   );
   reachGoal('payment_created', {
     ...cartParams(cartItems),
     payment_type: paymentType,
     ...appliedPromoParams(promo),
+    ...attributionParams(),
   });
 }
 
@@ -780,26 +808,34 @@ export function trackPurchase(order) {
 
   const items = order.items ?? [];
   const promo = order.promo ?? null;
-  pushEcommerceEvent('purchase', {
-    transaction_id: String(order.id),
-    currency: CURRENCY,
-    value: toPrice(order.value),
-    ...(promo?.code ? { coupon: promo.code } : {}),
-    items: items.map((item) => buildItem(item, { quantity: Number(item.quantity) || 1 })),
-  });
+  // Источник берём из снапшота: он зафиксирован в момент оплаты.
+  const traffic = order.traffic ?? attributionParams();
+  pushEcommerceEvent(
+    'purchase',
+    {
+      transaction_id: String(order.id),
+      currency: CURRENCY,
+      value: toPrice(order.value),
+      ...(promo?.code ? { coupon: promo.code } : {}),
+      items: items.map((item) => buildItem(item, { quantity: Number(item.quantity) || 1 })),
+    },
+    traffic
+  );
   // Ecommerce-покупку Метрика берёт из dataLayer; JS-цель добавляет к ней
-  // магазин, состав и браузер — для воронки по витринам.
+  // магазин, состав, браузер и источник — для воронки по витринам и каналам.
   reachGoal('purchase', {
     ...cartParams(items),
     order_id: String(order.id),
     value: toPrice(order.value),
     ...appliedPromoParams(promo),
+    ...traffic,
   });
   if (promo?.code) {
     reachGoal('purchase_with_promo', {
       order_id: String(order.id),
       value: toPrice(order.value),
       ...appliedPromoParams(promo),
+      ...traffic,
     });
   }
 
@@ -828,6 +864,7 @@ export function saveCheckoutSnapshot(cartItems, value = cartValue(cartItems), { 
       JSON.stringify({
         value: toPrice(value),
         promo: promoSnapshot(promo),
+        traffic: attributionParams(),
         items: cartItems.map((i) => ({
           id: String(i.id),
           name: i.variantLabel ? `${i.name ?? ''} ${i.variantLabel}` : (i.name ?? ''),
