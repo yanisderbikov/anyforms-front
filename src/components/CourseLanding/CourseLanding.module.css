@@ -812,6 +812,11 @@
   background: var(--panel);
 }
 
+video.appMediaItem {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 @media (min-width: 900px) {
   .appInnerWithMedia {
     grid-template-columns: 1fr 1fr;
@@ -1107,30 +1112,33 @@
 }
 
 .reviewItem {
+  position: relative;
   flex: 0 0 80%;
   max-width: 320px;
-  margin: 0;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--panel);
   scroll-snap-align: start;
 }
 
-.reviewImg {
-  display: block;
+.reviewBlur {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  border-radius: 20px;
-  background: var(--panel);
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px);
+  transform: scale(1.12);
 }
 
-.reviewCaption {
-  margin-top: 12px;
-  font-size: 15px;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.reviewCaption strong {
-  color: var(--white);
-  font-weight: 600;
+.reviewImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 @media (min-width: 720px) {

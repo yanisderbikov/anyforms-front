@@ -20,23 +20,15 @@ const GUIDE_PROMO_CODE = 'ГАЙД';
 const PROMO_POPUP_SEEN_KEY = 'af_promo_popup_seen';
 
 const REVIEWS_BASE = 'https://storage.yandexcloud.net/anyforms/course/reviews/';
-const REVIEW_FALLBACK_IMAGE = `${REVIEWS_BASE}review1.jpeg`;
+const REVIEWS_COUNT = 13;
 
-const FIRST_STREAM_REVIEWS = [
-  { name: 'Елена', role: 'дизайнер' },
-  { name: 'Евгения', role: 'свечевар' },
-  { name: 'Станислав', role: 'программист' },
-  { name: 'Валерия', role: 'свечевар' },
-  { name: 'Елена', role: 'кондитер' },
-  { name: 'Ольга', role: 'технолог акрилового гипса' },
-].map((review, i) => ({ ...review, image: `${REVIEWS_BASE}review${i + 1}.jpeg` }));
+const FIRST_STREAM_REVIEWS = Array.from(
+  { length: REVIEWS_COUNT },
+  (_, i) => `${REVIEWS_BASE}review${i + 1}.jpeg`
+);
 
-const showReviewFallback = (e) => {
-  if (e.currentTarget.src !== REVIEW_FALLBACK_IMAGE) e.currentTarget.src = REVIEW_FALLBACK_IMAGE;
-};
-
-const PROPOSALS_MEDIA = [];
-const CONSTRUCTOR_MEDIA = [];
+const PROPOSALS_MEDIA = ['https://storage.yandexcloud.net/anyforms/course/calculator.mp4'];
+const CONSTRUCTOR_MEDIA = ['https://storage.yandexcloud.net/anyforms/course/constructor.mp4'];
 
 const formatKopecks = (kopecks) =>
   `${Math.round(kopecks / 100).toLocaleString('ru-RU')} ₽`;
@@ -1016,19 +1008,16 @@ const CourseLanding = () => {
           <p className={styles.swipeHint}>← Листайте, чтобы посмотреть отзывы →</p>
         </div>
         <div className={styles.casesScroller}>
-          {FIRST_STREAM_REVIEWS.map((review) => (
-            <figure className={styles.reviewItem} key={review.image}>
+          {FIRST_STREAM_REVIEWS.map((src, i) => (
+            <div className={styles.reviewItem} key={src}>
+              <img className={styles.reviewBlur} src={src} alt="" aria-hidden="true" loading="lazy" />
               <img
                 className={styles.reviewImg}
-                src={review.image}
-                onError={showReviewFallback}
-                alt={`Отзыв: ${review.name}, ${review.role}`}
+                src={src}
+                alt={`Отзыв участника первого потока №${i + 1}`}
                 loading="lazy"
               />
-              <figcaption className={styles.reviewCaption}>
-                <strong>{review.name}</strong>, {review.role}
-              </figcaption>
-            </figure>
+            </div>
           ))}
         </div>
       </section>

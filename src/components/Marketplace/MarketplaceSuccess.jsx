@@ -105,6 +105,7 @@ const MarketplaceSuccess = () => {
         value: snapshot.value,
         items: snapshot.items,
         promo: snapshot.promo,
+        traffic: snapshot.traffic,
       });
       if (sent) clearCheckoutSnapshot();
     }
