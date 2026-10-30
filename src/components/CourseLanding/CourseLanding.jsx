@@ -92,7 +92,7 @@ const COURSE_FEATURES = [
   '10 готовых моделей для практики',
   'Закрытый чат мастеров (2000+)',
   'Поставщики, материалы и скидки на закупки',
-  'Ранний доступ к «Конструктору оснасток» и «Генератору коммерческих предложений»',
+  'Ранний доступ к «Конструктору оснасток» и «Калькулятору коммерческих предложений»',
   'Курс по гипсу Shape.studio от 24 Grams',
 ];
 
@@ -244,7 +244,7 @@ const GET_CARDS = [
       'Ранний доступ к нашему флагманскому продукту: поможет решить даже сложные инженерные задачи без навыков 3D-моделирования.',
   },
   {
-    title: 'Генератор коммерческих предложений',
+    title: 'Калькулятор коммерческих предложений',
     icon: '☆',
     text:
       'Ранний доступ к нашему флагманскому продукту: соберёт коммерческое предложение сразу в нескольких вариантах — вы не ошибётесь в расчётах, а клиент выберет подходящий и с большей вероятностью купит.',
@@ -322,7 +322,7 @@ const CASTINGS = CASTING_FILES.map((name) => `${CASTINGS_BASE}${encodeURICompone
 // Экран 8 — бонусы. featured — подсвеченный пункт (ранний доступ к приложениям).
 const BONUSES = [
   { key: 'constructor', text: 'Ранний доступ к нашему приложению «Конструктор оснасток»', featured: true },
-  { key: 'proposals', text: 'Ранний доступ к нашему приложению «Генератор коммерческих предложений»', featured: true },
+  { key: 'proposals', text: 'Ранний доступ к нашему приложению «Калькулятор коммерческих предложений»', featured: true },
   { key: 'links', text: 'Ссылки на проверенные материалы и поставщиков' },
   { key: 'discounts', text: 'Скидки на стартовые закупки' },
   { key: 'chat', text: 'Доступ в закрытый чат мастеров (2000+ участников)' },
@@ -568,16 +568,6 @@ const AppScreen = ({ id, title, lead, points, media, mediaAlt, onCta }) => (
             {title}
           </h2>
           <p className={styles.darkLead}>{lead}</p>
-          <ul className={styles.appList}>
-            {points.map((point) => (
-              <li className={styles.offerItem} key={point}>
-                <span className={styles.offerCheck} aria-hidden>
-                  →
-                </span>
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
           <button
             type="button"
             className={`${styles.cta} ${styles.ctaInline} ${styles.appCta}`}
@@ -589,11 +579,19 @@ const AppScreen = ({ id, title, lead, points, media, mediaAlt, onCta }) => (
             </span>
           </button>
         </div>
-        {media.length > 0 && (
-          <div className={styles.appMedia}>
-            <AppMedia items={media} alt={mediaAlt} />
-          </div>
-        )}
+        <div className={styles.appMedia}>
+          <AppMedia items={media} alt={mediaAlt} />
+          <ul className={styles.appList}>
+            {points.map((point) => (
+              <li className={styles.offerItem} key={point}>
+                <span className={styles.offerCheck} aria-hidden>
+                  →
+                </span>
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -1139,7 +1137,7 @@ const CourseLanding = () => {
         id="proposals"
         title={
           <>
-            Генератор коммерческих предложений —{' '}
+            Калькулятор коммерческих предложений —{' '}
             <span className={styles.textAccent}>несколько вариантов</span> для клиента
           </>
         }
@@ -1150,7 +1148,7 @@ const CourseLanding = () => {
           'Клиент выбирает подходящий вариант, а не решает «да или нет» — и чаще покупает',
         ]}
         media={PROPOSALS_MEDIA}
-        mediaAlt="Генератор коммерческих предложений anyforms"
+        mediaAlt="Калькулятор коммерческих предложений anyforms"
         onCta={scrollToBuy}
       />
 
@@ -1184,7 +1182,7 @@ const CourseLanding = () => {
             <Countdown left={saleLeft} className={styles.countdownBuy} />
             <div className={styles.tariffGrid} id="buy-tariffs">
               <article className={`${styles.tariffCard} ${styles.tariffCardFeatured}`}>
-                <span className={styles.tariffBadge}>{preorder ? 'Предзаказ' : 'Второй поток'}</span>
+                <span className={styles.tariffBadge}>Второй поток</span>
                 <span className={styles.tariffIcon} aria-hidden>
                   <VideoIcon size={26} />
                 </span>

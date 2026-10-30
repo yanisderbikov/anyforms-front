@@ -787,7 +787,7 @@
 
 .appList {
   list-style: none;
-  margin: 26px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -1841,7 +1841,7 @@ video.appMediaItem {
   }
 }
 
-/* ═══════════════ ОБРАТНЫЙ ОТСЧЁТ ДО ЗАКРЫТИЯ ПРЕДЗАКАЗА ═══════════════ */
+/* ═══════════════ ОБРАТНЫЙ ОТСЧЁТ ДО СТАРТА ═══════════════ */
 .countdown {
   position: relative;
   overflow: hidden;
