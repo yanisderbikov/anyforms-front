@@ -29,6 +29,9 @@ const isoToMskInput = (iso) => {
 
 const mskInputToIso = (value) => (value ? new Date(`${value}:00+03:00`).toISOString() : null);
 
+const COURSE_DISCOUNT_PERCENT = 'percent';
+const COURSE_DISCOUNT_AMOUNT = 'amount';
+
 const rubToKopecks = (value) => {
   const trimmed = String(value).trim().replace(',', '.');
   if (!trimmed) return null;
@@ -104,6 +107,9 @@ const emptyForm = {
   codeTtlDays: '14',
   firstOrderOnly: false,
   productCode: '',
+  courseDiscountMode: COURSE_DISCOUNT_PERCENT,
+  courseDiscountPercent: '100',
+  courseDiscountRub: '',
   amoResponsibleUserId: '',
   amoTaskTypeId: '',
   amoTaskDeadlineMinutes: '60',
@@ -134,6 +140,9 @@ const formFromPopup = (p) => ({
   codeTtlDays: p.codeTtlDays != null ? String(p.codeTtlDays) : emptyForm.codeTtlDays,
   firstOrderOnly: Boolean(p.firstOrderOnly),
   productCode: p.productCode || '',
+  courseDiscountMode: p.discountAmountKopecks != null ? COURSE_DISCOUNT_AMOUNT : COURSE_DISCOUNT_PERCENT,
+  courseDiscountPercent: p.discountPercent ? String(p.discountPercent) : emptyForm.courseDiscountPercent,
+  courseDiscountRub: p.discountAmountKopecks != null ? String(p.discountAmountKopecks / 100) : '',
   amoResponsibleUserId: p.amoResponsibleUserId != null ? String(p.amoResponsibleUserId) : '',
   amoTaskTypeId: p.amoTaskTypeId != null ? String(p.amoTaskTypeId) : '',
   amoTaskDeadlineMinutes: String(p.amoTaskDeadlineMinutes ?? 60),
@@ -203,11 +212,10 @@ const TYPE_HINTS = {
   [UNIQUE_CODE]: 'Попап сразу показывает посетителю готовый персональный код — без кнопок и форм. Код генерируется один раз на устройство, использовать его можно один раз.',
   [PUBLIC_CODE]: 'Всем показываем общий промокод из вкладки «Промокоды» — пока он действует.',
   [AFTER_PURCHASE]: 'Не попап, а блок на странице успешной оплаты: покупатель сразу получает одноразовый код на следующий заказ. Код привязан к телефону и почте из заказа, один код на каждый оплаченный заказ.',
-  [COURSE_AFTER_PURCHASE]: 'Блок на странице успешной оплаты: покупатель получает одноразовый код на курс со скидкой, равной сумме оплаченного заказа, и ссылку на лендинг, где скидка применяется сама. Код работает только с телефоном из заказа и не выдаётся тем, кто уже покупал курс.',
+  [COURSE_AFTER_PURCHASE]: 'Блок на странице успешной оплаты: покупатель получает одноразовый код на курс со скидкой (процент от заказа или фиксированная сумма) и ссылку на лендинг, где скидка применяется сама. Код работает только с телефоном из заказа и не выдаётся тем, кто уже покупал курс.',
 };
 
 const PREVIEW_AFTER_PURCHASE_CODE = 'NEXT-7KX2M';
-const PREVIEW_COURSE_CODE = 'COURSE-7KX2M';
 const PREVIEW_COURSE_PAID_KOPECKS = 500000;
 const PREVIEW_COURSE_PRICE_KOPECKS = 1690000;
 
@@ -396,7 +404,8 @@ const AdminPromoPopups = () => {
       const to = TEXT_DEFAULTS[nextType];
       const next = { ...prev, popupType: nextType };
       Object.keys(to).forEach((key) => {
-        if (!prev[key] || prev[key] === from[key]) next[key] = to[key];
+        const untouched = key in from ? from[key] : emptyForm[key];
+        if (!prev[key] || prev[key] === untouched) next[key] = to[key];
       });
       return next;
     });
@@ -467,8 +476,10 @@ const AdminPromoPopups = () => {
     const ttlDays = Number(form.codeTtlDays) || null;
     if (isCourse) {
       const price = selectedProduct?.priceKopecks ?? PREVIEW_COURSE_PRICE_KOPECKS;
-      const cap = rubToKopecks(form.discountAmountRub);
-      const discount = Math.max(0, Math.min(PREVIEW_COURSE_PAID_KOPECKS, cap || Infinity, price - 100));
+      const raw = form.courseDiscountMode === COURSE_DISCOUNT_AMOUNT
+        ? rubToKopecks(form.courseDiscountRub) || 0
+        : Math.floor((PREVIEW_COURSE_PAID_KOPECKS * (Number(form.courseDiscountPercent) || 0)) / 10000) * 100;
+      const discount = Math.max(0, Math.min(raw, price - 100));
       return {
         ...base,
         productCode: form.productCode,
@@ -479,7 +490,7 @@ const AdminPromoPopups = () => {
         discountedPriceKopecks: price - discount,
         codeTtlDays: ttlDays,
         phoneTail: '4567',
-        code: PREVIEW_COURSE_CODE,
+        code: `${(form.codePrefix || 'COURSE').toUpperCase()}-7KX2M`,
         validUntil: new Date(Date.now() + (ttlDays || 90) * 86400000).toISOString(),
       };
     }
@@ -505,8 +516,14 @@ const AdminPromoPopups = () => {
     const deadline = Number(form.amoTaskDeadlineMinutes);
     if (isCourse) {
       if (!form.productCode) return { error: 'Выберите продукт, на который выдаётся скидка.' };
-      if (amountKopecks != null && (!Number.isFinite(amountKopecks) || amountKopecks <= 0)) {
-        return { error: 'Потолок скидки — сумма в рублях больше нуля, или пусто.' };
+      const fixed = form.courseDiscountMode === COURSE_DISCOUNT_AMOUNT;
+      const coursePercent = Number(form.courseDiscountPercent);
+      const courseAmount = rubToKopecks(form.courseDiscountRub);
+      if (fixed && (!Number.isFinite(courseAmount) || !courseAmount || courseAmount <= 0)) {
+        return { error: 'Укажите скидку — сумму в рублях больше нуля.' };
+      }
+      if (!fixed && (!Number.isInteger(coursePercent) || coursePercent < 1 || coursePercent > 100)) {
+        return { error: 'Процент от заказа — целое число от 1 до 100.' };
       }
       if (!Number.isInteger(codeTtlDays) || codeTtlDays < 1 || codeTtlDays > 365) {
         return { error: 'Срок действия кода — целое число дней от 1 до 365.' };
@@ -517,8 +534,8 @@ const AdminPromoPopups = () => {
       return {
         fields: {
           productCode: form.productCode,
-          discountPercent: 0,
-          discountAmountKopecks: amountKopecks,
+          discountPercent: fixed ? 0 : coursePercent,
+          discountAmountKopecks: fixed ? courseAmount : null,
           minOrderKopecks: null,
           codePrefix: form.codePrefix.trim().toUpperCase(),
           codeTtlDays,
@@ -659,7 +676,8 @@ const AdminPromoPopups = () => {
       return [
         'скидка на курс после покупки',
         `продукт ${product?.title || p.productCode || '—'}`,
-        p.discountAmountKopecks ? `потолок ${minOrderLabel(p.discountAmountKopecks)}` : 'скидка равна сумме заказа',
+        p.discountAmountKopecks ? `скидка ${minOrderLabel(p.discountAmountKopecks)}` : `скидка ${p.discountPercent}% от заказа`,
+        `код ${p.codePrefix}-…`,
         `код на ${daysLabel(p.codeTtlDays)}`,
         p.maxShows != null ? `не больше ${p.maxShows} кодов одному клиенту` : null,
         periodLabel(p.validFrom, p.validUntil),
@@ -921,10 +939,28 @@ const AdminPromoPopups = () => {
                       <span className={shared.hint}>Код действует только на этот продукт; в магазине его применить нельзя.</span>
                     </label>
                     <label className={shared.label}>
-                      Потолок скидки, ₽
-                      <input type="number" name="discountAmountRub" value={form.discountAmountRub} onChange={setField} className={shared.input} placeholder="Без потолка" min="0.01" step="any" />
-                      <span className={shared.hint}>Скидка равна сумме оплаченного заказа, но не выше потолка и цены курса минус 1 ₽.</span>
+                      Размер скидки
+                      <Select name="courseDiscountMode" value={form.courseDiscountMode} onChange={setField}>
+                        <option value={COURSE_DISCOUNT_PERCENT}>Процент от суммы заказа</option>
+                        <option value={COURSE_DISCOUNT_AMOUNT}>Фиксированная сумма</option>
+                      </Select>
                     </label>
+                    {form.courseDiscountMode === COURSE_DISCOUNT_AMOUNT ? (
+                      <label className={shared.label}>
+                        Скидка, ₽ *
+                        <input type="number" name="courseDiscountRub" value={form.courseDiscountRub} onChange={setField} className={shared.input} min="1" step="any" />
+                        <span className={shared.hint}>Одна сумма для всех покупателей, не выше цены курса минус 1 ₽.</span>
+                      </label>
+                    ) : (
+                      <label className={shared.label}>
+                        Скидка, % от заказа *
+                        <input type="number" name="courseDiscountPercent" value={form.courseDiscountPercent} onChange={setField} className={shared.input} min="1" max="100" step="1" />
+                        <span className={shared.hint}>100% — скидка равна сумме заказа. Округляем вниз до рубля, не выше цены курса минус 1 ₽.</span>
+                      </label>
+                    )}
+                    <p className={`${shared.hint} ${styles.wide}`}>
+                      Проверьте текст выше: фраза «вернём стоимость этой покупки» верна только при скидке 100%.
+                    </p>
                   </>
                 ) : (
                   <>
@@ -947,9 +983,9 @@ const AdminPromoPopups = () => {
                   <input type="number" name="codeTtlDays" value={form.codeTtlDays} onChange={setField} className={shared.input} min="1" max="365" step="1" />
                 </label>
                 <label className={shared.label}>
-                  Префикс кода *
+                  Название кода (префикс) *
                   <input name="codePrefix" value={form.codePrefix} onChange={setField} className={shared.input} placeholder="SHOP" autoComplete="off" />
-                  <span className={shared.hint}>Код будет вида {(form.codePrefix || 'SHOP').toUpperCase()}-7KX2M.</span>
+                  <span className={shared.hint}>Код будет вида {(form.codePrefix || 'SHOP').toUpperCase()}-7KX2M: хвост случайный, у каждого покупателя свой. 2–10 латинских букв или цифр.</span>
                 </label>
               </div>
               {!isSuccessBlock && (
