@@ -38,6 +38,11 @@ const rubToKopecks = (value) => {
   return Math.round(Number(trimmed) * 100);
 };
 
+const orderSumLabel = ({ orderSumFromKopecks: from, orderSumToKopecks: to }) => {
+  const bounds = [from ? `от ${minOrderLabel(from)}` : null, to ? `до ${minOrderLabel(to)}` : null].filter(Boolean);
+  return bounds.length ? `заказ ${bounds.join(' ')}` : null;
+};
+
 const TEXT_DEFAULTS = {
   [CONTACT]: {
     name: 'Скидка 15% за телефон и почту',
@@ -110,6 +115,8 @@ const emptyForm = {
   courseDiscountMode: COURSE_DISCOUNT_PERCENT,
   courseDiscountPercent: '100',
   courseDiscountRub: '',
+  orderSumFromRub: '',
+  orderSumToRub: '',
   amoResponsibleUserId: '',
   amoTaskTypeId: '',
   amoTaskDeadlineMinutes: '60',
@@ -143,6 +150,8 @@ const formFromPopup = (p) => ({
   courseDiscountMode: p.discountAmountKopecks != null ? COURSE_DISCOUNT_AMOUNT : COURSE_DISCOUNT_PERCENT,
   courseDiscountPercent: p.discountPercent ? String(p.discountPercent) : emptyForm.courseDiscountPercent,
   courseDiscountRub: p.discountAmountKopecks != null ? String(p.discountAmountKopecks / 100) : '',
+  orderSumFromRub: p.orderSumFromKopecks != null ? String(p.orderSumFromKopecks / 100) : '',
+  orderSumToRub: p.orderSumToKopecks != null ? String(p.orderSumToKopecks / 100) : '',
   amoResponsibleUserId: p.amoResponsibleUserId != null ? String(p.amoResponsibleUserId) : '',
   amoTaskTypeId: p.amoTaskTypeId != null ? String(p.amoTaskTypeId) : '',
   amoTaskDeadlineMinutes: String(p.amoTaskDeadlineMinutes ?? 60),
@@ -606,6 +615,14 @@ const AdminPromoPopups = () => {
     if (form.validFrom && form.validUntil && form.validFrom >= form.validUntil) {
       return setError('Начало показа должно быть раньше окончания.');
     }
+    const orderSumFromKopecks = isSuccessBlock ? rubToKopecks(form.orderSumFromRub) : null;
+    const orderSumToKopecks = isSuccessBlock ? rubToKopecks(form.orderSumToRub) : null;
+    if ([orderSumFromKopecks, orderSumToKopecks].some((v) => v != null && (!Number.isFinite(v) || v <= 0))) {
+      return setError('Сумма заказа — в рублях больше нуля, или пусто.');
+    }
+    if (orderSumFromKopecks != null && orderSumToKopecks != null && orderSumFromKopecks > orderSumToKopecks) {
+      return setError('Сумма заказа «от» не может быть больше суммы «до».');
+    }
 
     let typeFields;
     if (issuesCodes) {
@@ -632,6 +649,8 @@ const AdminPromoPopups = () => {
       validFrom: mskInputToIso(form.validFrom),
       validUntil: mskInputToIso(form.validUntil),
       hideForKnownContacts: isSuccessBlock ? false : form.hideForKnownContacts,
+      orderSumFromKopecks,
+      orderSumToKopecks,
       ...typeFields,
     };
 
@@ -675,6 +694,7 @@ const AdminPromoPopups = () => {
       const product = products.find((c) => c.code === p.productCode);
       return [
         'скидка на курс после покупки',
+        orderSumLabel(p),
         `продукт ${product?.title || p.productCode || '—'}`,
         p.discountAmountKopecks ? `скидка ${minOrderLabel(p.discountAmountKopecks)}` : `скидка ${p.discountPercent}% от заказа`,
         `код ${p.codePrefix}-…`,
@@ -688,6 +708,7 @@ const AdminPromoPopups = () => {
     if (p.popupType === AFTER_PURCHASE) {
       return [
         'после покупки',
+        orderSumLabel(p),
         promoTerms(p),
         `код на ${daysLabel(p.codeTtlDays)}`,
         p.maxShows != null ? `не больше ${p.maxShows} кодов одному клиенту` : null,
@@ -894,6 +915,21 @@ const AdminPromoPopups = () => {
                   }[form.popupType]}
                 </span>
               </label>
+              {isSuccessBlock && (
+                <>
+                  <label className={shared.label}>
+                    Сумма заказа от, ₽
+                    <input type="number" name="orderSumFromRub" value={form.orderSumFromRub} onChange={setField} className={shared.input} placeholder="Без ограничения" min="0.01" step="any" />
+                  </label>
+                  <label className={shared.label}>
+                    Сумма заказа до, ₽
+                    <input type="number" name="orderSumToRub" value={form.orderSumToRub} onChange={setField} className={shared.input} placeholder="Без ограничения" min="0.01" step="any" />
+                  </label>
+                  <p className={`${shared.hint} ${styles.wide}`}>
+                    Код получит тот, чей оплаченный заказ попал в диапазон, границы включены. Можно завести несколько попапов с разными суммами и скидками; если диапазоны пересекаются, сработает попап с большим приоритетом.
+                  </p>
+                </>
+              )}
               <label className={shared.label}>
                 Показывать с (МСК)
                 <input type="datetime-local" name="validFrom" value={form.validFrom} onChange={setField} className={shared.input} />
@@ -973,7 +1009,7 @@ const AdminPromoPopups = () => {
                   <input type="number" name="discountAmountRub" value={form.discountAmountRub} onChange={setField} className={shared.input} placeholder="Не задана" min="0.01" step="any" />
                 </label>
                 <label className={shared.label}>
-                  Мин. сумма заказа, ₽
+                  {isAfterPurchase ? 'Мин. сумма следующего заказа, ₽' : 'Мин. сумма заказа, ₽'}
                   <input type="number" name="minOrderRub" value={form.minOrderRub} onChange={setField} className={shared.input} placeholder="Без порога" min="0.01" step="any" />
                 </label>
                   </>
