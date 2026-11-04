@@ -11,6 +11,7 @@ import {
   parsePositiveInt,
 } from './salesbotApi';
 import styles from './AdminSalesbotAnalytics.module.css';
+import Select from '../shared/Select/Select';
 
 const PAGE_SIZE = 50;
 
@@ -337,8 +338,8 @@ const AdminSalesbotAnalytics = () => {
           {logs && <span className={styles.count}>{logs.totalElements} записей</span>}
         </div>
         <div className={styles.logFilters}>
-          <select
-            className={styles.select}
+          <Select
+            pill
             value={logSource}
             onChange={(e) => {
               setLogSource(e.target.value);
@@ -359,9 +360,9 @@ const AdminSalesbotAnalytics = () => {
                   {t.label}
                 </option>
               ))}
-          </select>
-          <select
-            className={styles.select}
+          </Select>
+          <Select
+            pill
             value={logStatus}
             onChange={(e) => {
               setLogStatus(e.target.value);
@@ -375,7 +376,7 @@ const AdminSalesbotAnalytics = () => {
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
           <form className={styles.leadForm} onSubmit={applyLeadFilter}>
             <input
               className={styles.leadInput}

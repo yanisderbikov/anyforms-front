@@ -121,6 +121,10 @@
   margin-bottom: 16px;
 }
 
+.typeSelect {
+  width: 100%;
+}
+
 .typeRow p {
   margin: 0;
 }

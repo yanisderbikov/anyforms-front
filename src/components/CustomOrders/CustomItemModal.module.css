@@ -78,7 +78,6 @@
 }
 
 .input,
-.select,
 .textarea {
   border: 1px solid rgba(17, 17, 17, 0.12);
   border-radius: 14px;
@@ -94,7 +93,6 @@
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
   border-color: #111;
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);

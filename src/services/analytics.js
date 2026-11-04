@@ -481,6 +481,30 @@ export function trackPromoAfterPurchase(action, promo, extra = {}) {
   reachGoal(`promo_after_purchase_${action}`, params);
 }
 
+export function trackCoursePromoAfterPurchase(action, promo) {
+  if (!promo?.code) return;
+  if (action === 'shown') {
+    rememberPromoOffer(promo.code, {
+      source: 'course_after_purchase',
+      popup: promo.popupId,
+      popupName: promo.popupName,
+      popupType: 'COURSE_AFTER_PURCHASE',
+    });
+  }
+  const params = {
+    popup: String(promo.popupId ?? ''),
+    popup_name: compactString(promo.popupName),
+    popup_type: 'COURSE_AFTER_PURCHASE',
+    source: 'course_after_purchase',
+    code: normalizeCode(promo.code),
+    product: compactString(promo.productCode),
+    ...(promo.repeated != null ? { repeated: yesNo(promo.repeated) } : {}),
+    ...discountParams({ discountAmountKopecks: promo.discountKopecks }),
+  };
+  pushAnalyticsEvent('course_promo_after_purchase', { action, ...params });
+  reachGoal(`course_promo_after_purchase_${action}`, params);
+}
+
 export function trackPromoLink(code) {
   const key = normalizeCode(code);
   if (!key || !isBrowser()) return;

@@ -102,8 +102,11 @@
   min-height: 20px;
 }
 
+.select {
+  width: 100%;
+}
+
 .input,
-.select,
 .textarea {
   font-family: inherit;
   font-size: 0.92rem;
@@ -123,15 +126,13 @@
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
   outline: none;
   border-color: #111;
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
-.input:disabled,
-.select:disabled {
+.input:disabled {
   background: #f6f6f6;
   color: #8c8c8c;
 }

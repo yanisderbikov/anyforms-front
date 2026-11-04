@@ -11,6 +11,7 @@ import {
   RefreshButton,
 } from './invoiceShared';
 import styles from './AdminInvoices.module.css';
+import Select from '../shared/Select/Select';
 
 const PRODUCT_OPTIONS = [
   { code: 'GUIDE', label: 'Гайд' },
@@ -162,18 +163,18 @@ const TrainingInvoices = () => {
         <div className={styles.formGrid}>
           <label className={styles.label}>
             Продукт *
-            <select
+            <Select
               name="productCode"
               value={form.productCode}
               onChange={handleChange}
-              className={styles.input}
+              className={styles.selectField}
             >
               {PRODUCT_OPTIONS.map((p) => (
                 <option key={p.code} value={p.code}>
                   {p.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className={styles.label}>
             ФИО *

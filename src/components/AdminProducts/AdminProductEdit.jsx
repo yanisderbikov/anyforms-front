@@ -7,6 +7,7 @@ import { uploadAllToS3 } from '../../services/uploads';
 import UploadProgress from '../shared/UploadProgress';
 import AutoTextarea from '../CustomOrders/AutoTextarea';
 import styles from './AdminProductEdit.module.css';
+import Select from '../shared/Select/Select';
 
 const DEFAULT_SHOP_SLUG = 'anyforms';
 const NEW_ID = 'new';
@@ -651,11 +652,10 @@ const AdminProductEdit = () => {
         <Section title="Служебное">
           <label className={styles.label}>
             Товар в АМО
-            <select
+            <Select
               name="amoProductId"
               value={form.amoProductId}
               onChange={handleAmoChange}
-              className={styles.input}
             >
               <option value="">— не привязан —</option>
               {form.amoProductId &&
@@ -669,7 +669,7 @@ const AdminProductEdit = () => {
                   {p.name || `ID ${p.id}`}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <div className={styles.row}>
             <label className={styles.label}>

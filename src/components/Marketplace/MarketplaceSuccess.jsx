@@ -8,6 +8,7 @@ import {
   trackPaymentFailed,
   trackPaymentReturn,
   trackPromoAfterPurchase,
+  trackCoursePromoAfterPurchase,
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
@@ -15,6 +16,7 @@ import { clearCheckoutFormPromo } from './checkoutFormStorage';
 import { useShopTheme } from './shopThemes';
 import { getDeviceId } from '../../shared/deviceId';
 import PostPurchasePromo from '../PromoPopup/PostPurchasePromo';
+import CoursePromoAfterPurchase from '../PromoPopup/CoursePromoAfterPurchase';
 import styles from './checkout.module.css';
 
 const PAYMENT_TYPE = 'online';
@@ -62,6 +64,7 @@ const MarketplaceSuccess = () => {
   const isFail = searchParams.get('status') === 'fail';
   const [order, setOrder] = useState(null);
   const [afterPromo, setAfterPromo] = useState(null);
+  const [coursePromo, setCoursePromo] = useState(null);
 
   // Успех: отправляем purchase (состав заказа — из снапшота, сохранённого перед
   // редиректом на оплату) и очищаем корзину. trackPurchase сам защищён от
@@ -163,6 +166,34 @@ const MarketplaceSuccess = () => {
     };
   }, [orderNumber, isFail]);
 
+  useEffect(() => {
+    if (!orderNumber || isFail) return undefined;
+    let cancelled = false;
+    let attempts = 0;
+    let timer = null;
+    const load = () => {
+      apiClient.instance
+        .post('/api/public/promo-popup/course-after-purchase', { orderNumber, deviceId: getDeviceId() })
+        .then(({ status, data }) => {
+          if (cancelled) return;
+          if (status === 202) {
+            attempts += 1;
+            if (attempts < AFTER_PURCHASE_MAX_ATTEMPTS) timer = window.setTimeout(load, AFTER_PURCHASE_RETRY_MS);
+            return;
+          }
+          if (status !== 200 || !data?.code) return;
+          setCoursePromo(data);
+          trackCoursePromoAfterPurchase('shown', data);
+        })
+        .catch(() => {});
+    };
+    load();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [orderNumber, isFail]);
+
   const handlePromoCopy = () => {
     if (!afterPromo) return;
     trackPromoAfterPurchase('copied', afterPromo);
@@ -208,6 +239,14 @@ const MarketplaceSuccess = () => {
               </>
             )}
           </p>
+
+          {!isFail && coursePromo && (
+            <CoursePromoAfterPurchase
+              promo={coursePromo}
+              onCopy={() => trackCoursePromoAfterPurchase('copied', coursePromo)}
+              onOpen={() => trackCoursePromoAfterPurchase('opened', coursePromo)}
+            />
+          )}
 
           {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
 

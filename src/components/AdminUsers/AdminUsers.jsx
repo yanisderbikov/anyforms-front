@@ -5,6 +5,7 @@ import apiClient from '../../apiClient';
 import { authHeaders, formatDate, RefreshButton } from '../AdminInvoices/invoiceShared';
 import { getShops } from '../../services/itemsService';
 import styles from './AdminUsers.module.css';
+import Select from '../shared/Select/Select';
 
 const ROLES = [
   { value: 'ADMIN', label: 'админ — всё' },
@@ -203,25 +204,25 @@ const AdminUsers = () => {
           </label>
           <label className={styles.label}>
             Роль
-            <select name="role" value={form.role} onChange={setField} className={styles.input}>
+            <Select name="role" value={form.role} onChange={setField}>
               {ROLES.map((r) => (
                 <option key={r.value} value={r.value}>
                   {r.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           {form.role === SHOP_OWNER && (
             <label className={styles.label}>
               Магазин *
-              <select name="shopSlug" value={form.shopSlug} onChange={setField} className={styles.input} required>
+              <Select name="shopSlug" value={form.shopSlug} onChange={setField} required>
                 <option value="">Выберите магазин</option>
                 {shops.map((shop) => (
                   <option key={shop.slug} value={shop.slug}>
                     {shop.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           )}
         </div>
@@ -267,8 +268,8 @@ const AdminUsers = () => {
                     {u.superAdmin ? (
                       <span className={styles.roleFixed}>{ROLE_LABELS[u.role] || u.role}</span>
                     ) : (
-                      <select
-                        className={styles.roleSelect}
+                      <Select
+                        pill
                         value={pendingOwner === u.id ? SHOP_OWNER : u.role}
                         onChange={(e) => handleRoleChange(u, e.target.value)}
                         disabled={busy}
@@ -279,11 +280,11 @@ const AdminUsers = () => {
                             {ROLE_LABELS[r.value]}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     )}
                     {(pendingOwner === u.id || u.role === SHOP_OWNER) && !u.superAdmin && (
-                      <select
-                        className={styles.roleSelect}
+                      <Select
+                        pill
                         value={pendingOwner === u.id ? '' : u.shopSlug || ''}
                         onChange={(e) => handleShopChange(u, e.target.value)}
                         disabled={busy}
@@ -295,7 +296,7 @@ const AdminUsers = () => {
                             {shop.name}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     )}
                     <button type="button" className={styles.editBtn} onClick={() => handleRename(u)} disabled={busy}>
                       Имя

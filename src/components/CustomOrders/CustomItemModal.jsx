@@ -16,6 +16,7 @@ import AutoTextarea from './AutoTextarea';
 import ModelerSelect from './ModelerSelect';
 import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomItemModal.module.css';
+import Select from '../shared/Select/Select';
 
 const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
   const [form, setForm] = useState({
@@ -150,7 +151,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
           {!hideStatus && (
             <label className={styles.field}>
               <span className={styles.label}>статус</span>
-              <select className={styles.select} value={form.status} onChange={(e) => setF('status', e.target.value)}>
+              <Select value={form.status} onChange={(e) => setF('status', e.target.value)}>
                 {!CUSTOM_EDIT_STATUSES.some((s) => s.value === form.status) && (
                   <option value={form.status} disabled>
                     {CUSTOM_STATUS_LABELS[form.status] || form.status}
@@ -159,7 +160,7 @@ const CustomItemModal = ({ item, onClose, onSaved, onDeleted, hideStatus }) => {
                 {CUSTOM_EDIT_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
-              </select>
+              </Select>
             </label>
           )}
         </div>

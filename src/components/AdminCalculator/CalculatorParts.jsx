@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SOURCE_LABELS } from './calculatorModel';
 import styles from './AdminCalculator.module.css';
+import Select from '../shared/Select/Select';
 
 export const HintList = ({ hints }) => {
   if (!hints?.length) return null;
@@ -106,7 +107,7 @@ export const TriStateSelect = ({ label, hint, value, autoValue, onChange, disabl
       <span className={styles.labelHead}>
         <span>{label}</span>
       </span>
-      <select
+      <Select
         className={styles.select}
         value={current}
         disabled={disabled}
@@ -115,7 +116,7 @@ export const TriStateSelect = ({ label, hint, value, autoValue, onChange, disabl
         <option value="auto">{autoLabel}</option>
         <option value="yes">да</option>
         <option value="no">нет</option>
-      </select>
+      </Select>
       {hint && <span className={styles.hint}>{hint}</span>}
     </label>
   );

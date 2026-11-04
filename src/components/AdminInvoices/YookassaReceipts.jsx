@@ -4,6 +4,7 @@ import apiClient from '../../apiClient';
 import { EMAIL_RE } from '../../utils/phone';
 import { formatAmount, formatDate, authHeaders, RefreshButton } from './invoiceShared';
 import styles from './AdminInvoices.module.css';
+import Select from '../shared/Select/Select';
 
 const PRODUCT_LABELS = {
   GUIDE: 'Гайд',
@@ -421,11 +422,11 @@ const YookassaReceipts = () => {
             </label>
             <label className={styles.label}>
               Тип продукта
-              <select
+              <Select
                 name="productCode"
                 value={form.productCode}
                 onChange={handleChange}
-                className={styles.input}
+                className={styles.selectField}
               >
                 <option value="">Не указан</option>
                 {Object.entries(PRODUCT_LABELS).map(([code, label]) => (
@@ -433,7 +434,7 @@ const YookassaReceipts = () => {
                     {label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
           <button type="submit" className={styles.submit} disabled={saving}>

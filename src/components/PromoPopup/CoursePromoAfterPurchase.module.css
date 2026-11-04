@@ -1,0 +1,23 @@
+.open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  margin-top: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  text-transform: lowercase;
+  color: var(--shop-cta-fg, #fff);
+  background: var(--shop-cta-bg, #111);
+  transition: background 0.15s ease;
+}
+
+.open:hover {
+  background: var(--shop-cta-hover-bg, #333);
+  color: var(--shop-cta-hover-fg, #fff);
+}

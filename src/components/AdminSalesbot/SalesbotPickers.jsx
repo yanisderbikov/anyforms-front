@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from './AdminSalesbot.module.css';
+import Select from '../shared/Select/Select';
 
 // Выбор бота по имени из списка amoCRM; в таблицу уходит id. Если список не загрузился
 // или бота в нём нет — ввод id вручную.
@@ -12,7 +13,7 @@ export const BotPicker = ({ bots, botsError, value, onChange, autoFocus }) => {
   return (
     <div className={styles.picker}>
       {useSelect ? (
-        <select
+        <Select
           className={styles.select}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -26,7 +27,7 @@ export const BotPicker = ({ bots, botsError, value, onChange, autoFocus }) => {
               {(b.name || 'без названия') + ' · ' + b.id}
             </option>
           ))}
-        </select>
+        </Select>
       ) : (
         <input
           className={styles.input}
@@ -64,7 +65,7 @@ export const PipelinePicker = ({ pipelines, pipelinesError, pipelineId, statusId
     <div className={styles.picker}>
       {useSelect ? (
         <>
-          <select
+          <Select
             className={styles.select}
             value={pipelineId}
             onChange={(e) => onChange({ pipelineId: e.target.value, statusId: '' })}
@@ -78,8 +79,8 @@ export const PipelinePicker = ({ pipelines, pipelinesError, pipelineId, statusId
                 {(p.name || 'без названия') + ' · ' + p.id}
               </option>
             ))}
-          </select>
-          <select
+          </Select>
+          <Select
             className={styles.select}
             value={statusId}
             onChange={(e) => onChange({ pipelineId, statusId: e.target.value })}
@@ -93,7 +94,7 @@ export const PipelinePicker = ({ pipelines, pipelinesError, pipelineId, statusId
                 {(s.name || 'без названия') + ' · ' + s.id}
               </option>
             ))}
-          </select>
+          </Select>
         </>
       ) : (
         <>

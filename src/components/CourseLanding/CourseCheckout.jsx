@@ -48,14 +48,19 @@ const CourseCheckout = () => {
     saveCheckoutContact({ fullName, phone, email });
   }, [fullName, phone, email]);
 
-  const checkPromo = async (rawCode) => {
+  const checkPromo = async (rawCode, contact = { phone, email }) => {
     const code = normalizePromoCode(rawCode);
     if (!code) return;
     setPromoChecking(true);
     setPromoError('');
     try {
       const { data } = await apiClient.instance.get('/api/payment/promo-check', {
-        params: { code, productCode: COURSE_PRODUCT.code },
+        params: {
+          code,
+          productCode: COURSE_PRODUCT.code,
+          phone: isPhoneValid(contact.phone) ? toSubmitPhone(contact.phone) : undefined,
+          email: EMAIL_RE.test(contact.email.trim()) ? contact.email.trim() : undefined,
+        },
       });
       if (data?.valid) {
         setAppliedPromo(data);
@@ -94,6 +99,12 @@ const CourseCheckout = () => {
   const canSubmit = nameValid && phoneValid && emailValid && acceptTerms && !submitting;
 
   const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
+
+  const recheckPersonalPromo = () => {
+    if (appliedPromo?.personal || (promoError && promoInput.trim())) {
+      checkPromo(promoInput || appliedPromo?.code);
+    }
+  };
 
   const nameError = touched.fullName && !nameValid ? 'Укажите ваше ФИО.' : '';
   const phoneError =
@@ -247,7 +258,10 @@ const CourseCheckout = () => {
               placeholder="+7 999 123-45-67"
               value={phone}
               onChange={handlePhoneChange}
-              onBlur={() => markTouched('phone')}
+              onBlur={() => {
+                markTouched('phone');
+                recheckPersonalPromo();
+              }}
               aria-invalid={Boolean(phoneError)}
               required
             />
@@ -268,7 +282,10 @@ const CourseCheckout = () => {
                 setEmail(e.target.value);
                 setError('');
               }}
-              onBlur={() => markTouched('email')}
+              onBlur={() => {
+                markTouched('email');
+                recheckPersonalPromo();
+              }}
               aria-invalid={Boolean(emailError)}
               required
             />
@@ -306,6 +323,12 @@ const CourseCheckout = () => {
               </button>
             </div>
             {promoError && <p className={styles.fieldError}>{promoError}</p>}
+            {appliedPromo?.personal && (
+              <p className={styles.hint}>
+                Промокод персональный: он сработает только с номером телефона, который вы указывали
+                при заказе в магазине.
+              </p>
+            )}
             {appliedPromo && (
               <p className={styles.promoOk}>
                 Промокод {appliedPromo.code} применён: скидка{' '}

@@ -27,7 +27,9 @@ export const fillTemplate = (text, popup) =>
     .replaceAll('{days}', daysLabel(popup?.codeTtlDays))
     .replaceAll('{minOrder}', minOrderLabel(popup?.minOrderKopecks))
     .replaceAll('{code}', popup?.code || '')
-    .replaceAll('{until}', formatValidUntil(popup?.codeValidUntil));
+    .replaceAll('{until}', formatValidUntil(popup?.codeValidUntil))
+    .replaceAll('{price}', popup?.discountedPriceKopecks != null ? formatRub(popup.discountedPriceKopecks) : '')
+    .replaceAll('{oldPrice}', popup?.coursePriceKopecks != null ? formatRub(popup.coursePriceKopecks) : '');
 
 export const formatValidUntil = (iso) => {
   if (!iso) return '';
