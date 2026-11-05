@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fillTemplate, formatValidUntil } from './promoPopupText';
-import styles from './PostPurchasePromo.module.css';
-import courseStyles from './CoursePromoAfterPurchase.module.css';
+import { ArrowIcon, CopyIcon } from '../Marketplace/successIcons';
+import { discountLabel, fillTemplate, formatValidUntil } from './promoPopupText';
+import styles from './CoursePromoAfterPurchase.module.css';
 
 export const COURSE_LANDING_PATH = '/course';
 
@@ -22,11 +22,9 @@ const CoursePromoAfterPurchase = ({ promo, onCopy, onOpen, preview = false }) =>
   const path = buildCoursePromoPath(promo.code);
   const until = formatValidUntil(promo.validUntil);
   const note = [
-    'Код одноразовый',
-    promo.phoneTail
-      ? `только для номера телефона из этого заказа (…${promo.phoneTail})`
-      : 'только для телефона и почты из этого заказа',
-    until ? `действует по ${until} включительно` : null,
+    'Одноразовый',
+    promo.phoneTail ? `только для номера …${promo.phoneTail}` : 'только для телефона и почты из этого заказа',
+    until ? `действует по ${until}` : null,
   ]
     .filter(Boolean)
     .join(', ');
@@ -46,19 +44,30 @@ const CoursePromoAfterPurchase = ({ promo, onCopy, onOpen, preview = false }) =>
     : { onClick: () => onOpen?.(promo.code) };
 
   return (
-    <section className={styles.card} aria-label="Скидка на курс">
-      <p className={styles.eyebrow}>Бонус к покупке</p>
-      <h2 className={styles.title}>{fillTemplate(promo.title, template)}</h2>
-      {promo.description && <p className={styles.text}>{fillTemplate(promo.description, template)}</p>}
-      <button type="button" className={styles.codeBox} onClick={copyCode} aria-label="Скопировать промокод">
-        <span className={styles.code}>{promo.code}</span>
-        <span className={styles.copy}>{copied ? 'скопировано' : 'скопировать'}</span>
-      </button>
-      <Link className={courseStyles.open} to={path} {...openProps}>
-        {promo.buttonText || 'Открыть курс со скидкой'}
-      </Link>
-      <p className={styles.note}>{note}. По кнопке скидка применится сама.</p>
-    </section>
+    <div className={styles.frame}>
+      <section className={styles.gift} aria-label="Скидка на курс">
+        <div className={styles.offer}>
+          <p className={styles.eyebrow}>Подарок к заказу</p>
+          <span className={styles.amount}>−{discountLabel(template)}</span>
+          <h2 className={styles.title}>{fillTemplate(promo.title, template)}</h2>
+          {promo.description && <p className={styles.text}>{fillTemplate(promo.description, template)}</p>}
+        </div>
+        <div className={styles.actions}>
+          <div className={styles.codeBox}>
+            <span className={styles.code}>{promo.code}</span>
+            <button type="button" className={styles.copy} onClick={copyCode}>
+              <CopyIcon />
+              {copied ? 'скопировано' : 'скопировать код'}
+            </button>
+          </div>
+          <Link className={styles.open} to={path} {...openProps}>
+            {promo.buttonText || 'Открыть курс со скидкой'}
+            <ArrowIcon />
+          </Link>
+          <p className={styles.note}>{note}. По кнопке скидка применится сама.</p>
+        </div>
+      </section>
+    </div>
   );
 };
 
