@@ -15,6 +15,7 @@ import OptionsTable from './OptionsTable';
 import Breakdown from './Breakdown';
 import { errorMessage, uploadReference } from '../../services/orderCalculator';
 import styles from './AdminCalculator.module.css';
+import Select from '../shared/Select/Select';
 
 const REFERENCE_ACCEPT = 'image/*,.pdf,.stl,.obj,.3mf,.step,.stp,.zip';
 
@@ -157,7 +158,7 @@ const PositionCard = ({
         </label>
         <label className={styles.label}>
           Материал заливки
-          <select
+          <Select
             className={styles.select}
             value={position.pourMaterial}
             onChange={(e) => onChange({ pourMaterial: e.target.value })}
@@ -168,7 +169,7 @@ const PositionCard = ({
                 {m.hint ? ` — ${m.hint}` : ''}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         {!position.digitalOnly && (
           <NumberField

@@ -4,6 +4,7 @@ import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
 import { useListScrollMemory } from '../../hooks/useListScrollMemory';
 import styles from './AdminProducts.module.css';
+import Select from '../shared/Select/Select';
 
 // Магазин по умолчанию: витрина anyforms.
 const DEFAULT_SHOP_SLUG = 'anyforms';
@@ -159,8 +160,8 @@ const AdminProducts = () => {
           onChange={(e) => setNameFilter(e.target.value)}
           aria-label="Поиск по названию"
         />
-        <select
-          className={styles.shopFilter}
+        <Select
+          pill
           value={shopFilter}
           onChange={(e) => setShopFilter(e.target.value)}
           aria-label="Фильтр по магазину"
@@ -171,24 +172,17 @@ const AdminProducts = () => {
               {shop.name}
             </option>
           ))}
-        </select>
-        <div className={styles.statusTabs} role="group" aria-label="Фильтр по статусу">
-          {[
-            { key: 'all', label: 'Все' },
-            { key: 'active', label: 'Активные' },
-            { key: 'off', label: 'Выключенные' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              className={statusFilter === tab.key ? `${styles.tab} ${styles.tabActive}` : styles.tab}
-              aria-pressed={statusFilter === tab.key}
-              onClick={() => setStatusFilter(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        </Select>
+        <Select
+          pill
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Фильтр по статусу"
+        >
+          <option value="all">Все статусы</option>
+          <option value="active">Активные</option>
+          <option value="off">Выключенные</option>
+        </Select>
       </div>
 
       {pageError && <p className={`${styles.banner} ${styles.bannerError}`}>{pageError}</p>}

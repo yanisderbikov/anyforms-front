@@ -749,6 +749,13 @@ const CourseLanding = () => {
               По промокоду {promo.code} вам доступна скидка{' '}
               {promoDiscountLabel(promo)} — она уже применилась к ценам курса.
               {promoDeadline && <> Скидка действует {promoDeadline}.</>}
+              {promo.personal && (
+                <>
+                  {' '}
+                  Промокод персональный: при оплате укажите номер телефона и почту, которые вы
+                  указывали при заказе в магазине.
+                </>
+              )}
             </p>
             <button
               type="button"
@@ -812,6 +819,7 @@ const CourseLanding = () => {
               <p className={styles.promoStrip}>
                 Промокод {promo.code} применён — скидка {promoDiscountLabel(promo)}
                 {promoDeadline ? `. Ваша скидка действует ${promoDeadline}.` : '.'}
+                {promo.personal ? ' Код персональный: при оплате укажите телефон из заказа в магазине.' : ''}
               </p>
             )}
             <p className={`${styles.preorderNote} ${styles.preorderNoteDesktop}`}>

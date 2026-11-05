@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import apiClient from '../../apiClient';
 import { getShops } from '../../services/itemsService';
 import styles from './ShopSalesReport.module.css';
+import Select from '../shared/Select/Select';
 
 // Локальная дата в формате YYYY-MM-DD (toISOString сдвигает день из-за UTC).
 const toInputDate = (d) => {
@@ -149,8 +150,8 @@ const ShopSalesReport = () => {
 
       <div className={styles.controls}>
         {ownerShop === null && (
-          <select
-            className={styles.select}
+          <Select
+            pill
             value={shopSlug}
             onChange={(e) => setShopSlug(e.target.value)}
             aria-label="Магазин для отчёта"
@@ -161,7 +162,7 @@ const ShopSalesReport = () => {
                 {shop.name}
               </option>
             ))}
-          </select>
+          </Select>
         )}
         <div className={styles.dates}>
           <input

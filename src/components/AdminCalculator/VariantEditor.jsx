@@ -9,6 +9,7 @@ import {
 } from './calculatorModel';
 import { NumberField, Section, TriStateSelect } from './CalculatorParts';
 import styles from './AdminCalculator.module.css';
+import Select from '../shared/Select/Select';
 
 const DIGITAL_FIELDS = new Set(['fdmProjectHours']);
 const MODEL_PRICE = 'modelContractorPrice';
@@ -54,7 +55,7 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
       <div className={styles.grid}>
         <label className={styles.label}>
           Тип формы
-          <select
+          <Select
             className={styles.select}
             value={variant.formType}
             onChange={(e) => onChange({ formType: e.target.value })}
@@ -64,12 +65,12 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
                 {t.label}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         {!digital && (
           <label className={styles.label}>
             Мастер-модель
-            <select
+            <Select
               className={styles.select}
               value={variant.masterType}
               onChange={(e) => onChange({ masterType: e.target.value })}
@@ -79,7 +80,7 @@ const VariantEditor = ({ variant, option, catalog, founder, digital, modelRequir
                   {m.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         )}
         {modelRequired && (

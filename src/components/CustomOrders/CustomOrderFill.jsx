@@ -16,6 +16,7 @@ import CustomItemModal from './CustomItemModal';
 import AutoTextarea from './AutoTextarea';
 import UploadProgress from '../shared/UploadProgress';
 import styles from './CustomOrderFill.module.css';
+import Select from '../shared/Select/Select';
 
 const EMPTY = { productName: '', description: '', quantity: '', status: 'MODELING', nda: false };
 
@@ -166,13 +167,13 @@ const CustomOrderFill = () => {
         <input className={styles.inputNarrow} type="text" inputMode="numeric" placeholder="кол-во" value={form.quantity} onChange={(e) => setF('quantity', e.target.value.replace(/\D/g, ''))} />
 
         <span className={styles.label}>статус</span>
-        <select className={styles.statusSelect} value={form.status} onChange={(e) => setF('status', e.target.value)}>
+        <Select className={styles.statusSelect} value={form.status} onChange={(e) => setF('status', e.target.value)}>
           {CUSTOM_STATUSES.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label.toLowerCase()}
             </option>
           ))}
-        </select>
+        </Select>
 
         <label className={styles.checkRow}>
           <input type="checkbox" checked={form.nda} onChange={(e) => setF('nda', e.target.checked)} />

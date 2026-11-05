@@ -15,6 +15,7 @@ import {
 } from './salesbotApi';
 import { BotPicker, PipelinePicker } from './SalesbotPickers';
 import styles from './AdminSalesbotManualRun.module.css';
+import Select from '../shared/Select/Select';
 
 const POLL_MS = 3000;
 
@@ -243,11 +244,11 @@ const AdminSalesbotManualRun = () => {
           </label>
           <label className={styles.label}>
             Тип заказа (поле сделки «Розница»)
-            <select className={styles.select} value={retail} onChange={(e) => setRetail(e.target.value)}>
+            <Select className={styles.select} value={retail} onChange={(e) => setRetail(e.target.value)}>
               <option value="">любой</option>
               <option value="true">только розница</option>
               <option value="false">только не розница (под заказ)</option>
-            </select>
+            </Select>
           </label>
           <label className={styles.label}>
             Только лиды с тегом (необязательно)

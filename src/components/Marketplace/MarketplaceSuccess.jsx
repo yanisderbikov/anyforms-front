@@ -8,6 +8,7 @@ import {
   trackPaymentFailed,
   trackPaymentReturn,
   trackPromoAfterPurchase,
+  trackCoursePromoAfterPurchase,
   readCheckoutSnapshot,
   clearCheckoutSnapshot,
 } from '../../services/analytics';
@@ -15,7 +16,9 @@ import { clearCheckoutFormPromo } from './checkoutFormStorage';
 import { useShopTheme } from './shopThemes';
 import { getDeviceId } from '../../shared/deviceId';
 import PostPurchasePromo from '../PromoPopup/PostPurchasePromo';
-import styles from './checkout.module.css';
+import CoursePromoAfterPurchase from '../PromoPopup/CoursePromoAfterPurchase';
+import { ArrowIcon, CheckIcon, ChevronIcon, CrossIcon } from './successIcons';
+import styles from './MarketplaceSuccess.module.css';
 
 const PAYMENT_TYPE = 'online';
 const PAYMENT_RETURN_SENT_PREFIX = 'anyforms_payment_return_sent_';
@@ -47,6 +50,14 @@ const formatRub = (value) => {
   return `${num.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽`;
 };
 
+const pluralItems = (n) => {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'товар';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'товара';
+  return 'товаров';
+};
+
 const MarketplaceSuccess = () => {
   const { clear, shopSlug } = useCart();
   // Витрина, с которой был оформлен заказ: clear() чистит только товары,
@@ -62,6 +73,7 @@ const MarketplaceSuccess = () => {
   const isFail = searchParams.get('status') === 'fail';
   const [order, setOrder] = useState(null);
   const [afterPromo, setAfterPromo] = useState(null);
+  const [coursePromo, setCoursePromo] = useState(null);
 
   // Успех: отправляем purchase (состав заказа — из снапшота, сохранённого перед
   // редиректом на оплату) и очищаем корзину. trackPurchase сам защищён от
@@ -163,21 +175,52 @@ const MarketplaceSuccess = () => {
     };
   }, [orderNumber, isFail]);
 
+  useEffect(() => {
+    if (!orderNumber || isFail) return undefined;
+    let cancelled = false;
+    let attempts = 0;
+    let timer = null;
+    const load = () => {
+      apiClient.instance
+        .post('/api/public/promo-popup/course-after-purchase', { orderNumber, deviceId: getDeviceId() })
+        .then(({ status, data }) => {
+          if (cancelled) return;
+          if (status === 202) {
+            attempts += 1;
+            if (attempts < AFTER_PURCHASE_MAX_ATTEMPTS) timer = window.setTimeout(load, AFTER_PURCHASE_RETRY_MS);
+            return;
+          }
+          if (status !== 200 || !data?.code) return;
+          setCoursePromo(data);
+          trackCoursePromoAfterPurchase('shown', data);
+        })
+        .catch(() => {});
+    };
+    load();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [orderNumber, isFail]);
+
   const handlePromoCopy = () => {
     if (!afterPromo) return;
     trackPromoAfterPurchase('copied', afterPromo);
   };
 
   const deliveryAddress = [order?.pvzCity, order?.pvzStreet].filter(Boolean).join(', ');
-  const deliveryLabel = order?.deliveryMethod === 'PICKUP' ? 'Самовывоз' : 'Пункт выдачи СДЭК';
+  const deliveryLabel = order?.deliveryMethod === 'PICKUP' ? 'Самовывоз' : 'СДЭК';
   const totalFormatted = order?.totalRub ? formatRub(order.totalRub) : null;
+  const itemsCount = (order?.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   return (
     <div className={pageClass} style={theme?.style} id="top">
-      <div className={styles.inner}>
-        <div className={styles.centered}>
-          <div className={isFail ? styles.failIcon : styles.successIcon}>{isFail ? '✕' : '✓'}</div>
-          <h1 className={styles.centeredTitle}>
+      <div className={styles.sheet}>
+        <div className={styles.head}>
+          <div className={isFail ? `${styles.icon} ${styles.iconFail}` : styles.icon}>
+            {isFail ? <CrossIcon /> : <CheckIcon />}
+          </div>
+          <h1 className={styles.title}>
             {isFail ? (
               'Оплата не прошла'
             ) : orderNumber ? (
@@ -188,7 +231,7 @@ const MarketplaceSuccess = () => {
               'Заказ оформлен'
             )}
           </h1>
-          <p className={styles.centeredText}>
+          <p className={styles.text}>
             {isFail ? (
               <>
                 Платёж не прошёл, деньги не списаны — заказ не оформлен.
@@ -202,68 +245,97 @@ const MarketplaceSuccess = () => {
                 )}
               </>
             ) : (
-              <>
-                Спасибо за заказ! Мы отправили письмо с предварительным чеком и составом заказа на вашу почту.
-                Соберём заказ и передадим его в выбранный пункт выдачи СДЭК — трек-номер пришлём отдельно.
-              </>
+              'Спасибо за заказ! Чек и состав заказа отправили на почту.'
             )}
           </p>
+        </div>
 
-          {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
+        {!isFail && (
+          <ol className={styles.steps}>
+            <li className={styles.step}>
+              <span className={`${styles.stepLine} ${styles.stepLineDone}`} />
+              <span className={`${styles.stepDot} ${styles.stepDotDone}`}>
+                <CheckIcon />
+              </span>
+              <span className={styles.stepTitle}>Чек отправлен</span>
+              <span className={styles.stepSub}>Письмо уже на почте</span>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepLine} />
+              <span className={styles.stepDot}>2</span>
+              <span className={styles.stepTitle}>Передадим в СДЭК</span>
+              <span className={styles.stepSub}>{deliveryAddress || 'В выбранный пункт выдачи'}</span>
+            </li>
+            <li className={styles.step}>
+              <span className={styles.stepDot}>3</span>
+              <span className={styles.stepTitle}>
+                <span className={styles.stepTitleWide}>Пришлём трек-номер</span>
+                <span className={styles.stepTitleShort}>Пришлём трек</span>
+              </span>
+              <span className={styles.stepSub}>Отдельным сообщением</span>
+            </li>
+          </ol>
+        )}
 
-          {order?.items?.length > 0 && (
-            <div className={styles.receipt}>
-              <p className={styles.receiptTitle}>
-                Состав заказа{orderNumber ? ` #${orderNumber}` : ''}
-              </p>
+        {!isFail && coursePromo && (
+          <CoursePromoAfterPurchase
+            promo={coursePromo}
+            onCopy={() => trackCoursePromoAfterPurchase('copied', coursePromo)}
+            onOpen={() => trackCoursePromoAfterPurchase('opened', coursePromo)}
+          />
+        )}
+
+        {!isFail && afterPromo && <PostPurchasePromo promo={afterPromo} onCopy={handlePromoCopy} />}
+
+        {order?.items?.length > 0 && (
+          <details className={styles.receipt} open>
+            <summary className={styles.receiptSummary}>
+              <span className={styles.receiptTitle}>
+                Состав заказа · {itemsCount} {pluralItems(itemsCount)}
+              </span>
+              <span className={styles.receiptTotal}>
+                {totalFormatted}
+                <span className={styles.receiptChevron}>
+                  <ChevronIcon />
+                </span>
+              </span>
+            </summary>
+            <div className={styles.receiptBody}>
               {order.items.map((item, idx) => (
                 <div key={idx} className={styles.receiptRow}>
-                  <span className={styles.receiptName}>
-                    {item.name} <span className={styles.receiptQty}>× {item.quantity}</span>
+                  <span>
+                    {item.name} × {item.quantity}
                   </span>
-                  {item.amountRub && (
-                    <span className={styles.receiptPrice}>{formatRub(item.amountRub)}</span>
-                  )}
+                  {item.amountRub && <span className={styles.receiptPrice}>{formatRub(item.amountRub)}</span>}
                 </div>
               ))}
-              {totalFormatted && (
-                <div className={`${styles.receiptRow} ${styles.receiptTotal}`}>
-                  <span>Итого</span>
-                  <span>{totalFormatted}</span>
-                </div>
-              )}
               {deliveryAddress && (
-                <p className={styles.receiptDelivery}>
+                <p className={isFail ? styles.receiptDelivery : `${styles.receiptDelivery} ${styles.mobileOnly}`}>
                   {deliveryLabel}: {deliveryAddress}
                 </p>
               )}
             </div>
+          </details>
+        )}
+
+        <Link className={styles.back} to={isFail ? '/shop/checkout' : shopBase}>
+          {isFail ? 'попробовать ещё раз' : 'вернуться в магазин'}
+          <ArrowIcon />
+        </Link>
+
+        <p className={styles.support}>
+          Если понадобится помощь — напишите в поддержку в Telegram:{' '}
+          <a className={styles.supportLink} href={supportTgLink} target="_blank" rel="noopener noreferrer">
+            @{supportTg}
+          </a>
+          {orderNumber && (
+            <>
+              {' '}
+              и укажите номер заказа <strong>#{orderNumber}</strong>
+            </>
           )}
-
-          <Link className={styles.primaryLink} to={isFail ? '/shop/checkout' : shopBase}>
-            <span>{isFail ? 'Попробовать ещё раз' : 'Вернуться в магазин'}</span>
-            <span className={styles.ctaArrow} aria-hidden="true">→</span>
-          </Link>
-
-          <p className={styles.support}>
-            Если понадобится помощь — напишите в поддержку в Telegram:{' '}
-            <a
-              className={styles.inlineLink}
-              href={supportTgLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              @{supportTg}
-            </a>
-            {orderNumber && (
-              <>
-                {' '}
-                и укажите номер заказа <strong>#{orderNumber}</strong>
-              </>
-            )}
-            .
-          </p>
-        </div>
+          .
+        </p>
       </div>
     </div>
   );

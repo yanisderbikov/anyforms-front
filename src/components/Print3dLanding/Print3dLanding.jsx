@@ -8,6 +8,7 @@ import apiClient from '../../apiClient';
 import { getUtmParams, rememberUtmParams } from '../../utils/utm';
 import { trackMetrikaGoal } from '../../services/analytics';
 import styles from './Print3dLanding.module.css';
+import Select from '../shared/Select/Select';
 
 const LANDING_LEAD_NAME = 'Заявка с лендинга 3D-печати';
 // Воронка и статус amoCRM для заявок с лендинга 3D-печати
@@ -1154,7 +1155,7 @@ const Print3dLanding = () => {
                     <label className={styles.formLabel} htmlFor="partType">
                       Что нужно изготовить
                     </label>
-                    <select
+                    <Select
                       id="partType"
                       className={styles.formSelect}
                       value={formData.partType}
@@ -1166,13 +1167,13 @@ const Print3dLanding = () => {
                           {type}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="quantity">
                       Тираж
                     </label>
-                    <select
+                    <Select
                       id="quantity"
                       className={styles.formSelect}
                       value={formData.quantity}
@@ -1184,7 +1185,7 @@ const Print3dLanding = () => {
                           {option}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel} htmlFor="description">

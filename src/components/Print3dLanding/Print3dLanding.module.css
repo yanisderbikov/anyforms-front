@@ -836,8 +836,26 @@
   color: #999;
 }
 
+select.formSelect {
+  padding: 0.8rem 36px 0.8rem 0.95rem;
+  border: 1px solid #e0e0e3;
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select.formSelect:hover {
+  border-color: #c4c4c8;
+}
+
+select.formSelect:focus {
+  border-color: var(--accent);
+  background-color: #fff;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 .formInput,
-.formSelect,
 .formTextarea {
   padding: 0.8rem 0.95rem;
   border: 1px solid #e0e0e3;
@@ -855,13 +873,11 @@
 }
 
 .formInput:hover,
-.formSelect:hover,
 .formTextarea:hover {
   border-color: #c4c4c8;
 }
 
 .formInput:focus,
-.formSelect:focus,
 .formTextarea:focus {
   outline: none;
   border-color: var(--accent);
